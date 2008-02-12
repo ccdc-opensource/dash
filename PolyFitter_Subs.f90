@@ -931,7 +931,7 @@
       ENDIF
       CALL WMenuSetState(ID_ClearPeakFitRanges, ItemEnabled, iState)
 ! Ungrey / grey out 'Clear Peaks' button in Wizard window
-      CALL WDialogSelect(IDD_PW_Page10)
+      CALL SelectDASHDialog(IDD_PW_Page10)
       CALL WDialogFieldStateLogical(IDF_ClearPeakFitRanges, NumPeakFitRange .NE. 0)
       NPeaksFitted = 0
 ! Loop over all hatched areas. Per area, count all peaks that the user has indicated to be present.
@@ -945,19 +945,23 @@
         ENDDO
       ENDIF
       IF (NPeaksFitted .GE. 10) THEN
-        CALL WDialogSelect(IDD_PW_Page7)
+        CALL SelectDASHDialog(IDD_PW_Page7)
         CALL WDialogFieldState(IDNEXT, Enabled)
-        CALL WDialogSelect(IDD_PW_Page8)
+        CALL SelectDASHDialog(IDD_PW_Page8)
         CALL WDialogFieldState(IDNEXT, Enabled) ! The 'Run >' button
-        CALL WDialogSelect(IDD_PW_Page8b)
+        CALL SelectDASHDialog(IDD_PW_Page8b)
+        CALL WDialogFieldState(IDNEXT, Enabled) ! The 'Run >' button
+        CALL SelectDASHDialog(IDD_PW_Page8c)
         CALL WDialogFieldState(IDNEXT, Enabled) ! The 'Run >' button
       ELSE
-        CALL WDialogSelect(IDD_PW_Page7)
-        CALL WDialogGetRadioButton(IDF_RADIO1, IndexOption) ! 'Index now' or 'Enter known cell'
-        CALL WDialogFieldStateLogical(IDNEXT, IndexOption .EQ. 3)
-        CALL WDialogSelect(IDD_PW_Page8)
+        CALL SelectDASHDialog(IDD_PW_Page7)
+        CALL DASHWDialogGetRadioButton(IDF_RADIO1, IndexOption) ! 'Index now' or 'Enter known cell'
+        CALL WDialogFieldStateLogical(IDNEXT, IndexOption .EQ. 4)
+        CALL SelectDASHDialog(IDD_PW_Page8)
         CALL WDialogFieldState(IDNEXT, Disabled) ! The 'Run >' button
-        CALL WDialogSelect(IDD_PW_Page8b)
+        CALL SelectDASHDialog(IDD_PW_Page8b)
+        CALL WDialogFieldState(IDNEXT, Disabled) ! The 'Run >' button
+        CALL SelectDASHDialog(IDD_PW_Page8c)
         CALL WDialogFieldState(IDNEXT, Disabled) ! The 'Run >' button
       ENDIF
       CALL PopActiveWindowID
@@ -978,15 +982,15 @@
       CALL PushActiveWindowID
       IF (WeCanDoAPawleyRefinement()) THEN
         CALL SetModeMenuState(0,1)
-        CALL WDialogSelect(IDD_PW_Page10)
+        CALL SelectDASHDialog(IDD_PW_Page10)
         CALL WDialogFieldState(IDNEXT,Enabled)
-        CALL WDialogSelect(IDD_Pawley_Status)
+        CALL SelectDASHDialog(IDD_Pawley_Status)
         CALL WDialogFieldState(IDF_PawRef_Refine,Enabled)
       ELSE
         CALL SetModeMenuState(0,-1)
-        CALL WDialogSelect(IDD_PW_Page10)
+        CALL SelectDASHDialog(IDD_PW_Page10)
         CALL WDialogFieldState(IDNEXT,Disabled)
-        CALL WDialogSelect(IDD_Pawley_Status)
+        CALL SelectDASHDialog(IDD_Pawley_Status)
         CALL WDialogFieldState(IDF_PawRef_Refine,Disabled)
       ENDIF
       CALL PopActiveWindowID
@@ -1012,13 +1016,13 @@
 !C Try to get the peak shape parameters from the View Pawley dialogue. If this fails, use the
 !C values in memory.
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_ViewPawley)
-      CALL WDialogGetReal(IDF_Sigma1, tPeakShapeSigma(1))
-      CALL WDialogGetReal(IDF_Sigma2, tPeakShapeSigma(2))
-      CALL WDialogGetReal(IDF_Gamma1, tPeakShapeGamma(1))
-      CALL WDialogGetReal(IDF_Gamma2, tPeakShapeGamma(2))
-      CALL WDialogGetReal(IDF_HPSL, tPeakShapeHPSL)
-      CALL WDialogGetReal(IDF_HMSL, tPeakShapeHMSL)
+      CALL SelectDASHDialog(IDD_ViewPawley)
+      CALL DASHWDialogGetReal(IDF_Sigma1, tPeakShapeSigma(1))
+      CALL DASHWDialogGetReal(IDF_Sigma2, tPeakShapeSigma(2))
+      CALL DASHWDialogGetReal(IDF_Gamma1, tPeakShapeGamma(1))
+      CALL DASHWDialogGetReal(IDF_Gamma2, tPeakShapeGamma(2))
+      CALL DASHWDialogGetReal(IDF_HPSL, tPeakShapeHPSL)
+      CALL DASHWDialogGetReal(IDF_HMSL, tPeakShapeHMSL)
       IF ((tPeakShapeSigma(1) .GT. -100.0)  .AND. (tPeakShapeSigma(1) .LT. 100.0) .AND.   &
           (tPeakShapeSigma(2) .GT. -100.0)  .AND. (tPeakShapeSigma(2) .LT. 100.0) .AND.   &
           (tPeakShapeGamma(1) .GT. -100.0)  .AND. (tPeakShapeGamma(1) .LT. 100.0) .AND.   &
@@ -1087,27 +1091,27 @@
       CALL WSelectFile(FILTER, iFlags, tFileName, 'Enter DICVOL file name', IFTYPE)
       IF ((LEN_TRIM(tFileName) .EQ. 0) .OR. (WInfoDialog(ExitButtonCommon) .NE. CommonOK)) RETURN
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Index_Preparation)
-      CALL WDialogGetReal(IDF_wavelength1, Lambda)
-      CALL WDialogGetReal(IDF_Indexing_MinVol, Rvpar(1))
-      CALL WDialogGetReal(IDF_Indexing_MaxVol, Rvpar(2))
-      CALL WDialogGetReal(IDF_Indexing_Maxa, Rcpar(1))
-      CALL WDialogGetReal(IDF_Indexing_Maxb, Rcpar(2))
-      CALL WDialogGetReal(IDF_Indexing_Maxc, Rcpar(3))
-      CALL WDialogGetReal(IDF_Indexing_MinAng, Rcpar(4))
-      CALL WDialogGetReal(IDF_Indexing_MaxAng, Rcpar(5))
-      CALL WDialogGetReal(IDF_Indexing_Density, Rdens)
-      CALL WDialogGetReal(IDF_Indexing_MolWt,   Rmolwt)
-      CALL WDialogGetReal(IDF_Indexing_Fom,     tFoM)
-      CALL WDialogGetReal(IDF_ZeroPoint,        Rexpzp)
-      CALL WDialogGetCheckBox(IDF_Indexing_Cubic,      iSystem(1))
-      CALL WDialogGetCheckBox(IDF_Indexing_Tetra,      iSystem(2))
-      CALL WDialogGetCheckBox(IDF_Indexing_Hexa,       iSystem(3))
-      CALL WDialogGetCheckBox(IDF_Indexing_Ortho,      iSystem(4))
-      CALL WDialogGetCheckBox(IDF_Indexing_Monoclinic, iSystem(5))
-      CALL WDialogGetCheckBox(IDF_Indexing_Triclinic,  iSystem(6))
-      CALL WDialogGetRadioButton(IDF_Indexing_UseErrors,  UseErr)
-      CALL WDialogGetReal(IDF_eps,Epsilon)
+      CALL SelectDASHDialog(IDD_Index_Preparation)
+      CALL DASHWDialogGetReal(IDF_wavelength1, Lambda)
+      CALL DASHWDialogGetReal(IDF_Indexing_MinVol, Rvpar(1))
+      CALL DASHWDialogGetReal(IDF_Indexing_MaxVol, Rvpar(2))
+      CALL DASHWDialogGetReal(IDF_Indexing_Maxa, Rcpar(1))
+      CALL DASHWDialogGetReal(IDF_Indexing_Maxb, Rcpar(2))
+      CALL DASHWDialogGetReal(IDF_Indexing_Maxc, Rcpar(3))
+      CALL DASHWDialogGetReal(IDF_Indexing_MinAng, Rcpar(4))
+      CALL DASHWDialogGetReal(IDF_Indexing_MaxAng, Rcpar(5))
+      CALL DASHWDialogGetReal(IDF_Indexing_Density, Rdens)
+      CALL DASHWDialogGetReal(IDF_Indexing_MolWt,   Rmolwt)
+      CALL DASHWDialogGetReal(IDF_Indexing_Fom,     tFoM)
+      CALL DASHWDialogGetReal(IDF_ZeroPoint,        Rexpzp)
+      CALL DASHWDialogGetCheckBox(IDF_Indexing_Cubic,      iSystem(1))
+      CALL DASHWDialogGetCheckBox(IDF_Indexing_Tetra,      iSystem(2))
+      CALL DASHWDialogGetCheckBox(IDF_Indexing_Hexa,       iSystem(3))
+      CALL DASHWDialogGetCheckBox(IDF_Indexing_Ortho,      iSystem(4))
+      CALL DASHWDialogGetCheckBox(IDF_Indexing_Monoclinic, iSystem(5))
+      CALL DASHWDialogGetCheckBox(IDF_Indexing_Triclinic,  iSystem(6))
+      CALL DASHWDialogGetRadioButton(IDF_Indexing_UseErrors,  UseErr)
+      CALL DASHWDialogGetReal(IDF_eps,Epsilon)
 ! Write it out 
       OPEN(UNIT=hFile, FILE=tFileName, STATUS='UNKNOWN', ERR=999)
       WRITE(hFile,*,ERR=999) 'DICVOL input file created by DASH'

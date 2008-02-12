@@ -26,19 +26,23 @@
       CHARACTER(MaxPathLength) ::  InstallationDirectory
       CHARACTER(MaxPathLength) ::  StartUpDirectory
       CHARACTER(MaxPathLength) ::  AllUsersProfileDirectory
+      CHARACTER(MaxPathLength) ::  AppDataDirectory
+      CHARACTER(MaxPathLength) ::  PathToLicenseFile
 
       CHARACTER                ::  DIRSPACER
       DATA DIRSPACER / '\' / ! Windows spacer
 
       CHARACTER(MaxPathLength) :: VIEWEXE
       CHARACTER(20)            :: VIEWARG
-	  CHARACTER(MaxPathLength) :: MOGULEXE
-	  CHARACTER(MaxPathLength) :: DICVOLEXE
+      CHARACTER(MaxPathLength) :: MOGULEXE
+      CHARACTER(MaxPathLength) :: DICVOLEXE
       INTEGER                  :: DICVOL_ver
       INTEGER, PARAMETER       :: DICVOL_internal = 0, DICVOL04 = 4, DICVOL06 = 6
+      CHARACTER(MaxPathLength) :: McMailleEXE
+      INTEGER                  :: iMcMailleNgridOpt
 
-	  LOGICAL UseMogul
-	  DATA UseMogul / .TRUE. /
+      LOGICAL UseMogul
+      DATA UseMogul / .TRUE. /
 ! Set to false when Mogul not used for Modal Torsion Angle Ranges.
 ! Stops the user constantly being reminded that there isn't a path
 ! to a Mogul exe specified

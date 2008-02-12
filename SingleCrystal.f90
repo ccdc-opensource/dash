@@ -14,7 +14,7 @@
       LOGICAL, EXTERNAL :: Confirm
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SX_Page1)
+      CALL SelectDASHDialog(IDD_SX_Page1)
       SELECT CASE (EventType)
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
@@ -44,31 +44,31 @@
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDF_a_latt)
-              CALL WDialogGetReal(IDF_a_latt, CellPar(1))
+              CALL DASHWDialogGetReal(IDF_a_latt, CellPar(1))
               CALL UpdateCell
               CALL CheckUnitCellConsistency
             CASE (IDF_b_latt)
-              CALL WDialogGetReal(IDF_b_latt, CellPar(2))
+              CALL DASHWDialogGetReal(IDF_b_latt, CellPar(2))
               CALL UpdateCell
               CALL CheckUnitCellConsistency
             CASE (IDF_c_latt)
-              CALL WDialogGetReal(IDF_c_latt, CellPar(3))
+              CALL DASHWDialogGetReal(IDF_c_latt, CellPar(3))
               CALL UpdateCell
               CALL CheckUnitCellConsistency
             CASE (IDF_alp_latt)
-              CALL WDialogGetReal(IDF_alp_latt, CellPar(4))
+              CALL DASHWDialogGetReal(IDF_alp_latt, CellPar(4))
               CALL UpdateCell
               CALL CheckUnitCellConsistency
             CASE (IDF_bet_latt)
-              CALL WDialogGetReal(IDF_bet_latt, CellPar(5))
+              CALL DASHWDialogGetReal(IDF_bet_latt, CellPar(5))
               CALL UpdateCell
               CALL CheckUnitCellConsistency
             CASE (IDF_gam_latt)
-              CALL WDialogGetReal(IDF_gam_latt, CellPar(6))
+              CALL DASHWDialogGetReal(IDF_gam_latt, CellPar(6))
               CALL UpdateCell
               CALL CheckUnitCellConsistency
             CASE (IDF_Crystal_System_Menu)
-              CALL WDialogGetMenu(IDF_Crystal_System_Menu, LatBrav)
+              CALL DASHWDialogGetMenu(IDF_Crystal_System_Menu, LatBrav)
               CALL Upload_CrystalSystem
               CALL Generate_TicMarks
             CASE (IDF_Space_Group_Menu)
@@ -91,7 +91,7 @@
       IMPLICIT NONE
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SX_Page1a)
+      CALL SelectDASHDialog(IDD_SX_Page1a)
       SELECT CASE (EventType)
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
@@ -100,9 +100,9 @@
             CASE (IDBACK)
               CALL WizardWindowShow(IDD_SX_Page1)
             CASE (IDNEXT)
-              CALL WDialogSelect(IDD_ViewPawley)
+              CALL SelectDASHDialog(IDD_ViewPawley)
               CALL WDialogPutReal(IDF_MaxResolution, SXMaxResolution)
-              CALL WDialogSelect(IDD_SX_Page2)
+              CALL SelectDASHDialog(IDD_SX_Page2)
               CALL WDialogFieldStateLogical(IDNEXT, .FALSE.)
               PastPawley = .TRUE.
               CALL WizardWindowShow(IDD_SX_Page2)
@@ -131,7 +131,7 @@
       INTEGER iErr
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SX_Page2)
+      CALL SelectDASHDialog(IDD_SX_Page2)
       SELECT CASE (EventType)
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
@@ -142,7 +142,7 @@
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
             CASE (ID_PW_DF_Open)
-              CALL WDialogGetString(IDF_PW_DataFileName_String, CTEMP)
+              CALL DASHWDialogGetString(IDF_PW_DataFileName_String, CTEMP)
               iErr = HKLFFileOpen(CTEMP)
               CALL WDialogFieldStateLogical(IDNEXT, iErr .EQ. 0)
             CASE (IDBBROWSE)
@@ -252,7 +252,7 @@
 
       ! @@ ??
 ! Update the file name
-      CALL WDialogSelect(IDD_SX_Page2)
+      CALL SelectDASHDialog(IDD_SX_Page2)
       CALL WDialogPutString(IDF_PW_DataFileName_String, FNAME(1:KLEN))
       HKLFFileOpen = 0
       
@@ -312,7 +312,7 @@
       LOGICAL           Is_SX
       COMMON  / SXCOM / Is_SX
 
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
       INTEGER ISIG5, IArgKK
       INTEGER KXIMIN(MOBS), KXIMAX(MOBS)
       INTEGER KK, I, NLIN, iR, jR, J, K, hFile
@@ -326,11 +326,11 @@
       HKLFFileLoad = 1
       hFile = 121
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SX_Page2)
-      RecalculateESDs = WDialogGetCheckBoxLogical(IDF_RecalcESDs)
-      IgnoreLT = WDialogGetCheckBoxLogical(IDF_IgnLT)
-      IF (IgnoreLT) CALL WDialogGetReal(IDF_CutOff, CutOff)
-      AvgFriedelPairs = WDialogGetCheckBoxLogical(IDF_AvgFriedelPairs)
+      CALL SelectDASHDialog(IDD_SX_Page2)
+      RecalculateESDs = DASHWDialogGetCheckBoxLogical(IDF_RecalcESDs)
+      IgnoreLT = DASHWDialogGetCheckBoxLogical(IDF_IgnLT)
+      IF (IgnoreLT) CALL DASHWDialogGetReal(IDF_CutOff, CutOff)
+      AvgFriedelPairs = DASHWDialogGetCheckBoxLogical(IDF_AvgFriedelPairs)
       CALL PopActiveWindowID
       Is_SX = .TRUE.
       OPEN(hFile, FILE=TheFileName, STATUS='OLD', ERR=998)
@@ -474,7 +474,7 @@
       CALL Get_IPMaxMin 
       CALL Set_Wavelength(1.0)
       PAWLEYCHISQ = 1.0
-      CALL WDialogSelect(IDD_ViewPawley)
+      CALL SelectDASHDialog(IDD_ViewPawley)
  !     CALL WDialogPutReal(IDF_Sigma1,PeakShapeSigma(1),'(F10.4)')
  !     CALL WDialogPutReal(IDF_Sigma2,PeakShapeSigma(2),'(F10.4)')
  !     CALL WDialogPutReal(IDF_Gamma1,PeakShapeGamma(1),'(F10.4)')

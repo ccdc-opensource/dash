@@ -992,9 +992,9 @@
         IF (CN) FAC = 1.0/(SIN(RAD*ARGK)*SIN(0.5*RAD*ARGK))
         IF (SR) FAC = 1.0/(SIN(RAD*ARGK)*SIN(0.5*RAD*ARGK))
         IF (LX) FAC = ALPCOR
-!	This next line was the original line, but it's been commented
-!	out for numerical stability reasons and replaced by
-!	the line above
+!    This next line was the original line, but it's been commented
+!    out for numerical stability reasons and replaced by
+!    the line above
 !        IF (LX) FAC=ALPCOR*V(2)*V(2) ! V(2) = Volume of reciprocal unit cell.
         P1 = SCALEP(JPHASE)*SCALES(JSOURC)*EXP(-2.0*SSQRD*TFAC)*AMUL(KNOW)*FAC
 ! TFAC DERIVATIVE:
@@ -1674,6 +1674,9 @@
       CHARACTER*10 CONTYP(5)
       DATA CONTYP/' ', ' STRICT * ', 'SLACK TO *', ' FIXED *', ' STRICT - '/
 
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
+
       GOTO (10,20,30,100,50), N
 ! ENTRY FROM INPLPR TO READ LIMITS FROM L SLIM CARD:
    10 CALL RDREAL(STRTOL,7,IPT,80,IER)
@@ -1727,6 +1730,7 @@
           KK1(1) = KPAK(4,IG,KNOW-1,JPHASE,1)
           KK1(2) = KPAK(4,IG,KNOW,JPHASE,1)
           CALL ADDCON(2,KK1,AM,4)
+          IF (IBMBER .NE. 0) GOTO 100 ! Nothing but return
         ENDDO
       ENDIF
       GOTO 2
@@ -4287,8 +4291,8 @@
 ! AT PRESENT, EACH PEAK CENTRE TYPE IS 1:
       IF (TOF) CALL PCTF01(N)
       IF (CN .OR. SR .OR. LX) CALL PCCN01(N)
-!	NEXT LINE 'IF (LX) CALL PCLX01(N)' INTENDED FOR
-!	MULTIPLE LAMBDA STUFF.  COMMENTED OUT FOR THE MO, JUNE99
+!    NEXT LINE 'IF (LX) CALL PCLX01(N)' INTENDED FOR
+!    MULTIPLE LAMBDA STUFF.  COMMENTED OUT FOR THE MO, JUNE99
 !      IF (LX) CALL PCLX01(N)
       RETURN
       ENTRY PCXX8(NP,NV)
@@ -4590,7 +4594,7 @@
       SUBROUTINE PHMOVE(IO,N)
 
       USE REFVAR
-	  USE ATMVAR
+      USE ATMVAR
 !
 ! *** PHMOVE BY JCM 7 FEB 88 ***
 !

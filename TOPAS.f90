@@ -11,7 +11,7 @@
 
       CHARACTER*(*), INTENT (IN   ) :: input_file_name
 
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
       CHARACTER*20, EXTERNAL :: Integer2String
       LOGICAL exists, run_TOPAS_in_background
       INTEGER M, I, tLen
@@ -21,9 +21,9 @@
 
       ! Launch TOPAS and wait for it to return
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Configuration)
-      run_TOPAS_in_background = WDialogGetCheckBoxLogical(IDC_TOPAS_in_background)
-!      CALL WDialogGetString(IDF_TOPASExe, TOPASEXE)
+      CALL SelectDASHDialog(IDD_Configuration)
+      run_TOPAS_in_background = DASHWDialogGetCheckBoxLogical(IDC_TOPAS_in_background)
+!      CALL DASHWDialogGetString(IDF_TOPASExe, TOPASEXE)
       CALL PopActiveWindowID
       tLen = LEN_TRIM(input_file_name)
       I = LEN_TRIM(TOPASEXE)
@@ -98,7 +98,7 @@
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS), AVGESD
 
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
       REAL, EXTERNAL :: FnWavelengthOfMenuOption
       INTEGER hFileTOPAS, hTempFile
       INTEGER iLen, iLen_1, i, tLen
@@ -183,8 +183,8 @@
       WRITE(hFileTOPAS, '(A)', ERR=999) '    axial_del  0.0053'
       WRITE(hFileTOPAS, '(A)', ERR=999) '  lam'
       WRITE(hFileTOPAS, '(A)', ERR=999) '    ymin_on_ymax 0.001'
-      CALL WDialogSelect(IDD_PW_Page4)
-      IF ( WDialogGetCheckBoxLogical(IDC_Monochromated) .OR. (JRadOption .NE. 1) ) THEN
+      CALL SelectDASHDialog(IDD_PW_Page4)
+      IF ( DASHWDialogGetCheckBoxLogical(IDC_Monochromated) .OR. (JRadOption .NE. 1) ) THEN
         WRITE(hFileTOPAS, '(A,F9.6)', ERR=999) '    la 1 lo ', ALambda
       ELSE
         tIRadSelection = -1
@@ -300,11 +300,11 @@
 
       IMPLICIT NONE
 
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SAW_Page7_TOPAS)
-      IF ( .NOT. WDialogGetCheckBoxLogical(IDC_UseDASHRecommendation) ) RETURN
+      CALL SelectDASHDialog(IDD_SAW_Page7_TOPAS)
+      IF ( .NOT. DASHWDialogGetCheckBoxLogical(IDC_UseDASHRecommendation) ) RETURN
       SELECT CASE ( ext_RR_stage )
         CASE ( 2 ) ! Anisotropic Pawley refinement
           CALL WDialogFieldState(IDC_Anisotropic_broadening, Enabled)
@@ -366,12 +366,12 @@
 
       IMPLICIT NONE
 
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
       INTEGER, EXTERNAL :: WriteTOPASFileRietveld2
       INTEGER, EXTERNAL :: WriteTOPASPawleyAnisotropic
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SAW_Page7_TOPAS)
+      CALL SelectDASHDialog(IDD_SAW_Page7_TOPAS)
       SELECT CASE (EventType)
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
@@ -392,7 +392,7 @@
 
               IF ( ext_RR_stage .EQ. 2 ) THEN
                 ! Anisotropic broadening...
-                use_anisotropic_broadening = WDialogGetCheckBoxLogical(IDC_Anisotropic_broadening)
+                use_anisotropic_broadening = DASHWDialogGetCheckBoxLogical(IDC_Anisotropic_broadening)
                 IF ( use_anisotropic_broadening ) THEN
                   IF ( WriteTOPASPawleyAnisotropic(ext_RR_input_file_name) .EQ. 0 ) THEN
                     CALL Launch_TOPAS(ext_RR_input_file_name)
@@ -438,7 +438,7 @@
 
       CHARACTER*(*), INTENT (INOUT) :: FileNameBase
 
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
       INTEGER hFileTOPAS, hOutputFile
       INTEGER iLen
       LOGICAL is_last_line
@@ -476,7 +476,7 @@
       ENDIF
       GOTO 10
    40 CLOSE(hOutputFile)
-!      IF ( WDialogGetCheckBoxLogical(IDC_IncludeESDs) ) THEN
+!      IF ( DASHWDialogGetCheckBoxLogical(IDC_IncludeESDs) ) THEN
 !        WRITE(hFileTOPAS, '(A)', ERR=999) 'do_errors'
 !      ENDIF
       WriteTOPASPawleyAnisotropic = 0
@@ -509,7 +509,7 @@
 
       INTEGER, EXTERNAL :: StrFind, assembly_size
       CHARACTER*20, EXTERNAL :: Integer2String
-      LOGICAL, EXTERNAL :: assembly_contains, has_aromatic_bond, WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: assembly_contains, has_aromatic_bond, DASHWDialogGetCheckBoxLogical
       LOGICAL, EXTERNAL :: PutAtomsForSpecailPosition
       LOGICAL, EXTERNAL :: PutRestraints, TOPASWriteDistance, TOPASWriteAngle, TOPASWritePlane
       INTEGER hFileTOPAS, hOutputFile
@@ -538,7 +538,7 @@
       ! we would inadvertently miss the stage where the atomic coordinates are written out,
       ! which would be a disaster.
 
-      CALL WDialogSelect(IDD_SAW_Page7_TOPAS)
+      CALL SelectDASHDialog(IDD_SAW_Page7_TOPAS)
       ! Initialise to failure
       WriteTOPASFileRietveld2 = 1
       ExtLength = 3
@@ -578,14 +578,15 @@
         IF ( (word_len .EQ. 8) .AND. (word(1:8) .EQ. 'LOR_FWHM') ) THEN
           in_spherical_harmonics = .FALSE.
         ELSE
-          IF ( word(1:1) .EQ. 'Y' ) THEN
+          ! Undocumented TOPAS stuff, such as y20 or k61
+          IF ( word(1:1) .EQ. 'Y' .OR. word(1:1) .EQ. 'K' ) THEN
             iPos = StrFind(tLine, iLen, '  sh_', 5)
             IF ( iPos .NE. 0 ) tLine(iPos+1:iPos+1) = '!'
           ENDIF
         ENDIF
         WRITE(hFileTOPAS, '(A)', ERR=999) tLine(1:iLen)
       ELSE IF ( (word_len .EQ. 22) .AND. (word(1:22) .EQ. 'PENALTIES_WEIGHTING_K1') ) THEN
-        CALL WDialogGetInteger(IDF_K1, K)
+        CALL DASHWDialogGetInteger(IDF_K1, K)
         IF ( K .LT. 0 ) K = 1
         tStr = Integer2String(K)
         WRITE(hFileTOPAS, '(A)', ERR=999) 'penalties_weighting_K1 '//TRIM(tStr)
@@ -599,7 +600,7 @@
           ! #@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@
           !                             BEGIN
           ! #@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@#@
-          IF ( WDialogGetCheckBoxLogical(IDC_Scale) ) THEN
+          IF ( DASHWDialogGetCheckBoxLogical(IDC_Scale) ) THEN
             WRITE(hFileTOPAS, '(A)', ERR=999) '    scale @ 0.001'
           ELSE
             WRITE(hFileTOPAS, '(A)', ERR=999) '    scale   0.001'
@@ -616,7 +617,7 @@
           ELSE
             WRITE(hFileTOPAS, '(A)', ERR=999) "'    PO(@, 1.0, , 0 0 1)"
           ENDIF
-          IF ( WDialogGetCheckBoxLogical(IDC_Coordinates) ) THEN
+          IF ( DASHWDialogGetCheckBoxLogical(IDC_Coordinates) ) THEN
             WRITE(hFileTOPAS, '(A)', ERR=999) '    macro ref_flag { @ }'
           ELSE
             WRITE(hFileTOPAS, '(A)', ERR=999) '    macro ref_flag {   }'
@@ -637,9 +638,9 @@
           GOTO 45
        50 CONTINUE
           CLOSE(hSP_out_file)
-          CALL WDialogGetInteger(IDF_INTEGER_TOPAS_WSCALE_DIST, wscale_bond)
-          CALL WDialogGetInteger(IDF_INTEGER_TOPAS_WSCALE_ANGLE, wscale_angle)
-          CALL WDialogGetInteger(IDF_INTEGER_TOPAS_WSCALE_FLAT, wscale_flatten)
+          CALL DASHWDialogGetInteger(IDF_INTEGER_TOPAS_WSCALE_DIST, wscale_bond)
+          CALL DASHWDialogGetInteger(IDF_INTEGER_TOPAS_WSCALE_ANGLE, wscale_angle)
+          CALL DASHWDialogGetInteger(IDF_INTEGER_TOPAS_WSCALE_FLAT, wscale_flatten)
           WRITE(hFileTOPAS, '(A)', ERR=999) '    prm !bond_width 0'
           WRITE(hFileTOPAS, '(A,I10)', ERR=999) '    prm !bond_weight ', wscale_bond !10000
           WRITE(hFileTOPAS, '(A)', ERR=999) '    prm !angle_width 1'
@@ -655,13 +656,13 @@
           is_last_line = .TRUE.
         ENDIF
       ELSE IF ( (word_len .EQ. 3) .AND. (word(1:3) .EQ. 'BKG') ) THEN
-        IF ( WDialogGetCheckBoxLogical(IDC_Background) ) THEN
+        IF ( DASHWDialogGetCheckBoxLogical(IDC_Background) ) THEN
           WRITE(hFileTOPAS, '(A)', ERR=999) '  bkg @ '
         ELSE
           WRITE(hFileTOPAS, '(A)', ERR=999) '  bkg '
         ENDIF 
       ELSE IF ( (word_len .EQ. 5) .AND. (word(1:5) .EQ. 'SCALE') ) THEN
-        IF ( WDialogGetCheckBoxLogical(IDC_Scale) ) THEN
+        IF ( DASHWDialogGetCheckBoxLogical(IDC_Scale) ) THEN
           tLine(11:11) = '@'
         ELSE
           tLine(11:11) = ' '
@@ -679,12 +680,15 @@
         ! Do nothing: it will be added at the end if necessary
       ELSE IF ( (word_len .EQ. 29) .AND. (word(1:29) .EQ. 'OUT_YOBS_YCALC_AND_DIFFERENCE') ) THEN
         ! Do nothing: it will be added at the end if necessary
-      ELSE IF ( (word_len .EQ. 51) .AND. (word(1:51) .EQ. &
-                'OUT_X_YOBS_YCALC_AND_DIFFERENCE_DIVIDE_BY_SIGMAYOBS') ) THEN
+      ELSE IF ( (word_len .EQ. 11) .AND. (word(1:11) .EQ. 'OUT_PROFILE') ) THEN
+        ! Do nothing: it will be added at the end if necessary
+      ELSE IF ( (word_len .EQ. 8) .AND. (word(1:8) .EQ. 'OUT_TICK') ) THEN
+        ! Do nothing: it will be added at the end if necessary
+      ELSE IF ( (word_len .EQ. 19) .AND. (word(1:19) .EQ. 'OUT_POWDERDATABLOCK') ) THEN
         ! Do nothing: it will be added at the end if necessary
       ELSE IF ( ((word_len .EQ. 9) .AND. (word(1:9) .EQ. 'DO_ERRORS')) &
           .OR.  ((word_len .EQ. 10) .AND. (word(1:10) .EQ. "'DO_ERRORS")) ) THEN
-        IF ( WDialogGetCheckBoxLogical(IDC_IncludeESDs) ) THEN
+        IF ( DASHWDialogGetCheckBoxLogical(IDC_IncludeESDs) ) THEN
           WRITE(hFileTOPAS, '(A)', ERR=999) 'do_errors'
         ELSE
           WRITE(hFileTOPAS, '(A)', ERR=999) "'do_errors"
@@ -699,24 +703,35 @@
           ! Need to check if this is the "prm bnonh 3.000" line.
           iPos = StrFind(tLine, iLen, 'bnonh', 5)
           IF ( iPos .NE. 0 ) THEN
-            IF ( WDialogGetCheckBoxLogical(IDC_Biso) ) THEN
+            IF ( DASHWDialogGetCheckBoxLogical(IDC_Biso) ) THEN
               tLine(iPos-1:iPos-1) = ' '
             ELSE
               tLine(iPos-1:iPos-1) = '!'
             ENDIF
           ELSE
+            ! Need to check if the line is for special_position eg "prm dash_2 0.4670".
+            iPos = StrFind(tLine, iLen, 'dash_', 5)
+            IF ( iPos .NE. 0 ) THEN
+              IF ( DASHWDialogGetCheckBoxLogical(IDC_Coordinates) ) THEN
+                tLine(iPos-1:iPos-1) = ' '
+              ELSE
+                tLine(iPos-1:iPos-1) = '!'
+              ENDIF
+              GOTO 20
+            ENDIF
             IF ( INDEX(tLine, '!bond_weight') .GT. 0 ) THEN
-              CALL WDialogGetInteger(IDF_INTEGER_TOPAS_WSCALE_DIST, wscale_bond)
+              CALL DASHWDialogGetInteger(IDF_INTEGER_TOPAS_WSCALE_DIST, wscale_bond)
               WRITE(tLine, '(A,I10)', ERR=999) '    prm !bond_weight ', wscale_bond
             ELSE IF ( INDEX(tLine, '!angle_weight') .GT. 0 ) THEN
-              CALL WDialogGetInteger(IDF_INTEGER_TOPAS_WSCALE_ANGLE, wscale_angle)
+              CALL DASHWDialogGetInteger(IDF_INTEGER_TOPAS_WSCALE_ANGLE, wscale_angle)
               WRITE(tLine, '(A,I10)', ERR=999) '    prm !angle_weight ', wscale_angle
             ELSE IF ( INDEX(tLine, '!flatten_weight') .GT. 0 ) THEN
-              CALL WDialogGetInteger(IDF_INTEGER_TOPAS_WSCALE_FLAT, wscale_flatten)
+              CALL DASHWDialogGetInteger(IDF_INTEGER_TOPAS_WSCALE_FLAT, wscale_flatten)
               WRITE(tLine, '(A,I10)', ERR=999) '    prm !flatten_weight ', wscale_flatten
             ENDIF
           ENDIF
         ENDIF
+ 20     CONTINUE
         WRITE(hFileTOPAS, '(A)', ERR=999) TRIM(tLine)
       ELSE IF ( (word_len .EQ. 4) .AND. (word(1:4) .EQ. 'SITE') ) THEN
         ! We could read the fractional coordinates back in and use them to
@@ -725,7 +740,7 @@
       ELSE IF ( (word_len .EQ. 5) .AND. (word(1:5) .EQ. 'MACRO') ) THEN
         ! Check if rest is ref_flag
         IF ( StrFind(tLine, iLen, 'ref_flag', 8) .NE. 0 ) THEN
-          IF ( WDialogGetCheckBoxLogical(IDC_Coordinates) ) THEN
+          IF ( DASHWDialogGetCheckBoxLogical(IDC_Coordinates) ) THEN
             WRITE(hFileTOPAS, '(A)', ERR=999) '    macro ref_flag { @ }'
           ELSE
             WRITE(hFileTOPAS, '(A)', ERR=999) '    macro ref_flag {   }'
@@ -736,14 +751,14 @@
       ELSE IF ( (word_len .EQ. 1) .AND. (word(1:1) .EQ. 'A') ) THEN
         iPos = StrFind(tLine, iLen, 'uc_prm', 6)
         IF ( iPos .NE. 0 ) THEN
-          IF ( WDialogGetCheckBoxLogical(IDC_IncludeESDs) ) THEN
+          IF ( DASHWDialogGetCheckBoxLogical(IDC_IncludeESDs) ) THEN
             tLine(iPos-1:iPos-1) = ' '
           ELSE
             tLine(iPos-1:iPos-1) = '!'
           ENDIF
         ELSE
           iPos = StrFind(tLine, iLen, 'a', 1)
-          IF ( WDialogGetCheckBoxLogical(IDC_IncludeESDs) ) THEN
+          IF ( DASHWDialogGetCheckBoxLogical(IDC_IncludeESDs) ) THEN
             tLine(iPos+3:iPos+3) = '@'
           ELSE
             tLine(iPos+3:iPos+3) = ' '
@@ -753,7 +768,7 @@
       ELSE IF ( (word_len .EQ. 1) .AND. (word(1:1) .EQ. 'B') ) THEN
         IF ( .NOT. CellParConstrained(2) ) THEN
           iPos = StrFind(tLine, iLen, 'b', 1)
-          IF ( WDialogGetCheckBoxLogical(IDC_IncludeESDs) ) THEN
+          IF ( DASHWDialogGetCheckBoxLogical(IDC_IncludeESDs) ) THEN
             tLine(iPos+3:iPos+3) = '@'
           ELSE
             tLine(iPos+3:iPos+3) = ' '
@@ -763,7 +778,7 @@
       ELSE IF ( (word_len .EQ. 1) .AND. (word(1:1) .EQ. 'C') ) THEN
         IF ( .NOT. CellParConstrained(3) ) THEN
           iPos = StrFind(tLine, iLen, 'c', 1)
-          IF ( WDialogGetCheckBoxLogical(IDC_IncludeESDs) ) THEN
+          IF ( DASHWDialogGetCheckBoxLogical(IDC_IncludeESDs) ) THEN
             tLine(iPos+3:iPos+3) = '@'
           ELSE
             tLine(iPos+3:iPos+3) = ' '
@@ -773,14 +788,14 @@
       ELSE IF ( (word_len .EQ. 2) .AND. (word(1:2) .EQ. 'AL') ) THEN
         iPos = StrFind(tLine, iLen, 'uc_ang_prm', 10)
         IF ( iPos .NE. 0 ) THEN
-          IF ( WDialogGetCheckBoxLogical(IDC_IncludeESDs) ) THEN
+          IF ( DASHWDialogGetCheckBoxLogical(IDC_IncludeESDs) ) THEN
             tLine(iPos-1:iPos-1) = ' '
           ELSE
             tLine(iPos-1:iPos-1) = '!'
           ENDIF
         ELSE
           iPos = StrFind(tLine, iLen, 'al', 2)
-          IF ( WDialogGetCheckBoxLogical(IDC_IncludeESDs) .AND. (.NOT. CellParConstrained(4)) ) THEN
+          IF ( DASHWDialogGetCheckBoxLogical(IDC_IncludeESDs) .AND. (.NOT. CellParConstrained(4)) ) THEN
             tLine(iPos+3:iPos+3) = '@'
           ELSE
             tLine(iPos+3:iPos+3) = ' '
@@ -791,7 +806,7 @@
         iPos = StrFind(tLine, iLen, 'uc_ang_prm', 10)
         IF ( iPos .EQ. 0 ) THEN
           iPos = StrFind(tLine, iLen, 'be', 2)
-          IF ( WDialogGetCheckBoxLogical(IDC_IncludeESDs) .AND. (.NOT. CellParConstrained(5)) ) THEN
+          IF ( DASHWDialogGetCheckBoxLogical(IDC_IncludeESDs) .AND. (.NOT. CellParConstrained(5)) ) THEN
             tLine(iPos+3:iPos+3) = '@'
           ELSE
             tLine(iPos+3:iPos+3) = ' '
@@ -802,7 +817,7 @@
         iPos = StrFind(tLine, iLen, 'uc_ang_prm', 10)
         IF ( iPos .EQ. 0 ) THEN
           iPos = StrFind(tLine, iLen, 'ga', 2)
-          IF ( WDialogGetCheckBoxLogical(IDC_IncludeESDs) .AND. (.NOT. CellParConstrained(6)) ) THEN
+          IF ( DASHWDialogGetCheckBoxLogical(IDC_IncludeESDs) .AND. (.NOT. CellParConstrained(6)) ) THEN
             tLine(iPos+3:iPos+3) = '@'
           ELSE
             tLine(iPos+3:iPos+3) = ' '
@@ -822,13 +837,14 @@
       ENDIF
       IF ( .NOT. is_last_line ) GOTO 10
    40 CLOSE(hOutputFile)
-      IF ( WDialogGetCheckBoxLogical(IDC_WriteCIF) ) THEN
+      IF ( DASHWDialogGetCheckBoxLogical(IDC_WriteCIF) ) THEN
 !        WRITE(hFileTOPAS, '(A)', ERR=999) '    Out_CIF_STR("'//TRIM(FileNameBase)//'.cif")'
         WRITE(hFileTOPAS, '(A)', ERR=999) '    Out_CIF_STR_Uiso("'//TRIM(FileNameBase)//'.cif")'
       ENDIF
-      IF ( WDialogGetCheckBoxLogical(IDC_SaveProfile) ) THEN
-        WRITE(hFileTOPAS, '(A)', ERR=999) '    Out_X_Yobs_Ycalc_and_Difference_divide_by_SigmaYobs'// &
-                                               '("'//TRIM(FileNameBase)//'.pro")'
+      IF ( DASHWDialogGetCheckBoxLogical(IDC_SaveProfile) ) THEN
+        WRITE(hFileTOPAS, '(A)', ERR=999) '    Out_Profile("'//TRIM(FileNameBase)//'_plot.pro")'
+        WRITE(hFileTOPAS, '(A)', ERR=999) '    Out_Tick("'//TRIM(FileNameBase)//'_plot.tic")'
+        WRITE(hFileTOPAS, '(A)', ERR=999) '    Out_PowderDataBlock("'//TRIM(FileNameBase)//'_plot.pcif")'
       ENDIF
 !      WRITE(hFileTOPAS, '(A)', ERR=999) '    Out_X_Ycalc("'//TRIM(FileNameBase)//'.pp")'
 !      WRITE(hFileTOPAS, '(A)', ERR=999) '    Out_Yobs_Ycalc_and_Difference("'//TRIM(FileNameBase)//'_1.xco")'

@@ -19,14 +19,23 @@
       INTEGER       iTem, iTem1, iTem2, iNext
       CHARACTER*(8) chrfmt
 
-      CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Data_Properties)
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+
+      IF ( .NOT. IN_BATCH ) THEN
+        CALL PushActiveWindowID
+        CALL SelectDASHDialog(IDD_Data_Properties)
+      ENDIF
+
       IF (.NOT. FnPatternOK()) THEN
-        CALL WDialogClearField(IDF_xmin)
-        CALL WDialogClearField(IDF_xmax)
-        CALL WDialogClearField(IDF_ymin)
-        CALL WDialogClearField(IDF_ymax)
-        CALL PopActiveWindowID
+        IF ( .NOT. IN_BATCH ) THEN
+          CALL WDialogClearField(IDF_xmin)
+          CALL WDialogClearField(IDF_xmax)
+          CALL WDialogClearField(IDF_ymin)
+          CALL WDialogClearField(IDF_ymax)
+          CALL PopActiveWindowID
+        ENDIF
         RETURN
       ENDIF
       atem1 = MAX(ABS(XPMIN),ABS(XPMAX))
@@ -47,8 +56,10 @@
       CALL IntegerToString(item2,chrfmt(inext:inext),'(I1)')
       inext = inext + 1
       chrfmt(inext:inext) = ')'
-      CALL WDialogPutReal(IDF_xmin, XPMIN, chrfmt(1:inext))
-      CALL WDialogPutReal(IDF_xmax, XPMAX, chrfmt(1:inext))
+      IF ( .NOT. IN_BATCH ) THEN
+        CALL WDialogPutReal(IDF_xmin, XPMIN, chrfmt(1:inext))
+        CALL WDialogPutReal(IDF_xmax, XPMAX, chrfmt(1:inext))
+      ENDIF
       atem1 = MAX(ABS(ypmin),ABS(ypmax))
       atem2 = 0.0001 * ABS(ypmax-ypmin)
       item1 = 0.5 + ALOG10(atem1)
@@ -67,9 +78,12 @@
       CALL IntegerToString(item2,chrfmt(inext:inext),'(I1)')
       inext = inext + 1
       chrfmt(inext:inext) = ')'
-      CALL WDialogPutReal(IDF_ymin, ypmin, chrfmt(1:inext))
-      CALL WDialogPutReal(IDF_ymax, ypmax, chrfmt(1:inext))
-      CALL PopActiveWindowID
+
+      IF ( .NOT. IN_BATCH )  THEN
+        CALL WDialogPutReal(IDF_ymin, ypmin, chrfmt(1:inext))
+        CALL WDialogPutReal(IDF_ymax, ypmax, chrfmt(1:inext))
+        CALL PopActiveWindowID
+      ENDIF
 
       END SUBROUTINE UPLOAD_RANGE
 !

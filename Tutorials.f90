@@ -6,16 +6,26 @@
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
-
+      use kernel32
+      use dfwinty
+ 
       IMPLICIT NONE
 
       INTEGER, INTENT (IN   ) :: Tutorial_ID
 
-      CHARACTER(MaxPathLength) DirString, FileDir
-      CHARACTER(MaxPathLength) CurDir
+      CHARACTER(MaxPathLength) ManualPath, DocumentationPath, FileDir
+      CHARACTER(MaxPathLength) DestineDir
+
+      CHARACTER(MaxPathLength) TutorialFileName
       CHARACTER(1)             NumberStr
 
-      CALL IOsDirName(CurDir)
+      INTEGER d
+
+      DestineDir = TRIM(AppDataDirectory)//'DASH_files'
+      IF (.NOT. IOsDirExists(DestineDir)) CALL IOsDirMake(DestineDir)
+      CALL WSelectDir(DirCreate, DestineDir, 'Directory to save tutorial files')
+      IF (WInfoDialog(ExitButtonCommon) .NE. CommonOK .OR. LEN_TRIM(DestineDir) .LE. 0) RETURN
+
       SELECT CASE (Tutorial_ID)
         CASE (ID_Tutorial_1)
           NumberStr = '1'
@@ -27,16 +37,32 @@
           NumberStr = '4'
         CASE (ID_Tutorial_5)
           NumberStr = '5'
+        CASE (ID_Tutorial_6)
+          NumberStr = '6'
       END SELECT
-      DirString = InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//"Documentation"//DIRSPACER//"Tutorial"//NumberStr
-      FileDir = DirString(1:LEN_TRIM(DirString))//DIRSPACER//"Data files"
-      CALL IOsDirChange(FileDir(1:LEN_TRIM(FileDir)))
-      CALL IOsCopyFile('Tutorial_'//NumberStr//'.xye',CurDir(1:LEN_TRIM(CurDir))//DIRSPACER)
-      CALL IOsCopyFile('Tutorial_'//NumberStr//'*.mol2',CurDir(1:LEN_TRIM(CurDir))//DIRSPACER)
-      CALL IOsCopyFile('Tutorial_'//NumberStr//'*.zmatrix',CurDir(1:LEN_TRIM(CurDir))//DIRSPACER)
-      CALL IOsDirChange(CurDir(1:LEN_TRIM(CurDir)))
+
+      TutorialFileName = "tutorial-"//TRIM(NumberStr)//".html"
+
+      DocumentationPath = TRIM(InstallationDirectory)//"Documentation"
+      ManualPath        = TRIM(DocumentationPath)//DIRSPACER//"manual"//DIRSPACER//"portable_html"
+
+      FileDir = TRIM(DocumentationPath)//DIRSPACER//"Tutorial"//NumberStr//DIRSPACER//"Data files"
+      CALL IOsDirChange(TRIM(FileDir))
+      CALL IOsCopyFile('Tutorial_'//NumberStr//'.xye',TRIM(DestineDir)//DIRSPACER)
+      CALL IOsCopyFile('Tutorial_'//NumberStr//'.raw',TRIM(DestineDir)//DIRSPACER)
+      CALL IOsCopyFile('Tutorial_'//NumberStr//'*.mol2',TRIM(DestineDir)//DIRSPACER)
+      CALL IOsCopyFile('Tutorial_'//NumberStr//'*.zmatrix',TRIM(DestineDir)//DIRSPACER)
+
+      CALL IOsDirChange(TRIM(ManualPath))
+
       CALL WHelpFile(' ') ! In case the help file is open already
-      CALL WHelpFile(DirString(1:LEN_TRIM(DirString))//DIRSPACER//"Tutorial"//NumberStr//".chm")
+      CALL WHelpFile(TutorialFileName)
+
+      d=WinExec('cmd /c "'//TRIM(TutorialFileName)//'" 'C,SW_HIDE)
+
+
+      CALL IOsDirChange(TRIM(DestineDir))
+
 
       END SUBROUTINE LaunchTutorial
 !

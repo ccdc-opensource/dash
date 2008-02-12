@@ -22,9 +22,9 @@
       CALL SplitPath(tString, InstallationDirectory, tFile)
       IF (LEN_TRIM(InstallationDirectory) .EQ. 0) InstallationDirectory = '.'//DIRSPACER
       
-	  CALL IOsDirName(StartUpDirectory)
+      CALL IOsDirName(StartUpDirectory)
       StartUpDirectory = TRIM(StartUpDirectory)//DIRSPACER
-	  CALL IOsDirChange(InstallationDirectory)
+      CALL IOsDirChange(InstallationDirectory)
       CALL IOsDirName(InstallationDirectory)
       InstallationDirectory = TRIM(InstallationDirectory)//DIRSPACER
 
@@ -38,7 +38,14 @@
       IF ( LEN_TRIM(AllUsersProfileDirectory) .GT. 0 ) THEN
         AllUsersProfileDirectory = TRIM(AllUsersProfileDirectory)//DIRSPACER
       ELSE
-        AllUsersProfileDirectory = InstallationDirectory
+        AllUsersProfileDirectory = StartUpDirectory
+      ENDIF
+
+      CALL IOsVariable('APPDATA', AppDataDirectory)
+      IF ( LEN_TRIM(AppDataDirectory) .GT. 0 ) THEN
+        AppDataDirectory = TRIM(AppDataDirectory)//DIRSPACER
+      ELSE
+        AppDataDirectory = StartUpDirectory
       ENDIF
 
       END SUBROUTINE GetInstallationDirectory
@@ -77,6 +84,127 @@
       ENDDO
 
       END SUBROUTINE Init_StdOut
+
+
+      SUBROUTINE SelectDASHDialog(IDialogIdentifier)
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      INTEGER IDialogIdentifier
+
+      IF ( IDialogIdentifier .LE. 0 ) THEN
+        CALL DebugErrorMessage("SelectDASHDialog: Bad dialog identifier")
+        RETURN
+      ENDIF
+      CALL LoadDASHDialog(IDialogIdentifier)
+      
+      END SUBROUTINE SelectDASHDialog
+
+      SUBROUTINE LoadDASHDialog(IDialogIdentifier)
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      INTEGER IDialogIdentifier
+
+      INTEGER MAX_DIALOG_IDENTIFIERS
+      PARAMETER ( MAX_DIALOG_IDENTIFIERS = 5000 )
+      INTEGER DIALOG_STATE(MAX_DIALOG_IDENTIFIERS)
+      LOGICAL ROOT_OPEN
+      COMMON / DASH_DIALOG_STATE / DIALOG_STATE, ROOT_OPEN
+
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+      IF ( IDialogIdentifier .LE. 0 ) THEN
+        CALL DebugErrorMessage("LoadDASHDialog: Bad dialog identifier")
+        RETURN
+      ENDIF
+
+
+      IF ( DIALOG_STATE(IDialogIdentifier) .EQ. 0 ) THEN
+
+        IF ( IN_BATCH .AND. (.NOT. ROOT_OPEN) ) THEN
+
+! Open root window in hidden mode to allow dialogs being initialised properly.
+! This is required, as set in 3.1.1 of Winteracter User Guide.
+! Otherwise LoadDASHDialog will generate ErrLoadDialog while
+! loading most dialogs. As error-check is usually not carried out,
+! further operations on these dialogs may lead to more errors, even crash.
+
+          CALL WindowOpen(FLAGS = HideWindow + SysMenuOn + MinButton + MaxButton + StatusBar, X = WInfoScreen(1)/10, &
+                        Y = (WInfoScreen(2)/100) + 365, WIDTH = (WInfoScreen(1)*4)/5, &
+                        HEIGHT = (WInfoScreen(2)*3)/8, MENUID = IDR_MENU1, &
+                        TITLE = "DASH", NCOL256=128)
+          ROOT_OPEN = .TRUE.
+        ENDIF
+
+        CALL WDialogLoad(IDialogIdentifier)
+        DIALOG_STATE(IDialogIdentifier) = 1
+      ELSE
+        CALL WDialogSelect(IDialogIdentifier)
+      ENDIF
+
+      END SUBROUTINE LoadDASHDialog
+
+
+      SUBROUTINE UnloadDASHDialog(IDialogIdentifier)
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      INTEGER IDialogIdentifier
+
+      INTEGER MAX_DIALOG_IDENTIFIERS
+      PARAMETER ( MAX_DIALOG_IDENTIFIERS = 5000 )
+      INTEGER DIALOG_STATE(MAX_DIALOG_IDENTIFIERS)
+      LOGICAL ROOT_OPEN
+      COMMON / DASH_DIALOG_STATE / DIALOG_STATE, ROOT_OPEN
+
+      IF ( IDialogIdentifier .LE. 0 ) THEN
+        CALL DebugErrorMessage("UnloadDASHDialog: Bad dialog identifier")
+        RETURN
+      ENDIF
+
+      IF ( DIALOG_STATE(IDialogIdentifier) .EQ. 1 ) THEN
+        CALL PushActiveWindowID
+        CALL SelectDASHDialog(IDialogIdentifier)
+        CALL WDialogUnload()
+        DIALOG_STATE(IDialogIdentifier) = 0
+        CALL PopActiveWindowID
+      ENDIF
+
+      END SUBROUTINE UnloadDASHDialog
+
+
+      SUBROUTINE InitialiseDASHDialogState
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      INTEGER MAX_DIALOG_IDENTIFIERS
+      PARAMETER ( MAX_DIALOG_IDENTIFIERS = 5000 )
+      INTEGER DIALOG_STATE(MAX_DIALOG_IDENTIFIERS)
+      LOGICAL ROOT_OPEN
+      COMMON / DASH_DIALOG_STATE / DIALOG_STATE, ROOT_OPEN
+
+      INTEGER I
+
+      DO I = 1, MAX_DIALOG_IDENTIFIERS
+        DIALOG_STATE(I) = 0
+      END DO
+
+      END SUBROUTINE InitialiseDASHDialogState
+
 !
 !*****************************************************************************
 !
@@ -94,46 +222,46 @@
 ! swapped in and out of memory. This is ugly and error-prone, but that's the way it is.
 ! Currently those dialogues are IDD_SX_Page1a, IDD_PW_Page3a, D_SAW_Page6a and IDD_RR_External.
 
-      CALL WDialogLoad(IDD_Structural_Information)         !  1
-      CALL WDialogLoad(IDD_Configuration)                  !  2
-      CALL WDialogLoad(IDD_Index_Preparation)              !  3
-      CALL WDialogLoad(IDD_DV_Results)                     !  4
+      CALL LoadDASHDialog(IDD_Structural_Information)         !  1
+      CALL LoadDASHDialog(IDD_Configuration)                  !  2
+      CALL LoadDASHDialog(IDD_Index_Preparation)              !  3
+      CALL LoadDASHDialog(IDD_DV_Results)                     !  4
 ! Set the colours of the grid manually
-      CALL WDialogLoad(IDD_Plot_Option_Dialog)             !  5
-      CALL WDialogLoad(IDD_Polyfitter_Wizard_01)           !  6
-      CALL WDialogLoad(IDD_PW_Page1)                       !  7
-      CALL WDialogLoad(IDD_PW_Page3)                       !  8
-      CALL WDialogLoad(IDD_PW_Page4)                       !  9
-      CALL WDialogLoad(IDD_PW_Page5)                       ! 10
-      CALL WDialogLoad(IDD_PW_Page6)                       ! 11
-      CALL WDialogLoad(IDD_PW_Page7)                       ! 12
-      CALL WDialogLoad(IDD_PW_Page8)                       ! 13
-      CALL WDialogLoad(IDD_PW_Page8b)                      ! 14
-      CALL WDialogLoad(IDD_PW_Page9)                       ! 15
-      CALL WDialogLoad(IDD_PW_Page10)                      ! 16
-      CALL WDialogLoad(IDD_SX_Page1)                       ! 17
-      CALL WDialogLoad(IDD_SX_Page2)                       ! 18
-      CALL WDialogLoad(IDD_Pawley_Status)                  ! 19
-      CALL WDialogLoad(IDD_SAW_Page1)                      ! 20
-      CALL WDialogLoad(IDD_zmEdit)                         ! 21
-      CALL WDialogLoad(IDD_zmEditRotations)                ! 22
-      CALL WDialogLoad(IDD_SAW_Page2)                      ! 23
-      CALL WDialogLoad(IDD_SA_Modal_input2)                ! 24
-      CALL WDialogLoad(IDD_ModalDialog)                    ! 25
-      CALL WDialogLoad(IDD_SA_input3_2)                    ! 26
-      CALL WDialogLoad(IDD_SA_input4)                      ! 27
-      CALL WDialogLoad(IDD_SA_input5)                      ! 28
-      CALL WDialogLoad(IDD_SA_Action1)                     ! 29
-      CALL WDialogLoad(IDD_Summary)                        ! 30
-      CALL WDialogLoad(IDD_SAW_Page5)                      ! 31
-      CALL WDialogLoad(IDD_SAW_Page6)                      ! 32
-!      CALL WDialogLoad(IDD_Parameter_Status_2)
-      CALL WDialogLoad(IDD_OutputSolutions)                ! 33
-      CALL WDialogLoad(IDD_Rietveld2)                      ! 34
-      CALL WDialogLoad(IDD_RR_PO_Dialog)                   ! 35
-      CALL WDialogLoad(IDD_SAW_Page7_TOPAS)                ! 36
-      CALL WDialogLoad(IDD_SAW_Page7_GSAS)                 ! 37
-      CALL WDialogLoad(IDD_SAW_Page7_RIETAN)               ! 38
+      CALL LoadDASHDialog(IDD_Plot_Option_Dialog)             !  5
+      CALL LoadDASHDialog(IDD_Polyfitter_Wizard_01)           !  6
+      CALL LoadDASHDialog(IDD_PW_Page1)                       !  7
+      CALL LoadDASHDialog(IDD_PW_Page3)                       !  8
+      CALL LoadDASHDialog(IDD_PW_Page4)                       !  9
+      CALL LoadDASHDialog(IDD_PW_Page5)                       ! 10
+      CALL LoadDASHDialog(IDD_PW_Page6)                       ! 11
+      CALL LoadDASHDialog(IDD_PW_Page7)                       ! 12
+      CALL LoadDASHDialog(IDD_PW_Page8)                       ! 13
+      CALL LoadDASHDialog(IDD_PW_Page8b)                      ! 14
+      CALL LoadDASHDialog(IDD_PW_Page9)                       ! 15
+      CALL LoadDASHDialog(IDD_PW_Page10)                      ! 16
+      CALL LoadDASHDialog(IDD_SX_Page1)                       ! 17
+      CALL LoadDASHDialog(IDD_SX_Page2)                       ! 18
+      CALL LoadDASHDialog(IDD_Pawley_Status)                  ! 19
+      CALL LoadDASHDialog(IDD_SAW_Page1)                      ! 20
+      CALL LoadDASHDialog(IDD_zmEdit)                         ! 21
+      CALL LoadDASHDialog(IDD_zmEditRotations)                ! 22
+      CALL LoadDASHDialog(IDD_SAW_Page2)                      ! 23
+      CALL LoadDASHDialog(IDD_SA_Modal_input2)                ! 24
+      CALL LoadDASHDialog(IDD_ModalDialog)                    ! 25
+      CALL LoadDASHDialog(IDD_SA_input3_2)                    ! 26
+      CALL LoadDASHDialog(IDD_SA_input4)                      ! 27
+      CALL LoadDASHDialog(IDD_SA_input5)                      ! 28
+      CALL LoadDASHDialog(IDD_SA_Action1)                     ! 29
+      CALL LoadDASHDialog(IDD_Summary)                        ! 30
+      CALL LoadDASHDialog(IDD_SAW_Page5)                      ! 31
+      CALL LoadDASHDialog(IDD_SAW_Page6)                      ! 32
+!      CALL LoadDASHDialog(IDD_Parameter_Status_2)
+      CALL LoadDASHDialog(IDD_OutputSolutions)                ! 33
+      CALL LoadDASHDialog(IDD_Rietveld2)                      ! 34
+      CALL LoadDASHDialog(IDD_RR_PO_Dialog)                   ! 35
+      CALL LoadDASHDialog(IDD_SAW_Page7_TOPAS)                ! 36
+      CALL LoadDASHDialog(IDD_SAW_Page7_GSAS)                 ! 37
+      CALL LoadDASHDialog(IDD_SAW_Page7_RIETAN)               ! 38
 
       END SUBROUTINE PolyFitter_UploadDialogues
 !
@@ -219,7 +347,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE InitialiseVariables
+      SUBROUTINE InitialiseVariables(batch_setting)
 
       USE WINTERACTER
       USE DRUID_HEADER
@@ -303,6 +431,7 @@
       LOGICAL         in_batch
       COMMON /BATEXE/ in_batch
 
+      LOGICAL batch_setting
       REAL, EXTERNAL :: WaveLengthOf, dSpacing2TwoTheta
       INTEGER iWidth, iHeight
       PARAMETER (iWidth = 300, iHeight = 1)
@@ -313,27 +442,32 @@
 
 ! The initialisations should be split up into 'one off initialisations' (at the start up
 ! of DASH only) and 'whenever a new project file is opened'
-      in_batch = .FALSE.
+      in_batch = batch_setting
       SXMaxResolution = 1.75
       iRietveldMethod = INTERNAL_RB
       iRietveldMethodOpt = 1
+      iMcMailleNgridOpt = 1
       lRebin = .FALSE.
       iBinWidth = 1
       RR_SA_Sol = 1
-      CALL WDialogSelect(IDD_SA_input3_2)
       NS = 20
-      CALL WDialogPutInteger(IDF_SA_NS, NS)
       NT = 25
-      CALL WDialogPutInteger(IDF_SA_NT, NT)
       ISeed1 = 315
       ISeed2 = 159
-      CALL WDialogPutInteger(IDF_SA_RandomSeed1, ISeed1)
-      CALL WDialogPutInteger(IDF_SA_RandomSeed2, ISeed2)
       DO I = 1, MVAR
         ModalFlag(I) = 0 ! 0 = not a torsion angle
       ENDDO
       ShowAgain = .TRUE.
       Counter   = 0
+
+      IF ( .not. in_batch ) THEN
+        CALL SelectDASHDialog(IDD_SA_input3_2)
+        CALL WDialogPutInteger(IDF_SA_NS, NS)
+        CALL WDialogPutInteger(IDF_SA_NT, NT)
+        CALL WDialogPutInteger(IDF_SA_RandomSeed1, ISeed1)
+        CALL WDialogPutInteger(IDF_SA_RandomSeed2, ISeed2)
+      ENDIF
+
       CALL Clear_Zmatrices
       ChiHandle = -1
       PI     = 4.0*ATAN(1.0)
@@ -360,14 +494,20 @@
       VIEWEXE = ''
       MOGULEXE = ' '
       DICVOLEXE = ''
+      McMailleEXE = ''
       TOPASEXE = ''
       EXPGUIEXE = ''
       RIETANEXE = ''
+      GSASINS = ''
       Rietan_FP = .FALSE.
-      CALL GetPathToMercuryFromRegistry
-      CALL GetPathToMogulFromRegistry
-      CALL GetPathToTopasFromRegistry
-      CALL GetPathToExpguiFromRegistry
+      
+      IF ( .NOT. in_batch ) then
+        CALL GetPathToMercuryFromRegistry
+        CALL GetPathToMogulFromRegistry
+        CALL GetPathToTopasFromRegistry
+        CALL GetPathToExpguiFromRegistry
+      ENDIF
+
       DO I = 0, maxfrg
         izmoid(0,I) = 0
         izmbid(0,I) = 0
@@ -375,8 +515,12 @@
       CALL Clear_SA ! Sets NumOf_SA_Runs to 0
       CALL Update_Solutions
 !      nPeaksFound = 0
-      CALL WDialogSelect(IDD_SAW_Page5)
-      CALL WDialogFieldState(IDB_Prog3, Disabled)
+
+      IF ( .NOT. in_batch ) THEN
+        CALL SelectDASHDialog(IDD_SAW_Page5)
+        CALL WDialogFieldState(IDB_Prog3, Disabled)
+      ENDIF
+
       UseQuaternions = .TRUE.
 ! Initialise arrays to do with administration of open child windows
       ChildWinAutoClose = .FALSE.
@@ -402,36 +546,61 @@
 ! Now initialise the maximum resolution in the dialogue window
       DefaultMaxResolution = DASHDefaultMaxResolution
       CALL Update_TruncationLimits
-      CALL WDialogSelect(IDD_Index_Preparation)
-      CALL WDialogPutReal(IDF_eps, 0.03, '(F5.3)')
-      CALL WDialogSelect(IDD_Configuration)
-      CALL WDialogPutString(IDF_ViewExe, ViewExe)
-      CALL WDialogPutString(IDF_ViewArg, ViewArg)
-      CALL WDialogPutString(IDF_MogulExe, MogulExe)
-      CALL WDialogPutString(IDF_TopasExe, TopasExe)
-      CALL WDialogPutString(IDF_EXPGUIExe, ExpguiExe)
+      
+      IF ( .NOT. in_batch ) THEN 
+        CALL SelectDASHDialog(IDD_Index_Preparation)
+        CALL WDialogPutReal(IDF_eps, 0.03, '(F5.3)')
+        CALL SelectDASHDialog(IDD_Configuration)
+        CALL WDialogPutString(IDF_ViewExe, ViewExe)
+        CALL WDialogPutString(IDF_ViewArg, ViewArg)
+        CALL WDialogPutString(IDF_MogulExe, MogulExe)
+        CALL WDialogPutString(IDF_TopasExe, TopasExe)
+        CALL WDialogPutString(IDF_EXPGUIExe, ExpguiExe)
+      ENDIF
+
       CALL Set_AutoLocalMinimisation(.TRUE.)
       CALL Set_UseHydrogensDuringAutoLocalMinimise(.TRUE.)
       CALL Set_UseCrystallographicCoM(.TRUE.)
       CALL Set_AutoAlign(.TRUE.)
       Call Set_HydrogenTreatment(2) ! Absorb
-      CALL WDialogSelect(IDD_SA_Modal_input2)
+
+      CALL Set_SavePRO(.FALSE.)
+      CALL Set_SaveRES(.FALSE.)
+      CALL Set_SaveCCL(.FALSE.)
+      CALL Set_SaveCIF(.FALSE.)
+      CALL Set_SaveCSSR(.FALSE.)
+      CALL Set_SavePDB(.FALSE.)
+      CALL Set_OutputChi2vsMoves(.FALSE. )
+      CALL Set_SavePrjAtEnd(.FALSE.)
+      CALL Set_SaveParamAtEnd(.FALSE.)
+
+
       RandomInitVal = .TRUE.
-      CALL WDialogPutCheckBoxLogical(IDF_RandomInitVal, RandomInitVal)
       SA_SimplexDampingFactor = 0.1
+      
+      IF ( .NOT. in_batch ) THEN
+        CALL SelectDASHDialog(IDD_SA_Modal_input2)
+        CALL WDialogPutCheckBoxLogical(IDF_RandomInitVal, RandomInitVal)
 ! Grey out the "Previous Results >" button in the DICVOL Wizard window
-      CALL WDialogSelect(IDD_PW_Page8)
-      CALL WDialogFieldState(IDB_PrevRes,Disabled)
+        CALL SelectDASHDialog(IDD_PW_Page8)
+        CALL WDialogFieldState(IDB_PrevRes,Disabled)
+! Temp: Hide run topas in background, as requested in RT6522
+        CALL SelectDASHDialog(IDD_Configuration)
+        CALL WDialogFieldState(IDC_TOPAS_in_background, DialogHidden)
 ! Hide bkg term
-      CALL WDialogSelect(IDD_PW_Page6)
-      CALL WDialogFieldState(IDF_LABEL4, DialogHidden)
-      CALL WDialogFieldState(IDF_BKG_TERM_TOPAS, DialogHidden)
-      CALL WDialogFieldState(IDF_LABEL5, DialogHidden)
-      CALL WDialogFieldState(IDF_BKG_TERM_GSAS, DialogHidden)
-      CALL WDialogFieldState(IDF_LABEL6, DialogHidden)
-      CALL WDialogFieldState(IDF_BKG_TERM_RIETAN, DialogHidden)
+        CALL SelectDASHDialog(IDD_PW_Page6)
+        CALL WDialogFieldState(IDF_LABEL4, DialogHidden)
+        CALL WDialogFieldState(IDF_BKG_TERM_TOPAS, DialogHidden)
+        CALL WDialogFieldState(IDF_LABEL5, DialogHidden)
+        CALL WDialogFieldState(IDF_BKG_TERM_GSAS, DialogHidden)
+        CALL WDialogFieldState(IDF_LABEL6, DialogHidden)
+        CALL WDialogFieldState(IDF_BKG_TERM_RIETAN, DialogHidden)
+        CALL SelectDASHDialog(IDD_PW_Page4)
+        CALL WDialogFieldState(IDF_GSAS_Import_ins, DialogHidden)
 ! Grey out 'Remove background' button on toolbar
-      CALL WMenuSetState(ID_Remove_Background, ItemEnabled, WintOff)
+        CALL WMenuSetState(ID_Remove_Background, ItemEnabled, WintOff)
+      ENDIF
+
       SlimValue = 1.0
       ScalFac   = 0.01
       BackRef   = .TRUE.
@@ -605,10 +774,11 @@
       LOGICAL, EXTERNAL :: SavePDB, SaveCSSR, SaveCCL, SaveCIF, SaveRES,  &
                            Get_ColourFlexibleTorsions, ConnectPointsObs,  &
                            PlotObservedErrorBars, PlotDifferenceErrorBars, &
-						   PlotBackground, PlotPeakFitDifferenceProfile,  &
-                           WDialogGetCheckBoxLogical,                     &
+                           PlotBackground, PlotPeakFitDifferenceProfile,  &
+                           DASHWDialogGetCheckBoxLogical,                     &
                            Get_SavePRO, Get_OutputChi2vsMoves,            &
-                           Get_DivideByEsd, Get_SavePrjAtEnd
+                           Get_DivideByEsd, Get_SavePrjAtEnd,             &
+                           Get_SaveParamAtEnd
       LOGICAL, EXTERNAL :: Get_WriteWavelength2XYEFile
       LOGICAL, EXTERNAL :: Get_ShowCumChiSqd, Get_AutoAlign
       REAL, EXTERNAL :: WavelengthOf, PlotEsdMultiplier
@@ -625,13 +795,8 @@
       IF ( in_batch ) &
         RETURN
       RW = 0
-      CALL IOsVariable('APPDATA', tFileName)
-      IF ( LEN_TRIM(tFileName) .GT. 0 ) THEN
-        tFileName = TRIM(tFileName)//DIRSPACER//'D3.cfg'
-      ELSE
-        tFileName = TRIM(StartUpDirectory)//'D3.cfg'
-      ENDIF
       hFile = 10
+      tFileName = TRIM(AppDataDirectory)//'D3.cfg'
 ! Open the file as direct access (i.e. non-sequential) unformatted with a record length of 1 (=4 bytes)
       OPEN(UNIT=hFile,FILE=tFileName,ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',ERR=999)
       RecNr = 1
@@ -720,27 +885,27 @@
       DefaultWorkingDir = 'D:\cvsDASH\dash\Debug'
       CALL FileWriteString(hFile, RecNr, DefaultWorkingDir)
 ! Save defaults for background subtraction
-      CALL WDialogSelect(IDD_PW_Page6)
+      CALL SelectDASHDialog(IDD_PW_Page6)
   ! Number of iterations
-      CALL WDialogGetInteger(IDF_NumOfIterations, tInteger)
+      CALL DASHWDialogGetInteger(IDF_NumOfIterations, tInteger)
       CALL FileWriteInteger(hFile, RecNr, tInteger)
   ! Window
-      CALL WDialogGetInteger(IDF_WindowWidth, tInteger)
+      CALL DASHWDialogGetInteger(IDF_WindowWidth, tInteger)
       CALL FileWriteInteger(hFile, RecNr, tInteger)
   ! Use Monte Carlo YES / NO
-      CALL FileWriteLogical(hFile, RecNr, WDialogGetCheckBoxLogical(IDF_UseMCYN))
+      CALL FileWriteLogical(hFile, RecNr, DASHWDialogGetCheckBoxLogical(IDF_UseMCYN))
   ! Use spline smooth YES / NO
-      CALL FileWriteLogical(hFile, RecNr, WDialogGetCheckBoxLogical(IDF_UseMCYN))
+      CALL FileWriteLogical(hFile, RecNr, DASHWDialogGetCheckBoxLogical(IDF_UseMCYN))
 ! Save default wavelength
       CALL FileWriteReal(hFile, RecNr, WavelengthOf('Cu'))
 ! Save default maximum resolution
       CALL FileWriteReal(hFile, RecNr, DASHDefaultMaxResolution)
 ! Save the viewer
-      CALL WDialogSelect(IDD_Configuration)
-      CALL WDialogGetString(IDF_ViewExe, ViewExe)
+      CALL SelectDASHDialog(IDD_Configuration)
+      CALL DASHWDialogGetString(IDF_ViewExe, ViewExe)
       CALL FileWriteString(hFile, RecNr, ViewExe)
 ! and the viewer arguments
-      CALL WDialogGetString(IDF_ViewArg, ViewArg)
+      CALL DASHWDialogGetString(IDF_ViewArg, ViewArg)
       CALL FileWriteString(hFile, RecNr, ViewArg)
 ! Save hydrogen treatment 1 = ignore, 2 = absorb, 3 = explicit
       CALL FileWriteLogical(hFile, RecNr, HydrogenTreatment)
@@ -761,29 +926,29 @@
 ! Save the damping factor for the local minimisation
       CALL FileWriteReal(hFile, RecNr, SA_SimplexDampingFactor)
 ! Save the seeds for the random number generator
-      CALL WDialogSelect(IDD_SA_input3_2)
-      CALL WDialogGetInteger(IDF_SA_RandomSeed1, tInteger)
+      CALL SelectDASHDialog(IDD_SA_input3_2)
+      CALL DASHWDialogGetInteger(IDF_SA_RandomSeed1, tInteger)
       CALL FileWriteInteger(hFile, RecNr, tInteger)
-      CALL WDialogGetInteger(IDF_SA_RandomSeed2, tInteger)
+      CALL DASHWDialogGetInteger(IDF_SA_RandomSeed2, tInteger)
       CALL FileWriteInteger(hFile, RecNr, tInteger)
-      CALL WDialogGetInteger(IDF_SA_MaxRepeats, tInteger)
+      CALL DASHWDialogGetInteger(IDF_SA_MaxRepeats, tInteger)
       CALL FileWriteInteger(hFile, RecNr, tInteger)
-      CALL WDialogGetReal(IDF_SA_ChiTest, tReal)
+      CALL DASHWDialogGetReal(IDF_SA_ChiTest, tReal)
       CALL FileWriteReal(hFile, RecNr, tReal)
-      CALL WDialogGetReal(IDF_MaxMoves1, tReal)
+      CALL DASHWDialogGetReal(IDF_MaxMoves1, tReal)
       CALL FileWriteReal(hFile, RecNr, tReal)
-      CALL WDialogGetInteger(IDF_MaxMoves2, tInteger)
+      CALL DASHWDialogGetInteger(IDF_MaxMoves2, tInteger)
       CALL FileWriteInteger(hFile, RecNr, tInteger)
-      CALL WDialogSelect(IDD_SAW_Page5)
+      CALL SelectDASHDialog(IDD_SAW_Page5)
 ! Atom labels for SA solutions overlay. Two options: 
 ! 1. "Element symbol + solution number"
 ! 2. "Original atom labels"
-      CALL WDialogGetRadioButton(IDF_UseSolutionNr, tInteger)
+      CALL DASHWDialogGetRadioButton(IDF_UseSolutionNr, tInteger)
       CALL FileWriteInteger(hFile, RecNr, tInteger)
 ! Atom colours for SA solutions overlay. Two options: 
 ! 1. "By solution number"
 ! 2. "By element"
-      CALL WDialogGetRadioButton(IDF_ColourBySolution, tInteger)
+      CALL DASHWDialogGetRadioButton(IDF_ColourBySolution, tInteger)
       CALL FileWriteInteger(hFile, RecNr, tInteger)
 ! Following is new in DASH 2.1
 ! Use hydrogens for auto local minimise
@@ -797,39 +962,44 @@
       CALL FileWriteLogical(hFile, RecNr, Get_AutoAlign())
 ! Following is new in DASH 3.0
 ! Save the mogul path
-      CALL WDialogSelect(IDD_Configuration)
-      CALL WDialogGetString(IDF_MogulExe, MOGULEXE)
+      CALL SelectDASHDialog(IDD_Configuration)
+      CALL DASHWDialogGetString(IDF_MogulExe, MOGULEXE)
       CALL FileWriteString(hFile, RecNr, MOGULEXE)
 ! Use Mogul
       CALL FileWriteLogical(hFile, RecNr, UseMogul)
 ! Single crystal options
-      CALL WDialogSelect(IDD_SX_Page2)
-      CALL FileWriteLogical(hFile, RecNr, WDialogGetCheckBoxLogical(IDF_RecalcESDs))
-      CALL FileWriteLogical(hFile, RecNr, WDialogGetCheckBoxLogical(IDF_IgnLT))
-      CALL WDialogGetReal(IDF_CutOff, tReal)
+      CALL SelectDASHDialog(IDD_SX_Page2)
+      CALL FileWriteLogical(hFile, RecNr, DASHWDialogGetCheckBoxLogical(IDF_RecalcESDs))
+      CALL FileWriteLogical(hFile, RecNr, DASHWDialogGetCheckBoxLogical(IDF_IgnLT))
+      CALL DASHWDialogGetReal(IDF_CutOff, tReal)
       CALL FileWriteReal(hFile, RecNr, tReal)
-      CALL FileWriteLogical(hFile, RecNr, WDialogGetCheckBoxLogical(IDF_AvgFriedelPairs))
+      CALL FileWriteLogical(hFile, RecNr, DASHWDialogGetCheckBoxLogical(IDF_AvgFriedelPairs))
 ! Following is new in DASH 3.1
-      CALL WDialogSelect(IDD_Configuration)
-      CALL WDialogGetString(IDF_DICVOLExe, DICVOLEXE)
+      CALL SelectDASHDialog(IDD_Configuration)
+      CALL DASHWDialogGetString(IDF_DICVOLExe, DICVOLEXE)
       CALL FileWriteString(hFile, RecNr, DICVOLEXE)
-      CALL WDialogGetString(IDF_TOPASExe, TOPASEXE)
+      CALL DASHWDialogGetString(IDF_TOPASExe, TOPASEXE)
       CALL FileWriteString(hFile, RecNr, TOPASEXE)
-      CALL WDialogGetString(IDF_EXPGUIExe, EXPGUIEXE)
+      CALL DASHWDialogGetString(IDF_EXPGUIExe, EXPGUIEXE)
       CALL FileWriteString(hFile, RecNr, EXPGUIEXE)
-      CALL WDialogGetString(IDF_RIETANExe, RIETANEXE)
+      CALL DASHWDialogGetString(IDF_RIETANExe, RIETANEXE)
       CALL FileWriteString(hFile, RecNr, RIETANEXE)
+      CALL DASHWDialogGetString(IDF_McMailleExe, McMailleEXE)
+      CALL FileWriteString(hFile, RecNr, McMailleEXE)
       CALL FileWriteLogical(hFile, RecNr, Get_WriteWavelength2XYEFile())
-      CALL FileWriteLogical(hFile, RecNr, WDialogGetCheckBoxLogical(IDC_cif_for_viewer))
+      CALL FileWriteLogical(hFile, RecNr, DASHWDialogGetCheckBoxLogical(IDF_BuiltIn_Mercury))
+      CALL FileWriteLogical(hFile, RecNr, DASHWDialogGetCheckBoxLogical(IDC_cif_for_viewer))
 ! Save defaults for background subtraction
-      CALL WDialogSelect(IDD_PW_Page6)
+      CALL SelectDASHDialog(IDD_PW_Page6)
   ! Use window smooth YES / NO
-      CALL FileWriteLogical(hFile, RecNr, WDialogGetCheckBoxLogical(IDF_UseSmooth))
+      CALL FileWriteLogical(hFile, RecNr, DASHWDialogGetCheckBoxLogical(IDF_UseSmooth))
   ! Window
-      CALL WDialogGetInteger(IDF_SmoothWindow, tInteger)
+      CALL DASHWDialogGetInteger(IDF_SmoothWindow, tInteger)
       CALL FileWriteInteger(hFile, RecNr, tInteger)
 ! Save .dash file at end of SA?
       CALL FileWriteLogical(hFile, RecNr, Get_SavePrjAtEnd())
+! Save .tbl file at end of SA?
+      CALL FileWriteLogical(hFile, RecNr, Get_SaveParamAtEnd())
 
 ! Save difference profile?
       CALL FileWriteLogical(hFile, RecNr, PlotDifferenceErrorBars())
@@ -873,13 +1043,11 @@
       LOGICAL   FExists
       INTEGER   tLen, MainVersionLen, SubVersionLen
 
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
       RW = 1
-      CALL IOsVariable('APPDATA', tFileName)
-      IF ( LEN_TRIM(tFileName) .GT. 0 ) THEN
-        tFileName = TRIM(tFileName)//DIRSPACER//'D3.cfg'
-      ELSE
-        tFileName = TRIM(StartUpDirectory)//'D3.cfg'
-      ENDIF
+      tFileName = TRIM(AppDataDirectory)//'D3.cfg'
       INQUIRE(FILE=tFileName,EXIST=FExists)
       IF (.NOT. FExists) RETURN
       hFile = 10
@@ -969,29 +1137,39 @@
       CALL FileRWInteger(hFile, RecNr, RW, KolBack%IRed)
       CALL FileRWInteger(hFile, RecNr, RW, KolBack%IGreen)
       CALL FileRWInteger(hFile, RecNr, RW, KolBack%IBlue)
-      CALL WDialogSelect(IDD_Plot_Option_Dialog)
+
+      IF ( .NOT. IN_BATCH ) &
+        CALL SelectDASHDialog(IDD_Plot_Option_Dialog)
 ! Show error bars YES / NO
       CALL FileReadLogical(hFile, RecNr, tLogical)
-      CALL WDialogPutCheckBoxLogical(IDF_ErrorBar_Check, tLogical)
+      IF ( .NOT. IN_BATCH ) &
+        CALL WDialogPutCheckBoxLogical(IDF_ErrorBar_Check, tLogical)
 ! Show background YES / NO
       CALL FileReadLogical(hFile, RecNr, tLogical)
-      CALL WDialogPutCheckBoxLogical(IDF_background_check, tLogical)
+      IF ( .NOT. IN_BATCH ) &
+        CALL WDialogPutCheckBoxLogical(IDF_background_check, tLogical)
 ! Connect data points with lines YES / NO
       CALL FileReadLogical(hFile, RecNr, tLogical)
-      CALL WDialogPutCheckBoxLogical(IDF_ConnectObsPoints, tLogical)
+      IF ( .NOT. IN_BATCH ) &
+        CALL WDialogPutCheckBoxLogical(IDF_ConnectObsPoints, tLogical)
 ! Plot peak fit difference YES / NO
       CALL FileReadLogical(hFile, RecNr, tLogical)
-      CALL WDialogPutCheckBoxLogical(IDF_PlotPeakFitDif, tLogical)
+      IF ( .NOT. IN_BATCH ) &
+        CALL WDialogPutCheckBoxLogical(IDF_PlotPeakFitDif, tLogical)
 ! Read the default working directory
       CALL FileReadString(hFile, RecNr, tString)
 ! Read defaults for background subtraction
-      CALL WDialogSelect(IDD_PW_Page6)
+      IF ( .NOT. IN_BATCH ) &
+        CALL SelectDASHDialog(IDD_PW_Page6)
       CALL FileReadInteger(hFile, RecNr, tInteger)      ! Number of iterations
-      CALL WDialogPutInteger(IDF_NumOfIterations, tInteger)
+      IF ( .NOT. IN_BATCH ) &
+        CALL WDialogPutInteger(IDF_NumOfIterations, tInteger)
       CALL FileReadInteger(hFile, RecNr, tInteger)      ! Window
-      CALL WDialogPutInteger(IDF_WindowWidth, tInteger)
+      IF ( .NOT. IN_BATCH ) &
+        CALL WDialogPutInteger(IDF_WindowWidth, tInteger)
       CALL FileReadLogical(hFile, RecNr, tLogical)      ! Use Monte Carlo YES / NO
-      CALL WDialogPutCheckBoxLogical(IDF_UseMCYN, tLogical)
+      IF ( .NOT. IN_BATCH ) &
+        CALL WDialogPutCheckBoxLogical(IDF_UseMCYN, tLogical)
       CALL FileReadLogical(hFile, RecNr, tLogical)      ! Use spline smooth YES / NO
 ! Read default wavelength
       CALL FileReadReal(hFile, RecNr, tReal)
@@ -1001,12 +1179,17 @@
 ! Now initialise the maximum resolution in the dialogue window
       CALL Update_TruncationLimits
 ! Read the viewer
-      CALL WDialogSelect(IDD_Configuration)
+      IF ( .NOT. IN_BATCH ) &
+        CALL SelectDASHDialog(IDD_Configuration)
       CALL FileReadString(hFile, RecNr, ViewExe)
-      CALL WDialogPutString(IDF_ViewExe, ViewExe)
+  
+      IF ( .NOT. IN_BATCH ) &
+        CALL WDialogPutString(IDF_ViewExe, ViewExe)
 ! and the viewer arguments
       CALL FileReadString(hFile, RecNr, ViewArg)
-      CALL WDialogPutString(IDF_ViewArg, ViewArg)
+
+      IF ( .NOT. IN_BATCH ) &
+        CALL WDialogPutString(IDF_ViewArg, ViewArg)
 ! Read hydrogen treatment. This was a LOGICAL for versions below DASH 2.2
       IF ( (MainVersionStr .EQ. "1") .OR.    &
           ((MainVersionStr .EQ. "2") .AND. ((SubVersionStr .EQ. "0") .OR. (SubVersionStr .EQ. "1") .OR. (SubVersionStr .EQ. "2"))) ) THEN
@@ -1022,64 +1205,101 @@
       ENDIF
 ! Colour flexible torsions (in Z-matrix viewer) YES / NO
       CALL FileReadLogical(hFile, RecNr, tLogical)
-      CALL WDialogPutCheckBoxLogical(IDF_ColFlexTors, tLogical)
-      CALL WDialogSelect(IDD_SA_input4)
+      IF ( .NOT. IN_BATCH ) &
+        CALL WDialogPutCheckBoxLogical(IDF_ColFlexTors, tLogical)
+ 
 ! Read YES / NO which molecular file formats are to be written out when a best solution is found
       CALL FileReadLogical(hFile, RecNr, tLogical)   ! 1. .pdb  ?
-      CALL WDialogPutCheckBoxLogical(IDF_OutputPDB, tLogical)
+      CALL Set_SavePDB(tLogical)
+      
       CALL FileReadLogical(hFile, RecNr, tLogical)   ! 2. .cssr ?
-      CALL WDialogPutCheckBoxLogical(IDF_OutputCSSR, tLogical)
+      CALL Set_SaveCSSR(tLogical)
+
       CALL FileReadLogical(hFile, RecNr, tLogical)   ! 3. .ccl  ?
-      CALL WDialogPutCheckBoxLogical(IDF_OutputCCL, tLogical)
+      CALL Set_SaveCCL(tLogical)
+
       CALL FileReadLogical(hFile, RecNr, tLogical)   ! 4. .cif  ?
-      CALL WDialogPutCheckBoxLogical(IDF_OutputCIF, tLogical)
+      CALL Set_SaveCIF(tLogical)
+      
       CALL FileReadLogical(hFile, RecNr, tLogical)   ! 5. .res  ?
-      CALL WDialogPutCheckBoxLogical(IDF_OutputRES, tLogical)
+      CALL Set_SaveRES(tLogical)
+      
       CALL FileReadLogical(hFile, RecNr, tLogical)   ! 6. .pro  ?
-      CALL WDialogPutCheckBoxLogical(IDF_OutputPRO, tLogical)
+      CALL Set_SavePRO(tLogical)
+
+
+
 ! Auto local minimisation at the end of every run in multirun YES / NO
       CALL FileReadLogical(hFile, RecNr, tLogical)
-      CALL WDialogPutCheckBoxLogical(IDF_AutoLocalOptimise, tLogical)
+
+      IF ( .NOT. IN_BATCH ) THEN
+        CALL SelectDASHDialog(IDD_SA_input4)
+        CALL WDialogPutCheckBoxLogical(IDF_AutoLocalOptimise, tLogical)
+      ENDIF
+
 ! Read output profile chi**2 versus moves plot YES / NO
       CALL FileReadLogical(hFile, RecNr, tLogical)
-      CALL WDialogPutCheckBoxLogical(IDF_OutputChi2vsMoves, tLogical)
+      CALL Set_OutputChi2vsMoves(tLogical)
+
 ! Read the damping factor for the local minimisation
       CALL FileReadReal(hFile,RecNr,SA_SimplexDampingFactor)
 ! Read the seeds for the random number generator
-      CALL WDialogSelect(IDD_SA_input3_2)
+
+      IF ( .NOT. IN_BATCH ) &
+        CALL SelectDASHDialog(IDD_SA_input3_2)
+  
       CALL FileReadInteger(hFile, RecNr, tInteger)
-      CALL WDialogPutInteger(IDF_SA_RandomSeed1, tInteger)
+      IF ( .NOT. IN_BATCH ) &
+        CALL WDialogPutInteger(IDF_SA_RandomSeed1, tInteger)
+
       CALL FileReadInteger(hFile, RecNr, tInteger)
-      CALL WDialogPutInteger(IDF_SA_RandomSeed2, tInteger)
+      IF ( .NOT. IN_BATCH ) &
+        CALL WDialogPutInteger(IDF_SA_RandomSeed2, tInteger)
+
       CALL FileReadInteger(hFile, RecNr, tInteger)
-      CALL WDialogPutInteger(IDF_SA_MaxRepeats, tInteger)
+      IF ( .NOT. IN_BATCH ) &
+        CALL WDialogPutInteger(IDF_SA_MaxRepeats, tInteger)
+      
       CALL FileReadReal(hFile, RecNr, tReal)
-      CALL WDialogPutReal(IDF_SA_ChiTest, tReal)
+      IF ( .NOT. IN_BATCH ) &
+        CALL WDialogPutReal(IDF_SA_ChiTest, tReal)
+
       CALL FileReadReal(hFile, RecNr, tReal)
-      CALL WDialogPutReal(IDF_MaxMoves1, tReal)
+      IF ( .NOT. IN_BATCH ) &
+        CALL WDialogPutReal(IDF_MaxMoves1, tReal)
+
       CALL FileReadInteger(hFile, RecNr, tInteger)
-      CALL WDialogPutInteger(IDF_MaxMoves2, tInteger)
-      CALL WDialogSelect(IDD_SAW_Page5)
+      IF ( .NOT. IN_BATCH ) &
+        CALL WDialogPutInteger(IDF_MaxMoves2, tInteger)
+
+      IF ( .NOT. IN_BATCH ) &
+        CALL SelectDASHDialog(IDD_SAW_Page5)
 ! Atom labels for SA solutions overlay. Two options: 
 ! 1. "Element symbol + solution number"
 ! 2. "Original atom labels"
       CALL FileReadInteger(hFile, RecNr, tInteger)
-      SELECT CASE (tInteger)
-        CASE (1)
-          CALL WDialogPutRadioButton(IDF_UseSolutionNr)
-        CASE (2)
-          CALL WDialogPutRadioButton(IDF_UseOriginal)
-      END SELECT
+      IF ( .NOT. IN_BATCH ) THEN
+        SELECT CASE (tInteger)
+          CASE (1)
+            CALL WDialogPutRadioButton(IDF_UseSolutionNr)
+          CASE (2)
+            CALL WDialogPutRadioButton(IDF_UseOriginal)
+        END SELECT
+      END IF
+
 ! Atom colours for SA solutions overlay. Two options: 
 ! 1. "By solution number"
 ! 2. "By element"
       CALL FileReadInteger(hFile, RecNr, tInteger)
-      SELECT CASE (tInteger)
-        CASE (1)
-          CALL WDialogPutRadioButton(IDF_ColourBySolution)
-        CASE (2)
-          CALL WDialogPutRadioButton(IDF_ColourByElement)
-      END SELECT
+
+      IF ( .NOT. IN_BATCH ) THEN
+        SELECT CASE (tInteger)
+          CASE (1)
+            CALL WDialogPutRadioButton(IDF_ColourBySolution)
+          CASE (2)
+            CALL WDialogPutRadioButton(IDF_ColourByElement)
+        END SELECT
+      ENDIF
 ! Following is new in DASH 2.1
 ! Use hydrogens for auto local minimise
       CALL FileReadLogical(hFile, RecNr, tLogical)
@@ -1090,8 +1310,10 @@
       CALL Set_UseHydrogensDuringAutoLocalMinimise(tLogical)
 ! Plot cumulative chi-squared 
       CALL FileReadLogical(hFile, RecNr, tLogical)
-      CALL WDialogSelect(IDD_Plot_Option_Dialog)
-      CALL WDialogPutCheckBoxLogical(IDF_ShowCumChiSqd, tLogical)
+      IF ( .NOT. IN_BATCH ) THEN
+        CALL SelectDASHDialog(IDD_Plot_Option_Dialog)
+        CALL WDialogPutCheckBoxLogical(IDF_ShowCumChiSqd, tLogical)
+      ENDIF
 ! Following is new in DASH 2.2
 ! Divide difference by ESDs
       CALL FileReadLogical(hFile, RecNr, tLogical)
@@ -1099,7 +1321,8 @@
         CLOSE(hFile)
         RETURN
       ENDIF
-      CALL WDialogPutCheckBoxLogical(IDF_DivDiffByEsd, tLogical)
+      IF ( .NOT. IN_BATCH ) &
+        CALL WDialogPutCheckBoxLogical(IDF_DivDiffByEsd, tLogical)
 ! Auto align      
       CALL FileReadLogical(hFile, RecNr, tLogical)
       CALL Set_AutoAlign(tLogical)
@@ -1110,20 +1333,29 @@
         CLOSE(hFile)
         RETURN
       ENDIF
-      CALL WDialogSelect(IDD_Configuration)
-      CALL WDialogPutString(IDF_MogulExe, MOGULEXE)
+ 
+      IF ( .NOT. IN_BATCH ) THEN
+        CALL SelectDASHDialog(IDD_Configuration)
+        CALL WDialogPutString(IDF_MogulExe, MOGULEXE)
+      ENDIF
+
 ! Use Mogul
       CALL FileReadLogical(hFile, RecNr, UseMogul)
 ! Single crystal options
-      CALL WDialogSelect(IDD_SX_Page2)
+      IF ( .NOT. IN_BATCH ) &
+        CALL SelectDASHDialog(IDD_SX_Page2)
       CALL FileReadLogical(hFile, RecNr, tLogical)
-      CALL WDialogPutCheckBoxLogical(IDF_RecalcESDs, tLogical)
+      IF ( .NOT. IN_BATCH ) &
+        CALL WDialogPutCheckBoxLogical(IDF_RecalcESDs, tLogical)
       CALL FileReadLogical(hFile, RecNr, tLogical)
-      CALL WDialogPutCheckBoxLogical(IDF_IgnLT, tLogical)
+      IF ( .NOT. IN_BATCH ) &
+        CALL WDialogPutCheckBoxLogical(IDF_IgnLT, tLogical)
       CALL FileReadReal(hFile, RecNr, tReal)
-      CALL WDialogPutReal(IDF_CutOff, tReal)
+      IF ( .NOT. IN_BATCH ) &
+        CALL WDialogPutReal(IDF_CutOff, tReal)
       CALL FileReadLogical(hFile, RecNr, tLogical)
-      CALL WDialogPutCheckBoxLogical(IDF_AvgFriedelPairs, tLogical)
+      IF ( .NOT. IN_BATCH ) &
+        CALL WDialogPutCheckBoxLogical(IDF_AvgFriedelPairs, tLogical)
 ! Following is new in DASH 3.1
 ! Read the DICVOL04 path
       CALL FileReadString(hFile, RecNr, DICVOLEXE)
@@ -1131,63 +1363,114 @@
         CLOSE(hFile)
         RETURN
       ENDIF
-      CALL WDialogSelect(IDD_Configuration)
-      CALL WDialogPutString(IDF_DICVOLExe, DICVOLEXE)
+      IF ( .NOT. IN_BATCH ) THEN
+        CALL SelectDASHDialog(IDD_Configuration)
+        CALL WDialogPutString(IDF_DICVOLExe, DICVOLEXE)
+      ENDIF
       CALL FileReadString(hFile, RecNr, TOPASEXE)
-      CALL WDialogPutString(IDF_TOPASExe, TOPASEXE)
+      IF ( .NOT. IN_BATCH ) &
+        CALL WDialogPutString(IDF_TOPASExe, TOPASEXE)
       CALL FileReadString(hFile, RecNr, EXPGUIEXE)
-      CALL WDialogPutString(IDF_EXPGUIExe, EXPGUIEXE)
+      IF ( .NOT. IN_BATCH ) &
+        CALL WDialogPutString(IDF_EXPGUIExe, EXPGUIEXE)
       CALL FileReadString(hFile, RecNr, RIETANEXE)
-      CALL WDialogPutString(IDF_RIETANExe, RIETANEXE)
+      IF ( .NOT. IN_BATCH ) &
+        CALL WDialogPutString(IDF_RIETANExe, RIETANEXE)
+      CALL FileReadString(hFile, RecNr, McMailleEXE)
+      IF ( .NOT. IN_BATCH ) &
+        CALL WDialogPutString(IDF_McMailleExe, McMailleEXE)
       CALL FileReadLogical(hFile, RecNr, tLogical)
-      CALL WDialogPutCheckBoxLogical(IDC_wl_in_xye, tLogical)
+      IF ( .NOT. IN_BATCH ) &
+        CALL WDialogPutCheckBoxLogical(IDC_wl_in_xye, tLogical)
       CALL FileReadLogical(hFile, RecNr, tLogical)
-      CALL WDialogPutCheckBoxLogical(IDC_cif_for_viewer, tLogical)
-! Update state of related radio/check
-      CALL WDialogSelect(IDD_PW_Page7)
-      IF ( LEN_TRIM(DICVOLEXE) .GT. 0 ) THEN
-        CALL WDialogFieldState(IDF_RADIO2, Enabled)
-      ELSE
-        CALL WDialogFieldState(IDF_RADIO2, Disabled)
+      IF ( .NOT. IN_BATCH ) &
+        CALL WDialogPutCheckBoxLogical(IDF_BuiltIn_Mercury, tLogical)
+      IF ( .NOT. IN_BATCH ) THEN
+        IF (tLogical) THEN
+          CALL WDialogFieldState(IDF_Use_Client, Enabled)
+          CALL WDialogFieldState(IDBBROWSE, Disabled)
+          CALL WDialogFieldState(IDF_ViewExe, Disabled)
+          CALL WDialogFieldState(IDF_ViewArg, Disabled)
+        ELSE
+          CALL WDialogFieldState(IDF_Use_Client, Disabled)
+          CALL WDialogFieldState(IDBBROWSE, Enabled)
+          CALL WDialogFieldState(IDF_ViewExe, Enabled)
+          CALL WDialogFieldState(IDF_ViewArg, Enabled)
+        ENDIF
       ENDIF
-! As loaded by WizardWindowShow, IDD_SAW_Page6a has to be handled there
-      CALL WDialogSelect(IDD_SAW_Page6)
-      IF ( SetRRMethodRadioState() ) CALL WDialogPutRadioButton(IDF_RADIO1)
-      IF ( tLogical ) THEN
-        CALL WDialogSelect(IDD_Summary)
-        CALL WDialogFieldState(IDF_ColourBySolution, Disabled)
-        CALL WDialogPutRadioButton(IDF_ColourByElement)
-        CALL WDialogSelect(IDD_SAW_Page5)
-        CALL WDialogFieldState(IDF_ColourBySolution, Disabled)
-        CALL WDialogPutRadioButton(IDF_ColourByElement)
-      ELSE
-        CALL WDialogSelect(IDD_Summary)
-        CALL WDialogFieldState(IDF_ColourBySolution, Enabled)
-        CALL WDialogSelect(IDD_SAW_Page5)
-        CALL WDialogFieldState(IDF_ColourBySolution, Enabled)
-      ENDIF
-! Read defaults for background subtraction
-      CALL WDialogSelect(IDD_PW_Page6)
-      CALL FileReadLogical(hFile, RecNr, tLogical)      ! Use Monte Carlo YES / NO
-      CALL WDialogPutCheckBoxLogical(IDF_UseSmooth, tLogical)
-      IF ( tLogical ) THEN
-        CALL WDialogFieldState(IDF_LABEL3, Enabled)
-        CALL WDialogFieldState(IDF_SmoothWindow, Enabled)
-      ELSE
-        CALL WDialogFieldState(IDF_LABEL3, Disabled)
-        CALL WDialogFieldState(IDF_SmoothWindow, Disabled)
-      ENDIF
-      CALL FileReadInteger(hFile, RecNr, tInteger)      ! Window
-      CALL WDialogPutInteger(IDF_SmoothWindow, tInteger)
-      CALL WDialogSelect(IDD_SA_input4)
-      CALL FileReadLogical(hFile, RecNr, tLogical)
-      CALL WDialogPutCheckBoxLogical(IDC_OuputDASH, tLogical)
 
       CALL FileReadLogical(hFile, RecNr, tLogical)
-      CALL WDialogPutCheckBoxLogical(IDF_DifferenceErrorBar_Check, tLogical)
+      IF ( .NOT. IN_BATCH ) THEN
+        CALL WDialogPutCheckBoxLogical(IDC_cif_for_viewer, tLogical)
+! Update state of related radio/check
+        CALL SelectDASHDialog(IDD_PW_Page7)
+        IF ( LEN_TRIM(DICVOLEXE) .GT. 0 ) THEN
+          CALL WDialogFieldState(IDF_RADIO2, Enabled)
+        ELSE
+          CALL WDialogFieldState(IDF_RADIO2, Disabled)
+        ENDIF
+        IF ( LEN_TRIM(McMailleEXE) .GT. 0 ) THEN
+          CALL WDialogFieldState(IDF_RADIO3, Enabled)
+        ELSE
+          CALL WDialogFieldState(IDF_RADIO3, Disabled)
+        ENDIF
+! As loaded by WizardWindowShow, IDD_SAW_Page6a has to be handled there
+        CALL SelectDASHDialog(IDD_SAW_Page6)
+        IF ( SetRRMethodRadioState() ) CALL WDialogPutRadioButton(IDF_RADIO1)
+        IF ( tLogical ) THEN
+          CALL SelectDASHDialog(IDD_Summary)
+          CALL WDialogFieldState(IDF_ColourBySolution, Disabled)
+          CALL WDialogPutRadioButton(IDF_ColourByElement)
+          CALL SelectDASHDialog(IDD_SAW_Page5)
+          CALL WDialogFieldState(IDF_ColourBySolution, Disabled)
+          CALL WDialogPutRadioButton(IDF_ColourByElement)
+        ELSE
+          CALL SelectDASHDialog(IDD_Summary)
+          CALL WDialogFieldState(IDF_ColourBySolution, Enabled)
+          CALL SelectDASHDialog(IDD_SAW_Page5)
+          CALL WDialogFieldState(IDF_ColourBySolution, Enabled)
+        ENDIF
+      ENDIF
+
+! Read defaults for background subtraction
+      IF ( .NOT. IN_BATCH ) &
+        CALL SelectDASHDialog(IDD_PW_Page6)
+      CALL FileReadLogical(hFile, RecNr, tLogical)      ! Use Monte Carlo YES / NO
+      IF ( .NOT. IN_BATCH ) & 
+        CALL WDialogPutCheckBoxLogical(IDF_UseSmooth, tLogical)
+      
+      IF ( .NOT. IN_BATCH ) THEN
+        IF ( tLogical ) THEN
+          CALL WDialogFieldState(IDF_LABEL3, Enabled)
+          CALL WDialogFieldState(IDF_SmoothWindow, Enabled)
+        ELSE
+          CALL WDialogFieldState(IDF_LABEL3, Disabled)
+          CALL WDialogFieldState(IDF_SmoothWindow, Disabled)
+        ENDIF
+      ENDIF
+
+      CALL FileReadInteger(hFile, RecNr, tInteger)      ! Window
+
+      IF ( .NOT. IN_BATCH ) THEN
+        CALL WDialogPutInteger(IDF_SmoothWindow, tInteger)
+        CALL SelectDASHDialog(IDD_SA_input4)
+      ENDIF
+
+      CALL FileReadLogical(hFile, RecNr, tLogical)
+      CALL Set_SavePrjAtEnd(tLogical)
+
+      CALL FileReadLogical(hFile, RecNr, tLogical)
+      CALL Set_SaveParamAtEnd(tLogical)
+
+      CALL FileReadLogical(hFile, RecNr, tLogical)
+
+      IF ( .NOT. IN_BATCH ) &
+        CALL WDialogPutCheckBoxLogical(IDF_DifferenceErrorBar_Check, tLogical)
 
       CALL FileReadReal(hFile, RecNr, tReal)
-      CALL WDialogPutReal(IDF_ErrorMultiplier_RealEntry, tReal)
+
+      IF ( .NOT. IN_BATCH ) &
+        CALL WDialogPutReal(IDF_ErrorMultiplier_RealEntry, tReal)
 
       CLOSE(hFile)
       RETURN

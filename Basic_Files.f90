@@ -159,6 +159,15 @@
   999 RETURN
 
       END SUBROUTINE FileReadInteger
+
+      LOGICAL FUNCTION FileErrorOccurred
+
+      INTEGER     BFIOErrorCode
+      COMMON /IO/ BFIOErrorCode
+
+      FileErrorOccurred = ( BFIOErrorCode .EQ. 1 )
+
+      END FUNCTION FileErrorOccurred
 !
 !*****************************************************************************
 ! 
@@ -392,7 +401,7 @@
       ENDDO
 ! If we haven't found a '.' by now, we cannot deal with the extension anyway
       Extension = ''
-      IF (FileName(iPos:iPos) .NE. '.') THEN
+      IF (iPos .EQ. 0 .OR. FileName(iPos:iPos) .NE. '.') THEN
         ExtLength = 0
       ELSE
         Extension = FileName(iPos+1:iLen)

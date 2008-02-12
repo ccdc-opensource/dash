@@ -37,7 +37,7 @@
       CALL SetModeMenuState(-1,1)
       CALL SelectMode(ID_Pawley_Refinement_Mode)
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Pawley_Status)
+      CALL SelectDASHDialog(IDD_Pawley_Status)
       IF (SpaceGroupDetermination) THEN
         CALL WDialogPutString(IDF_PawRef_Solve, 'Run>')
       ELSE
@@ -180,7 +180,7 @@
       COMMON /SGFLAG/ SpaceGroupDetermination
 
       INTEGER, EXTERNAL :: Quick_Pawley_Fit, GETTIC
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
       REAL, EXTERNAL :: DEGREE
       LOGICAL, EXTERNAL :: SaveProject
 ! Save the boxes from Pawley fit to Pawley fit
@@ -203,7 +203,7 @@
 
       Exists = .FALSE.
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Pawley_Status)
+      CALL SelectDASHDialog(IDD_Pawley_Status)
       SELECT CASE (EventType)
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
@@ -287,7 +287,7 @@
               PeakShapeSigma(2) = PKFNSP(1,2,1,1)
               PeakShapeGamma(1) = PKFNSP(2,1,1,1)
               PeakShapeGamma(2) = PKFNSP(2,2,1,1)
-              CALL WDialogSelect(IDD_ViewPawley)
+              CALL SelectDASHDialog(IDD_ViewPawley)
               CALL WDialogPutReal(IDF_Sigma1, PeakShapeSigma(1), '(F10.4)')
               CALL WDialogPutReal(IDF_Sigma2, PeakShapeSigma(2), '(F10.4)')
               CALL WDialogPutReal(IDF_Gamma1, PeakShapeGamma(1), '(F10.4)')
@@ -311,17 +311,17 @@
               CALL Upload_ZeroPoint 
               CALL Generate_TicMarks
 ! JCC Save the settings
-              CALL WDialogSelect(IDD_Pawley_Status)
-              CALL WDialogGetReal(IDF_Pawley_Cycle_Rwp, RLastValues(1)) 
-              CALL WDialogGetReal(IDF_Pawley_Cycle_ChiSq, RLastValues(2))
-              CALL WDialogGetReal(IDF_Pawley_Cycle_RwpExp, RLastValues(3))
-              CALL WDialogGetInteger(IDF_Pawley_Cycle_NumPts, ILastValues(1))
-              CALL WDialogGetInteger(IDF_Pawley_Cycle_NumRefs, ILastValues(2))
+              CALL SelectDASHDialog(IDD_Pawley_Status)
+              CALL DASHWDialogGetReal(IDF_Pawley_Cycle_Rwp, RLastValues(1)) 
+              CALL DASHWDialogGetReal(IDF_Pawley_Cycle_ChiSq, RLastValues(2))
+              CALL DASHWDialogGetReal(IDF_Pawley_Cycle_RwpExp, RLastValues(3))
+              CALL DASHWDialogGetInteger(IDF_Pawley_Cycle_NumPts, ILastValues(1))
+              CALL DASHWDialogGetInteger(IDF_Pawley_Cycle_NumRefs, ILastValues(2))
               LastValuesSet = .TRUE.
               CALL make_polybackup
 ! Disable the Solve button until the user does a Save
               CALL WDialogFieldState(IDF_PawRef_Solve, Disabled)
-              CALL WDialogSelect(IDD_Pawley_Status)
+              CALL SelectDASHDialog(IDD_Pawley_Status)
               IF (LastValuesSet) CALL WDialogFieldState(IDB_PawRef_Save, Enabled)
               CALL WDialogFieldState(IDF_PawRef_Refine, Enabled)
               CALL WDialogFieldState(IDB_PawRef_Accept, Disabled)
@@ -343,7 +343,7 @@
 ! window
                 IF(SpaceGroupDetermination) THEN 
                   CALL WDialogFieldState(IDB_PawRef_Save, Disabled)
-                  CALL WDialogGetInteger(IDF_Pawley_Refinement_Number, Inum)
+                  CALL DASHWDialogGetInteger(IDF_Pawley_Refinement_Number, Inum)
                     IF (Inum .LE. 1) THEN
                       CALL WDialogFieldState(IDF_PawRef_Solve, Disabled)
                     ELSE
@@ -399,13 +399,13 @@
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDF_PawRef_RefSigm1_Check)
-              CALL WDialogFieldStateLogical(IDF_PawRef_RefSigm2_Check,.NOT. WDialogGetCheckBoxLogical(IDF_PawRef_RefSigm1_Check))
+              CALL WDialogFieldStateLogical(IDF_PawRef_RefSigm2_Check,.NOT. DASHWDialogGetCheckBoxLogical(IDF_PawRef_RefSigm1_Check))
             CASE (IDF_PawRef_RefSigm2_Check)
-              CALL WDialogFieldStateLogical(IDF_PawRef_RefSigm1_Check,.NOT. WDialogGetCheckBoxLogical(IDF_PawRef_RefSigm2_Check))
+              CALL WDialogFieldStateLogical(IDF_PawRef_RefSigm1_Check,.NOT. DASHWDialogGetCheckBoxLogical(IDF_PawRef_RefSigm2_Check))
             CASE (IDF_PawRef_RefGamm1_Check)
-              CALL WDialogFieldStateLogical(IDF_PawRef_RefGamm2_Check,.NOT. WDialogGetCheckBoxLogical(IDF_PawRef_RefGamm1_Check))
+              CALL WDialogFieldStateLogical(IDF_PawRef_RefGamm2_Check,.NOT. DASHWDialogGetCheckBoxLogical(IDF_PawRef_RefGamm1_Check))
             CASE (IDF_PawRef_RefGamm2_Check)
-              CALL WDialogFieldStateLogical(IDF_PawRef_RefGamm1_Check,.NOT. WDialogGetCheckBoxLogical(IDF_PawRef_RefGamm2_Check))
+              CALL WDialogFieldStateLogical(IDF_PawRef_RefGamm1_Check,.NOT. DASHWDialogGetCheckBoxLogical(IDF_PawRef_RefGamm2_Check))
           END SELECT
       END SELECT
       CALL PopActiveWindowID
@@ -465,7 +465,7 @@
                        XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD
       
       LOGICAL, EXTERNAL :: FnUnitCellOK, FnWaveLengthOK, FnPatternOK
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical, NearlyEqual
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical, NearlyEqual
       REAL,    EXTERNAL :: WavelengthOf
       INTEGER NPawBack
       CHARACTER*4 ChRadOption(4)
@@ -497,9 +497,9 @@
       NumInternalDSC = DataSetChange
       NumPawleyRef = NumPawleyRef + 1
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Pawley_Status)
-      CALL WDialogGetInteger(IDF_IDF_PawRef_NBack,NPawBack)
-      CALL WDialogGetInteger(IDF_Pawley_Total_Cycles,NTCycles)    
+      CALL SelectDASHDialog(IDD_Pawley_Status)
+      CALL DASHWDialogGetInteger(IDF_IDF_PawRef_NBack,NPawBack)
+      CALL DASHWDialogGetInteger(IDF_Pawley_Total_Cycles,NTCycles)    
       hFile = 42
       OPEN(hFile,FILE='polyp.ccl',status='unknown',ERR=999)
       WRITE(hFile,4210,ERR=999) 
@@ -522,7 +522,7 @@
       'L REFI PAWL'/                                                    &
       'L SORC ', A4/                                                    &
       'L WGHT 3')
-      CALL WDialogGetCheckBox(IDF_PawRef_UseInts_Check, Item)
+      CALL DASHWDialogGetCheckBox(IDF_PawRef_UseInts_Check, Item)
       IRtyp = 2 - Item
       WRITE(hFile,4246,ERR=999) IRTYP, XPMIN, XPMAX
  4246 FORMAT('L RTYP  'I3,2F10.3,'  0.001')
@@ -532,7 +532,7 @@
       IF ((ZeroPoint .LT. -1.0) .OR. (ZeroPoint .GT. 1.0)) ZeroPoint = 0.0
       WRITE(hFile,4260,ERR=999) ZeroPoint
  4260 FORMAT('L ZERO ',F10.5)
-      CALL WDialogGetReal(IDF_Slim_Parameter, SlimValue)
+      CALL DASHWDialogGetReal(IDF_Slim_Parameter, SlimValue)
       WRITE(hFile,4270,ERR=999) ScalFac, SlimValue
  4270 FORMAT('L SCAL   ',F7.5,/                                         &
       'L SLIM ',F5.2,' '/                                               &
@@ -542,13 +542,13 @@
       WRITE(hFile,"('L PKFN LIMS 0.005')",ERR=999)
 !C Try to get the peak shape parameters from the View Pawley dialogue. If this fails, use the
 !C values in memory.
-      CALL WDialogSelect(IDD_ViewPawley)
-      CALL WDialogGetReal(IDF_Sigma1, tPeakShapeSigma(1))
-      CALL WDialogGetReal(IDF_Sigma2, tPeakShapeSigma(2))
-      CALL WDialogGetReal(IDF_Gamma1, tPeakShapeGamma(1))
-      CALL WDialogGetReal(IDF_Gamma2, tPeakShapeGamma(2))
-      CALL WDialogGetReal(IDF_HPSL, tPeakShapeHPSL)
-      CALL WDialogGetReal(IDF_HMSL, tPeakShapeHMSL)
+      CALL SelectDASHDialog(IDD_ViewPawley)
+      CALL DASHWDialogGetReal(IDF_Sigma1, tPeakShapeSigma(1))
+      CALL DASHWDialogGetReal(IDF_Sigma2, tPeakShapeSigma(2))
+      CALL DASHWDialogGetReal(IDF_Gamma1, tPeakShapeGamma(1))
+      CALL DASHWDialogGetReal(IDF_Gamma2, tPeakShapeGamma(2))
+      CALL DASHWDialogGetReal(IDF_HPSL, tPeakShapeHPSL)
+      CALL DASHWDialogGetReal(IDF_HMSL, tPeakShapeHMSL)
       IF ((tPeakShapeSigma(1) .GT. -100.0)  .AND. (tPeakShapeSigma(1) .LT. 100.0) .AND.   &
           (tPeakShapeSigma(2) .GT. -100.0)  .AND. (tPeakShapeSigma(2) .LT. 100.0) .AND.   &
           (tPeakShapeGamma(1) .GT. -100.0)  .AND. (tPeakShapeGamma(1) .LT. 100.0) .AND.   &
@@ -562,7 +562,7 @@
         PeakShapeHPSL     = tPeakShapeHPSL
         PeakShapeHMSL     = tPeakShapeHMSL
       ENDIF
-      CALL WDialogSelect(IDD_Pawley_Status)
+      CALL SelectDASHDialog(IDD_Pawley_Status)
       WRITE(hFile,4271,ERR=999) PeakShapeSigma(1), PeakShapeSigma(2)
       WRITE(hFile,4272,ERR=999) PeakShapeGamma(1), PeakShapeGamma(2)
       WRITE(hFile,4273,ERR=999) PeakShapeHPSL
@@ -578,13 +578,13 @@
         WRITE(hFile,"('L BACK ',7(F13.5,1X))",ERR=999) (PR_BackGround(J),J=6,NPawBack)
       ENDIF
       WRITE(hFile,'(A)',ERR=999) 'L VARY ONLY ALL INTS'
-      IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefBack_Check )) WRITE(hFile,'(A)',ERR=999) 'L VARY ALL BACK'
-      IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefCell_Check )) WRITE(hFile,'(A)',ERR=999) 'L VARY ALL CELL'
-      IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefZero_Check )) WRITE(hFile,'(A)',ERR=999) 'L VARY ZERO 1 '
-      IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefSigm1_Check)) WRITE(hFile,'(A)',ERR=999) 'L VARY SIGM 1'
-      IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefSigm2_Check)) WRITE(hFile,'(A)',ERR=999) 'L VARY SIGM 2'
-      IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefGamm1_Check)) WRITE(hFile,'(A)',ERR=999) 'L VARY GAMM 1'
-      IF (WDialogGetCheckBoxLogical(IDF_PawRef_RefGamm2_Check)) WRITE(hFile,'(A)',ERR=999) 'L VARY GAMM 2'
+      IF (DASHWDialogGetCheckBoxLogical(IDF_PawRef_RefBack_Check )) WRITE(hFile,'(A)',ERR=999) 'L VARY ALL BACK'
+      IF (DASHWDialogGetCheckBoxLogical(IDF_PawRef_RefCell_Check )) WRITE(hFile,'(A)',ERR=999) 'L VARY ALL CELL'
+      IF (DASHWDialogGetCheckBoxLogical(IDF_PawRef_RefZero_Check )) WRITE(hFile,'(A)',ERR=999) 'L VARY ZERO 1 '
+      IF (DASHWDialogGetCheckBoxLogical(IDF_PawRef_RefSigm1_Check)) WRITE(hFile,'(A)',ERR=999) 'L VARY SIGM 1'
+      IF (DASHWDialogGetCheckBoxLogical(IDF_PawRef_RefSigm2_Check)) WRITE(hFile,'(A)',ERR=999) 'L VARY SIGM 2'
+      IF (DASHWDialogGetCheckBoxLogical(IDF_PawRef_RefGamm1_Check)) WRITE(hFile,'(A)',ERR=999) 'L VARY GAMM 1'
+      IF (DASHWDialogGetCheckBoxLogical(IDF_PawRef_RefGamm2_Check)) WRITE(hFile,'(A)',ERR=999) 'L VARY GAMM 2'
       CLOSE(hFile)
       CALL PopActiveWindowID
       RETURN

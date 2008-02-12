@@ -75,8 +75,14 @@
       LOGICAL DesorbHydrogens
       REAL    XSIM(MVAR), DXSIM(MVAR)
 
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
       IF (Auto .AND. (.NOT. AutoMinimise)) RETURN
-      CALL WCursorShape(CurHourGlass)
+ 
+      IF ( .NOT. IN_BATCH ) &
+        CALL WCursorShape(CurHourGlass)
+
       tLOG_HYDROGENS = LOG_HYDROGENS
       DesorbHydrogens = .FALSE.
       IF (Auto .AND. UseHAutoMin) THEN
@@ -119,26 +125,30 @@
         ENDDO
         CALL valchipro(CHIPROBEST)
         NewOptimumFound = .TRUE.
-        CALL WDialogSelect(IDD_SA_Action1)
-        CALL WDialogPutReal(IDF_min_chisq, FOPT, '(F8.2)')
-        CALL WDialogPutReal(IDF_profile_chisq2, CHIPROBEST, '(F8.2)')
-        CALL WDialogSelect(IDD_Summary)
-        CALL WGridPutCellReal(IDF_SA_Summary, 4, Curr_SA_Run, CHIPROBEST, '(F7.2)')
-        CALL WGridPutCellReal(IDF_SA_Summary, 5, Curr_SA_Run, FOPT, '(F7.2)')
-  !U      CALL WDialogSelect(IDD_Parameter_Status)
+        IF ( .NOT. IN_BATCH ) THEN
+          CALL SelectDASHDialog(IDD_SA_Action1)
+          CALL WDialogPutReal(IDF_min_chisq, FOPT, '(F8.2)')
+          CALL WDialogPutReal(IDF_profile_chisq2, CHIPROBEST, '(F8.2)')
+          CALL SelectDASHDialog(IDD_Summary)
+          CALL WGridPutCellReal(IDF_SA_Summary, 4, Curr_SA_Run, CHIPROBEST, '(F7.2)')
+          CALL WGridPutCellReal(IDF_SA_Summary, 5, Curr_SA_Run, FOPT, '(F7.2)')
+  !U      CALL SelectDASHDialog(IDD_Parameter_Status)
   !U      DO i = 1, nvar
   !U        CALL WGridPutCellReal(IDF_CPL_grid,1,i,xopt(i),'(F12.5)')
   !U        DO icol = 2, 7
   !U          CALL WGridClearCell(IDF_CPL_grid,icol,i)
   !U        ENDDO
   !U      ENDDO
+        ENDIF
       ELSE
         IF (PrefParExists) THEN
           CALL PO_PRECFC(x_unique(iPrfPar))
           CALL FCN(x_unique,DFTEM,0)
         ENDIF
       ENDIF
-      CALL WCursorShape(CurCrossHair)
+
+      IF ( .NOT. IN_BATCH ) &
+        CALL WCursorShape(CurCrossHair)
 
       END SUBROUTINE LocalMinimise
 !

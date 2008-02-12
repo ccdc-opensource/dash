@@ -38,21 +38,31 @@
       REAL                                                                          iX, iUB, iLB  
       COMMON /ModalTorsions/ ModalFlag(mvar), RowNumber, iRadio, iX, iUB, iLB
 
+      LOGICAL, EXTERNAL :: SDIFileLoad
+      INTEGER, EXTERNAL :: Read_One_zm
+
       CHARACTER*255 line, keyword, tString
-      INTEGER iTem, hFile, nl, I, iLen, iFrg, iDummy
+      INTEGER iTem, hFile, nl, I, iLen, iFrg, iDummy, iP
       REAL    rTem
       REAL    MaxMoves1
       INTEGER MaxMoves2
+      LOGICAL tSdiIn, tZmIn
 
       in_batch = .TRUE.
       hFile = 63
       iFrg = 0
-      OPEN (UNIT=hFile, FILE=ArgString, STATUS='OLD', ERR=999)
+      tSdiIn = .FALSE.
+      tZmIn  = .FALSE.
+      OPEN (UNIT=hFile, FILE=ArgString, STATUS='OLD', ERR=998)
 ! Loop over all records
       DO WHILE ( .TRUE. )
- 10     READ(hFile, '(A)', END=100, ERR=999) line
+ 10     READ(hFile, '(A)', END=100, ERR=998) line
         nl = LEN_TRIM(line)
         IF ( nl .EQ. 0 ) GOTO 10 ! Blank line
+        iP = VERIFY(line, ' '//CHAR(9)) ! Locate first non space/tab char
+        IF ( iP .EQ. 0 ) GOTO 10 ! White spaces only
+        line = line(iP:) ! Remove leading white spaces
+        nl = nl - iP + 1 ! Update string length
         IF ( line(1:1) .EQ. "#" ) GOTO 10 ! It's a comment
         CALL INextString(line, keyword)
         CALL IUpperCase(keyword)
@@ -60,12 +70,36 @@
           CASE ('SDI') ! The .sdi file, containing wavelength, pattern, space group etc. etc.
             I = InfoError(1) ! reset the errors
             IF (InfoError(1) .NE. 0) GOTO 999
-            ! Problem here: should be function, we don't have a way of telling if this call succeeded
-            CALL SDIFileLoad(line(:nl))
+            IF ( .NOT. SDIFileLoad(line(:nl))) GOTO 999
+            tSdiIn = .TRUE.
           CASE ('OUT') ! The output file, must have extension .dash
             I = InfoError(1) ! reset the errors
             IF (InfoError(1) .NE. 0) GOTO 999
             PrjFileName = line(:nl)
+          CASE ('SAVE')
+            I = InfoError(1) ! reset the errors
+            CALL INextString(line, tString)
+            IF (InfoError(1) .NE. 0) GOTO 999
+
+            iLen = LEN_TRIM(tString)
+            IF      (tString(1:iLen) .EQ. "TBL")  THEN
+              CALL Set_SaveParamAtEnd(.TRUE.)
+            ELSE IF (tString(1:iLen) .EQ. "CHI")  THEN
+              CALL Set_OutputChi2vsMoves(.TRUE.)
+            ELSE IF (tString(1:iLen) .EQ. "CIF")  THEN
+              CALL Set_SaveCIF(.TRUE.)
+            ELSE IF (tString(1:iLen) .EQ. "PDB")  THEN
+              CALL Set_SavePDB(.TRUE.)
+            ELSE IF (tString(1:iLen) .EQ. "PRO")  THEN
+              CALL Set_SavePRO(.TRUE.)
+            ELSE IF (tString(1:iLen) .EQ. "CCL")  THEN
+              CALL Set_SaveCCL(.TRUE.)
+            ELSE IF (tString(1:iLen) .EQ. "CSSR") THEN
+              CALL Set_SaveCSSR(.TRUE.)
+            ELSE IF (tString(1:iLen) .EQ. "RES")  THEN
+              CALL Set_SaveRES(.TRUE.)
+            ENDIF
+
           CASE ('T0') ! T0, the starting temperature for the SA
             I = InfoError(1) ! reset the errors
             CALL INextReal(line, rTem)
@@ -120,12 +154,12 @@
             I = InfoError(1) ! reset the errors
             CALL INextString(line, tString)
             IF (InfoError(1) .NE. 0) GOTO 999
-            UseCCoM = (tString(1:iLen) .EQ. "TRUE")
+            UseCCoM = (tString(1:LEN_TRIM(tString) ) .EQ. "TRUE")
           CASE ('AUTOALIGN') ! Auto align
             I = InfoError(1) ! reset the errors
             CALL INextString(line, tString)
             IF (InfoError(1) .NE. 0) GOTO 999
-            LAlign = (tString(1:iLen) .EQ. "TRUE")
+            LAlign = (tString(1:LEN_TRIM(tString)) .EQ. "TRUE")
           CASE ('HYDROGEN') ! Hydrogen treatment
             I = InfoError(1) ! reset the errors
             CALL INextInteger(line, iTem)
@@ -135,12 +169,12 @@
             I = InfoError(1) ! reset the errors
             CALL INextString(line, tString)
             IF (InfoError(1) .NE. 0) GOTO 999
-            AutoMinimise = (tString(1:iLen) .EQ. "TRUE")
+            AutoMinimise = (tString(1:LEN_TRIM(tString)) .EQ. "TRUE")
           CASE ('MINIMISEHYDR') ! Use Hydrogens for auto local minimise
             I = InfoError(1) ! reset the errors
             CALL INextString(line, tString)
             IF (InfoError(1) .NE. 0) GOTO 999
-            UseHAutoMin = (tString(1:iLen) .EQ. "TRUE")
+            UseHAutoMin = (tString(1:LEN_TRIM(tString)) .EQ. "TRUE")
           CASE ('RANDOMISE') ! Randomise initial SA-parameter values
             I = InfoError(1) ! reset the errors
             CALL INextString(line, tString)
@@ -151,7 +185,12 @@
             I = InfoError(1) ! reset the errors
             iFrg = iFrg + 1
             frag_file(iFrg) = line(:nl)
-            CALL Read_One_Zm(iFrg)
+            iDummy = Read_One_Zm(iFrg)
+            IF (iDummy .NE. 0) THEN
+             CALL FileErrorPopup(frag_file(iFrg), iDummy)
+             GOTO 999 ! reading failed
+            ENDIF
+            tZmIn = .TRUE.
           CASE ('PO_DIR')
             I = InfoError(1) ! reset the errors
             CALL INextInteger(line, PO_Direction(1))
@@ -168,7 +207,7 @@
             CALL INextInteger(line, iTem)
             IF (InfoError(1) .NE. 0) GOTO 999
             DO I = 1, iTem
-              READ(hFile, '(A)', END=100, ERR=999) line
+              READ(hFile, '(A)', END=100, ERR=998) line
               nl = LEN_TRIM(line)  ! Since we only read iTem lines, this would crash
               IF ( nl .NE. 0 ) THEN ! Blank line
                 IF ( line(1:1) .NE. "#" ) THEN ! It's a comment
@@ -199,23 +238,31 @@
                     CASE DEFAULT
                       GOTO 999 ! Error
                   END SELECT
-           !       CALL ParseRawInput(I)
+                  CALL ParseRawInput(I)
                 ENDIF
               ENDIF
             ENDDO
+          CASE DEFAULT
+            CALL InfoMessage('Ignore the line begin with unknown keyword: '//TRIM(keyword))
         END SELECT
       ENDDO       
   100 CONTINUE 
+      IF ( ( .NOT. tSdiIn ) .OR. ( .NOT. tZmIn ) ) GOTO 996
       CLOSE(hFile)
       CALL BeginSA
       ! Exit DASH, but before doing so, save output to a file.
       ! it is probably best to save the output to a file that is specified in
-      ! the .duff file, because that makes it easier for the user to later relate
+      ! the .dbf file, because that makes it easier for the user to later relate
       ! the output back to the input.
       CALL PrjReadWrite(PrjFileName, cWrite)
       CALL DoExit
-  999 CONTINUE
-      CLOSE(hFile)
+
+  996 CALL ErrorMessage('Failed to read SDI or ZMATRIX line from '//TRIM(ArgString))
+      GOTO 990
+  998 CALL ErrorMessage('Problem occurred while open or read '//TRIM(ArgString))
+      GOTO 990
+  999 CALL ErrorMessage('Problem occurred while processing line begin with: '//TRIM(keyword))
+  990 CLOSE(hFile)
       CALL DoExit
 
       END SUBROUTINE BatchMode
@@ -234,15 +281,15 @@
       INTEGER                                                                    HydrogenTreatment
       COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign, HydrogenTreatment
 
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SA_input4)
-      CALL WDialogGetRadioButton(IDR_HydrogensIgnore, HydrogenTreatment)
-      UseCCoM = WDialogGetCheckBoxLogical(IDF_CrystallographicCoM)
-      AutoMinimise = WDialogGetCheckBoxLogical(IDF_AutoLocalOptimise)
-      UseHAutoMin = WDialogGetCheckBoxLogical(IDF_UseHydrogensAuto)
-      LAlign = WDialogGetCheckBoxLogical(IDF_Align)
+      CALL SelectDASHDialog(IDD_SA_input4)
+      CALL DASHWDialogGetRadioButton(IDR_HydrogensIgnore, HydrogenTreatment)
+      UseCCoM = DASHWDialogGetCheckBoxLogical(IDF_CrystallographicCoM)
+      AutoMinimise = DASHWDialogGetCheckBoxLogical(IDF_AutoLocalOptimise)
+      UseHAutoMin = DASHWDialogGetCheckBoxLogical(IDF_UseHydrogensAuto)
+      LAlign = DASHWDialogGetCheckBoxLogical(IDF_Align)
       CALL PopActiveWindowID
 
       END SUBROUTINE DownLoadSAOPT
@@ -270,8 +317,8 @@
 ! Save the batch file
       BatchFileSaveAs = 1 ! Failure
       iFLAGS = SaveDialog + AppendExt + PromptOn
-      FILTER = 'DASH batch files (*.duff)|*.duff|'
-      tFileName = OutputFilesBaseName(1:OFBN_Len)//'.duff'
+      FILTER = 'DASH batch files (*.dbf)|*.dbf|'
+      tFileName = OutputFilesBaseName(1:OFBN_Len)//'.dbf'
       CALL WSelectFile(FILTER,iFLAGS,tFileName,'Save project file')
       IF ((WinfoDialog(4) .EQ. CommonOK) .AND. (LEN_TRIM(tFileName) .NE. 0)) THEN
         CALL WriteBatchFile(tFileName, .FALSE.)
@@ -321,6 +368,12 @@
       REAL                                                                          iX, iUB, iLB  
       COMMON /ModalTorsions/ ModalFlag(mvar), RowNumber, iRadio, iX, iUB, iLB
 
+
+      LOGICAL , EXTERNAL :: Get_SavePRO, SavePDB
+      LOGICAL , EXTERNAL :: SaveCSSR, SaveCCL, SaveCIF, SaveRes
+      LOGICAL , EXTERNAL :: Get_SaveParamAtEnd
+      LOGICAL , EXTERNAL :: Get_OutputChi2vsMoves
+
       INTEGER iHandle, i, iFrg
       REAL    tReal
       INTEGER tInt
@@ -347,6 +400,57 @@
       WRITE(iHandle,'(A)',ERR=999) '# each run.'
       WRITE(iHandle,'(A,X,I6)',ERR=999) 'SEED1', iSeed1
       WRITE(iHandle,'(A,X,I6)',ERR=999) 'SEED2', iSeed2
+
+      WRITE(iHandle,'(A)',ERR=999) '# You can customize output by uncommenting some of the lines below'
+
+      IF ( Get_SavePRO() ) THEN
+        WRITE(iHandle,'(A)',ERR=999) 'SAVE PRO'
+      ELSE
+        WRITE(iHandle,'(A)',ERR=999) '# SAVE PRO'
+      ENDIF
+
+      IF ( SaveCIF() )  THEN
+        WRITE(iHandle,'(A)',ERR=999) 'SAVE CIF'
+      ELSE
+        WRITE(iHandle,'(A)',ERR=999) '# SAVE CIF'
+      ENDIF
+
+      IF ( SaveRES() ) THEN
+        WRITE(iHandle,'(A)',ERR=999) 'SAVE RES'
+      ELSE
+        WRITE(iHandle,'(A)',ERR=999) '# SAVE RES'
+      ENDIF
+
+      IF ( SaveCCL() ) THEN
+        WRITE(iHandle,'(A)',ERR=999) 'SAVE CCL'
+      ELSE
+        WRITE(iHandle,'(A)',ERR=999) '# SAVE CCL'
+      ENDIF
+      
+      IF ( SaveCSSR() ) THEN
+        WRITE(iHandle,'(A)',ERR=999) 'SAVE CSSR'
+      ELSE
+        WRITE(iHandle,'(A)',ERR=999) '# SAVE CSSR'
+      ENDIF
+
+      IF ( SavePDB() ) THEN
+        WRITE(iHandle,'(A)',ERR=999) 'SAVE PDB'
+      ELSE
+        WRITE(iHandle,'(A)',ERR=999) '# SAVE PDB'
+      ENDIF
+
+      IF ( Get_SaveParamAtEnd() ) THEN
+        WRITE(iHandle,'(A)',ERR=999) 'SAVE TBL'
+      ELSE
+        WRITE(iHandle,'(A)',ERR=999) '# SAVE TBL'
+      ENDIF
+
+      IF ( Get_OutputChi2vsMoves() ) THEN    
+        WRITE(iHandle,'(A)',ERR=999) 'SAVE CHI'
+      ELSE
+        WRITE(iHandle,'(A)',ERR=999) '# SAVE CHI'
+      ENDIF
+  
       WRITE(iHandle,'(A)',ERR=999) '# On a distributed system, NRUNS should probably be set to:'
       WRITE(iHandle,'(A)',ERR=999) '#     (total number of runs / number of processors)'
       WRITE(iHandle,'(A,X,I3)',ERR=999) 'NRUNS', MaxRuns
@@ -427,7 +531,7 @@
 
       CLOSE(iHandle) 
       RETURN
- 999  CALL ErrorMessage('Error writing .duff file.')
+ 999  CALL ErrorMessage('Error writing .dbf file.')
       CLOSE(iHandle) 
 
       END SUBROUTINE WriteBatchFile

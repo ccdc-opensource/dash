@@ -12,7 +12,7 @@
       CHARACTER*(*), INTENT (IN   ) :: input_file_name
       LOGICAL, INTENT (IN   ) :: fg_EXPGUI
 
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
       INTEGER, EXTERNAL :: FillOptStr, CheckEXPGUIExe
       CHARACTER*20, EXTERNAL :: Integer2String
 
@@ -29,11 +29,11 @@
         IF ( FillOptStr(opt_str) .LE. 0 ) GOTO 996
         IF ( CheckEXPGUIExe(EXPGUIEXE, tScriptName, fg_EXPGUI) .NE. 0 ) RETURN
         CALL PushActiveWindowID
-        CALL WDialogSelect(IDD_SAW_Page7_GSAS)
-        CALL WDialogGetInteger(IDF_NCYCL, nCycle)
-        CALL WDialogGetReal(IDF_REAL_GSAS_FACTR_DIST, factr_dist)
-        CALL WDialogGetReal(IDF_REAL_GSAS_FACTR_ANGLE, factr_angle)
-        CALL WDialogGetReal(IDF_REAL_GSAS_FACTR_PLANE, factr_plane)
+        CALL SelectDASHDialog(IDD_SAW_Page7_GSAS)
+        CALL DASHWDialogGetInteger(IDF_NCYCL, nCycle)
+        CALL DASHWDialogGetReal(IDF_REAL_GSAS_FACTR_DIST, factr_dist)
+        CALL DASHWDialogGetReal(IDF_REAL_GSAS_FACTR_ANGLE, factr_angle)
+        CALL DASHWDialogGetReal(IDF_REAL_GSAS_FACTR_PLANE, factr_plane)
         CALL PopActiveWindowID
         ExtLength = MIN(LEN_TRIM(input_file_name), LEN(tExtension))
         CALL SplitPath2(input_file_name, tDirName, tFileNameRoot, tExtension, ExtLength)
@@ -167,22 +167,21 @@
 
       CHARACTER*(*), INTENT (  OUT) :: OptStr
 
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
 
       INTEGER opt
 
       FillOptStr = 0
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SAW_Page7_GSAS)
+      CALL SelectDASHDialog(IDD_SAW_Page7_GSAS)
       opt = 0
-      IF ( WDialogGetCheckBoxLogical(IDC_Initialisation) ) opt = opt + Z'03'
-      IF ( WDialogGetCheckBoxLogical(IDC_Background) ) opt = opt + Z'04'
-      IF ( WDialogGetCheckBoxLogical(IDC_Scale) ) opt = opt + Z'08'
-      IF ( WDialogGetCheckBoxLogical(IDC_PO) ) opt = opt + Z'10'
-      IF ( WDialogGetCheckBoxLogical(IDC_Biso) ) opt = opt + Z'20'
-      IF ( WDialogGetCheckBoxLogical(IDC_Coordinates_Non_H) ) opt = opt + Z'40'
-      IF ( WDialogGetCheckBoxLogical(IDC_Coordinates_H) ) opt = opt + Z'80'
-      IF ( WDialogGetCheckBoxLogical(IDC_WriteCIF) ) opt = opt + Z'100'
+      IF ( DASHWDialogGetCheckBoxLogical(IDC_Initialisation) ) opt = opt + Z'03'
+      IF ( DASHWDialogGetCheckBoxLogical(IDC_Background) ) opt = opt + Z'04'
+      IF ( DASHWDialogGetCheckBoxLogical(IDC_Scale) ) opt = opt + Z'08'
+      IF ( DASHWDialogGetCheckBoxLogical(IDC_PO) ) opt = opt + Z'10'
+      IF ( DASHWDialogGetCheckBoxLogical(IDC_Biso) ) opt = opt + Z'20'
+      IF ( DASHWDialogGetCheckBoxLogical(IDC_Coordinates) ) opt = opt + Z'40' + Z'80'
+      IF ( DASHWDialogGetCheckBoxLogical(IDC_WriteCIF) ) opt = opt + Z'100'
       CALL PopActiveWindowID
 
       WRITE(OptStr,'(Z32)') opt
@@ -199,12 +198,12 @@
 
       IMPLICIT NONE
 
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SAW_Page7_GSAS)
+      CALL SelectDASHDialog(IDD_SAW_Page7_GSAS)
       IF ( ext_RR_stage .GT. 2 .AND. &
-           .NOT. WDialogGetCheckBoxLogical(IDC_UseDASHRecommendation) ) THEN
+           .NOT. DASHWDialogGetCheckBoxLogical(IDC_UseDASHRecommendation) ) THEN
           CALL PopActiveWindowID
           RETURN
       ENDIF
@@ -216,8 +215,7 @@
           CALL WDialogPutCheckBoxLogical(IDC_Background,        .FALSE.)
           CALL WDialogPutCheckBoxLogical(IDC_PO,                .FALSE.)
           CALL WDialogPutCheckBoxLogical(IDC_Biso,              .FALSE.)
-          CALL WDialogPutCheckBoxLogical(IDC_Coordinates_Non_H, .FALSE.)
-          CALL WDialogPutCheckBoxLogical(IDC_Coordinates_H,     .FALSE.)
+          CALL WDialogPutCheckBoxLogical(IDC_Coordinates,       .FALSE.)
           CALL WDialogPutCheckBoxLogical(IDC_WriteCIF,          .FALSE.)
         CASE ( 2 ) 
           CALL WDialogPutCheckBoxLogical(IDC_Initialisation,    .FALSE.)
@@ -225,8 +223,7 @@
           CALL WDialogPutCheckBoxLogical(IDC_Background,        .TRUE.)
           CALL WDialogPutCheckBoxLogical(IDC_PO,                .FALSE.)
           CALL WDialogPutCheckBoxLogical(IDC_Biso,              .FALSE.)
-          CALL WDialogPutCheckBoxLogical(IDC_Coordinates_Non_H, .FALSE.)
-          CALL WDialogPutCheckBoxLogical(IDC_Coordinates_H,     .FALSE.)
+          CALL WDialogPutCheckBoxLogical(IDC_Coordinates,       .FALSE.)
           CALL WDialogPutCheckBoxLogical(IDC_WriteCIF,          .FALSE.)
         CASE ( 3 )
           CALL WDialogPutCheckBoxLogical(IDC_Initialisation,    .FALSE.)
@@ -234,8 +231,7 @@
           CALL WDialogPutCheckBoxLogical(IDC_Background,        .TRUE.)
           CALL WDialogPutCheckBoxLogical(IDC_PO,                .FALSE.)
           CALL WDialogPutCheckBoxLogical(IDC_Biso,              .TRUE.)
-          CALL WDialogPutCheckBoxLogical(IDC_Coordinates_Non_H, .FALSE.)
-          CALL WDialogPutCheckBoxLogical(IDC_Coordinates_H,     .FALSE.)
+          CALL WDialogPutCheckBoxLogical(IDC_Coordinates,       .FALSE.)
           CALL WDialogPutCheckBoxLogical(IDC_WriteCIF,          .FALSE.)
         CASE ( 4 )
           CALL WDialogPutCheckBoxLogical(IDC_Initialisation,    .FALSE.)
@@ -243,17 +239,7 @@
           CALL WDialogPutCheckBoxLogical(IDC_Background,        .TRUE.)
           CALL WDialogPutCheckBoxLogical(IDC_PO,                .FALSE.)
           CALL WDialogPutCheckBoxLogical(IDC_Biso,              .TRUE.)
-          CALL WDialogPutCheckBoxLogical(IDC_Coordinates_Non_H, .TRUE.)
-          CALL WDialogPutCheckBoxLogical(IDC_Coordinates_H,     .FALSE.)
-          CALL WDialogPutCheckBoxLogical(IDC_WriteCIF,          .FALSE.)
-        CASE ( 5 )
-          CALL WDialogPutCheckBoxLogical(IDC_Initialisation,    .FALSE.)
-          CALL WDialogPutCheckBoxLogical(IDC_Scale,             .TRUE.)
-          CALL WDialogPutCheckBoxLogical(IDC_Background,        .TRUE.)
-          CALL WDialogPutCheckBoxLogical(IDC_PO,                .FALSE.)
-          CALL WDialogPutCheckBoxLogical(IDC_Biso,              .TRUE.)
-          CALL WDialogPutCheckBoxLogical(IDC_Coordinates_Non_H, .TRUE.)
-          CALL WDialogPutCheckBoxLogical(IDC_Coordinates_H,     .TRUE.)
+          CALL WDialogPutCheckBoxLogical(IDC_Coordinates,       .TRUE.)
           CALL WDialogPutCheckBoxLogical(IDC_WriteCIF,          .TRUE.)
       END SELECT
       CALL PopActiveWindowID
@@ -272,11 +258,11 @@
 
       IMPLICIT NONE
 
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
       INTEGER, EXTERNAL :: Launch_GSAS
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SAW_Page7_GSAS)
+      CALL SelectDASHDialog(IDD_SAW_Page7_GSAS)
       SELECT CASE (EventType)
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
@@ -289,7 +275,7 @@
               ENDIF
               CALL EndWizardPastPawley
             CASE (IDB_WRITE)
-              IF ( WDialogGetCheckBoxLogical(IDC_Initialisation) ) THEN
+              IF ( DASHWDialogGetCheckBoxLogical(IDC_Initialisation) ) THEN
                 ext_RR_stage = 1
                 CALL UpdateGSASCheckBoxes
               ENDIF
@@ -313,6 +299,7 @@
       INTEGER FUNCTION WriteGSASFiles(TheFileName)
 
       USE DRUID_HEADER
+      USE TAVAR
       USE VARIABLES
 
       IMPLICIT NONE
@@ -320,7 +307,7 @@
       CHARACTER*(*), INTENT (IN   ) :: TheFileName
 
       INTEGER, EXTERNAL :: WriteEXPGUIPhaseFile
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
 
       INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
@@ -329,6 +316,7 @@
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS), AVGESD
 
+      LOGICAL, EXTERNAL :: IsConstantStepWidth, Confirm
       REAL, EXTERNAL :: FnWavelengthOfMenuOption
       INTEGER, PARAMETER :: chFileRaw = 116, chFileIns = 117
       INTEGER iBaseLen, i, tLen, ExtLength
@@ -337,7 +325,7 @@
       INTEGER tIRadSelection
       CHARACTER (80) tLine
       INTEGER iNRec, i1, i2, j, iPola, iRad
-      REAL Lambda1, Lambda2, Pola, UVW(3), LXY(2), YScale, YMax
+      REAL Lambda1, Lambda2, Pola, UVW(3), LXY(2), YScale, YEsdScale, YMax, StepWidth
       REAL, PARAMETER :: cZero = 0.0, cKRatio = 0.5
       LOGICAL YScaled
 
@@ -345,6 +333,29 @@
       ! from one of the Wizard windows as part of a "iRietveldMethod" Rietveld refinement
       ! Initialise to failure
       WriteGSASFiles = 1
+      IF (MINVAL(YOBIN(1:NBIN)) .LT. 0.0) THEN
+        IF ( .NOT. Confirm( &
+             'There is at least one data point in the pattern with negative intensity.'//CHAR(13)// &
+             'GSAS may set negative intensities to zero.'//CHAR(13)//CHAR(13)// &
+             'If this is caused by DASH background subtraction,'//CHAR(13)// &
+             'it can be switched off in the Wizard to pass raw intensity.'//CHAR(13)//CHAR(13)// &
+             'Do you want to continue?') &
+           ) RETURN
+      ENDIF
+      StepWidth = XBIN(2) - XBIN(1)
+! Tests show that some constant width data sets (eg. Tutorial_4) can generate
+! rounding error up to 3.3E-6 on step width differences.
+! As expecting 1E-5 precision on 2-theta (eg. write .xye with F10.5), 
+! we may need double precision XBIN to overcome the rounding error.
+      IF (.NOT. IsConstantStepWidth(5E-6)) THEN
+        IF ( .NOT. Confirm( &
+             'The pattern step width seems non-constant.'//CHAR(13)// &
+             'The GSAS raw file format requires a constant step width. To resolve'//CHAR(13)// &
+             'this, the step width can be set to the average of whole pattern.'//CHAR(13)//CHAR(13)// &
+             'Do you want to use an averaged step width?') &
+           ) RETURN
+        StepWidth = (XBIN(NBIN) - XBIN(1)) / (NBIN - 1)
+      ENDIF
       ExtLength = MIN(LEN_TRIM(TheFileName), LEN(tExtension))
       CALL SplitPath2(TheFileName, tDirName, tFileNameRoot, tExtension, ExtLength)
       ! CALL IOsDirChange(tDirName)
@@ -362,7 +373,7 @@
       iNRec = NBIN / 5
       IF ( MOD(NBIN,5) .NE. 0 ) iNRec = iNRec + 1
       WRITE(tLine, '(A,2(I6,1X),A,1X,2(F10.4,1X),A)', ERR=999) 'BANK 1 ', NBIN, iNRec, 'CONS', &
-            XBIN(1) * 100.0,(XBIN(2) - XBIN(1)) * 100.0,'0.0 0.0 ESD'
+            XBIN(1) * 100.0,StepWidth * 100.0,'0.0 0.0 ESD'
       WRITE(chFileRaw, '(A80)', ERR=999) tLine
       ! Scale YOBIN, EBIN to fit F8.2, allowing negative values
       YMax = 0.0
@@ -376,16 +387,17 @@
         YScaled = .TRUE.
       ENDDO
       i1 = 1
+      YEsdScale = SQRT(YScale)
       DO I = 1, iNRec
         i2 = i1 + 4
         IF ( i2 .GT. NBIN ) i2 = NBIN
-        WRITE(tLine, '(10F8.2)', ERR=999) (YOBIN(J) * YScale, EBIN(J) * YScale, J = i1, i2)
+        WRITE(tLine, '(10F8.2)', ERR=999) (YOBIN(J) * YScale, EBIN(J) * YEsdScale, J = i1, i2)
         WRITE(chFileRaw, '(A80)', ERR=999) tLine
         i1 = i2 + 1
       ENDDO
       CLOSE(chFileRaw)
       IF ( YScaled ) CALL DebugErrorMessage('Intensity is rescaled to fit GSAS ESD format')
-      CALL WDialogSelect(IDD_PW_Page4)
+      CALL SelectDASHDialog(IDD_PW_Page4)
       IF ( JRadOption .EQ. 1 ) THEN
         tInstName = 'Lab X-ray'
         ! typical Pseudo-Viogt profile parameters for X-ray from GSAS manual
@@ -427,7 +439,7 @@
           Lambda2 = 0.0
           iRad = 0
         END SELECT
-        IF ( WDialogGetCheckBoxLogical(IDC_Monochromated) ) THEN
+        IF ( DASHWDialogGetCheckBoxLogical(IDC_Monochromated) ) THEN
           iPola = 0 ! diffracted beam
           Lambda2 = 0.0
         ELSE
@@ -452,6 +464,18 @@
       ! GSAS ins file
       tFileName = FileNameBase(1:iBaseLen)//'.ins'
       tLen = iBaseLen + 4
+      IF (DASHWDialogGetCheckBoxLogical(IDF_GSAS_Import_ins)) THEN
+        CALL ILowerCase(GSASINS)
+        CALL ILowerCase(tFileName)
+        CALL InfoError(1) ! Clear errors
+        CALL IOsCopyFile(GSASINS, tFileName(1:tLen))
+        I = InfoError(1)
+        IF (I .EQ. 0 .OR. I .EQ. ErrSameNames) GOTO 100  ! Done
+        CALL WarningMessage('Failed to copy the given .ins file: '//CHAR(13)//&
+                            TRIM(GSASINS)//CHAR(13)//'to'//CHAR(13)//&
+                            tFileName(1:tLen)//CHAR(13)//CHAR(13)//&
+                            'DASH will generated one.')
+      ENDIF
       OPEN(UNIT=chFileIns,FILE=tFileName(1:tLen),STATUS='unknown',ERR=998)
       WRITE(tLine, '(12X,60I1)', ERR=998) ((mod(I,10), I=1,10), J=1,6)
       WRITE(chFileIns, '(A80)', ERR=998) tLine
@@ -480,11 +504,11 @@
 !        WRITE(tLine, '(A,I1,4A15)', ERR=998) 'INS  1PRCF1', I, ('0.000000E+000', J=1,4)
 !        WRITE(chFileIns, '(A80)', ERR=998) tLine
 !      ENDDO
-      WRITE(tLine, '(A,4A15)', ERR=998) 'INS  1PRCF13', ('0.000000E+000', I=1,2)
-      WRITE(chFileIns, '(A80)', ERR=998) tLine
+!      WRITE(tLine, '(A,4A15)', ERR=998) 'INS  1PRCF13', ('0.000000E+000', I=1,2)
+!      WRITE(chFileIns, '(A80)', ERR=998) tLine
       CLOSE(chFileIns)
 
-      WriteGSASFiles = WriteEXPGUIPhaseFile(FileNameBase)
+  100 WriteGSASFiles = WriteEXPGUIPhaseFile(FileNameBase)
       RETURN
 
   999 CALL ErrorMessage('Error writing GSAS raw file.')

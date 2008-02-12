@@ -33,7 +33,7 @@
       INTEGER         CurrentWizardWindow
       COMMON /Wizard/ CurrentWizardWindow
 
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
 
       IF (CurrentWizardWindow .EQ. 0) RETURN
 ! Things go all wrong if some intelligent part of DASH decides that the current Wizard window should be
@@ -44,7 +44,7 @@
         CALL WindowSelect(0)
         CALL IOsWait(50) ! wait half a sec
       ENDDO
-      CALL WDialogSelect(CurrentWizardWindow)
+      CALL SelectDASHDialog(CurrentWizardWindow)
       IF (WInfoDialog(6) .GT. 0) THEN
         IXPos_IDD_Wizard = WInfoDialog(6)
         IYPos_IDD_Wizard = WInfoDialog(7)
@@ -55,17 +55,20 @@
 ! out of memory and back again.
       SELECT CASE ( CurrentWizardWindow )
         CASE ( IDD_RR_External )
-          CALL WDialogUnload(IDD_RR_External)
+          CALL UnloadDASHDialog(IDD_RR_External)
         CASE ( IDD_SX_Page1a )
-          CALL WDialogGetReal(IDF_MaxResolution, SXMaxResolution)
-          CALL WDialogUnload(IDD_SX_Page1a)
+          CALL DASHWDialogGetReal(IDF_MaxResolution, SXMaxResolution)
+          CALL UnloadDASHDialog(IDD_SX_Page1a)
         CASE ( IDD_SAW_Page6a )
-          CALL WDialogGetRadioButton(IDF_RADIO1, iRietveldMethodOpt)
-          CALL WDialogUnload(IDD_SAW_Page6a)
+          CALL DASHWDialogGetRadioButton(IDF_RADIO1, iRietveldMethodOpt)
+          CALL UnloadDASHDialog(IDD_SAW_Page6a)
+        CASE ( IDD_PW_Page8c )
+          CALL DASHWDialogGetRadioButton(IDF_RADIO1, iMcMailleNgridOpt)
+          CALL UnloadDASHDialog(IDD_PW_Page8c)
         CASE ( IDD_PW_Page3a )
-          lRebin = WDialogGetCheckBoxLogical(IDF_BinData)
-          CALL WDialogGetInteger(IDF_LBIN, iBinWidth)
-          CALL WDialogUnload(IDD_PW_Page3a)
+          lRebin = DASHWDialogGetCheckBoxLogical(IDF_BinData)
+          CALL DASHWDialogGetInteger(IDF_LBIN, iBinWidth)
+          CALL UnloadDASHDialog(IDD_PW_Page3a)
       END SELECT
 
       CurrentWizardWindow = 0
@@ -104,12 +107,12 @@
 ! out of memory and back again.
       SELECT CASE ( TheDialogID )
         CASE ( IDD_RR_External )
-          CALL WDialogLoad(IDD_RR_External)
+          CALL LoadDASHDialog(IDD_RR_External)
         CASE ( IDD_SX_Page1a )
-          CALL WDialogLoad(IDD_SX_Page1a)
+          CALL LoadDASHDialog(IDD_SX_Page1a)
           CALL WDialogPutReal(IDF_MaxResolution, SXMaxResolution)
         CASE ( IDD_SAW_Page6a )
-          CALL WDialogLoad(IDD_SAW_Page6a)
+          CALL LoadDASHDialog(IDD_SAW_Page6a)
           IF ( SetRRMethodRadioState() ) iRietveldMethodOpt = 1
           SELECT CASE ( iRietveldMethodOpt )
              CASE ( 2 )
@@ -121,14 +124,24 @@
              CASE DEFAULT
                CALL WDialogPutRadioButton(IDF_RADIO1)
           END SELECT
+        CASE ( IDD_PW_Page8c )
+          CALL LoadDASHDialog(IDD_PW_Page8c)
+          SELECT CASE ( iMcMailleNgridOpt )
+             CASE ( 2 )
+               CALL WDialogPutRadioButton(IDF_RADIO2)
+             CASE ( 3 )
+               CALL WDialogPutRadioButton(IDF_RADIO3)
+             CASE DEFAULT
+               CALL WDialogPutRadioButton(IDF_RADIO1)
+          END SELECT
         CASE ( IDD_PW_Page3a )
-          CALL WDialogLoad(IDD_PW_Page3a)
+          CALL LoadDASHDialog(IDD_PW_Page3a)
           CALL WDialogPutCheckBoxLogical(IDF_BinData, lRebin)
           CALL WDialogPutInteger(IDF_LBIN, iBinWidth)
           CALL WDialogFieldStateLogical(IDF_LBIN, lRebin)
       END SELECT
 
-      CALL WDialogSelect(TheDialogID)
+      CALL SelectDASHDialog(TheDialogID)
       CurrentWizardWindow = TheDialogID
       CALL WDialogShow(IXPos_IDD_Wizard, IYPos_IDD_Wizard, IDNEXT, Modeless)
       CALL WMenuSetState(ID_Start_Wizard, ItemEnabled, WintOff)
@@ -201,7 +214,7 @@
       LOGICAL, EXTERNAL :: WeCanDoAPawleyRefinement
 
       CALL EndWizard
-      CALL WDialogSelect(IDD_Polyfitter_Wizard_01)
+      CALL SelectDASHDialog(IDD_Polyfitter_Wizard_01)
       CALL WDialogPutRadioButton(IDF_PW_Option4)
       PastPawley = .FALSE.
 ! Ungrey 'Clear cell parameters' button on toolbar
@@ -216,13 +229,13 @@
       CALL WMenuSetState(ID_import_dpj_file, ItemEnabled, WintOn)
 ! Make unit cell etc. under 'View' no longer read only 
       CALL Upload_Cell_Constants
-      CALL WDialogSelect(IDD_Crystal_Symmetry)
+      CALL SelectDASHDialog(IDD_Crystal_Symmetry)
       CALL WDialogFieldState(IDF_Space_Group_Menu, Enabled)
       CALL WDialogFieldState(IDF_Crystal_System_Menu, Enabled)
       CALL WDialogFieldState(IDF_ZeroPoint,Enabled)
       CALL WDialogFieldState(IDAPPLY, Enabled)
       CALL WDialogFieldState(IDB_Delabc, Enabled)
-      CALL WDialogSelect(IDD_Data_Properties)
+      CALL SelectDASHDialog(IDD_Data_Properties)
       CALL WDialogFieldState(IDAPPLY, Enabled)
       IF (JRadOption .EQ. 1) CALL WDialogFieldState(IDF_Wavelength_Menu, Enabled)
       CALL WDialogFieldState(IDF_wavelength1, Enabled)
@@ -231,9 +244,9 @@
       CALL WDialogFieldState(IDF_CWN_Source, Disabled)
       CALL WDialogFieldState(IDF_TOF_source, Disabled)
 ! @@ ?
-      CALL WDialogSelect(IDD_Peak_Positions)
+      CALL SelectDASHDialog(IDD_Peak_Positions)
       CALL WDialogFieldState(ID_Index_Output, DialogReadOnly)
-      CALL WDialogSelect(IDD_ViewPawley)
+      CALL SelectDASHDialog(IDD_ViewPawley)
       CALL WDialogFieldState(IDF_Sigma1, Enabled)
       CALL WDialogFieldState(IDF_Sigma2, Enabled)
       CALL WDialogFieldState(IDF_Gamma1, Enabled)
@@ -258,9 +271,10 @@
 
       LOGICAL, EXTERNAL :: FnPatternOK
       INTEGER IPW_Option
+      CHARACTER(MaxPathLength) tFile
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Polyfitter_Wizard_01)
+      CALL SelectDASHDialog(IDD_Polyfitter_Wizard_01)
       SELECT CASE (EventType)
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
@@ -268,16 +282,16 @@
               CALL EndWizard
             CASE (IDNEXT)
 ! We're off the main page and on to new pages depending on the option.
-              CALL WDialogGetRadioButton(IDF_PW_Option1, IPW_Option)
+              CALL DASHWDialogGetRadioButton(IDF_PW_Option1, IPW_Option)
               SELECT CASE (IPW_Option)
                 CASE (1) ! View data / determine peaks positions
-                  CALL WDialogSelect(IDD_PW_Page3)
+                  CALL SelectDASHDialog(IDD_PW_Page3)
 ! If no data => grey out 'Next >' button
                   CALL WDialogFieldStateLogical(IDNEXT, FnPatternOK())
                   CALL WDialogFieldStateLogical(IDB_Bin, FnPatternOK())
                   CALL WizardWindowShow(IDD_PW_Page3)
                 CASE (2) ! Single crystal
-                  CALL WDialogSelect(IDD_SX_Page1)
+                  CALL SelectDASHDialog(IDD_SX_Page1)
                   ZeroPoint = 0.0
                   CALL Upload_ZeroPoint               
                   CALL Generate_TicMarks
@@ -289,8 +303,11 @@
                   CALL SelectMode(IDB_AnalyseSolutions)
                 CASE (5) ! Rietveld refinement
                   CALL WizardWindowShow(IDD_SAW_Page6)
-                  CALL WDialogFieldState(IDNEXT, Disabled)
-                  CALL WDialogFieldState(IDB_Restart, Disabled)
+                  CALL DASHWDialogGetString(IDF_Xtal_File_Name, tFile)
+                  IF (LEN_TRIM(tFile) .LE. 0) THEN
+                    CALL WDialogFieldState(IDNEXT, Disabled)
+                    CALL WDialogFieldState(IDB_Restart, Disabled)
+                  ENDIF
               END SELECT
           END SELECT
       END SELECT
@@ -358,12 +375,12 @@
       INCLUDE 'PARAMS.INC'
 
       INTEGER, EXTERNAL :: DiffractionFileBrowse, DiffractionFileOpen
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical, FnPatternOK
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical, FnPatternOK
       CHARACTER(MaxPathLength) CTEMP
-      INTEGER ISTAT
+      INTEGER ISTAT, iTmpJRadOption
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_PW_Page3)
+      CALL SelectDASHDialog(IDD_PW_Page3)
       SELECT CASE (EventType)
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
@@ -374,6 +391,14 @@
                 CALL WizardWindowShow(IDD_Polyfitter_Wizard_01)
               ENDIF
             CASE (IDNEXT, IDB_Bin)
+              IF ( iRietveldMethod .NE. INTERNAL_RB ) THEN
+                CALL DASHWDialogGetString(IDF_PWa_DataFileName_String, CTEMP)
+                IF (LEN_TRIM(CTEMP) .LE. 0) THEN
+                  CALL ErrorMessage('Have you chosen a diffaction file?')
+                  GOTO 230
+                ENDIF
+                IF (DiffractionFileOpen(CTEMP) .NE. 0) GOTO 230
+              ENDIF
               CALL WizardApplyDiffractionFileInput
               CALL Profile_Plot
 ! If the user is re-binning this profile, make sure we pass the binning
@@ -381,19 +406,27 @@
                 CALL WizardWindowShow(IDD_PW_Page3a)
               ELSE
                 CALL WizardWindowShow(IDD_PW_Page4)
+                IF ( iRietveldMethod .NE. INTERNAL_RB ) THEN
+                  ! Match radiation and state of monochromated option
+                  CALL DASHWDialogGetRadioButton(IDF_LabX_Source, iTmpJRadOption)
+                  CALL WDialogFieldStateLogical(IDC_Monochromated, iTmpJRadOption .EQ. 1)
+                ENDIF
               ENDIF
+  230         CONTINUE
             CASE (IDCANCEL, IDCLOSE)
               IF ( iRietveldMethod .NE. INTERNAL_RB ) THEN
                 CALL CopyBackup2Pattern()
                 iRietveldMethod = INTERNAL_RB
+                CALL EndWizardPastPawley
+              ELSE
+                CALL EndWizard
               ENDIF
-              CALL EndWizard
             CASE (ID_PWa_DF_Open)
-              CALL WDialogGetString(IDF_PWa_DataFileName_String, CTEMP)
+              CALL DASHWDialogGetString(IDF_PWa_DataFileName_String, CTEMP)
               ISTAT = DiffractionFileOpen(CTEMP)
 ! If no data => grey out 'Next >' button
-              CALL WDialogFieldStateLogical(IDNEXT, FnPatternOK())
-              CALL WDialogFieldStateLogical(IDB_Bin, FnPatternOK())
+              CALL WDialogFieldStateLogical(IDNEXT,  (ISTAT .EQ. 0 .AND. FnPatternOK()))
+              CALL WDialogFieldStateLogical(IDB_Bin, (ISTAT .EQ. 0 .AND. FnPatternOK()))
             CASE (IDBBROWSE)
               ISTAT = DiffractionFileBrowse()
 ! If no data => grey out 'Next >' button
@@ -419,12 +452,12 @@
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS), AVGESD
 
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_PW_Page3a)
-      IF (WDialogGetCheckBoxLogical(IDF_BinData)) THEN
-        CALL WDialogGetInteger(IDF_LBIN,LBIN)
+      CALL SelectDASHDialog(IDD_PW_Page3a)
+      IF (DASHWDialogGetCheckBoxLogical(IDF_BinData)) THEN
+        CALL DASHWDialogGetInteger(IDF_LBIN,LBIN)
       ELSE
         LBIN = 1
       ENDIF
@@ -449,10 +482,11 @@
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS), AVGESD
 
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
+      INTEGER iTmpJRadOption
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_PW_Page3a)
+      CALL SelectDASHDialog(IDD_PW_Page3a)
       SELECT CASE (EventType)
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
@@ -464,12 +498,19 @@
               CALL WizardApplyRebin
               CALL Profile_Plot
               CALL WizardWindowShow(IDD_PW_Page4)
+              IF ( iRietveldMethod .NE. INTERNAL_RB ) THEN
+                ! Match radiation and state of monochromated option
+                CALL DASHWDialogGetRadioButton(IDF_LabX_Source, iTmpJRadOption)
+                CALL WDialogFieldStateLogical(IDC_Monochromated, iTmpJRadOption .EQ. 1)
+              ENDIF
             CASE (IDCANCEL, IDCLOSE)
               IF ( iRietveldMethod .NE. INTERNAL_RB ) THEN
                 CALL CopyBackup2Pattern()
                 iRietveldMethod = INTERNAL_RB
+                CALL EndWizardPastPawley
+              ELSE
+                CALL EndWizard
               ENDIF
-              CALL EndWizard
             CASE (IDAPPLY)
               CALL WizardApplyRebin
               CALL Profile_Plot
@@ -478,7 +519,7 @@
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDF_BinData)
 ! If set to 'TRUE', ungrey value field and vice versa
-              CALL WDialogFieldStateLogical(IDF_LBIN, WDialogGetCheckBoxLogical(IDF_BinData))
+              CALL WDialogFieldStateLogical(IDF_LBIN, DASHWDialogGetCheckBoxLogical(IDF_BinData))
           END SELECT                
       END SELECT
       CALL PopActiveWindowID
@@ -506,12 +547,14 @@
 
       REAL, EXTERNAL :: TwoTheta2dSpacing
       LOGICAL, EXTERNAL :: FnWavelengthOK
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
       REAL Temp
-      INTEGER IRadSelection
+      INTEGER IRadSelection, iFlags
+      CHARACTER(MaxPathLength) tFileName
+      CHARACTER(LEN=45) :: FILTER
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_PW_Page4)
+      CALL SelectDASHDialog(IDD_PW_Page4)
       SELECT CASE (EventType)
         CASE ( PushButton ) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
@@ -526,7 +569,7 @@
               IF (.NOT. FnWavelengthOK()) THEN
                 CALL ErrorMessage('Invalid wavelength.')
               ELSE
-                CALL WDialogGetReal(IDF_wavelength1, Temp)
+                CALL DASHWDialogGetReal(IDF_wavelength1, Temp)
                 CALL Set_Wavelength(Temp)
                 CALL WizardWindowShow(IDD_PW_Page5)
               ENDIF
@@ -534,26 +577,45 @@
               IF ( iRietveldMethod .NE. INTERNAL_RB ) THEN
                 CALL CopyBackup2Pattern()
                 iRietveldMethod = INTERNAL_RB
+                CALL EndWizardPastPawley
+              ELSE
+                CALL EndWizard
               ENDIF
-              CALL EndWizard
           END SELECT
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDF_LabX_Source, IDF_SynX_Source, IDF_CWN_Source, IDF_TOF_source)
-              CALL WDialogGetRadioButton(IDF_LabX_Source, JRadOption)
+              CALL DASHWDialogGetRadioButton(IDF_LabX_Source, JRadOption)
               CALL Upload_Source
               CALL Generate_TicMarks 
               IF ( iRietveldMethod .NE. INTERNAL_RB ) THEN ! Enable/disable "Monochromated" check box
                 CALL WDialogFieldStateLogical(IDC_Monochromated, JRadOption .EQ. 1)
               ENDIF
             CASE (IDF_wavelength1)
-              CALL WDialogGetReal(IDF_wavelength1, Temp)
+              CALL DASHWDialogGetReal(IDF_wavelength1, Temp)
               CALL Set_Wavelength(Temp)
               CALL Generate_TicMarks 
             CASE (IDF_Wavelength_Menu)
-              CALL WDialogGetMenu(IDF_Wavelength_Menu, IRadSelection)
+              CALL DASHWDialogGetMenu(IDF_Wavelength_Menu, IRadSelection)
               CALL SetWavelengthToSelection(IRadSelection)
               CALL Generate_TicMarks 
+            CASE (IDF_GSAS_Import_ins)
+              IF ( EventInfo%VALUE2 .EQ. IDF_GSAS_Import_ins .AND. &
+                   iRietveldMethod .EQ. FOR_GSAS ) THEN
+                IF (DASHWDialogGetCheckBoxLogical(IDF_GSAS_Import_ins)) THEN
+                   CALL InfoMessage('When click on OK, you will be prompted to select'//CHAR(13)//&
+                               'an INS file to be used in GSAS. It will be copied'//CHAR(13)//&
+                               'to the directory where the generated EXP file goes '//CHAR(13)//&
+                               'and renamed as the same base name.'//CHAR(13)//&
+                               'Note: only BANK 1 will be used in the refinement.')
+                   tFileName = GSASINS
+                   FILTER = 'GSAS ins file (*.ins)|*.ins|'
+                   iFlags = LoadDialog + AppendExt + PromptOn
+                   CALL WSelectFile(FILTER, iFlags, tFileName, 'Select a GSAS ins file')
+                   IF ((WinfoDialog(4) .EQ. CommonOk) .AND. (LEN_TRIM(tFileName) .NE. 0)) &
+                     GSASINS = tFileName
+                ENDIF
+              ENDIF
           END SELECT                
       END SELECT
       CALL PopActiveWindowID
@@ -569,20 +631,20 @@
 
       IMPLICIT NONE
 
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical, FnPatternOK
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical, FnPatternOK
       REAL, EXTERNAL :: TwoTheta2dSpacing
       REAL    tMin, tMax
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_PW_Page5)
-      IF (WDialogGetCheckBoxLogical(IDF_TruncateStartYN)) THEN
-        CALL WDialogGetReal(IDF_Min2Theta, tMin)
+      CALL SelectDASHDialog(IDD_PW_Page5)
+      IF (DASHWDialogGetCheckBoxLogical(IDF_TruncateStartYN)) THEN
+        CALL DASHWDialogGetReal(IDF_Min2Theta, tMin)
       ELSE
 ! If the user doesn't want to truncate the data, just restore the old values
         tMin = 0.0
       ENDIF
-      IF (WDialogGetCheckBoxLogical(IDF_TruncateEndYN)) THEN
-        CALL WDialogGetReal(IDF_Max2Theta, tMax)
+      IF (DASHWDialogGetCheckBoxLogical(IDF_TruncateEndYN)) THEN
+        CALL DASHWDialogGetReal(IDF_Max2Theta, tMax)
       ELSE
 ! If the user doesn't want to truncate the data, just restore the old values
         tMax = 90.0
@@ -592,14 +654,14 @@
       IF (FnPatternOK()) THEN
 ! Update the values in the min/max fields to reflect what has actually happened
 ! (e.g. in case min was .GT. max)
-        IF (WDialogGetCheckBoxLogical(IDF_TruncateStartYN)) THEN
+        IF (DASHWDialogGetCheckBoxLogical(IDF_TruncateStartYN)) THEN
           CALL WDialogPutReal(IDF_Min2Theta, tMin)
         ENDIF
-        IF (WDialogGetCheckBoxLogical(IDF_TruncateEndYN)) THEN
+        IF (DASHWDialogGetCheckBoxLogical(IDF_TruncateEndYN)) THEN
           CALL WDialogPutReal(IDF_Max2Theta, tMax)
           CALL WDialogPutReal(IDF_MaxResolution, TwoTheta2dSpacing(tMax))
         ENDIF
-        CALL WDialogSelect(IDD_ViewPawley)
+        CALL SelectDASHDialog(IDD_ViewPawley)
         CALL WDialogPutReal(IDF_MaxResolution, TwoTheta2dSpacing(tMax))
       ENDIF
       CALL PopActiveWindowID
@@ -623,12 +685,12 @@
       COMMON /BackupPROFOBS/ BackupNOBS, BackupXOBS(MOBS), BackupYOBS(MOBS), BackupEOBS(MOBS)
 
       REAL, EXTERNAL :: TwoTheta2dSpacing, dSpacing2TwoTheta
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical, FnPatternOK
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical, FnPatternOK
       REAL tReal, tMin, tMax
       INTEGER tFieldState
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_PW_Page5)
+      CALL SelectDASHDialog(IDD_PW_Page5)
       SELECT CASE (EventType)
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
@@ -652,8 +714,10 @@
               IF ( iRietveldMethod .NE. INTERNAL_RB ) THEN
                 CALL CopyBackup2Pattern()
                 iRietveldMethod = INTERNAL_RB
+                CALL EndWizardPastPawley
+              ELSE
+                CALL EndWizard
               ENDIF
-              CALL EndWizard
             CASE (IDAPPLY)
               CALL WizardApplyProfileRange
 ! Check if we have reasonable data left. If not, don't allow the truncation
@@ -669,10 +733,10 @@
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDF_TruncateStartYN)
 ! If set to 'TRUE', ungrey value field and vice versa
-              CALL WDialogFieldStateLogical(IDF_Min2Theta, WDialogGetCheckBoxLogical(IDF_TruncateStartYN))
+              CALL WDialogFieldStateLogical(IDF_Min2Theta, DASHWDialogGetCheckBoxLogical(IDF_TruncateStartYN))
             CASE (IDF_TruncateEndYN)
 ! If set to 'TRUE', ungrey value fields and vice versa
-              IF (WDialogGetCheckBoxLogical(IDF_TruncateEndYN)) THEN
+              IF (DASHWDialogGetCheckBoxLogical(IDF_TruncateEndYN)) THEN
                 tFieldState = Enabled
               ELSE
                 tFieldState = Disabled
@@ -681,31 +745,31 @@
               CALL WDialogFieldState(IDF_MaxResolution, tFieldState)
               CALL WDialogFieldState(IDB_Convert, tFieldState)
             CASE (IDF_Min2Theta)
-              CALL WDialogGetReal(IDF_Min2Theta, tMin)
+              CALL DASHWDialogGetReal(IDF_Min2Theta, tMin)
               IF (tMin .LT. BackupXOBS(1)) tMin = BackupXOBS(1)
-              CALL WDialogGetReal(IDF_Max2Theta, tMax)
+              CALL DASHWDialogGetReal(IDF_Max2Theta, tMax)
               IF (tMin .GT. tMax) tMin = tMax
               CALL WDialogPutReal(IDF_Min2Theta, tMin)
             CASE (IDF_Max2Theta)
 ! When entering a maximum value for 2 theta, update maximum value for the resolution
-              CALL WDialogGetReal(IDF_Max2Theta, tMax)
+              CALL DASHWDialogGetReal(IDF_Max2Theta, tMax)
               IF (tMax .GT. BackupXOBS(BackupNOBS)) tMax = BackupXOBS(BackupNOBS)
-              CALL WDialogGetReal(IDF_Min2Theta, tMin)
+              CALL DASHWDialogGetReal(IDF_Min2Theta, tMin)
               IF (tMax .LT. tMin) tMax = tMin
               CALL WDialogPutReal(IDF_Max2Theta, tMax)
               CALL WDialogPutReal(IDF_MaxResolution, TwoTheta2dSpacing(tMax))
-              CALL WDialogSelect(IDD_ViewPawley)
+              CALL SelectDASHDialog(IDD_ViewPawley)
               CALL WDialogPutReal(IDF_MaxResolution, TwoTheta2dSpacing(tMax))
             CASE (IDF_MaxResolution)
 ! When entering a maximum value for the resolution, update maximum value for 2 theta
-              CALL WDialogGetReal(IDF_MaxResolution, tReal)
+              CALL DASHWDialogGetReal(IDF_MaxResolution, tReal)
               tMax = dSpacing2TwoTheta(tReal)
               IF (tMax .GT. BackupXOBS(BackupNOBS)) tMax = BackupXOBS(BackupNOBS)
-              CALL WDialogGetReal(IDF_Min2Theta, tMin)
+              CALL DASHWDialogGetReal(IDF_Min2Theta, tMin)
               IF (tMax .LT. tMin) tMax = tMin
               CALL WDialogPutReal(IDF_Max2Theta, tMax)
               CALL WDialogPutReal(IDF_MaxResolution, TwoTheta2dSpacing(tMax))
-              CALL WDialogSelect(IDD_ViewPawley)
+              CALL SelectDASHDialog(IDD_ViewPawley)
               CALL WDialogPutReal(IDF_MaxResolution, TwoTheta2dSpacing(tMax))
           END SELECT
       END SELECT
@@ -724,18 +788,18 @@
 
       INCLUDE 'lattice.inc'
 
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
       INTEGER tInt1, tInt2, tInt3
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_PW_Page6)
-      IF (WDialogGetCheckBoxLogical(IDF_SubtractBackground)) THEN
-        CALL WDialogGetInteger(IDF_NumOfIterations, tInt2)
-        CALL WDialogGetInteger(IDF_WindowWidth, tInt1)
-        CALL WDialogGetInteger(IDF_SmoothWindow, tInt3)
+      CALL SelectDASHDialog(IDD_PW_Page6)
+      IF (DASHWDialogGetCheckBoxLogical(IDF_SubtractBackground)) THEN
+        CALL DASHWDialogGetInteger(IDF_NumOfIterations, tInt2)
+        CALL DASHWDialogGetInteger(IDF_WindowWidth, tInt1)
+        CALL DASHWDialogGetInteger(IDF_SmoothWindow, tInt3)
         CALL SubtractBackground(tInt1, tInt2, &
-                                WDialogGetCheckBoxLogical(IDF_UseMCYN), &
-                                WDialogGetCheckBoxLogical(IDF_UseSmooth), tInt3)
+                                DASHWDialogGetCheckBoxLogical(IDF_UseMCYN), &
+                                DASHWDialogGetCheckBoxLogical(IDF_UseSmooth), tInt3)
       ELSE
         CALL Clear_BackGround
         BACKREF = .TRUE.
@@ -774,7 +838,7 @@
       REAL                               BackupXOBS,       BackupYOBS,       BackupEOBS
       COMMON /BackupPROFOBS/ BackupNOBS, BackupXOBS(MOBS), BackupYOBS(MOBS), BackupEOBS(MOBS)
 
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
       INTEGER tInt1, tInt2, tInt3, tFieldState
       REAL             tYPMIN,     tYPMAX,       &
                        tXPGMIN,    tXPGMAX,    tYPGMIN,    tYPGMAX,      &
@@ -782,7 +846,7 @@
       INTEGER          tIPMIN, tIPMAX, tiStart, tiStop, tnPoints
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_PW_Page6)
+      CALL SelectDASHDialog(IDD_PW_Page6)
       SELECT CASE (EventType)
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
@@ -804,8 +868,10 @@
               IF ( iRietveldMethod .NE. INTERNAL_RB ) THEN
                 CALL CopyBackup2Pattern()
                 iRietveldMethod = INTERNAL_RB
+                CALL EndWizardPastPawley
+              ELSE
+                CALL EndWizard
               ENDIF
-              CALL EndWizard
             CASE (IDB_Preview)
               tYPMIN     = YPMIN
               tYPMAX     = YPMAX
@@ -823,18 +889,18 @@
               tiStop     = iStop
               tnPoints   = nPoints
               CALL WizardApplyProfileRange
-              IF ( WDialogGetCheckBoxLogical(IDF_SubtractBackground) ) THEN
-                CALL WDialogGetInteger(IDF_NumOfIterations, tInt2)
-                CALL WDialogGetInteger(IDF_WindowWidth, tInt1)
-                CALL WDialogGetInteger(IDF_SmoothWindow, tInt3)
+              IF ( DASHWDialogGetCheckBoxLogical(IDF_SubtractBackground) ) THEN
+                CALL DASHWDialogGetInteger(IDF_NumOfIterations, tInt2)
+                CALL DASHWDialogGetInteger(IDF_WindowWidth, tInt1)
+                CALL DASHWDialogGetInteger(IDF_SmoothWindow, tInt3)
                 CALL CalculateBackground(tInt1, tInt2, &
-                                         WDialogGetCheckBoxLogical(IDF_UseMCYN), &
-                                         WDialogGetCheckBoxLogical(IDF_UseSmooth), tInt3)
+                                         DASHWDialogGetCheckBoxLogical(IDF_UseMCYN), &
+                                         DASHWDialogGetCheckBoxLogical(IDF_UseSmooth), tInt3)
               ELSE
                 CALL Clear_BackGround
               ENDIF
 ! Force display of background
-              CALL WDialogSelect(IDD_Plot_Option_Dialog)
+              CALL SelectDASHDialog(IDD_Plot_Option_Dialog)
               CALL WDialogPutCheckBoxLogical(IDF_background_check, .TRUE.)
               XPGMIN    = tXPGMIN
               XPGMAX    = tXPGMAX
@@ -859,7 +925,7 @@
           SELECT CASE (EventInfo%VALUE1)
             CASE ( IDF_SubtractBackground )
 ! If set to 'TRUE', ungrey value field and vice versa
-              IF ( WDialogGetCheckBoxLogical(IDF_SubtractBackground) ) THEN
+              IF ( DASHWDialogGetCheckBoxLogical(IDF_SubtractBackground) ) THEN
                 tFieldState = Enabled
               ELSE
                 tFieldState = Disabled
@@ -878,7 +944,7 @@
               CALL WDialogFieldState(IDF_LABEL3, tFieldState)
               CALL WDialogFieldState(IDF_SmoothWindow, tFieldState)
             CASE ( IDF_UseSmooth )
-              IF ( WDialogGetCheckBoxLogical(IDF_UseSmooth) ) THEN
+              IF ( DASHWDialogGetCheckBoxLogical(IDF_UseSmooth) ) THEN
                 CALL WDialogFieldState(IDF_LABEL3, Enabled)
                 CALL WDialogFieldState(IDF_SmoothWindow, Enabled)
               ELSE
@@ -906,17 +972,17 @@
       INTEGER IndexOption, p
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_PW_Page7)
+      CALL SelectDASHDialog(IDD_PW_Page7)
       SELECT CASE (EventType)
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
               CALL WizardWindowShow(IDD_PW_Page6)
             CASE (IDNEXT)
-              CALL WDialogGetRadioButton(IDF_RADIO1, IndexOption) ! 'Index now', 'DICVOL04' or 'Enter known cell'
+              CALL DASHWDialogGetRadioButton(IDF_RADIO1, IndexOption) ! 'Index now', 'DICVOL04' or 'Enter known cell'
               SELECT CASE (IndexOption)
                 CASE (1) ! Index pattern now
-                  CALL WDialogSelect(IDD_PW_Page8)
+                  CALL SelectDASHDialog(IDD_PW_Page8)
                   DICVOL_ver = DICVOL_internal
 ! If this is synchrotron data, then set the default error in the peak positions to 0.03 rather than 0.04.
 ! This decreases the number of solutions and increases the speed of the search.
@@ -927,7 +993,7 @@
                   ENDIF
                   CALL WizardWindowShow(IDD_PW_Page8)
                 CASE (2) ! external DICVOL
-                  CALL WDialogSelect(IDD_PW_Page8b)
+                  CALL SelectDASHDialog(IDD_PW_Page8b)
                   p = LEN_TRIM(DICVOLEXE)
                   IF ( p .GE. 6 .AND. (DICVOLEXE(p-5:p) .EQ. '06.exe' .OR. &
                        DICVOLEXE(p-5:p) .EQ. '06.EXE') ) THEN
@@ -946,8 +1012,10 @@
                     CALL WDialogPutReal(IDF_eps, 0.04, '(F5.3)')
                   ENDIF
                   CALL WizardWindowShow(IDD_PW_Page8b)
-                CASE (3) ! Enter known unit cell parameters
-                  CALL WDialogSelect(IDD_PW_Page1)
+                CASE (3) ! Stand-alone McMaille
+                  CALL WizardWindowShow(IDD_PW_Page8c)
+                CASE (4) ! Enter known unit cell parameters
+                  CALL SelectDASHDialog(IDD_PW_Page1)
 ! If the cell is OK, the Next> button should be enabled
                   CALL WDialogFieldStateLogical(IDNEXT, FnUnitCellOK())
                   CALL WizardWindowShow(IDD_PW_Page1)
@@ -973,7 +1041,7 @@
       IMPLICIT NONE
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_DICVOLRunning)
+      CALL SelectDASHDialog(IDD_DICVOLRunning)
       SELECT CASE (EventType)
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
@@ -1006,7 +1074,7 @@
       CHARACTER*20 tString
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_DICVOLRunning)
+      CALL SelectDASHDialog(IDD_DICVOLRunning)
       IF (IAND(TheCrystalSystem, cCubic       ) .EQ. cCubic       ) THEN
         tString = Integer2String(DICVOL_NumOfSolutions(1))
         CALL WDialogPutString(IDF_LabProgCubic, tString(1:LEN_TRIM(tString)))
@@ -1063,7 +1131,7 @@
                         IOrdTem(MTPeak),                                         &
                         IHPk(3,MTPeak)
 
-      LOGICAL, EXTERNAL :: FnUnitCellOK, Confirm, WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: FnUnitCellOK, Confirm, DASHWDialogGetCheckBoxLogical
       REAL,    EXTERNAL :: TwoTheta2dSpacing
       REAL    Rvpar(2), Rdens, Rmolwt, Rexpzp
       LOGICAL system(6)
@@ -1072,7 +1140,7 @@
       CHARACTER*2 nStr
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_PW_Page8)
+      CALL SelectDASHDialog(IDD_PW_Page8)
       SELECT CASE (EventType)
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
@@ -1082,25 +1150,25 @@
               CALL WizardWindowShow(IDD_PW_Page7)
             CASE (IDNEXT)
               CALL CheckIfPeaksFitted
-              CALL WDialogGetReal(IDF_Indexing_MinVol, Rvpar(1))
-              CALL WDialogGetReal(IDF_Indexing_MaxVol, Rvpar(2))
-              CALL WDialogGetReal(IDF_Indexing_Maxa,   amax)
+              CALL DASHWDialogGetReal(IDF_Indexing_MinVol, Rvpar(1))
+              CALL DASHWDialogGetReal(IDF_Indexing_MaxVol, Rvpar(2))
+              CALL DASHWDialogGetReal(IDF_Indexing_Maxa,   amax)
               Bmax = amax
               Cmax = amax
-              CALL WDialogGetReal(IDF_Indexing_MinAng,      Bemin)
-              CALL WDialogGetReal(IDF_Indexing_MaxAng,      Bemax)
-              CALL WDialogGetReal(IDF_Indexing_Density,     Rdens)
-              CALL WDialogGetReal(IDF_Indexing_MolWt,       Rmolwt)
-              CALL WDialogGetReal(IDF_ZeroPoint,            Rexpzp)
-              system(1) = WDialogGetCheckBoxLogical(IDF_Indexing_Cubic)
-              system(2) = WDialogGetCheckBoxLogical(IDF_Indexing_Tetra)
-              system(3) = WDialogGetCheckBoxLogical(IDF_Indexing_Hexa)
-              system(4) = WDialogGetCheckBoxLogical(IDF_Indexing_Ortho)
-              system(5) = WDialogGetCheckBoxLogical(IDF_Indexing_Monoclinic)
-              system(6) = WDialogGetCheckBoxLogical(IDF_Indexing_Triclinic)
-              CALL WDialogGetReal(IDF_eps,                  Epsilon)
-              CALL WDialogGetReal(IDF_Indexing_Fom,         fom)
-              CALL WDialogGetReal(IDF_Indexing_ScaleFactor, DV_ScaleFactor)
+              CALL DASHWDialogGetReal(IDF_Indexing_MinAng,      Bemin)
+              CALL DASHWDialogGetReal(IDF_Indexing_MaxAng,      Bemax)
+              CALL DASHWDialogGetReal(IDF_Indexing_Density,     Rdens)
+              CALL DASHWDialogGetReal(IDF_Indexing_MolWt,       Rmolwt)
+              CALL DASHWDialogGetReal(IDF_ZeroPoint,            Rexpzp)
+              system(1) = DASHWDialogGetCheckBoxLogical(IDF_Indexing_Cubic)
+              system(2) = DASHWDialogGetCheckBoxLogical(IDF_Indexing_Tetra)
+              system(3) = DASHWDialogGetCheckBoxLogical(IDF_Indexing_Hexa)
+              system(4) = DASHWDialogGetCheckBoxLogical(IDF_Indexing_Ortho)
+              system(5) = DASHWDialogGetCheckBoxLogical(IDF_Indexing_Monoclinic)
+              system(6) = DASHWDialogGetCheckBoxLogical(IDF_Indexing_Triclinic)
+              CALL DASHWDialogGetReal(IDF_eps,                  Epsilon)
+              CALL DASHWDialogGetReal(IDF_Indexing_Fom,         fom)
+              CALL DASHWDialogGetReal(IDF_Indexing_ScaleFactor, DV_ScaleFactor)
 ! Number of degrees of freedom, we don't even count the zero point
               NumDoF = 0
               IF (system(1)) NumDof = MAX(NumDoF, 1)
@@ -1170,7 +1238,7 @@
               ENDDO
               CALL WCursorShape(CurHourGlass)
               NumOfDICVOLSolutions = 0
-              CALL WDialogLoad(IDD_DICVOLRunning)
+              CALL LoadDASHDialog(IDD_DICVOLRunning)
               IF (system(1)) THEN
                 CALL WDialogFieldState(IDF_LabCubic            ,DialogReadOnly)
                 CALL WDialogFieldState(IDF_LabProgCubic        ,DialogReadOnly)
@@ -1222,8 +1290,7 @@
               CALL WDialogShow(-1, -1, 0, Modeless)
               CALL WCursorShape(CurHourGlass)
               CALL DICVOL91(system(1),system(2),system(3),system(4),system(5),system(6),Rvpar(1),Rvpar(2),Rmolwt,Rdens,Rdens/50.0)
-              CALL WDialogSelect(IDD_DICVOLRunning)
-              CALL WDialogUnload
+              CALL UnloadDASHDialog(IDD_DICVOLRunning)
               CALL WCursorShape(CurCrossHair)
               IF (NumOfDICVOLSolutions .EQ. 0) THEN
 ! Pop up a window showing the DICVOL output file in a text editor
@@ -1232,7 +1299,7 @@
                 CALL SetChildWinAutoClose(iHandle)
                 CALL ErrorMessage('No solutions were found.')
 ! Grey out the "Previous Results >" button in the DICVOL Wizard window
-                CALL WDialogSelect(IDD_PW_Page8)
+                CALL SelectDASHDialog(IDD_PW_Page8)
                 CALL WDialogFieldState(IDB_PrevRes, Disabled)
                 GOTO 999
               ENDIF  
@@ -1251,7 +1318,7 @@
                 CALL UpdateCell
               ENDIF
 ! Pop up the next Wizard window showing the solutions, so that the user can choose one to be imported into DASH
-              CALL WDialogSelect(IDD_PW_Page9)
+              CALL SelectDASHDialog(IDD_PW_Page9)
 ! Clear all fields in the grid
               CALL WDialogClearField(IDF_DV_Summary_0)
               WRITE(nStr,'(I2)') n
@@ -1273,7 +1340,7 @@
                 IF (DICVOLSolutions(I)%F .GT. 0.0) CALL WGridPutCellReal (IDF_DV_Summary_0, 11, I, DICVOLSolutions(I)%F,'(F7.1)')
               ENDDO
 ! Ungrey the "Previous Results >" button in the DICVOL Wizard window
-              CALL WDialogSelect(IDD_PW_Page8)
+              CALL SelectDASHDialog(IDD_PW_Page8)
               CALL WDialogFieldState(IDB_PrevRes,Enabled)
               CALL WizardWindowShow(IDD_PW_Page9)
             CASE (IDB_PrevRes)
@@ -1282,7 +1349,7 @@
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDF_ZeroPoint)
-              CALL WDialogGetReal(IDF_ZeroPoint,ZeroPoint)
+              CALL DASHWDialogGetReal(IDF_ZeroPoint,ZeroPoint)
               CALL Upload_ZeroPoint               
           END SELECT
       END SELECT
@@ -1332,7 +1399,7 @@
       INTEGER nFOM, iLen
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_PW_Page8b)
+      CALL SelectDASHDialog(IDD_PW_Page8b)
       SELECT CASE (EventType)
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
@@ -1342,29 +1409,29 @@
               CALL WizardWindowShow(IDD_PW_Page7)
             CASE (IDNEXT)
               CALL CheckIfPeaksFitted
-              CALL WDialogGetReal(IDF_Indexing_MinVol, Rvpar(1))
-              CALL WDialogGetReal(IDF_Indexing_MaxVol, Rvpar(2))
-              CALL WDialogGetReal(IDF_Indexing_Maxa,   Amax)
+              CALL DASHWDialogGetReal(IDF_Indexing_MinVol, Rvpar(1))
+              CALL DASHWDialogGetReal(IDF_Indexing_MaxVol, Rvpar(2))
+              CALL DASHWDialogGetReal(IDF_Indexing_Maxa,   Amax)
               Bmax = Amax
               Cmax = Amax
-              CALL WDialogGetReal(IDF_Indexing_MinAng,      Bemin)
-              CALL WDialogGetReal(IDF_Indexing_MaxAng,      Bemax)
-              CALL WDialogGetReal(IDF_Indexing_Density,     Rdens)
-              CALL WDialogGetReal(IDF_Indexing_MolWt,       Rmolwt)
-              CALL WDialogGetReal(IDF_ZeroPoint,            Rexpzp)
-              CALL WDialogGetCheckBox(IDF_Indexing_Cubic,      iSystem(1))
-              CALL WDialogGetCheckBox(IDF_Indexing_Tetra,      iSystem(2))
-              CALL WDialogGetCheckBox(IDF_Indexing_Hexa,       iSystem(3))
-              CALL WDialogGetCheckBox(IDF_Indexing_Ortho,      iSystem(4))
-              CALL WDialogGetCheckBox(IDF_Indexing_Monoclinic, iSystem(5))
-              CALL WDialogGetCheckBox(IDF_Indexing_Triclinic,  iSystem(6))
-              CALL WDialogGetReal(IDF_eps,                  Epsilon)
-              CALL WDialogGetReal(IDF_Indexing_Fom,         tFoM)
-              CALL WDialogGetReal(IDF_Indexing_ScaleFactor, DV_ScaleFactor)
-              CALL WDialogGetInteger(IDF_MaxImpLines, MaxImpurityLines)
-              CALL WDialogGetCheckBox(IDC_Estimate_zp, iEstimateZeroPointError)
-              CALL WDialogGetCheckBox(IDC_Refine_zp, iRefineZeroPointError)
-              CALL WDialogGetCheckBox(IDC_Exhaustive, iExhaustive)
+              CALL DASHWDialogGetReal(IDF_Indexing_MinAng,      Bemin)
+              CALL DASHWDialogGetReal(IDF_Indexing_MaxAng,      Bemax)
+              CALL DASHWDialogGetReal(IDF_Indexing_Density,     Rdens)
+              CALL DASHWDialogGetReal(IDF_Indexing_MolWt,       Rmolwt)
+              CALL DASHWDialogGetReal(IDF_ZeroPoint,            Rexpzp)
+              CALL DASHWDialogGetCheckBox(IDF_Indexing_Cubic,      iSystem(1))
+              CALL DASHWDialogGetCheckBox(IDF_Indexing_Tetra,      iSystem(2))
+              CALL DASHWDialogGetCheckBox(IDF_Indexing_Hexa,       iSystem(3))
+              CALL DASHWDialogGetCheckBox(IDF_Indexing_Ortho,      iSystem(4))
+              CALL DASHWDialogGetCheckBox(IDF_Indexing_Monoclinic, iSystem(5))
+              CALL DASHWDialogGetCheckBox(IDF_Indexing_Triclinic,  iSystem(6))
+              CALL DASHWDialogGetReal(IDF_eps,                  Epsilon)
+              CALL DASHWDialogGetReal(IDF_Indexing_Fom,         tFoM)
+              CALL DASHWDialogGetReal(IDF_Indexing_ScaleFactor, DV_ScaleFactor)
+              CALL DASHWDialogGetInteger(IDF_MaxImpLines, MaxImpurityLines)
+              CALL DASHWDialogGetCheckBox(IDC_Estimate_zp, iEstimateZeroPointError)
+              CALL DASHWDialogGetCheckBox(IDC_Refine_zp, iRefineZeroPointError)
+              CALL DASHWDialogGetCheckBox(IDC_Exhaustive, iExhaustive)
 ! Number of degrees of freedom, we don't even count the zero point
               NumDoF = 0
               IF ( iSystem(1) .EQ. 1 ) NumDof = MAX(NumDoF, 1)
@@ -1462,8 +1529,8 @@
               CLOSE(hFile)
               ! Launch external DICVOL and wait for it to return
               CALL PushActiveWindowID
-              CALL WDialogSelect(IDD_Configuration)
-              CALL WDialogGetString(IDF_DICVOLExe, DICVOLEXE)
+              CALL SelectDASHDialog(IDD_Configuration)
+              CALL DASHWDialogGetString(IDF_DICVOLExe, DICVOLEXE)
               CALL PopActiveWindowID
               I = LEN_TRIM(DICVOLEXE)
               IF ( I .EQ. 0 ) THEN
@@ -1505,7 +1572,7 @@
                 CALL UpdateCell
               ENDIF
 ! Pop up the next Wizard window showing the solutions, so that the user can choose one to be imported into DASH
-              CALL WDialogSelect(IDD_PW_Page9)
+              CALL SelectDASHDialog(IDD_PW_Page9)
 ! Clear all fields in the grid
               CALL WDialogClearField(IDF_DV_Summary_0)
               WRITE(nStr,'(I2)') nFOM
@@ -1527,7 +1594,7 @@
                 IF (DICVOLSolutions(I)%F .GT. 0.0) CALL WGridPutCellReal (IDF_DV_Summary_0, 11, I, DICVOLSolutions(I)%F,'(F7.1)')
               ENDDO
 ! Ungrey the "Previous Results >" button in the DICVOL Wizard window
-              CALL WDialogSelect(IDD_PW_Page8b)
+              CALL SelectDASHDialog(IDD_PW_Page8b)
               CALL WDialogFieldState(IDB_PrevRes,Enabled)
               CALL WizardWindowShow(IDD_PW_Page9)
             CASE (IDB_PrevRes)
@@ -1536,7 +1603,7 @@
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDF_ZeroPoint)
-              CALL WDialogGetReal(IDF_ZeroPoint,ZeroPoint)
+              CALL DASHWDialogGetReal(IDF_ZeroPoint,ZeroPoint)
               CALL Upload_ZeroPoint               
           END SELECT
       END SELECT
@@ -1795,7 +1862,7 @@
       INTEGER iFlags
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_PW_Page9)
+      CALL SelectDASHDialog(IDD_PW_Page9)
       SELECT CASE (EventType)
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
@@ -1838,7 +1905,7 @@
           RETURN
       END SELECT
       DO iRow = 1, NumOfDICVOLSolutions
-        CALL WGridGetCellCheckBox(IDF_DV_Summary_0, 1, iRow, iStatus)
+        CALL DASHWGridGetCellCheckBox(IDF_DV_Summary_0, 1, iRow, iStatus)
         IF (iStatus .EQ. 1) THEN
 ! Import the unit cell parameters into DASH
           CellPar(1) = DICVOLSolutions(iRow)%a
@@ -1878,7 +1945,7 @@
       LOGICAL, EXTERNAL :: Confirm
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_PW_Page1)
+      CALL SelectDASHDialog(IDD_PW_Page1)
       SpaceGroupDetermination = .FALSE. 
       SELECT CASE (EventType)
         CASE (PushButton) ! one of the buttons was pushed
@@ -1894,23 +1961,25 @@
 !   1. choose 'Enter known cell' in wizard window Indexing I
 !   2. after DICVOL, after choosing 'Index now' in wizard window Indexing I
 ! Did we get here from 'Enter known cell' in wizard window Indexing I?
-              CALL WDialogSelect(IDD_PW_Page7)
-              CALL WDialogGetRadioButton(IDF_RADIO3, iOption) ! 'Index now' or 'Enter known cell'
-              IF (iOption .EQ. 3) THEN
-                CALL WizardWindowShow(IDD_PW_Page7)
-              ELSE
+              CALL SelectDASHDialog(IDD_PW_Page7)
+              CALL DASHWDialogGetRadioButton(IDF_RADIO3, iOption) ! 'Index now' or 'Enter known cell'
+              IF (iOption .LE. 2) THEN
                 CALL WizardWindowShow(IDD_PW_Page9)
+              ELSE IF (iOption .EQ. 3) THEN
+                CALL WizardWindowShow(IDD_PW_Page8c)
+              ELSE
+                CALL WizardWindowShow(IDD_PW_Page7)
               ENDIF
             CASE (IDNEXT)
               CALL Download_SpaceGroup(IDD_PW_Page1)
               CALL Download_Cell_Constants(IDD_PW_Page1)
               CALL CheckUnitCellConsistency
               IF (NumberSGTable .EQ. LPosSG(LatBrav)) CALL WarningMessage('Space-group symmetry has not been reset.')
-              CALL WDialogSelect(IDD_PW_Page10)
+              CALL SelectDASHDialog(IDD_PW_Page10)
               CALL WDialogPutString(IDF_LABEL5, 'The next step is Pawley Refinement')  
               CALL WizardWindowShow(IDD_PW_Page10)
             CASE (IDAPPLY)
-              CALL WDialogGetReal(IDF_ZeroPoint, ZeroPoint)
+              CALL DASHWDialogGetReal(IDF_ZeroPoint, ZeroPoint)
               CALL Upload_ZeroPoint               
               CALL Download_SpaceGroup(IDD_PW_Page1)
               CALL Download_Cell_Constants(IDD_PW_Page1)
@@ -1926,45 +1995,45 @@
                CALL Generate_TicMarks
                CALL Download_SpaceGroup(IDD_PW_Page1) 
                SpaceGroupDetermination = .TRUE.
-               CALL WDialogSelect(IDD_PW_Page10)
+               CALL SelectDASHDialog(IDD_PW_Page10)
                CALL WDialogPutString(IDF_LABEL5, 'The next step in Space Group Determination is Pawley Refinement')
                CALL WizardWindowShow(IDD_PW_Page10)
           END SELECT
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDF_a_latt)
-              CALL WDialogGetReal(IDF_a_latt, CellPar(1))
+              CALL DASHWDialogGetReal(IDF_a_latt, CellPar(1))
               CALL UpdateCell
               CALL CheckUnitCellConsistency
             CASE (IDF_b_latt)
-              CALL WDialogGetReal(IDF_b_latt, CellPar(2))
+              CALL DASHWDialogGetReal(IDF_b_latt, CellPar(2))
               CALL UpdateCell
               CALL CheckUnitCellConsistency
             CASE (IDF_c_latt)
-              CALL WDialogGetReal(IDF_c_latt, CellPar(3))
+              CALL DASHWDialogGetReal(IDF_c_latt, CellPar(3))
               CALL UpdateCell
               CALL CheckUnitCellConsistency
             CASE (IDF_alp_latt)
-              CALL WDialogGetReal(IDF_alp_latt, CellPar(4))
+              CALL DASHWDialogGetReal(IDF_alp_latt, CellPar(4))
               CALL UpdateCell
               CALL CheckUnitCellConsistency
             CASE (IDF_bet_latt)
-              CALL WDialogGetReal(IDF_bet_latt, CellPar(5))
+              CALL DASHWDialogGetReal(IDF_bet_latt, CellPar(5))
               CALL UpdateCell
               CALL CheckUnitCellConsistency
             CASE (IDF_gam_latt)
-              CALL WDialogGetReal(IDF_gam_latt, CellPar(6))
+              CALL DASHWDialogGetReal(IDF_gam_latt, CellPar(6))
               CALL UpdateCell
               CALL CheckUnitCellConsistency
             CASE (IDF_Crystal_System_Menu)
-              CALL WDialogGetMenu(IDF_Crystal_System_Menu, LatBrav)
+              CALL DASHWDialogGetMenu(IDF_Crystal_System_Menu, LatBrav)
               CALL Upload_CrystalSystem
               CALL Generate_TicMarks
             CASE (IDF_Space_Group_Menu)
               CALL Download_SpaceGroup(IDD_PW_Page1)
               CALL Generate_TicMarks
             CASE (IDF_ZeroPoint)
-              CALL WDialogGetReal(IDF_ZeroPoint, ZeroPoint)
+              CALL DASHWDialogGetReal(IDF_ZeroPoint, ZeroPoint)
               CALL Upload_ZeroPoint               
               CALL Generate_TicMarks
           END SELECT                
@@ -1989,7 +2058,7 @@
       LOGICAL, EXTERNAL :: Confirm
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_PW_Page10)
+      CALL SelectDASHDialog(IDD_PW_Page10)
       SELECT CASE (EventType)
         CASE (PushButton)
           SELECT CASE (EventInfo%VALUE1)
@@ -2008,6 +2077,130 @@
       CALL PopActiveWindowID
 
       END SUBROUTINE DealWithWizardWindowPawley1
+!
+!*****************************************************************************
+!
+      SUBROUTINE DealWithWizardWindowMcMaille
+
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      INCLUDE 'GLBVAR.INC'
+
+      LOGICAL, EXTERNAL :: FnUnitCellOK, LaunchMcMaille
+      INTEGER Ngrid
+
+      CALL PushActiveWindowID
+      CALL SelectDASHDialog(IDD_PW_Page8c)
+      SELECT CASE (EventType)
+        CASE (PushButton) ! one of the buttons was pushed
+          SELECT CASE (EventInfo%VALUE1)
+            CASE (IDBACK)
+              CALL WizardWindowShow(IDD_PW_Page7)
+            CASE (IDNEXT)
+              CALL CheckIfPeaksFitted
+              CALL DASHWDialogGetRadioButton(IDF_RADIO1, iMcMailleNgridOpt)
+              Ngrid = 3
+              IF ( iMcMailleNgridOpt .EQ. 2 ) Ngrid = -3
+              IF ( iMcMailleNgridOpt .EQ. 3 ) Ngrid = 4
+              IF ( LaunchMcMaille(Ngrid) ) THEN
+                  CALL SelectDASHDialog(IDD_PW_Page1)
+! If the cell is OK, the Next> button should be enabled
+                  CALL WDialogFieldStateLogical(IDNEXT, FnUnitCellOK())
+                  CALL WizardWindowShow(IDD_PW_Page1)
+              ENDIF
+            CASE (IDCANCEL, IDCLOSE)
+              CALL EndWizard
+          END SELECT
+      END SELECT
+      CALL PopActiveWindowID
+
+      END SUBROUTINE DealWithWizardWindowMcMaille
+!
+!*****************************************************************************
+!
+      LOGICAL FUNCTION LaunchMcMaille(Ngrid)
+
+      USE DRUID_HEADER
+      USE VARIABLES
+      USE DICVAR
+
+      IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: Ngrid
+
+      INCLUDE 'PARAMS.INC'
+      INCLUDE 'GLBVAR.INC'
+      INCLUDE 'lattice.inc'
+
+      INTEGER           NTPeak
+      REAL              AllPkPosVal,         AllPkPosEsd
+      REAL              AllPkAreaVal
+      REAL              PkProb
+      INTEGER           IOrdTem
+      INTEGER           IHPk
+      COMMON /ALLPEAKS/ NTPeak,                                                  &
+                        AllPkPosVal(MTPeak), AllPkPosEsd(MTPeak),                &
+                        AllPkAreaVal(MTPeak),                                    &
+                        PkProb(MTPeak),                                          &
+                        IOrdTem(MTPeak),                                         &
+                        IHPk(3,MTPeak)
+
+      INTEGER I, M, iOrd, hFile
+      CHARACTER(MaxPathLength) tDirName, tFileName !, tCurrentDirName
+      LOGICAL exists
+      
+      LaunchMcMaille = .FALSE.
+      IF (NTPeak .LE. 3) GOTO 994
+      hFile = 117
+      OPEN(UNIT=hFile, FILE='DASHMcMaille.dat', STATUS='UNKNOWN', ERR=997)
+      WRITE(hFile,*,ERR=997) 'McMaille input file created by DASH'
+      WRITE(hFile,'(F10.6,1X,F10.5,1X,I5)',ERR=997) ALambda, 0.0, Ngrid
+      WRITE(hFile, '(A)' ,ERR=997) '!    2-Theta    Intensity'
+      DO I = 1, NTPeak
+        iOrd = iOrdTem(i)
+        WRITE(hFile,'(F12.5,X,F12.2))',ERR=997) AllPkPosVal(iOrd), AllPkAreaVal(iOrd)
+      ENDDO
+      CLOSE(hFile)
+      IF (LEN_TRIM(McMailleEXE) .EQ. 0) GOTO 998
+      INQUIRE(FILE=McMailleEXE, EXIST=exists)
+      IF (.NOT. exists) GOTO 999
+! McMaille requires to run from its install directory, or copy all .hkl files
+      CALL SplitPath(McMailleEXE, tDirName, tFileName)
+! There is bug (McMaille-v4) in handling path with spaces, the author has agreed to fix
+! it in future release. Use copy .hkl method as a work-around
+!      CALL IOsDirName(tCurrentDirName)
+!      CALL IOsDirChange(tDirName)
+      CALL IOsCopyFile(TRIM(tDirName)//'*.hkl', '.')
+      M = InfoError(1) ! Clear errors
+!      CALL IOSCommand('CMD /C '//TRIM(tFileName)//' "'//TRIM(tCurrentDirName)//'\DASHMcMaille" && '// &
+!                      'NOTEPAD "'//TRIM(tCurrentDirName)//'\DASHMcMaille.imp"')
+      CALL IOSCommand('CMD /C "'//TRIM(McMailleEXE)//'" DASHMcMaille && '// &
+                      'NOTEPAD DASHMcMaille.imp')
+      M = InfoError(1)
+!      CALL IOsDirChange(tCurrentDirName)
+      IF (M .NE. 0) GOTO 999
+      LaunchMcMaille = .TRUE.
+      RETURN
+ 
+  997 CALL ErrorMessage("Error writing McMaille input file.")
+      CLOSE(hFile)
+      RETURN
+  998 CALL ErrorMessage("DASH could not launch McMaille. No executable is currently specified."//CHAR(13)//&
+                        "This can be changed in the Configuration... window"//CHAR(13)//&
+                        "under Options in the menu bar.")
+      RETURN
+  999 CALL ErrorMessage("DASH could not launch McMaille. The executable is currently configured"//CHAR(13)//&
+                        "to launch the program "//TRIM(McMailleEXE)//CHAR(13)//&
+                        "This can be changed in the Configuration... window"//CHAR(13)//&
+                        "under Options in the menu bar.")
+      RETURN
+  994 CALL ErrorMessage("DASH could not launch McMaille. Too few peak are currently fitted. ")
+      RETURN
+
+      END FUNCTION LaunchMcMaille
 !
 !*****************************************************************************
 !

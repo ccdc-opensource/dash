@@ -727,6 +727,8 @@
      DO j = 1,3
        Origin(1,j) = CentreOfMass(j)
      END DO
+     Origin(1,4) = 0.0
+
 
      NumberofOrigins = 1 
 

@@ -9,11 +9,24 @@
 
       IMPLICIT NONE
 
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
       CHARACTER*2 Exp
       TYPE (License_Info) Info
       
-      CALL WDialogLoad(IDD_LicenceAgreement)
-      CALL WDialogLoad(IDD_License_Dialog)
+      IF ( in_batch ) THEN
+        CALL ReadLicenceFile(Info)
+        IF (Info%Valid .EQ. 1 ) THEN
+          RETURN
+        ELSE
+          CALL AppendBatchLogFile('Error: Invalid license')
+        ENDIF
+        CALL DoExit
+      ENDIF
+
+      CALL LoadDASHDialog(IDD_LicenceAgreement)
+      CALL LoadDASHDialog(IDD_License_Dialog)
       CALL ReadLicenceFile(Info)
 
       DO WHILE (Info%Valid .LE. 0) 
@@ -37,10 +50,8 @@
         WRITE(Exp,'(I2)') Info%DaysLeft
         CALL InfoMessage("Your DASH licence will expire in "//Exp//" days.")
       ENDIF
-      CALL WDialogSelect(IDD_License_Dialog)
-      CALL WDialogUnload
-      CALL WDialogSelect(IDD_LicenceAgreement)
-      CALL WDialogUnload
+      CALL UnloadDASHDialog(IDD_License_Dialog)
+      CALL UnloadDASHDialog(IDD_LicenceAgreement)
 
       END SUBROUTINE CheckLicence
 !
@@ -54,6 +65,9 @@
 
       TYPE(License_Info) Info
 
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
       CHARACTER*80 line, CLString
       INTEGER      dummy, hFile
 
@@ -61,20 +75,23 @@
       Info%KeyStr = ''
       hFile = 10
 
-      OPEN(UNIT=hFile,FILE=TRIM(AllUsersProfileDirectory)//'DashLicense.dat',STATUS='OLD',ERR=6)
+      PathToLicenseFile = TRIM(AllUsersProfileDirectory)//'DashLicense.dat'
+      OPEN(UNIT=hFile,FILE=PathToLicenseFile,STATUS='OLD',ERR=6)
       GOTO 10
     6 CLOSE(hFile,iostat=dummy)
-      OPEN(UNIT=hFile,FILE=TRIM(InstallationDirectory)//'License.dat',STATUS='OLD',ERR=9)
+      PathToLicenseFile = TRIM(InstallationDirectory)//'License.dat'
+      OPEN(UNIT=hFile,FILE=PathToLicenseFile,STATUS='OLD',ERR=9)
       GOTO 10
     9 CLOSE(hFile,iostat=dummy)
-      OPEN(UNIT=hFile,FILE=TRIM(StartUpDirectory)//'DashLicense.dat',STATUS='OLD',ERR=999)
+      PathToLicenseFile = TRIM(StartUpDirectory)//'DashLicense.dat'
+      OPEN(UNIT=hFile,FILE=PathToLicenseFile,STATUS='OLD',ERR=999)
    10 READ(hFile,'(A)',ERR=999,END=999) line
       IF (line(1:1) .EQ. '#') GOTO 10
       CALL INextString(line,CLString)
       Info%KeyStr = CLString
       CALL DecodeLicence(CLString,Info)
       IF (Info%Valid .EQ. 1) THEN
-        IF (Info%LicenceType .EQ. DemoKey) CALL ShowLicenceAgreement(Info)
+        IF (Info%LicenceType .EQ. DemoKey .AND. .NOT. in_batch) CALL ShowLicenceAgreement(Info)
       ENDIF
   999 CLOSE(hFile,iostat=dummy)
 
@@ -90,7 +107,7 @@
 
       IMPLICIT NONE
 
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
       LOGICAL     INLOOP
       INTEGER     ICode
       CHARACTER*MaxPathLength ClString
@@ -98,11 +115,11 @@
 
       INLOOP = .TRUE.
       Info%Valid = 0
-      CALL WDialogSelect(IDD_License_Dialog)
+      CALL SelectDASHDialog(IDD_License_Dialog)
       CALL WDialogShow(-1, -1, 0, SemiModeless)
       CALL WDialogPutString(IDF_License_String, Info%KeyStr)
       CALL WMessageEnable(FieldChanged, Enabled)
-      IF (WDialogGetCheckBoxLogical(IDF_License_Site)) THEN
+      IF (DASHWDialogGetCheckBoxLogical(IDF_License_Site)) THEN
         CALL WDialogFieldState(IDF_License_SiteCode, Enabled)
         CALL WDialogFieldState(IDF_License_SiteCodeLabel, Enabled)
       ELSE
@@ -117,7 +134,7 @@
               CASE (IDCANCEL, ID_Licensing_Exit)
                 CALL DoExit
               CASE (IDOK)
-                CALL WDialogGetString(IDF_License_String, CLString)
+                CALL DASHWDialogGetString(IDF_License_String, CLString)
                 CALL DecodeLicence(CLString, Info)
                 IF (Info%Valid .LT. 0 ) THEN
                   SELECT CASE (Info%Valid)
@@ -129,12 +146,12 @@
                       CALL ErrorMessage("Your DASH licence is invalid for this machine.")
                   END SELECT
                 ELSE
-                  IF (WDialogGetCheckBoxLogical(IDF_License_Site)) THEN
+                  IF (DASHWDialogGetCheckBoxLogical(IDF_License_Site)) THEN
                     IF (Info%LicenceType .NE. SiteKey) THEN
                       CALL ErrorMessage("Sorry, the licence key is not a site licence.")
                       Info%Valid = -6
                     ELSE
-                      CALL WDialogGetInteger(IDF_License_SiteCode, ICode) 
+                      CALL DASHWDialogGetInteger(IDF_License_SiteCode, ICode) 
                       IF (Info%SerialNumber .NE. ICode) THEN
                         CALL ErrorMessage("Sorry, the licence key is not valid for this site.") 
                         Info%Valid = -6
@@ -159,7 +176,7 @@
           CASE (CloseRequest)
             CALL DoExit
           CASE (FieldChanged)
-            IF (WDialogGetCheckBoxLogical(IDF_License_Site)) THEN
+            IF (DASHWDialogGetCheckBoxLogical(IDF_License_Site)) THEN
               CALL WDialogFieldState(IDF_License_SiteCode,Enabled)
               CALL WDialogFieldState(IDF_License_SiteCodeLabel,Enabled)
             ELSE
@@ -168,7 +185,7 @@
             ENDIF
         END SELECT
       ENDDO
-   99 CALL WDialogSelect(IDD_License_Dialog)
+   99 CALL SelectDASHDialog(IDD_License_Dialog)
       CALL WDialogHide
 
       END SUBROUTINE GetLicenceKeyDialogue
@@ -191,11 +208,11 @@
 
       IFlags = SaveDialog + DirChange + AppendExt
       fstr = 'Text files|*.txt|All files|*.*|'
-      fname_2 = ' '
+      fname_2 = AllUsersProfileDirectory
       Idummy = 1
       CALL WSelectFile(fstr, iFlags, fname_2, "Please enter a filename", iDummy)
-      IF (fname_2(1:1) .EQ. ' ') RETURN
-      OPEN(UNIT = Iun, FILE=fname_2(1:LEN_TRIM(fname_2)), STATUS='unknown', ERR=99)
+      IF (LEN_TRIM(fname_2) .LE. 0 .OR. fname_2 .EQ. AllUsersProfileDirectory) RETURN
+      OPEN(UNIT = Iun, FILE=TRIM(fname_2), STATUS='unknown', ERR=99)
       Sn = Get_DiskSerialNumber("C:\\"C)
       WRITE(Iun,'(A)',ERR=100) 'This file is provided to submit requests for '//ProgramVersion//' licences.'
       WRITE(Iun,'(A)',ERR=100) 'A DASH evaluation licence will allow you to run DASH on any PC.'
@@ -301,15 +318,19 @@
 ! Convert expiry date to a string
       CALL Date2String(Info%ExpiryDate, tDateStr, tLen)
       kString = 'In order to run this evaluation version of DASH, you must first read and agree to the '// &
-                'terms of the following licence agreement:'//NextLine// &
-                'DASH (the "Program") is a copyright work belonging to CCDC Software Limited.  In '// &
-                'consideration of the access to the Program granted you, you agree to run and use the '// &
+                'terms of the following Software Licence Agreement (Evaluation):'//NextLine// &
+                'DASH, excluding the component program Mercury DASH which is a copyright work of '// &
+                'the Cambridge Crystallographic Data Centre, and its associate documentation  and software '// &
+                'have been jointly developed by and are copyright works of  '// &
+                'CCDC Software Limited (CCDC) and the Council for the Central Laboratory of the Research Councils (CCLRC) '// &
+                'and all rights are protected.' //NextLine// &
+                'In consideration of the access to DASH the "Program" (including any or all '// &
+                'components) granted you, you agree to run and use the '// &
                 'Program solely in accordance with the following terms.'//NextLine// &
-                'You are permitted to run and to use the Program and the documentation'// &
-                ' until '//tDateStr(1:tLen)//' for the purpose of evaluating whether or not the software '// &
+                'You are permitted to run and to use the Program and the documentation '// &
+                'until '//tDateStr(1:tLen)//' for the purpose of evaluating whether or not the Program '// &
                 'meets your requirements. Within 14 days of this date you agree to delete '// &
-                'all copies of the Program from your computers and storage systems unless an extension '// &
-                'of the evaluation period is granted by CCDC Software Limited.'//NextLine// &
+                'all copies of the Program from your computers and storage systems. '//NextLine// &
                 'You may not supply, assign, transfer or sublicense (in whole or part) the Program to any'// &
                 ' third party as part of a commercial transaction or for any consideration, in money,'// &
                 ' money''s worth or otherwise, or free of charge.  The Program shall only be accessible'// &
@@ -356,7 +377,7 @@
                 ' have read the full text above and I AGREE" option below. If you do not agree'// &
                 ' to the foregoing terms and conditions you should select the "I DO NOT AGREE"'// &
                 ' option below. After making your selection, please click OK to proceed.'
-      CALL WDialogSelect(IDD_LicenceAgreement)
+      CALL SelectDASHDialog(IDD_LicenceAgreement)
       CALL WDialogPutString(IDF_Agreement, kString)
       CALL WDialogShow(-1, -1, 0, SemiModeless)
       DO WHILE (.TRUE.)
@@ -369,7 +390,7 @@
               CASE (IDB_Here)
                 Info%Valid = -5
               CASE (IDOK)
-                CALL WDialogGetRadioButton(IDF_IDoNotAgree, iOption)
+                CALL DASHWDialogGetRadioButton(IDF_IDoNotAgree, iOption)
                 SELECT CASE (iOption)
                   CASE (1)
                     CALL DoExit
@@ -441,7 +462,7 @@
       READ(LString,'(2Z8,Z4)',ERR = 99) v(1), v(2), checksum
       cs = IEOR(v(1),v(2))
 ! ### Version dependent lines
-      cs = IEOR(cs,16#CCDC)
+      cs = IEOR(cs,16#BBCB)
 ! Check the checksum
       IF (tCheckSum .NE. checksum) THEN
 ! If the checksum is invalid, then that's the end of our checks.
@@ -575,7 +596,7 @@
           IF ( ProgramVersion(8:8) .EQ. '0' ) THEN ! DASH 3.0
             VersionDependentMangler = 16#CCDC
           ELSE IF ( ProgramVersion(8:8) .EQ. '1' ) THEN ! DASH 3.1
-            VersionDependentMangler = 16#CCDC
+            VersionDependentMangler = 16#BBCB
           ENDIF
         ENDIF
         checksum = IEOR(checksum, VersionDependentMangler)

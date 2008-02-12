@@ -1,4 +1,4 @@
-! Winteracter module created : 11/Oct/2007 19:47:43
+! Winteracter module created : 10/Jan/2008 16:33:24
 !
       MODULE Druid_Header
           IMPLICIT NONE
@@ -680,8 +680,6 @@
           INTEGER, PARAMETER :: IDBBROWSE5                      =  1556
           INTEGER, PARAMETER :: IDF_RIETANExe                   =  1455
           INTEGER, PARAMETER :: IDBBROWSE6                      =  1557
-          INTEGER, PARAMETER :: IDC_Coordinates_H               =  1475
-          INTEGER, PARAMETER :: IDC_Coordinates_Non_H           =  1372
           INTEGER, PARAMETER :: IDF_RADIO4                      =  1131
           INTEGER, PARAMETER :: IDF_Ext_RR_inp_file_name        =  1456
           INTEGER, PARAMETER :: IDB_FG_EXPGUI                   =  1453
@@ -702,4 +700,12 @@
           INTEGER, PARAMETER :: IDF_BKG_TERM_TOPAS              =  1564
           INTEGER, PARAMETER :: IDF_BKG_TERM_GSAS               =  1565
           INTEGER, PARAMETER :: IDF_BKG_TERM_RIETAN             =  1566
+          INTEGER, PARAMETER :: IDF_OutputTbl                   =  1567
+          INTEGER, PARAMETER :: IDF_BuiltIn_Mercury             =  1568
+          INTEGER, PARAMETER :: IDF_Use_Client                  =  1569
+          INTEGER, PARAMETER :: IDF_McMailleExe                 =  1573
+          INTEGER, PARAMETER :: IDBBROWSE7                      =  1558
+          INTEGER, PARAMETER :: IDD_PW_Page8c                   =   166
+          INTEGER, PARAMETER :: IDF_GSAS_Import_ins             =  1570
+          INTEGER, PARAMETER :: ID_Tutorial_6                   = 40026
       END MODULE Druid_Header

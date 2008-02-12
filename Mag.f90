@@ -116,7 +116,7 @@
 !
       SUBROUTINE MAGCNC
 
-	  USE ATMVAR
+      USE ATMVAR
 !
 ! *** MAGCNC uodated by PJB 17-Jan-95 ***
 !

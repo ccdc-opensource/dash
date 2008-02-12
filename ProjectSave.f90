@@ -45,13 +45,14 @@
 
       IMPLICIT NONE
 
-      CHARACTER(LEN=60) FILTER
+      CHARACTER(LEN=150) FILTER
       INTEGER           iFlags, iFType 
       CHARACTER(LEN=MaxPathLength) tFileName
 
       iFlags = LoadDialog + DirChange + PromptOn + AppendExt
       FILTER = 'All files (*.*)|*.*|'//&
-               'DASH project files (*.dash)|*.dash|'
+               'DASH project files (*.dash)|*.dash|'//&
+               'DASH 3.0 project files (*.dash30)|*.dash30|'
       tFileName = ''
 ! iFType specifies which of the file types in the list is the default
       iFType = 2
@@ -111,7 +112,54 @@
 !
 !*****************************************************************************
 !
+
       SUBROUTINE PrjReadWrite(ThePrjFile, ReadOrWrite)
+
+      USE PRJVAR
+
+      CHARACTER*(*), INTENT (IN   ) :: ThePrjFile
+      INTEGER,       INTENT (IN   ) :: ReadOrWrite
+
+      CHARACTER*(255) DirName, FileName, Extension
+      INTEGER ExtLen
+
+      LOGICAL SUCCESS
+      LOGICAL, EXTERNAL :: PrjReadWriteImpl
+
+      INTEGER InitialHydrogenTreatment
+
+      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign
+      INTEGER                                                                    HydrogenTreatment
+      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign, HydrogenTreatment
+
+      InitialHydrogenTreatment = HydrogenTreatment
+
+      ExtLen = 6
+      CALL SplitPath2(ThePrjFile, DirName, FileName, Extension, ExtLen)
+      CALL StrUpperCase(Extension)
+
+      IF ( EXTENSION .NE. "DASH30" ) THEN
+          SUCCESS = PrjReadWriteImpl(ThePrjFile, ReadOrWrite, .FALSE. )
+      ELSE
+          SUCCESS = .FALSE.
+      ENDIF
+
+      IF ( .NOT. SUCCESS ) THEN
+        HydrogenTreatment = InitialHydrogenTreatment
+        SUCCESS = PrjReadWriteImpl(ThePrjFile, ReadOrWrite, .TRUE. )    
+      ENDIF
+
+      IF ( .NOT. SUCCESS ) THEN
+         IF  ( ReadOrWrite .EQ. cRead ) THEN
+             CALL ErrorMessage('Error reading project file.')
+         ELSE
+             CALL ErrorMessage('Error writing project file.')
+         ENDIF
+      ENDIF
+
+      END SUBROUTINE PrjReadWrite
+
+      LOGICAL FUNCTION PrjReadWriteImpl(ThePrjFile, ReadOrWrite, ForceOldVersion)
 !
 ! This subroutine saves the project file.
 !
@@ -124,6 +172,7 @@
 
       CHARACTER*(*), INTENT (IN   ) :: ThePrjFile
       INTEGER,       INTENT (IN   ) :: ReadOrWrite
+      LOGICAL, INTENT (IN   )       :: ForceOldVersion
 
       INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
@@ -176,11 +225,20 @@
       CHARACTER*(255) tString
       CHARACTER*(10) Version  ! We have patch releases like "DASH 2.1.1"
 
+      INTEGER     BFIOErrorCode
+      COMMON /IO/ BFIOErrorCode
+
+
+      BFIOErrorCode = 0
+      
       ErrCounter = 0
       CALL PushActiveWindowID
       iPrjReadOrWrite = ReadOrWrite
       RW = iPrjReadOrWrite
       hPrjFile = 10
+
+      PrjReadWriteImpl = .TRUE.
+ 
       OPEN(UNIT=hPrjFile,FILE=ThePrjFile,ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',ERR=999)
       iPrjRecNr = 1
 ! Read / Write the header
@@ -303,9 +361,16 @@
 ! Must read/write hydrogen treatment first, because that is necessary to
 ! calculate the atomic weightings. This wasn't written out in version 3.0, so need
 ! to add a check.
-  !F    IF ( (RW .EQ. cWrite) .OR. (Version(6:8) .NE. "3.0") ) &
-  !F      CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, HydrogenTreatment)
+      IF ( (RW .EQ. cWrite) .OR. (Version(6:8) .NE. "3.0") ) THEN
+        IF ( .NOT. ForceOldVersion ) THEN
+          CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, HydrogenTreatment)
+          IF ( BFIOErrorCode .EQ. 1 ) GOTO 999
+        ENDIF
+      ENDIF
+
       CALL PrjReadWriteZmatrices
+      IF ( BFIOErrorCode .EQ. 1 ) GOTO 999
+
       CALL PrjErrTrace
 ! Read / Write Preferred Orientation
       CALL PrjReadWritePO
@@ -322,15 +387,15 @@
       CALL PrjErrTrace
       IF ( (RW .EQ. cRead) .AND. (.NOT. in_batch) ) THEN
 ! Grey out the "Save... chi sqrd progress"
-        CALL WDialogSelect(IDD_OutputSolutions)
+        CALL SelectDASHDialog(IDD_OutputSolutions)
         CALL WDialogFieldState(IDF_GROUP2, Disabled)
         CALL WDialogFieldState(IDB_OutputChiSqd, Disabled)
         CALL WDialogFieldState(IDF_LABEL5, Disabled)
         CALL WDialogFieldState(IDF_LABEL3, Disabled)
         CALL CloseOutputSolutionsChildWindows
-        CALL WDialogSelect(IDD_SAW_Page5)
+        CALL SelectDASHDialog(IDD_SAW_Page5)
         CALL WDialogFieldState(IDB_Prog3,Disabled)
-        CALL WDialogSelect(IDD_ViewPawley)
+        CALL SelectDASHDialog(IDD_ViewPawley)
         CALL WDialogPutReal(IDF_Sigma1, PeakShapeSigma(1), '(F10.4)')
         CALL WDialogPutReal(IDF_Sigma2, PeakShapeSigma(2), '(F10.4)')
         CALL WDialogPutReal(IDF_Gamma1, PeakShapeGamma(1), '(F10.4)')
@@ -341,23 +406,31 @@
         CALL WDialogPutInteger(IDF_Pawley_Cycle_NumRefs, NumOfRef)
         CALL WDialogPutReal(IDF_Pawley_Cycle_ChiSq, PAWLEYCHISQ, '(F12.3)')
 ! Grey out the "Previous Results >" button in the DICVOL Wizard window
-        CALL WDialogSelect(IDD_PW_Page8)
+        CALL SelectDASHDialog(IDD_PW_Page8)
         CALL WDialogFieldState(IDB_PrevRes, Disabled)
         BackRef = .FALSE.
         CALL SetModeMenuState(0,1)
 ! Change global variable FNAME
-        FNAME = ThePrjFile
+        FNAME = '' ! clear diffraction file entry
 ! Update this throughout the program (Wizard + status bar)
         CALL ScrUpdateFileName
+        FNAME = ThePrjFile
+! Update the status bar at the bottom of the screen.
+         CALL WindowOutStatusBar(1, FNAME)
       ENDIF
+
       CLOSE(hPrjFile)
       CALL PopActiveWindowID
       RETURN
-  999 CALL ErrorMessage('Error writing project file.')
-      CLOSE(hPrjFile)
-      CALL PopActiveWindowID
 
-      END SUBROUTINE PrjReadWrite
+  999 CLOSE(hPrjFile)
+      CALL PopActiveWindowID
+      
+      PrjReadWriteImpl = .FALSE.
+
+      RETURN
+
+      END FUNCTION PrjReadWriteImpl
 !
 !*****************************************************************************
 !
@@ -367,7 +440,7 @@
 !
       USE PRJVAR
       USE SOLVAR
-	  USE ATMVAR
+      USE ATMVAR
 
       IMPLICIT NONE
 
@@ -578,71 +651,184 @@
       INTEGER, EXTERNAL :: ElmSymbol2CSD
       INTEGER iFrg, RW, iAtomNr, BondNr
 
+
+      INTEGER     BFIOErrorCode
+      COMMON /IO/ BFIOErrorCode
+
+      LOGICAL, EXTERNAL :: FileErrorOccurred
+
+
 ! Read or Write?
       RW = iPrjReadOrWrite
       CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, nfrag)
+      IF ( RW .EQ. cRead .AND. nFrag .GT. maxfrg ) THEN
+          BFIOErrorCode = 1
+          RETURN
+      ENDIF
+
       DO iFrg = 1, nFrag
         CALL FileRWString (hPrjFile, iPrjRecNr, RW, frag_file(iFrg))
+        IF ( FileErrorOccurred() ) RETURN
+
         CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, izmpar(iFrg))
+        IF ( FileErrorOccurred() ) RETURN
+
         CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, icomflg(iFrg))
+        IF ( FileErrorOccurred() ) RETURN
+
         CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, natoms(iFrg))
+        IF ( FileErrorOccurred() ) RETURN
+
         DO iAtomNr = 1, natoms(iFrg)
           CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, ioptb(iAtomNr,iFrg))
+          IF ( FileErrorOccurred() ) RETURN
+
           CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, iopta(iAtomNr,iFrg))
+          IF ( FileErrorOccurred() ) RETURN
+
           CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, ioptt(iAtomNr,iFrg))
+          IF ( FileErrorOccurred() ) RETURN
+
           CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, iz1(iAtomNr,iFrg))
+          IF ( FileErrorOccurred() ) RETURN
+
           CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, iz2(iAtomNr,iFrg))
+          IF ( FileErrorOccurred() ) RETURN
+
           CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, iz3(iAtomNr,iFrg))
+          IF ( FileErrorOccurred() ) RETURN
+
           CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, blen(iAtomNr,iFrg))
+          IF ( FileErrorOccurred() ) RETURN
+
           CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, alph(iAtomNr,iFrg))
+          IF ( FileErrorOccurred() ) RETURN
+
           CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, bet(iAtomNr,iFrg))
+          IF ( FileErrorOccurred() ) RETURN
+
           CALL FileRWString (hPrjFile, iPrjRecNr, RW, ElSym(iAtomNr,iFrg))
+          IF ( FileErrorOccurred() ) RETURN
+
           IF (RW .EQ. cRead) THEN
             zmElementCSD(iAtomNr,iFrg) = ElmSymbol2CSD(ElSym(iAtomNr,iFrg))
           ENDIF
           CALL FileRWString (hPrjFile, iPrjRecNr, RW, OriginalLabel(iAtomNr,iFrg))
+          IF ( FileErrorOccurred() ) RETURN
+
           CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, tiso(iAtomNr,iFrg))
+          IF ( FileErrorOccurred() ) RETURN
+
           CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, occ(iAtomNr,iFrg))
+          IF ( FileErrorOccurred() ) RETURN
+
           CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, izmoid(iAtomNr,iFrg))
+          IF ( FileErrorOccurred() ) RETURN
+
           izmbid(izmoid(iAtomNr,iFrg),iFrg) = iAtomNr ! the back mapping
           CALL FileRWLogical(hPrjFile, iPrjRecNr, RW, UseQuaternions(iFrg))
+          IF ( FileErrorOccurred() ) RETURN
+
           CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, zmSingleRotAxDef(iFrg))
+          IF ( FileErrorOccurred() ) RETURN
+
           CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, zmSingleRotAxAtm(1,iFrg))
+          IF ( FileErrorOccurred() ) RETURN
+
           CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, zmSingleRotAxAtm(2,iFrg))
+          IF ( FileErrorOccurred() ) RETURN
+
           CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmSingleRotAxFrac(1,iFrg))
+          IF ( FileErrorOccurred() ) RETURN
+
           CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmSingleRotAxFrac(2,iFrg))
+          IF ( FileErrorOccurred() ) RETURN
+
           CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmSingleRotAxFrac(3,iFrg))
+          IF ( FileErrorOccurred() ) RETURN
+
           CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, zmSingleRotAxPlnAtm(1,iFrg))
+          IF ( FileErrorOccurred() ) RETURN
+
           CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, zmSingleRotAxPlnAtm(2,iFrg))
+          IF ( FileErrorOccurred() ) RETURN
+
           CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, zmSingleRotAxPlnAtm(3,iFrg))
+          IF ( FileErrorOccurred() ) RETURN
+
           CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmSingleRotationQs(0,iFrg))
+          IF ( FileErrorOccurred() ) RETURN
+
           CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmSingleRotationQs(1,iFrg))
+          IF ( FileErrorOccurred() ) RETURN
+
           CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmSingleRotationQs(2,iFrg))
+          IF ( FileErrorOccurred() ) RETURN
+
           CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmSingleRotationQs(3,iFrg))
+          IF ( FileErrorOccurred() ) RETURN
+
           CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, zmSingleRAIniOrDef(iFrg))
+          IF ( FileErrorOccurred() ) RETURN
+
           CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmSingleRAIniOrFrac(1,iFrg))
+          IF ( FileErrorOccurred() ) RETURN
+
           CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmSingleRAIniOrFrac(2,iFrg))
+          IF ( FileErrorOccurred() ) RETURN
+
           CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmSingleRAIniOrFrac(3,iFrg))
+          IF ( FileErrorOccurred() ) RETURN
+
           CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmSingleRAIniOrEuler(1,iFrg))
+          IF ( FileErrorOccurred() ) RETURN
+
           CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmSingleRAIniOrEuler(2,iFrg))
+          IF ( FileErrorOccurred() ) RETURN
+
           CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmSingleRAIniOrEuler(3,iFrg))
+          IF ( FileErrorOccurred() ) RETURN
+
           CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmSingleRAIniOrQuater(0,iFrg))
+          IF ( FileErrorOccurred() ) RETURN
+
           CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmSingleRAIniOrQuater(1,iFrg))
+          IF ( FileErrorOccurred() ) RETURN
+
           CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmSingleRAIniOrQuater(2,iFrg))
+          IF ( FileErrorOccurred() ) RETURN
+
           CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmSingleRAIniOrQuater(3,iFrg))
+          IF ( FileErrorOccurred() ) RETURN
+
           CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmInitialQs(0,iFrg))
+          IF ( FileErrorOccurred() ) RETURN
+
           CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmInitialQs(1,iFrg))
+          IF ( FileErrorOccurred() ) RETURN
+
           CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmInitialQs(2,iFrg))
+          IF ( FileErrorOccurred() ) RETURN
+
           CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, zmInitialQs(3,iFrg))
+          IF ( FileErrorOccurred() ) RETURN
+
         ENDDO
         IF (RW .EQ. cRead) THEN
           CALL zmDoAdmin(iFrg)
         ENDIF
         CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, NumberOfBonds(iFrg))
+        IF ( FileErrorOccurred() ) RETURN
+
         DO BondNr = 1, NumberOfBonds(iFrg)
           CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, BondType(BondNr,iFrg))
+          IF ( FileErrorOccurred() ) RETURN
+
           CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, Bonds(1,BondNr,iFrg))
+          IF ( FileErrorOccurred() ) RETURN
+
           CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, Bonds(2,BondNr,iFrg))
+          IF ( FileErrorOccurred() ) RETURN
         ENDDO
       ENDDO
       IF (RW .EQ. cRead) THEN 

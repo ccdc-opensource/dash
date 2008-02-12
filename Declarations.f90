@@ -137,14 +137,14 @@
 !O! JCC GGCALC dimension increased to 500
 !O      REAL            REFH,           AMUL
 !O      REAL            ESDOBS,         SOMEGA,       GGCALC
-!O	  
+!O
 !O      INTEGER         MAXKK, KMIN, KMAX, KMOD, KNOW
 !O      INTEGER                                           ISMAG
 !O      REAL            DKDDS
 !O      INTEGER                KOM23
 !O
 !O      COMMON /REFLNS/ REFH(3,MFCSTO), AMUL(MFCSTO),                                   &
-!O	                  ESDOBS(MFCSTO), SOMEGA(MFCSTO), GGCALC(500),                    &
+!O                      ESDOBS(MFCSTO), SOMEGA(MFCSTO), GGCALC(500),                    &
 !O                      MAXKK(9), KMIN, KMAX, KMOD, KNOW, ISMAG(MFCSTO), &
 !O                      DKDDS, KOM23
 !O

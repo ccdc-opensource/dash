@@ -44,14 +44,14 @@
       CHARACTER*(15) file_name
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SAW_Page5)
+      CALL SelectDASHDialog(IDD_SAW_Page5)
       SELECT CASE (EventType)
         CASE (PushButton)
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
               CALL CloseOutputSolutionsChildWindows
               CALL EndWizardPastPawley
-              CALL WDialogSelect(IDD_Polyfitter_Wizard_01)
+              CALL SelectDASHDialog(IDD_Polyfitter_Wizard_01)
               CALL WDialogPutRadioButton(IDF_PW_Option5)
               CALL WizardWindowShow(IDD_Polyfitter_Wizard_01)
               CALL SelectMode(ID_Peak_Fitting_Mode)
@@ -66,15 +66,15 @@
             CASE (IDB_LoadSol)
               CALL PrjFileBrowse
             CASE (IDBSAVE)
-              CALL WDialogSelect(IDD_OutputSolutions)
+              CALL SelectDASHDialog(IDD_OutputSolutions)
               CALL WDialogShow(-1, -1, 0, ModeLess)
               CALL WDialogPutString(IDF_DirAndBaseName, OutputFilesBaseName(1:OFBN_Len))
               CALL UpdateOutputSolutionsWindow
             CASE (IDB_Prog3)
               CALL OpenChiSqPlotWindow
             CASE (IDB_Select)
-              CALL WDialogGetInteger(IDF_Limit1, iLimit1)
-              CALL WDialogGetInteger(IDF_Limit2, iLimit2)
+              CALL DASHWDialogGetInteger(IDF_Limit1, iLimit1)
+              CALL DASHWDialogGetInteger(IDF_Limit2, iLimit2)
               IF (iLimit1 .GT. iLimit2) THEN
                 tInteger = iLimit2
                 iLimit2  = iLimit1
@@ -92,7 +92,7 @@
               CALL UpdateOutputSolutionsWindow
             CASE (IDF_InvertSelection)
               DO iRow = 1, NumOf_SA_Runs
-                CALL WGridGetCellCheckBox(IDF_SA_summary, 3, iRow, istatus)
+                CALL DASHWGridGetCellCheckBox(IDF_SA_summary, 3, iRow, istatus)
                 IF (istatus .EQ. 1) THEN
                   CALL WGridPutCellCheckBox(IDF_SA_Summary, 3, iRow, Unchecked)
                 ELSE
@@ -125,13 +125,13 @@
 ! Allows you to view pdb file of SA Solutions, each clicked
 ! check box in fresh Mercury window
       DO iRow = 1, NumOf_SA_Runs
-        CALL WGridGetCellCheckBox(IDF_SA_summary, 2, iRow, iStatus)
+        CALL DASHWGridGetCellCheckBox(IDF_SA_summary, 2, iRow, iStatus)
         IF (iStatus .EQ. 1) THEN
           CALL WGridPutCellCheckBox(IDF_SA_Summary, 2, iRow, Unchecked)
 ! Calls subroutine which opens Mercury window with .pdb file
 !         CALL SA_STRUCTURE_OUTPUT_PDB(iSol2Run(iRow), file_name)
           CALL SA_STRUCTURE_OUTPUT_NON_OVERLAP(iSol2Run(iRow), file_name)
-          CALL ViewStructure(file_name)
+          CALL ViewStructure(file_name, .FALSE.)
 ! Calls subroutine which plots observed diffraction pattern with calculated pattern
           CALL organise_sa_result_data(iRow)
           CALL PopActiveWindowID
@@ -140,16 +140,16 @@
       ENDDO
 ! Allows you to restart a run
       DO iRow = 1, NumOf_SA_Runs
-        CALL WGridGetCellCheckBox(IDF_SA_summary, 6, iRow, iStatus)
+        CALL DASHWGridGetCellCheckBox(IDF_SA_summary, 6, iRow, iStatus)
         IF (iStatus .EQ. 1) THEN
           CALL WGridPutCellCheckBox(IDF_SA_Summary, 6, iRow, Unchecked)
           IF (Confirm("Restarting the simulated annealing will erase all current solutions."//CHAR(13)// &
                       "In order to keep the current solutions and append new ones, choose 'Resume SA'."//CHAR(13)// &
                       "Do you wish to continue and erase all current solutions?")) THEN
             CALL CloseOutputSolutionsChildWindows
-            CALL WDialogSelect(IDD_SAW_Page5)
+            CALL SelectDASHDialog(IDD_SAW_Page5)
 ! Fill SA Parameter Bounds Wizard Window with the values from this solution.
-            CALL WDialogSelect(IDD_SA_Modal_input2)
+            CALL SelectDASHDialog(IDD_SA_Modal_input2)
             DO IV = 1, NVAR
               CALL WGridPutCellReal(IDF_parameter_grid_modal, 1, IV, BestValuesDoF(IV,iSol2Run(iRow)))
             ENDDO
@@ -165,7 +165,7 @@
       ENDDO
 ! Rietveld refinement
       DO iRow = 1, NumOf_SA_Runs
-        CALL WGridGetCellCheckBox(IDF_SA_summary, 7, iRow, iStatus)
+        CALL DASHWGridGetCellCheckBox(IDF_SA_summary, 7, iRow, iStatus)
         IF ( iStatus .EQ. 1 ) THEN
           CALL WGridPutCellCheckBox(IDF_SA_Summary, 7, iRow, Unchecked)
           CALL CloseOutputSolutionsChildWindows
@@ -202,7 +202,7 @@
 
       CALL PushActiveWindowID
 ! Close "Save Solutions" window which may be up
-      CALL WDialogSelect(IDD_OutputSolutions)
+      CALL SelectDASHDialog(IDD_OutputSolutions)
       CALL WDialogHide
 ! Close all SA profile child windows that are still open
       DO i = 1, MaxNumChildWin
@@ -254,12 +254,12 @@
       CHARACTER(100) FILTER
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_OutputSolutions)
+      CALL SelectDASHDialog(IDD_OutputSolutions)
       SELECT CASE (EventType)
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDCANCEL, IDCLOSE)
-              CALL WDialogSelect(IDD_OutputSolutions)
+              CALL SelectDASHDialog(IDD_OutputSolutions)
               CALL WDialogHide
             CASE (IDBBROWSE)
               iFlags = SaveDialog + PromptOn
@@ -275,7 +275,7 @@
             CASE (IDB_SaveTBL)
               iFlags = SaveDialog + AppendExt + PromptOn
               FILTER = 'Parameter table (*.tbl)|*.tbl|'
-              CALL WDialogGetString(IDF_DirAndBaseName,tFileName)
+              CALL DASHWDialogGetString(IDF_DirAndBaseName,tFileName)
               tFileName = tFileName(1:LEN_TRIM(tFileName))//'.tbl'
               CALL WSelectFile(FILTER, iFlags, tFileName, 'Save parameters')
 ! Problems here: 
@@ -297,7 +297,7 @@
             CASE (IDB_OutputChiSqd)
               iFlags = SaveDialog + AppendExt + PromptOn
               FILTER = 'Chi-sqrd vs. number of moves (*.chi)|*.chi|'
-              CALL WDialogGetString(IDF_DirAndBaseName,tFileName)
+              CALL DASHWDialogGetString(IDF_DirAndBaseName,tFileName)
               tFileName = tFileName(1:LEN_TRIM(tFileName))//'.chi'
               CALL WSelectFile(FILTER,iFlags,tFileName,'Save chi-sqrd vs. number of moves')
               IF ((WInfoDialog(4) .EQ. CommonOK) .AND. (LEN_TRIM(tFileName) .NE. 0)) THEN
@@ -338,7 +338,7 @@
       REAL                                                           ChiMult
       COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
       INTEGER iOption, NumOfFileTypes, iRow, iStatus, NumSelSol, CheckedSol(1:5)
       CHARACTER(100) LineStr(0:5)
       INTEGER iLine, I, J
@@ -350,10 +350,13 @@
       CHARACTER(3) RunNumStr
       LOGICAL SaveButtonAvailable
 
+      LOGICAL , EXTERNAL :: Get_SavePRO, SavePDB
+      LOGICAL , EXTERNAL :: SaveCSSR, SaveCCL, SaveCIF, SaveRes
+
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_OutputSolutions)
+      CALL SelectDASHDialog(IDD_OutputSolutions)
 ! Get directory + base name and form appropriate string
-      CALL WDialogGetString(IDF_DirAndBaseName, tFileName)
+      CALL DASHWDialogGetString(IDF_DirAndBaseName, tFileName)
       tLen = LEN_TRIM(tFileName)
 ! Maximum to be added: "_Best.cssr" = 10
 ! Total: 60
@@ -372,27 +375,27 @@
       BaseStr = BaseStr(1:BaseLen)//"_"
       BaseLen = BaseLen + 1
       NumOfFileTypes = 0
-      IF (WDialogGetCheckBoxLogical(IDF_OutputPDB)) THEN
+      IF (DASHWDialogGetCheckBoxLogical(IDF_OutputPDB)) THEN
         CALL INC(NumOfFileTypes)
         ExtStr(NumOfFileTypes) = 'pdb'
       ENDIF
-      IF (WDialogGetCheckBoxLogical(IDF_OutputCSSR)) THEN
+      IF (DASHWDialogGetCheckBoxLogical(IDF_OutputCSSR)) THEN
         CALL INC(NumOfFileTypes)
         ExtStr(NumOfFileTypes) = 'cssr'
       ENDIF
-      IF (WDialogGetCheckBoxLogical(IDF_OutputCCL)) THEN
+      IF (DASHWDialogGetCheckBoxLogical(IDF_OutputCCL)) THEN
         CALL INC(NumOfFileTypes)
         ExtStr(NumOfFileTypes) = 'ccl'
       ENDIF
-      IF (WDialogGetCheckBoxLogical(IDF_OutputCIF)) THEN
+      IF (DASHWDialogGetCheckBoxLogical(IDF_OutputCIF)) THEN
         CALL INC(NumOfFileTypes)
         ExtStr(NumOfFileTypes) = 'cif'
       ENDIF
-      IF (WDialogGetCheckBoxLogical(IDF_OutputRES)) THEN
+      IF (DASHWDialogGetCheckBoxLogical(IDF_OutputRES)) THEN
         CALL INC(NumOfFileTypes)
         ExtStr(NumOfFileTypes) = 'res'
       ENDIF
-      IF (WDialogGetCheckBoxLogical(IDF_OutputPRO)) THEN
+      IF (DASHWDialogGetCheckBoxLogical(IDF_OutputPRO)) THEN
         CALL INC(NumOfFileTypes)
         ExtStr(NumOfFileTypes) = 'pro'
       ENDIF
@@ -404,7 +407,7 @@
         LineStr(0) = "No output formats are currently selected."
       ELSE
         LineStr(0) = "The following files will be saved:"
-        CALL WDialogGetMenu(IDF_OutputSolMenu,iOption)
+        CALL DASHWDialogGetMenu(IDF_OutputSolMenu,iOption)
         SELECT CASE (iOption)
           CASE (1) ! Best Solution
             J = NumOfFileTypes
@@ -415,10 +418,10 @@
             IF (NumOfFileTypes .GT. 5) LineStr(5) = "etc."
           CASE (2) ! Selected Solutions
 ! Check if any solution selected at all
-            CALL WDialogSelect(IDD_SAW_Page5)
+            CALL SelectDASHDialog(IDD_SAW_Page5)
             NumSelSol = 0
             DO iRow = 1, NumOf_SA_Runs
-              CALL WGridGetCellCheckBox(IDF_SA_summary, 3, iRow, istatus)
+              CALL DASHWGridGetCellCheckBox(IDF_SA_summary, 3, iRow, istatus)
               IF (istatus .EQ. 1) THEN
                 NumSelSol = NumSelSol + 1
                 IF (NumSelSol .LE. 5) CheckedSol(NumSelSol) = iRow
@@ -440,7 +443,7 @@
               ENDDO
             ENDIF
             IF (NumSelSol*NumOfFileTypes .GT. 5) LineStr(5) = "etc."
-            CALL WDialogSelect(IDD_OutputSolutions)
+            CALL SelectDASHDialog(IDD_OutputSolutions)
           CASE (3) ! All Solutions
             iLine = 0
             DO I = 1, NumOf_SA_Runs
@@ -482,7 +485,7 @@
       REAL                                                           ChiMult
       COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
       CHARACTER(4) ExtStr(1:6)
       INTEGER      ExistingFiles(1:6) ! per extension
       INTEGER iOption, NumOfFileTypes, iStatus
@@ -493,48 +496,51 @@
       CHARACTER(100) tString
       CHARACTER(255) tMessage
       INTEGER        Ext2Type(6)
+      LOGICAL, EXTERNAL :: SavePDB, SaveCSSR, Get_SavePro
+      LOGICAL, EXTERNAL :: SaveCCL, SaveCIF, SaveRES
+
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_OutputSolutions)
+      CALL SelectDASHDialog(IDD_OutputSolutions)
 ! Get directory + base name
-      CALL WDialogGetString(IDF_DirAndBaseName,tFileName)
+      CALL DASHWDialogGetString(IDF_DirAndBaseName,tFileName)
       tLen = LEN_TRIM(tFileName)
       tFileName = tFileName(1:tLen)//"_"
       tLen = tLen + 1
 ! First, generate all possible filenames and check that we wouldn't overwrite one
       NumOfFileTypes = 0
-      IF (WDialogGetCheckBoxLogical(IDF_OutputPDB)) THEN
+      IF (DASHWDialogGetCheckBoxLogical(IDF_OutputPDB)) THEN
         CALL INC(NumOfFileTypes)
         ExtStr(NumOfFileTypes) = 'pdb'
         Ext2Type(NumOfFileTypes) = 1
       ENDIF
-      IF (WDialogGetCheckBoxLogical(IDF_OutputCSSR)) THEN
+      IF (DASHWDialogGetCheckBoxLogical(IDF_OutputCSSR)) THEN
         CALL INC(NumOfFileTypes)
         ExtStr(NumOfFileTypes) = 'cssr'
         Ext2Type(NumOfFileTypes) = 2
       ENDIF
-      IF (WDialogGetCheckBoxLogical(IDF_OutputCCL)) THEN
+      IF (DASHWDialogGetCheckBoxLogical(IDF_OutputCCL)) THEN
         CALL INC(NumOfFileTypes)
         ExtStr(NumOfFileTypes) = 'ccl'
         Ext2Type(NumOfFileTypes) = 3
       ENDIF
-      IF (WDialogGetCheckBoxLogical(IDF_OutputCIF)) THEN
+      IF (DASHWDialogGetCheckBoxLogical(IDF_OutputCIF)) THEN
         CALL INC(NumOfFileTypes)
         ExtStr(NumOfFileTypes) = 'cif'
         Ext2Type(NumOfFileTypes) = 4
       ENDIF
-      IF (WDialogGetCheckBoxLogical(IDF_OutputRES)) THEN
+      IF (DASHWDialogGetCheckBoxLogical(IDF_OutputRES)) THEN
         CALL INC(NumOfFileTypes)
         ExtStr(NumOfFileTypes) = 'res'
         Ext2Type(NumOfFileTypes) = 5
       ENDIF
-      IF (WDialogGetCheckBoxLogical(IDF_OutputPRO)) THEN
+      IF (DASHWDialogGetCheckBoxLogical(IDF_OutputPRO)) THEN
         CALL INC(NumOfFileTypes)
         ExtStr(NumOfFileTypes) = 'pro'
         Ext2Type(NumOfFileTypes) = 6
       ENDIF
       ExistingFiles = 0
-      CALL WDialogGetMenu(IDF_OutputSolMenu,iOption)
+      CALL DASHWDialogGetMenu(IDF_OutputSolMenu,iOption)
 ! Try all possible output names, when match, set OutputExists to .TRUE.
       SELECT CASE (iOption)
         CASE (1) ! Best Solution
@@ -544,9 +550,9 @@
             IF (OutputExists) ExistingFiles(J) = ExistingFiles(J) + 1
           ENDDO
         CASE (2) ! Selected Solutions
-          CALL WDialogSelect(IDD_SAW_Page5)
+          CALL SelectDASHDialog(IDD_SAW_Page5)
           DO I = 1, NumOf_SA_Runs
-            CALL WGridGetCellCheckBox(IDF_SA_summary,3,I,istatus)
+            CALL DASHWGridGetCellCheckBox(IDF_SA_summary,3,I,istatus)
             IF (istatus .EQ. 1) THEN
               DO J = 1, NumOfFileTypes
                 WRITE (RunNumStr,'(I3.3)') iSol2Run(I)
@@ -610,9 +616,9 @@
             IF (WriteThisFile) CALL SA_structure_output_2(1, -1, tFileName, Ext2Type(J))
           ENDDO
         CASE (2) ! Selected Solutions
-          CALL WDialogSelect(IDD_SAW_Page5)
+          CALL SelectDASHDialog(IDD_SAW_Page5)
           DO I = 1, NumOf_SA_Runs
-            CALL WGridGetCellCheckBox(IDF_SA_summary,3,I,istatus)
+            CALL DASHWGridGetCellCheckBox(IDF_SA_summary,3,I,istatus)
             IF (istatus .EQ. 1) THEN
               DO J = 1, NumOfFileTypes
                 WRITE (RunNumStr,'(I3.3)') iSol2Run(I)
@@ -734,17 +740,22 @@
       CHARACTER*2               LATT
       INTEGER                   NumOfAtmPerElm(1:MaxElm)
       CHARACTER*72              DASHRemarkStr
-      REAL                      tIntChiSqd, tProChiSqd
+      REAL                      tIntChiSqd, tProChiSqd, tPO
       INTEGER                   tRunNr
       LOGICAL tLOG_HYDROGENS
-	  REAL TOUISO
+      REAL TOUISO
 
       IF ( TheRunNr .GE. 0 ) THEN
         tRunNr = TheRunNr
       ELSE
         tRunNr = iSol2Run(TheSolutionNr)
       ENDIF
-      WRITE (DASHRemarkStr,100,ERR=999) IntensityChiSqd(tRunNr), ProfileChiSqd(tRunNr), MaxMoves
+      IF ( tRunNr .GT. 0 ) THEN
+        WRITE (DASHRemarkStr,100,ERR=999) IntensityChiSqd(tRunNr), ProfileChiSqd(tRunNr), MaxMoves
+      ELSE
+        WRITE (DASHRemarkStr,100,ERR=999) 0.0, 0.0, 0
+      ENDIF
+
   100 FORMAT ('chi**2=',F7.2,' and profile chi**2=',F7.2,' max. moves=',I8)
 ! Just in case the user decides to change this in the options menu just while we are in this routine:
 ! make local copies of the variables that determine which files to save.
@@ -822,7 +833,12 @@
         OPEN (UNIT=hFileCIF,FILE=TheFileName,STATUS='unknown',ERR=999)
         WRITE (hFileCIF,'("data_global")',ERR=999)
         WRITE (hFileCIF,'(A)',ERR=999) '# '//DASHRemarkStr
-        IF (WriteCIFCommon(hFileCIF, IntensityChiSqd(tRunNr), BestValuesDoF(iPrfPar,tRunNr), .FALSE.) .NE. 0) GOTO 999
+        tPO = 0.0
+        IF (PrefParExists .AND. tRunNR .GT. 0) tPO = BestValuesDoF(iPrfPar,tRunNr)
+        tIntChiSqd = 0.0
+        IF ( tRunNr .GT. 0) &
+            tIntChiSqd = IntensityChiSqd(tRunNr)
+        IF (WriteCIFCommon(hFileCIF, tIntChiSqd, tPO, .FALSE.) .NE. 0) GOTO 999
       ENDIF
 ! RES ...
       IF (tSaveRES) THEN
@@ -902,13 +918,15 @@
  1037     FORMAT ('REMARK Translations: ',3F10.6)
         ENDIF
         IF (natoms(iFrg) .GT. 1) THEN
-! Normalise the Q-rotations before writing them out ...
-          qvals(1) = BestValuesDoF(ipcount+4,tRunNr)
-          qvals(2) = BestValuesDoF(ipcount+5,tRunNr)
-          qvals(3) = BestValuesDoF(ipcount+6,tRunNr)
-          qvals(4) = BestValuesDoF(ipcount+7,tRunNr)
-          qnrm = SQRT(qvals(1)**2 + qvals(2)**2 + qvals(3)**2 + qvals(4)**2)
-          qvals = qvals / qnrm
+! Normalise the Q-rotations before writing them out 
+          IF ( tRunNr .GT. 0 ) THEN
+            qvals(1) = BestValuesDoF(ipcount+4,tRunNr)
+            qvals(2) = BestValuesDoF(ipcount+5,tRunNr)
+            qvals(3) = BestValuesDoF(ipcount+6,tRunNr)
+            qvals(4) = BestValuesDoF(ipcount+7,tRunNr)
+            qnrm = SQRT(qvals(1)**2 + qvals(2)**2 + qvals(3)**2 + qvals(4)**2)
+            qvals = qvals / qnrm
+          ENDIF
           IF (tSavePDB) THEN
             WRITE (hFilePDB,1038,ERR=999) (qvals(ij),ij=1,4)
  1038       FORMAT ('REMARK Q-Rotations : ',4F10.6)
