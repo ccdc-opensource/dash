@@ -53,9 +53,13 @@
       INTEGER IBMBER
       COMMON / CCSLER / IBMBER 
 
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
       INTEGER NTPeak, I, J, NumFittedPFR, NumRows
 
-      CALL PushActiveWindowID
+      IF ( .NOT. in_batch ) &
+        CALL PushActiveWindowID
       IBMBER = 0
       NTPeak = 0
       NumFittedPFR = 0 ! The number of Peak Fit Ranges that have actually been fitted
@@ -79,118 +83,144 @@
         NumRows = NumFittedPFR
       ENDIF
 !C Clear sigmas
-      CALL WDialogSelect(IDD_Sigma_info)
-      CALL WGridRows(IDF_Sigma_Grid, NumRows)
-      CALL WDialogClearField(IDF_Sigma_Grid)
-      CALL WDialogClearField(IDF_Sigma1)
-      CALL WDialogClearField(IDF_sigma2)
+
+      IF ( .NOT. in_batch ) THEN
+        CALL SelectDASHDialog(IDD_Sigma_info)
+        CALL WGridRows(IDF_Sigma_Grid, NumRows)
+        CALL WDialogClearField(IDF_Sigma_Grid)
+        CALL WDialogClearField(IDF_Sigma1)
+        CALL WDialogClearField(IDF_sigma2)
+      ENDIF
       PeakShapeSigma(1) = -999.0
       PeakShapeSigma(2) = -999.0
 !C Clear gammas
-      CALL WDialogSelect(IDD_Gamma_info)
-      CALL WGridRows(IDF_Gamma_Grid, NumRows)
-      CALL WDialogClearField(IDF_Gamma_Grid)
-      CALL WDialogClearField(IDF_Gamma1)
-      CALL WDialogClearField(IDF_Gamma2)
+      
+      IF ( .NOT. in_batch ) THEN
+        CALL SelectDASHDialog(IDD_Gamma_info)
+        CALL WGridRows(IDF_Gamma_Grid, NumRows)
+        CALL WDialogClearField(IDF_Gamma_Grid)
+        CALL WDialogClearField(IDF_Gamma1)
+        CALL WDialogClearField(IDF_Gamma2)
+      ENDIF
       PeakShapeGamma(1) = -999.0
       PeakShapeGamma(2) = -999.0
 !C Clear HPSL
-      CALL WDialogSelect(IDD_HPSL_info)
-      CALL WGridRows(IDF_HPSL_Grid, NumRows)
-      CALL WDialogClearField(IDF_HPSL_Grid)
-      CALL WDialogClearField(IDF_HPSL)
+      IF ( .NOT. in_batch ) THEN
+        CALL SelectDASHDialog(IDD_HPSL_info)
+        CALL WGridRows(IDF_HPSL_Grid, NumRows)
+        CALL WDialogClearField(IDF_HPSL_Grid)
+        CALL WDialogClearField(IDF_HPSL)
+      ENDIF
       PeakShapeHPSL = -999.0
 !C Clear HMSL
-      CALL WDialogSelect(IDD_HMSL_info)
-      CALL WGridRows(IDF_HMSL_Grid, NumRows)
-      CALL WDialogClearField(IDF_HMSL_Grid)
-      CALL WDialogClearField(IDF_HMSL)
+      IF ( .NOT. in_batch ) THEN
+        CALL SelectDASHDialog(IDD_HMSL_info)
+        CALL WGridRows(IDF_HMSL_Grid, NumRows)
+        CALL WDialogClearField(IDF_HMSL_Grid)
+        CALL WDialogClearField(IDF_HMSL)
+      ENDIF
       PeakShapeHMSL = -999.0
 !C Clear FWHM
-      CALL WDialogSelect(IDD_FWHM_info)
-      CALL WGridRows(IDF_FWHM_Grid, NumRows)
-      CALL WDialogClearField(IDF_FWHM_Grid)
+      IF ( .NOT. in_batch ) THEN
+        CALL SelectDASHDialog(IDD_FWHM_info)
+        CALL WGridRows(IDF_FWHM_Grid, NumRows)
+        CALL WDialogClearField(IDF_FWHM_Grid)
 !C Clear View Pawley window
-      CALL WDialogSelect(IDD_ViewPawley)
-      CALL WDialogClearField(IDF_Sigma1)
-      CALL WDialogClearField(IDF_Sigma2)
-      CALL WDialogClearField(IDF_Gamma1)
-      CALL WDialogClearField(IDF_Gamma2)
-      CALL WDialogClearField(IDF_HPSL)
-      CALL WDialogClearField(IDF_HMSL)
+        CALL SelectDASHDialog(IDD_ViewPawley)
+        CALL WDialogClearField(IDF_Sigma1)
+        CALL WDialogClearField(IDF_Sigma2)
+        CALL WDialogClearField(IDF_Gamma1)
+        CALL WDialogClearField(IDF_Gamma2)
+        CALL WDialogClearField(IDF_HPSL)
+        CALL WDialogClearField(IDF_HMSL)
+      ENDIF
       IF (NumFittedPFR .EQ. 0) THEN
-        CALL PopActiveWindowID
+        IF ( .NOT. in_batch ) &
+          CALL PopActiveWindowID
         RETURN
       ENDIF
 !C Sort all peak fit ranges. Those that haven't been fitted have been set to 200.0 and will appear after the others.
       CALL SORT_REAL(PkPosAv, iOrdTem, NumPeakFitRange)
 !C Write out sigmas
-      CALL WDialogSelect(IDD_Sigma_info)
+      IF ( .NOT. in_batch ) THEN
+        CALL SelectDASHDialog(IDD_Sigma_info)
 !C Only update those that have actually been fitted--we wouldn't have sensible values to show for the others anyway.
-      DO I = 1, NumFittedPFR
-        iOrd = iOrdTem(I)
-        CALL WGridPutCellReal(IDF_Sigma_Grid, 1, I, PkPosAv(iOrd), '(F12.3)')
-        CALL WGridPutCellReal(IDF_Sigma_Grid, 2, I, PkFnVal(1,iOrd), '(F12.5)')
-        CALL WGridPutCellReal(IDF_Sigma_Grid, 3, I, PkFnEsd(1,iOrd), '(F12.5)')
-      ENDDO
+        DO I = 1, NumFittedPFR
+          iOrd = iOrdTem(I)
+          CALL WGridPutCellReal(IDF_Sigma_Grid, 1, I, PkPosAv(iOrd), '(F12.3)')
+          CALL WGridPutCellReal(IDF_Sigma_Grid, 2, I, PkFnVal(1,iOrd), '(F12.5)')
+          CALL WGridPutCellReal(IDF_Sigma_Grid, 3, I, PkFnEsd(1,iOrd), '(F12.5)')
+        ENDDO
+      ENDIF
+
       IF (NumFittedPFR .GE. 3) THEN
 !C Let's fit Sigma
         CALL Fit_Sigma(FitPar, FitEsd, 2)
         IF (IBMBER .NE. 0) THEN
           IBMBER = 0
           CALL DebugErrorMessage('Fitting Sigma Failed.')
-          CALL PopActiveWindowID
+          IF ( .NOT. in_batch ) &
+            CALL PopActiveWindowID
           RETURN
         ENDIF
         PeakShapeSigma(1) = ABS(FitPar(1))
         PeakShapeSigma(2) = ABS(FitPar(2))
-        CALL WDialogPutReal(IDF_Sigma1, PeakShapeSigma(1), '(F10.4)')
-        CALL WDialogPutReal(IDF_Sigma2, PeakShapeSigma(2), '(F10.4)')
-        DO I = 1, NumFittedPFR
-          iOrd = IOrdTem(I)
-          CALL WGridPutCellReal(IDF_Sigma_Grid, 4, I, PkFnCal(1,iOrd), '(F12.4)')
-        ENDDO
-        CALL WDialogSelect(IDD_ViewPawley)
-        CALL WDialogPutReal(IDF_Sigma1, PeakShapeSigma(1), '(F10.4)')
-        CALL WDialogPutReal(IDF_Sigma2, PeakShapeSigma(2), '(F10.4)')
+        IF ( .NOT. in_batch )  THEN
+          CALL WDialogPutReal(IDF_Sigma1, PeakShapeSigma(1), '(F10.4)')
+          CALL WDialogPutReal(IDF_Sigma2, PeakShapeSigma(2), '(F10.4)')
+          DO I = 1, NumFittedPFR
+            iOrd = IOrdTem(I)
+            CALL WGridPutCellReal(IDF_Sigma_Grid, 4, I, PkFnCal(1,iOrd), '(F12.4)')
+          ENDDO
+          CALL SelectDASHDialog(IDD_ViewPawley)
+          CALL WDialogPutReal(IDF_Sigma1, PeakShapeSigma(1), '(F10.4)')
+          CALL WDialogPutReal(IDF_Sigma2, PeakShapeSigma(2), '(F10.4)')
+        ENDIF
       ENDIF
 !C Write out gammas
-      CALL WDialogSelect(IDD_Gamma_info)
-      DO I = 1, NumFittedPFR
-        iOrd = IOrdTem(I)
-        CALL WGridPutCellReal(IDF_Gamma_Grid, 1, I, PkPosAv(iOrd), '(F12.3)')
-        CALL WGridPutCellReal(IDF_Gamma_Grid, 2, I, PkFnVal(2,iOrd), '(F12.5)')
-        CALL WGridPutCellReal(IDF_Gamma_Grid, 3, I, PkFnEsd(2,iOrd), '(F12.5)')
-      ENDDO
+      IF ( .NOT. in_batch ) THEN
+        CALL SelectDASHDialog(IDD_Gamma_info)
+        DO I = 1, NumFittedPFR
+          iOrd = IOrdTem(I)
+          CALL WGridPutCellReal(IDF_Gamma_Grid, 1, I, PkPosAv(iOrd), '(F12.3)')
+          CALL WGridPutCellReal(IDF_Gamma_Grid, 2, I, PkFnVal(2,iOrd), '(F12.5)')
+          CALL WGridPutCellReal(IDF_Gamma_Grid, 3, I, PkFnEsd(2,iOrd), '(F12.5)')
+        ENDDO
+      ENDIF
       IF (NumFittedPFR .GE. 3) THEN
 !C Let's fit Gamma
         CALL Fit_Gamma(FitPar,FitEsd,2)
         IF (IBMBER .NE. 0) THEN
           IBMBER = 0
           CALL DebugErrorMessage('Fitting Gamma Failed.')
-          CALL PopActiveWindowID
+          IF ( .NOT. in_batch ) &
+             CALL PopActiveWindowID
           RETURN
         ENDIF
         PeakShapeGamma(1) = FitPar(1)
         PeakShapeGamma(2) = FitPar(2)
-        CALL WDialogPutReal(IDF_Gamma1, PeakShapeGamma(1), '(F10.4)')
-        CALL WDialogPutReal(IDF_Gamma2, PeakShapeGamma(2), '(F10.4)')
-        DO I = 1, NumFittedPFR
-          iOrd = IOrdTem(i)
-          CALL WGridPutCellReal(IDF_Gamma_Grid, 4, I, PkFnCal(2,iOrd), '(F12.4)')
-        ENDDO
-        CALL WDialogSelect(IDD_ViewPawley)
-        CALL WDialogPutReal(IDF_Gamma1, PeakShapeGamma(1), '(F10.4)')
-        CALL WDialogPutReal(IDF_Gamma2, PeakShapeGamma(2), '(F10.4)')
+        IF ( .NOT. in_batch ) THEN
+          CALL WDialogPutReal(IDF_Gamma1, PeakShapeGamma(1), '(F10.4)')
+          CALL WDialogPutReal(IDF_Gamma2, PeakShapeGamma(2), '(F10.4)')
+          DO I = 1, NumFittedPFR
+            iOrd = IOrdTem(i)
+            CALL WGridPutCellReal(IDF_Gamma_Grid, 4, I, PkFnCal(2,iOrd), '(F12.4)')
+          ENDDO
+          CALL SelectDASHDialog(IDD_ViewPawley)
+          CALL WDialogPutReal(IDF_Gamma1, PeakShapeGamma(1), '(F10.4)')
+          CALL WDialogPutReal(IDF_Gamma2, PeakShapeGamma(2), '(F10.4)')
+        ENDIF
       ENDIF
 !C Write out HPSL
-      CALL WDialogSelect(IDD_HPSL_info)
-      DO I = 1, NumFittedPFR
-        iOrd = IOrdTem(I)
-        CALL WGridPutCellReal(IDF_HPSL_Grid, 1, I, PkPosAv(iOrd), '(F12.3)')
-        CALL WGridPutCellReal(IDF_HPSL_Grid, 2, I, PkFnVal(3,iOrd), '(F12.5)')
-        CALL WGridPutCellReal(IDF_HPSL_Grid, 3, I, PkFnEsd(3,iOrd), '(F12.5)')
-      ENDDO
+      IF ( .NOT. in_batch ) THEN
+        CALL SelectDASHDialog(IDD_HPSL_info)
+        DO I = 1, NumFittedPFR
+          iOrd = IOrdTem(I)
+          CALL WGridPutCellReal(IDF_HPSL_Grid, 1, I, PkPosAv(iOrd), '(F12.3)')
+          CALL WGridPutCellReal(IDF_HPSL_Grid, 2, I, PkFnVal(3,iOrd), '(F12.5)')
+          CALL WGridPutCellReal(IDF_HPSL_Grid, 3, I, PkFnEsd(3,iOrd), '(F12.5)')
+        ENDDO
+      ENDIF
       IF (NumFittedPFR .GE. 2) THEN
 !C Let's fit HPSL
         IPtPS = 3 
@@ -198,26 +228,31 @@
         IF (IBMBER .NE. 0) THEN
           IBMBER = 0
           CALL DebugErrorMessage('Fitting HPSL Failed.')
-          CALL PopActiveWindowID
+          IF ( .NOT. in_batch ) &
+            CALL PopActiveWindowID
           RETURN
         ENDIF
         PeakShapeHPSL = MAX(0.0002,FitPar(1))
-        CALL WDialogPutReal(IDF_HPSL, PeakShapeHPSL, '(F10.4)')
-        DO I = 1, NumFittedPFR
-          iOrd = IOrdTem(I)
-          CALL WGridPutCellReal(IDF_HPSL_Grid, 4, I, PkFnCal(3,iOrd), '(F12.4)')
-        ENDDO
-        CALL WDialogSelect(IDD_ViewPawley)
-        CALL WDialogPutReal(IDF_HPSL, PeakShapeHPSL, '(F10.4)')
+        IF ( .NOT. in_batch ) THEN
+          CALL WDialogPutReal(IDF_HPSL, PeakShapeHPSL, '(F10.4)')
+          DO I = 1, NumFittedPFR
+            iOrd = IOrdTem(I)
+            CALL WGridPutCellReal(IDF_HPSL_Grid, 4, I, PkFnCal(3,iOrd), '(F12.4)')
+          ENDDO
+          CALL SelectDASHDialog(IDD_ViewPawley)
+          CALL WDialogPutReal(IDF_HPSL, PeakShapeHPSL, '(F10.4)')
+        ENDIF
       ENDIF
 !C Write out HMSL
-      CALL WDialogSelect(IDD_HMSL_info)
-      DO I = 1, NumFittedPFR
-        iOrd = IOrdTem(I)
-        CALL WGridPutCellReal(IDF_HMSL_Grid, 1, I, PkPosAv(iOrd), '(F12.3)')
-        CALL WGridPutCellReal(IDF_HMSL_Grid, 2, I, PkFnVal(4,iOrd), '(F12.5)')
-        CALL WGridPutCellReal(IDF_HMSL_Grid, 3, I, PkFnEsd(4,iOrd), '(F12.5)')
-      ENDDO
+      IF ( .NOT. in_batch ) THEN
+        CALL SelectDASHDialog(IDD_HMSL_info)
+        DO I = 1, NumFittedPFR
+          iOrd = IOrdTem(I)
+          CALL WGridPutCellReal(IDF_HMSL_Grid, 1, I, PkPosAv(iOrd), '(F12.3)')
+          CALL WGridPutCellReal(IDF_HMSL_Grid, 2, I, PkFnVal(4,iOrd), '(F12.5)')
+          CALL WGridPutCellReal(IDF_HMSL_Grid, 3, I, PkFnEsd(4,iOrd), '(F12.5)')
+        ENDDO
+      ENDIF
 !C Let's fit HMSL
       IF (NumFittedPFR .GE. 2) THEN
         IPtPS = 4
@@ -225,26 +260,31 @@
         IF (IBMBER .NE. 0) THEN
           IBMBER = 0
           CALL DebugErrorMessage('Fitting HMSL Failed.')
-          CALL PopActiveWindowID
+          IF ( .NOT. in_batch ) &
+            CALL PopActiveWindowID
           RETURN
         ENDIF
         PeakShapeHMSL = MAX(0.0001, FitPar(1))
-        CALL WDialogPutReal(IDF_HMSL, PeakShapeHMSL, '(F10.4)')
-        DO I = 1, NumFittedPFR
-          iOrd = IOrdTem(I)
-          CALL WGridPutCellReal(IDF_HMSL_Grid, 4, I, PkFnCal(4,iOrd), '(F12.4)')
-        ENDDO
-        CALL WDialogSelect(IDD_ViewPawley)
-        CALL WDialogPutReal(IDF_HMSL, PeakShapeHMSL, '(F10.4)')
+        IF ( .NOT. in_batch ) THEN
+          CALL WDialogPutReal(IDF_HMSL, PeakShapeHMSL, '(F10.4)')
+          DO I = 1, NumFittedPFR
+            iOrd = IOrdTem(I)
+            CALL WGridPutCellReal(IDF_HMSL_Grid, 4, I, PkFnCal(4,iOrd), '(F12.4)')
+          ENDDO
+          CALL SelectDASHDialog(IDD_ViewPawley)
+          CALL WDialogPutReal(IDF_HMSL, PeakShapeHMSL, '(F10.4)')
+        ENDIF
       ENDIF
 !C Write out FWHM
-      CALL WDialogSelect(IDD_FWHM_info)
-      DO I = 1, NumFittedPFR
-        iOrd = IOrdTem(I)
-        CALL WGridPutCellReal(IDF_FWHM_Grid, 1, I, PkPosAv(iOrd), '(F12.3)')
-        CALL WGridPutCellReal(IDF_FWHM_Grid, 2, I, PF_FWHM(iOrd), '(F12.5)')
-        CALL WGridPutCellReal(IDF_FWHM_Grid, 3, I, PF_IntBreadth(iOrd), '(F12.5)')
-      ENDDO
+      IF ( .NOT. in_batch ) THEN
+        CALL SelectDASHDialog(IDD_FWHM_info)
+        DO I = 1, NumFittedPFR
+          iOrd = IOrdTem(I)
+          CALL WGridPutCellReal(IDF_FWHM_Grid, 1, I, PkPosAv(iOrd), '(F12.3)')
+          CALL WGridPutCellReal(IDF_FWHM_Grid, 2, I, PF_FWHM(iOrd), '(F12.5)')
+          CALL WGridPutCellReal(IDF_FWHM_Grid, 3, I, PF_IntBreadth(iOrd), '(F12.5)')
+        ENDDO
+      ENDIF
 !C Warn if HPSL is less than HMSL
       IF (NumFittedPFR .GE. 2) THEN
         IF (PeakShapeHMSL .GT. PeakShapeHPSL) THEN
@@ -256,13 +296,16 @@
           ptem4 = PeakShapeHMSL
           PeakShapeHPSL = ptem4
           PeakShapeHMSL = ptem3
-          CALL WDialogSelect(IDD_ViewPawley)
-          CALL WDialogPutReal(IDF_HPSL, PeakShapeHPSL, '(F10.4)')
-          CALL WDialogPutReal(IDF_HMSL, PeakShapeHMSL, '(F10.4)')
+          IF ( .NOT. in_batch ) THEN
+            CALL SelectDASHDialog(IDD_ViewPawley)
+            CALL WDialogPutReal(IDF_HPSL, PeakShapeHPSL, '(F10.4)')
+            CALL WDialogPutReal(IDF_HMSL, PeakShapeHMSL, '(F10.4)')
 !U         ENDIF
+          ENDIF
         ENDIF
       ENDIF
-      CALL PopActiveWindowID
+      IF ( .NOT. in_batch ) &
+        CALL PopActiveWindowID
 
       END SUBROUTINE Upload_Widths
 !

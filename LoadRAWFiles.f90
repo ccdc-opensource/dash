@@ -72,19 +72,18 @@
             iRange = 1
           ELSE
             CALL PushActiveWindowID
-            CALL WDialogLoad(IDD_DataRangeSTOE)
-            CALL WDialogSelect(IDD_DataRangeSTOE)
+            CALL LoadDASHDialog(IDD_DataRangeSTOE)
             CALL WDialogPutMenu(IDF_DataRangeMenu, TitleOfRange, tNumOfRanges, 1)
             CALL WDialogShow(-1, -1, IDOK, Modal)
             IF (WInfoDialog(ExitButton) .NE. IDOK) THEN
               Load_raw_File = 2
-              CALL WDialogUnload
+              CALL UnloadDASHDialog(IDD_DataRangeSTOE) !WInfoDialog(CurrentDialog)
               CALL PopActiveWindowID
               RETURN
             ENDIF
-            CALL WDialogGetMenu(IDF_DataRangeMenu,iRange)
+            CALL DASHWDialogGetMenu(IDF_DataRangeMenu,iRange)
 ! iRange is the data range to be read.
-            CALL WDialogUnload
+            CALL UnloadDASHDialog(IDD_DataRangeSTOE) !WInfoDialog(CurrentDialog)
             CALL PopActiveWindowID
           ENDIF
           Load_raw_File = Load_rawSTOE_File(TheFileName, iRange)
@@ -103,8 +102,7 @@
             LoadRange(1) = .TRUE.
           ELSE
             CALL PushActiveWindowID
-            CALL WDialogLoad(IDD_DataRangeBruker)
-            CALL WDialogSelect(IDD_DataRangeBruker)
+            CALL LoadDASHDialog(IDD_DataRangeBruker)
             DO CurrRange = 1, tNumOfRanges 
               iHighlightList(CurrRange) = 1
             ENDDO
@@ -112,13 +110,13 @@
             CALL WDialogShow(-1, -1, IDOK, Modal)
             IF (WInfoDialog(ExitButton) .NE. IDOK) THEN
               Load_raw_File = 2
-              CALL WDialogUnload
+              CALL UnloadDASHDialog(IDD_DataRangeBruker) !WInfoDialog(CurrentDialog)
               CALL PopActiveWindowID
               RETURN
             ENDIF
-            CALL WDialogGetMenu(IDF_DataRangeMenu, iHighlightList)
+            CALL DASHWDialogGetMenu(IDF_DataRangeMenu, iHighlightList)
 ! The array iHighlightList now contains '1' for every data range to be read, '0' otherwise.
-            CALL WDialogUnload
+            CALL UnloadDASHDialog(IDD_DataRangeBruker) !WInfoDialog(CurrentDialog)
             CALL PopActiveWindowID
             AtLeastOneSelected = .FALSE.
             DO I = 1, tNumOfRanges

@@ -1,8 +1,8 @@
 !
 !*****************************************************************************
 !
-    SUBROUTINE SA_soln_store
-    
+      SUBROUTINE SA_soln_store
+
 !ep July 2001
 !   This subroutine is called by SA_Structure_Output.for.  It writes out
 !   the powder diffraction pattern (2theta and yobs) and the calculated fit
@@ -16,7 +16,7 @@
       IMPLICIT NONE
 
 !   The common blocks below contain the info required for .pro file
-	INCLUDE 'PARAMS.INC'
+      INCLUDE 'PARAMS.INC'
 
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
@@ -36,6 +36,7 @@
       INTEGER    hFile
 
       IF (.NOT. Get_SavePRO()) RETURN
+
       hFile = 61
       OPEN(UNIT=hFile,FILE=OutputFilesBaseName(1:OFBN_Len)//'_'//SA_RunNumberStr//'.pro',status='unknown',ERR=999)
       DO I = 1, NBIN

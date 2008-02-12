@@ -12,8 +12,8 @@
       LOGICAL, EXTERNAL :: Confirm
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Configuration)
-      CALL WDialogGetString(IDF_MogulExe, MOGULEXE)
+      CALL SelectDASHDialog(IDD_Configuration)
+      CALL DASHWDialogGetString(IDF_MogulExe, MOGULEXE)
       CALL PopActiveWindowID
       IF (LEN_TRIM(MOGULEXE) .NE. 0) THEN
         UseMogul = .TRUE. 
@@ -225,13 +225,13 @@
       CHARACTER(MaxPathLength), INTENT(IN   ) :: Script_file, MogulOutputFile
       INTEGER, INTENT (IN   ) :: iFRow
             
-      LOGICAL, EXTERNAL :: Confirm, WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: Confirm, DASHWDialogGetCheckBoxLogical
       INTEGER I,M
       LOGICAL exists
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Configuration)
-      CALL WDialogGetString(IDF_MogulExe, MOGULEXE)
+      CALL SelectDASHDialog(IDD_Configuration)
+      CALL DASHWDialogGetString(IDF_MogulExe, MOGULEXE)
       CALL PopActiveWindowID
       I = LEN_TRIM(MOGULEXE)
       INQUIRE(FILE = MOGULEXE(1:I),EXIST=exists)
@@ -321,7 +321,7 @@
         MogulText = 'No recommendation - not enough data'
         ModalFlag(IFROW) = 1
         Assigned = .TRUE.
-        CALL WDialogSelect(IDD_ModalDialog)
+        CALL SelectDASHDialog(IDD_ModalDialog)
         CALL WDialogPutString(IDF_MogulText, MogulText)
         RETURN
       ENDIF
@@ -425,7 +425,7 @@
         MogulText = 'No recommendation'
         ModalFlag(IFRow) = 1
       ENDIF
-      CALL WDialogSelect(IDD_ModalDialog)
+      CALL SelectDASHDialog(IDD_ModalDialog)
       CALL WDialogPutString(IDF_MogulText, MogulText)
       RETURN
 

@@ -37,11 +37,11 @@
       WRITE(tFileHandle,'("  Parameters for simulated annealing in ",A8)',ERR=999) ProgramVersion
       CALL Date2String(DateToday(),DateStr,tLen)
       WRITE(tFileHandle,'(A)',ERR=999) "  Date = "//DateStr(1:tLen)
-      CALL WDialogSelect(IDD_SAW_Page1)
-      CALL WDialogGetString(IDF_SA_Project_Name,tSDIFile)
+      CALL SelectDASHDialog(IDD_SAW_Page1)
+      CALL DASHWDialogGetString(IDF_SA_Project_Name,tSDIFile)
       WRITE(tFileHandle,'("  SDI file = ",A)',ERR=999) tSDIFile(1:LEN_TRIM(tSDIFile))
 ! Profile range (including maximum resolution), wavelength, unit cell parameters, zero point
-      CALL WDialogSelect(IDD_SA_Modal_input2)
+      CALL SelectDASHDialog(IDD_SA_Modal_input2)
       kk = 0
       DO iFrg = 1, nFrag
 ! Write the name of the file
@@ -50,13 +50,13 @@
         DO ii = 1, izmpar(ifrg)
           kk = kk + 1
           ilen = LEN_TRIM(czmpar(ii,iFrg))
-          CALL WGridGetCellReal    (IDF_parameter_grid_modal,1,kk,x)
-          CALL WGridGetCellCheckBox(IDF_parameter_grid_modal,4,kk,Fixed)
+          CALL DASHWGridGetCellReal    (IDF_parameter_grid_modal,1,kk,x)
+          CALL DASHWGridGetCellCheckBox(IDF_parameter_grid_modal,4,kk,Fixed)
           IF (Fixed .EQ. 1) THEN
             WRITE(tFileHandle,"('    ',A36,1X,F12.5,1X,A5)",ERR=999) czmpar(ii,iFrg),x,'Fixed'
           ELSE
-            CALL WGridGetCellReal(IDF_parameter_grid_modal,2,kk,lb)
-            CALL WGridGetCellReal(IDF_parameter_grid_modal,3,kk,ub)
+            CALL DASHWGridGetCellReal(IDF_parameter_grid_modal,2,kk,lb)
+            CALL DASHWGridGetCellReal(IDF_parameter_grid_modal,3,kk,ub)
             WRITE(tFileHandle,"('    ',A36,1X,F12.5,1X,F12.5,1X,F12.5)",ERR=999) czmpar(ii,iFrg),x,lb,ub
           ENDIF
         ENDDO
@@ -66,42 +66,42 @@
         WRITE(tFileHandle,'("  March-Dollase preferred orientation correction will be applied.")',ERR=999)
         WRITE(tFileHandle,'("  Orientation: a* = ",I3,", b* = ",I3,", c* = ",I3)',ERR=999) (PO_Direction(ii),ii=1,3)
         kk = kk + 1
-        CALL WGridGetCellReal(IDF_parameter_grid_modal,2,kk,lb)
-        CALL WGridGetCellReal(IDF_parameter_grid_modal,3,kk,ub)
-        CALL WGridGetCellReal(IDF_parameter_grid_modal,1,kk,x)
+        CALL DASHWGridGetCellReal(IDF_parameter_grid_modal,2,kk,lb)
+        CALL DASHWGridGetCellReal(IDF_parameter_grid_modal,3,kk,ub)
+        CALL DASHWGridGetCellReal(IDF_parameter_grid_modal,1,kk,x)
         tString36 = 'Preferred Orientation'
         WRITE(tFileHandle,"('    ',A36,1X,F12.5,1X,F12.5,1X,F12.5)",ERR=999) tString36,x,lb,ub
       ENDIF
 ! Total number of parameters for this problem
 ! Number of atoms
-      CALL WDialogSelect(IDD_SA_input3_2)
-      CALL WDialogGetInteger(IDF_SA_RandomSeed1,I)
+      CALL SelectDASHDialog(IDD_SA_input3_2)
+      CALL DASHWDialogGetInteger(IDF_SA_RandomSeed1,I)
       WRITE(tFileHandle,'("  Random seed 1 = ",I5)',ERR=999) I
-      CALL WDialogGetInteger(IDF_SA_RandomSeed2,I)
+      CALL DASHWDialogGetInteger(IDF_SA_RandomSeed2,I)
       WRITE(tFileHandle,'("  Random seed 2 = ",I5)',ERR=999) I
-      CALL WDialogGetReal(IDF_SA_T0, R)
+      CALL DASHWDialogGetReal(IDF_SA_T0, R)
       IF (R .EQ. 0.0) THEN
         WRITE(tFileHandle,'("  Initial temperature = to be estimated by DASH")',ERR=999)
       ELSE
         WRITE(tFileHandle,'("  Initial temperature = ",F9.2)',ERR=999) R
       ENDIF
-      CALL WDialogGetReal(IDF_SA_Tredrate,R)
+      CALL DASHWDialogGetReal(IDF_SA_Tredrate,R)
       WRITE(tFileHandle,'("  Cooling rate = ",F8.4)',ERR=999) R
-      CALL WDialogGetInteger(IDF_SA_NS,I)
+      CALL DASHWDialogGetInteger(IDF_SA_NS,I)
       WRITE(tFileHandle,'("  N1 = ",I5)',ERR=999) I
-      CALL WDialogGetInteger(IDF_SA_NT,I)
+      CALL DASHWDialogGetInteger(IDF_SA_NT,I)
       WRITE(tFileHandle,'("  N2 = ",I5)',ERR=999) I
-      CALL WDialogGetInteger(IDF_SA_Moves,I)
+      CALL DASHWDialogGetInteger(IDF_SA_Moves,I)
       WRITE(tFileHandle,'("  Number of moves at each temperature = ",I5)',ERR=999) I
-      CALL WDialogGetInteger(IDF_SA_MaxRepeats,I) ! Number of runs
+      CALL DASHWDialogGetInteger(IDF_SA_MaxRepeats,I) ! Number of runs
       IF (I .EQ. 1) THEN
         WRITE(tFileHandle,'("  Single run, runs until user stops it")',ERR=999)
       ELSE
         WRITE(tFileHandle,'("  Number of runs = ",I5)',ERR=999) I
-        CALL WDialogGetReal(IDF_MaxMoves1,MaxMoves1)
+        CALL DASHWDialogGetReal(IDF_MaxMoves1,MaxMoves1)
         IF (MaxMoves1 .LT.   0.001) MaxMoves1 =   0.001
         IF (MaxMoves1 .GT. 100.0  ) MaxMoves1 = 100.0
-        CALL WDialogGetInteger(IDF_MaxMoves2,MaxMoves2)
+        CALL DASHWDialogGetInteger(IDF_MaxMoves2,MaxMoves2)
         IF (MaxMoves2 .LT. 1) MaxMoves2 = 1
         IF (MaxMoves2 .GT. 8) MaxMoves2 = 8
         tMaxMoves = MaxMoves1 * (10**FLOAT(MaxMoves2))
@@ -126,7 +126,7 @@
           MaxMovesStr(ilen-8:ilen-8) = ','
         ENDIF
         WRITE(tFileHandle,'("  Maximum number of moves per run = ",A)',ERR=999) MaxMovesStr(1:LEN_TRIM(MaxMovesStr))
-        CALL WDialogGetReal(IDF_SA_ChiTest,R)
+        CALL DASHWDialogGetReal(IDF_SA_ChiTest,R)
         WRITE(tFileHandle,'("  A run will stop when the profile chi² is less than ",   &
                 F6.2," · ",F7.3," = ",F8.4)',ERR=999) R, PAWLEYCHISQ, R*PAWLEYCHISQ
       ENDIF
@@ -139,10 +139,20 @@
       CALL PopActiveWindowID
 
       END FUNCTION WriteSAParametersToFile
+
+      SUBROUTINE SA_Parameter_Set
+
+      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign
+      INTEGER                                                                    HydrogenTreatment
+      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign, HydrogenTreatment
+
+      CALL SA_Parameter_Set1(HydrogenTreatment)
+
+      END SUBROUTINE SA_Parameter_Set
 !
 !*****************************************************************************
 !
-      SUBROUTINE SA_Parameter_Set
+      SUBROUTINE SA_Parameter_Set1(HydrogenTreatment)
 !
 ! This routine initialises things after all Z-matrices are known. So that is 1. when
 ! leaving the Z-matrices window, 2. when loading a project file.
@@ -158,6 +168,8 @@
 
       INCLUDE 'PARAMS.INC'
       INCLUDE 'Lattice.inc'
+
+      INTEGER, INTENT(IN) :: HydrogenTreatment
 
       REAL            f2cpdb
       COMMON /pdbcat/ f2cpdb(1:3,1:3)
@@ -184,14 +196,10 @@
       LOGICAL           Resume_SA
       COMMON /RESUMESA/ Resume_SA
 
-      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign
-      INTEGER                                                                    HydrogenTreatment
-      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign, HydrogenTreatment
-
       LOGICAL         in_batch
       COMMON /BATEXE/ in_batch
 
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
       REAL, EXTERNAL :: Degrees2Radians
       CHARACTER*36 parlabel(mvar)
       INTEGER I, II, kk, iFrg
@@ -337,14 +345,14 @@
       ENDDO
       NStPar = kk
       IF ( .NOT. in_batch ) THEN
-        CALL WDialogSelect(IDD_SAW_Page2)
-        PrefParExists = WDialogGetCheckBoxLogical(IDF_Use_PO)
+        CALL SelectDASHDialog(IDD_SAW_Page2)
+        PrefParExists = DASHWDialogGetCheckBoxLogical(IDF_Use_PO)
       ENDIF
 ! Set up preferred orientation. This can't be the first parameter: it must be appended to the rest.
       IF ( PrefParExists ) THEN
-        CALL WDialogGetInteger(IDF_PO_a, PO_Direction(1))
-        CALL WDialogGetInteger(IDF_PO_b, PO_Direction(2))
-        CALL WDialogGetInteger(IDF_PO_c, PO_Direction(3))
+        CALL DASHWDialogGetInteger(IDF_PO_a, PO_Direction(1))
+        CALL DASHWDialogGetInteger(IDF_PO_b, PO_Direction(2))
+        CALL DASHWDialogGetInteger(IDF_PO_c, PO_Direction(3))
         kk = kk + 1
         Par2iFrg(kk) = 0
         kzmpar2(kk) = 7 ! preferred orientation
@@ -356,27 +364,30 @@
       ENDIF
       nvar = kk
 ! Now fill the grid
-      CALL WDialogSelect(IDD_SA_Modal_input2)
-      CALL WGridRows(IDF_parameter_grid_modal, nvar)
-      DO i = 1, nvar
-        CALL WGridLabelRow(IDF_parameter_grid_modal, i, parlabel(i))
-        CALL WGridPutCellReal(IDF_parameter_grid_modal, 1, i, x_unique(i), '(F12.5)')
-        CALL WGridPutCellReal(IDF_parameter_grid_modal, 2, i, lb(i), '(F12.5)')
-        CALL WGridPutCellReal(IDF_parameter_grid_modal, 3, i, ub(i), '(F12.5)')
-        CALL WGridPutCellCheckBox(IDF_parameter_grid_modal, 4, i, Unchecked)
-        CALL WGridPutCellCheckBox(IDF_parameter_grid_modal, 5, i, Unchecked)
-        CALL WGridStateCell(IDF_parameter_grid_modal, 1, i, Enabled)
-        CALL WGridStateCell(IDF_parameter_grid_modal, 2, i, Enabled)
-        CALL WGridStateCell(IDF_parameter_grid_modal, 3, i, Enabled)
+      IF ( .NOT. IN_BATCH ) THEN
+        CALL SelectDASHDialog(IDD_SA_Modal_input2)
+        CALL WGridRows(IDF_parameter_grid_modal, nvar)
+        DO i = 1, nvar
+          CALL WGridLabelRow(IDF_parameter_grid_modal, i, parlabel(i))
+          CALL WGridPutCellReal(IDF_parameter_grid_modal, 1, i, x_unique(i), '(F12.5)')
+          CALL WGridPutCellReal(IDF_parameter_grid_modal, 2, i, lb(i), '(F12.5)')
+          CALL WGridPutCellReal(IDF_parameter_grid_modal, 3, i, ub(i), '(F12.5)')
+          CALL WGridPutCellCheckBox(IDF_parameter_grid_modal, 4, i, Unchecked)
+          CALL WGridPutCellCheckBox(IDF_parameter_grid_modal, 5, i, Unchecked)
+          CALL WGridStateCell(IDF_parameter_grid_modal, 1, i, Enabled)
+          CALL WGridStateCell(IDF_parameter_grid_modal, 2, i, Enabled)
+          CALL WGridStateCell(IDF_parameter_grid_modal, 3, i, Enabled)
 !        prevub(i) = ub(i) ! taken out of this version of DASH by CJ?
 !        prevlb(i) = lb(i)
-      ENDDO
+        ENDDO
 ! Tick "Randomise initial values"
-      CALL WDialogPutCheckBoxLogical(IDF_RandomInitVal, .TRUE.)
-      Resume_SA = .FALSE.
-      CALL PopActiveWindowID
+        CALL WDialogPutCheckBoxLogical(IDF_RandomInitVal, .TRUE.)
+        CALL PopActiveWindowID
+      ENDIF
 
-      END SUBROUTINE SA_Parameter_Set
+      Resume_SA = .FALSE.
+
+      END SUBROUTINE SA_Parameter_Set1
 !
 !*****************************************************************************
 !
@@ -452,8 +463,14 @@
       CHARACTER*(80) FileName
       CHARACTER*(3)  FrgStr
 
-      CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SAW_Page1)
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+      IF (.NOT. IN_BATCH ) THEN
+        CALL PushActiveWindowID
+        CALL SelectDASHDialog(IDD_SAW_Page1)
+      ENDIF
+
       izmtot = 0
       NATOM  = 0
       DO iFrg = 1, nFrag
@@ -466,47 +483,54 @@
         izmtot = izmtot + NumberOfDOF
         IF ((iFrg-first_zm_in_win+1 .GE. 1) .AND. &
             (iFrg-first_zm_in_win+1 .LE. maxfrginterface)) THEN
-          WRITE(FrgStr, '(I3)') iFrg
-          CALL WDialogPutString(IDFZMLabel(iFrg-first_zm_in_win+1), FrgStr)
+          IF ( .NOT. IN_BATCH ) THEN
+            WRITE(FrgStr, '(I3)') iFrg
+            CALL WDialogPutString(IDFZMLabel(iFrg-first_zm_in_win+1), FrgStr)
 ! Due to lack of space: display the name of file only, without its full path
-          CALL SplitPath(frag_file(iFrg), DirName, FileName)
-          CALL WDialogPutString(IDFZMFile(iFrg-first_zm_in_win+1), FileName)
+            CALL SplitPath(frag_file(iFrg), DirName, FileName)
+            CALL WDialogPutString(IDFZMFile(iFrg-first_zm_in_win+1), FileName)
 ! Enable 'Delete' button
-          CALL WDialogFieldState(IDBZMDelete(iFrg-first_zm_in_win+1), Enabled)
+            CALL WDialogFieldState(IDBZMDelete(iFrg-first_zm_in_win+1), Enabled)
 ! Enable 'View' button
-          CALL WDialogFieldState(IDBZMView(iFrg-first_zm_in_win+1), Enabled)
+            CALL WDialogFieldState(IDBZMView(iFrg-first_zm_in_win+1), Enabled)
 ! Enable 'Edit...' button
-          CALL WDialogFieldState(IDBzmEdit(iFrg-first_zm_in_win+1), Enabled)
-          CALL WDialogPutInteger(IDFZMpars(iFrg-first_zm_in_win+1), NumberOfDOF)
+            CALL WDialogFieldState(IDBzmEdit(iFrg-first_zm_in_win+1), Enabled)
+            CALL WDialogPutInteger(IDFZMpars(iFrg-first_zm_in_win+1), NumberOfDOF)
+          ENDIF
         ENDIF
       ENDDO
 ! Clear remainder
       DO iFrg = nFrag+1, maxfrg
         IF ((iFrg-first_zm_in_win+1 .GE. 1) .AND. &
             (iFrg-first_zm_in_win+1 .LE. maxfrginterface)) THEN
-          WRITE(FrgStr, '(I3)') iFrg
-          CALL WDialogPutString(IDFZMLabel(iFrg-first_zm_in_win+1), FrgStr)
-          CALL WDialogClearField(IDFZMFile(iFrg-first_zm_in_win+1))
+          IF ( .NOT. IN_BATCH ) THEN
+
+            WRITE(FrgStr, '(I3)') iFrg
+            CALL WDialogPutString(IDFZMLabel(iFrg-first_zm_in_win+1), FrgStr)
+            CALL WDialogClearField(IDFZMFile(iFrg-first_zm_in_win+1))
 ! Disable 'View' button
-          CALL WDialogFieldState(IDBZMView(iFrg-first_zm_in_win+1), Disabled)
+            CALL WDialogFieldState(IDBZMView(iFrg-first_zm_in_win+1), Disabled)
 ! Disable 'Delete' button
-          CALL WDialogFieldState(IDBZMDelete(iFrg-first_zm_in_win+1), Disabled)
+            CALL WDialogFieldState(IDBZMDelete(iFrg-first_zm_in_win+1), Disabled)
 ! Disable 'Edit...' button
-          CALL WDialogFieldState(IDBzmEdit(iFrg-first_zm_in_win+1), Disabled)
-          CALL WDialogClearField(IDFZMpars(iFrg-first_zm_in_win+1))
+            CALL WDialogFieldState(IDBzmEdit(iFrg-first_zm_in_win+1), Disabled)
+            CALL WDialogClearField(IDFZMpars(iFrg-first_zm_in_win+1))
+          ENDIF
         ENDIF
       ENDDO
 ! JvdS @@ Following is wrong (we need a valid .sdi as well), but 
 ! a. identical to DASH 1.0
 ! b. it's difficult to keep track of the validity of the .sdi file
-      CALL WDialogFieldStateLogical(IDNEXT,nfrag .NE. 0)
-      CALL WDialogFieldStateLogical(IDB_PO,nfrag .NE. 0) 
-      IF (izmtot .EQ. 0) THEN            
-        CALL WDialogClearField(IDF_ZM_allpars)
-      ELSE
-        CALL WDialogPutInteger(IDF_ZM_allpars, izmtot)
+      IF ( .NOT. IN_BATCH ) THEN
+        CALL WDialogFieldStateLogical(IDNEXT,nfrag .NE. 0)
+        CALL WDialogFieldStateLogical(IDB_PO,nfrag .NE. 0) 
+        IF (izmtot .EQ. 0) THEN            
+          CALL WDialogClearField(IDF_ZM_allpars)
+        ELSE
+          CALL WDialogPutInteger(IDF_ZM_allpars, izmtot)
+        ENDIF
+        CALL PopActiveWindowID
       ENDIF
-      CALL PopActiveWindowID
 
       END SUBROUTINE UpdateZmatrixSelection
 !

@@ -4,6 +4,7 @@
       SUBROUTINE Profile_Plot
 
       USE VARIABLES
+      USE TAVAR
 
       IMPLICIT NONE
 
@@ -60,6 +61,8 @@
  !         CALL PlotPeaksFound
 ! Plot peakfit ranges
           IF (NumPeakFitRange .GT. 0) CALL Plot_PeakFit_Info
+        ENDIF
+        IF ((.NOT. PastPawley) .OR. (iRietveldMethod .NE. INTERNAL_RB)) THEN
 ! Plot Background
           IF (PlotBackground()) CALL Plot_Background
         ENDIF
@@ -365,9 +368,9 @@
       COMMON /CMN007/ CummChiSqd(MOBS)
 
       LOGICAL, EXTERNAL :: PlotObservedErrorBars, PlotDifferenceErrorBars 
-	  LOGICAL, EXTERNAL :: ConnectPointsObs, Get_ShowCumChiSqd, Get_DivideByEsd
+      LOGICAL, EXTERNAL :: ConnectPointsObs, Get_ShowCumChiSqd, Get_DivideByEsd
       REAL, EXTERNAL :: PlotEsdMultiplier
-	  REAL    YDIF(MOBS), YADD
+      REAL    YDIF(MOBS), YADD
       INTEGER I, II 
       REAL    sizmtem, xptem, yptem, xgtem, ygtem, esdmul
       LOGICAL tGet_ShowCumChiSqd, tGet_DivideByEsd
@@ -415,7 +418,7 @@
       CALL IPgXYPairs(XBIN(iStart:), YDIF(iStart:))
 ! Do the error bars on the difference profile - we've precalculated the min & max pointers
       IF (PlotDifferenceErrorBars()) THEN
-	    esdmul = PlotEsdMultiplier()
+        esdmul = PlotEsdMultiplier()
         CALL IGrColourN(KolNumDif)
         DO I = IPMIN, IPMAX
           xptem = XBIN(I)          

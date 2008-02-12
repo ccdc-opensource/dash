@@ -54,9 +54,9 @@
       chi_x_min = FLOAT(nmpert)/100000.0
       chi_y_min = 0.0
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SA_Action1)
+      CALL SelectDASHDialog(IDD_SA_Action1)
       CALL WDialogFieldState(IDB_Prog3, Disabled)
-      CALL WDialogSelect(IDD_SAW_Page5)
+      CALL SelectDASHDialog(IDD_SAW_Page5)
       CALL WDialogFieldState(IDB_Prog3, Disabled)
       CALL PopActiveWindowID
       IF (Resume_SA) THEN
@@ -409,9 +409,9 @@
       CALL UnRegisterChildWindow(ChiHandle)
       ChiHandle = -1
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SA_Action1)
+      CALL SelectDASHDialog(IDD_SA_Action1)
       CALL WDialogFieldState(IDB_Prog3,Enabled)
-      CALL WDialogSelect(IDD_SAW_Page5)
+      CALL SelectDASHDialog(IDD_SAW_Page5)
       CALL WDialogFieldState(IDB_Prog3,Enabled)
       CALL PopActiveWindowID
 

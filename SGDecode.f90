@@ -19,9 +19,9 @@
      &     1, 1, 0, 0, 0, 1, 0, 0, -1, 0, 1, -1, 0, 0, 0, 1, 0, -1, 0,  &
      &     1, 0, 0, 0, 0, 1, 1, -1, 0, 1, 0, 0, 0, 0, 1/
       INTEGER latvec(3,7)
-!	data latvec/ 6,0,0, 0,6,0, 0,0,6, 6,6,6, 6,6,0, 6,0,6, 8,4,4/
-!	the above latvec is all wrong, but the one below only works
-!	for A,B,C and I centering
+!     data latvec/ 6,0,0, 0,6,0, 0,0,6, 6,6,6, 6,6,0, 6,0,6, 8,4,4/
+!     the above latvec is all wrong, but the one below only works
+!     for A,B,C and I centering
       DATA latvec/0,6,6, 6,0,6, 6,6,0, 6,6,6, 8,4,4, 4,8,8, 0,0,0/
 
       INTEGER     msymmin

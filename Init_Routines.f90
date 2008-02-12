@@ -65,24 +65,29 @@
 
       INTEGER iSol
       CHARACTER*3 RowLabelStr
+      
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+      IF ( IN_BATCH ) RETURN
 
       CALL PushActiveWindowID
       IF (NumOf_SA_Runs .EQ. 0) THEN
 ! Winteracter doesn't seem able to cope with setting the number of rows in a grid to zero,
 ! so if no SA runs, the number of rows is set such that it fills the screen but doesn't allow
 ! scrolling down.
-        CALL WDialogSelect(IDD_SAW_Page5)
+        CALL SelectDASHDialog(IDD_SAW_Page5)
         CALL WGridRows(IDF_SA_Summary, 5)
         CALL WDialogClearField(IDF_SA_Summary)
         CALL WDialogPutInteger(IDF_Limit1, 1)
         CALL WDialogPutInteger(IDF_Limit2, 1)
-        CALL WDialogSelect(IDD_Summary)
+        CALL SelectDASHDialog(IDD_Summary)
         CALL WGridRows(IDF_SA_Summary, 5)
         CALL WDialogClearField(IDF_SA_Summary)
         CALL WDialogPutInteger(IDF_Limit1, 1)
         CALL WDialogPutInteger(IDF_Limit2, 1)
       ELSE
-        CALL WDialogSelect(IDD_SAW_Page5)
+        CALL SelectDASHDialog(IDD_SAW_Page5)
         CALL WGridRows(IDF_SA_Summary, NumOf_SA_Runs)
         DO iSol = 1, NumOf_SA_Runs
           WRITE(RowLabelStr,'(I3)') iSol
@@ -94,7 +99,7 @@
         ENDDO
         CALL WDialogPutInteger(IDF_Limit1, 1)
         CALL WDialogPutInteger(IDF_Limit2, NumOf_SA_Runs)
-        CALL WDialogSelect(IDD_Summary)
+        CALL SelectDASHDialog(IDD_Summary)
         CALL WGridRows(IDF_SA_Summary, NumOf_SA_Runs)
         DO iSol = 1, NumOf_SA_Runs
           WRITE(RowLabelStr,'(I3)') iSol
@@ -137,7 +142,7 @@
       IMPLICIT NONE
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SAW_Page2)
+      CALL SelectDASHDialog(IDD_SAW_Page2)
       CALL WDialogPutCheckBoxLogical(IDF_Use_PO, PrefParExists)
       CALL WDialogPutInteger(IDF_PO_a, PO_Direction(1))
       CALL WDialogPutInteger(IDF_PO_b, PO_Direction(2))
@@ -183,12 +188,19 @@
                         XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT),         &
                         PF_FWHM(MAX_NPFR),          PF_IntBreadth(MAX_NPFR)
 
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+
 ! Clear all variables
       NumPeakFitRange = 0
 ! Update 'View'|'Peak Positions'...
       CALL Upload_Positions
 !... and 'View'|'Peak Widths' tabs
       CALL Upload_Widths
+
+      IF ( in_batch ) return
+
 ! Redraw
       CALL Profile_Plot
 ! Disable Pawley refinement button and 'Next >' button in Wizard window
@@ -282,10 +294,15 @@
       REAL                                                           ChiMult
       COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
-      CALL PushActiveWindowID
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
       NumOf_SA_Runs = 0
+      IF (in_batch ) return
+
+      CALL PushActiveWindowID
       ! Now clear the solutions from the analyse solutions window
-      CALL WDialogSelect(IDD_SAW_Page5)
+      CALL SelectDASHDialog(IDD_SAW_Page5)
       CALL WDialogClearField(IDF_SA_Summary)
       CALL PopActiveWindowID
 
@@ -315,11 +332,17 @@
       LOGICAL, EXTERNAL :: FnPatternOK, FnWavelengthOK
       REAL       tMaxResolution
 
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+
+      IF ( IN_BATCH ) RETURN
+
       CALL PushActiveWindowID
 ! In principle, set resolution so as to truncate at DefaultMaxResolution.
 ! However, if truncation resolution not attainable with current data range / wavelength,
 ! adjust the setting of the maximum resolution to maximum possible.
-      CALL WDialogSelect(IDD_ViewPawley)
+      CALL SelectDASHDialog(IDD_ViewPawley)
       IF (FnPatternOK() .AND. FnWavelengthOK()) THEN
         tMaxResolution = MAX(TwoTheta2dSpacing(XPMAX), DefaultMaxResolution)
         CALL WDialogPutReal(IDF_MaxResolution, tMaxResolution)
@@ -327,7 +350,7 @@
         tMaxResolution = DefaultMaxResolution
         CALL WDialogClearField(IDF_MaxResolution)
       ENDIF
-      CALL WDialogSelect(IDD_PW_Page5)
+      CALL SelectDASHDialog(IDD_PW_Page5)
 ! Initialise truncation of start of powder pattern
       CALL WDialogPutReal(IDF_Min2Theta, XPMIN, '(F6.3)')
       CALL WDialogPutReal(IDF_MaxResolution, tMaxResolution)

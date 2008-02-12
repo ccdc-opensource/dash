@@ -37,12 +37,15 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE SDIFileOpen(TheFileName)
+      LOGICAL FUNCTION SDIFileOpen(TheFileName)
 !
 ! This routine tries to open an SDI file.
 !
 ! INPUT   : TheFileName = the file name
 !
+! RETURNS : TRUE for success
+!           FALSE for error
+
       USE WINTERACTER
       USE VARIABLES
 
@@ -50,9 +53,13 @@
 
       CHARACTER*(*), INTENT (IN   ) :: TheFileName
 
-      LOGICAL FExists
+      LOGICAL, EXTERNAL :: SDIFileLoad
+
+      LOGICAL FExists, tStat
       INTEGER KLEN
 
+      ! Initialise to failure
+      SDIFileOpen = .FALSE.
       KLEN = LEN_TRIM(TheFileName)
       IF (KLEN .EQ. 0) RETURN
       INQUIRE(FILE=TheFileName(1:KLEN),EXIST=FExists)
@@ -63,10 +70,10 @@
 ! This is the point of no return: the selected file will be new file, valid data or not
 ! Change global variable FNAME
       FNAME = TheFileName
-      CALL SDIFileLoad(FNAME(1:KLEN)) 
+      tStat = SDIFileLoad(FNAME(1:KLEN))
 ! Next line is necessary due to the way ScrUpdateFileName in SDIFileLoad works
       FNAME = TheFileName
-      IF (NoData) THEN
+      IF ((.NOT. tStat) .OR. NoData) THEN
         CALL ErrorMessage("Could not read the project file "//FNAME(1:KLEN)//&
                           CHAR(13)//"successfully.")
         RETURN
@@ -76,12 +83,16 @@
       CALL WindowOutStatusBar(1,FNAME)
 ! Update the file name of the project in the SA pop up
       CALL ScrUpdateFileNameSDIFile(FNAME(1:KLEN))
+      SDIFileOpen = .TRUE.
       
-      END SUBROUTINE SDIFileOpen
+      END FUNCTION SDIFileOpen
 !
 !*****************************************************************************
 !
-      SUBROUTINE SDIFileLoad(SDIFile)
+      LOGICAL FUNCTION SDIFileLoad(SDIFile)
+
+! RETURNS : TRUE for success
+!           FALSE for error
 
       USE WINTERACTER
       USE DRUID_HEADER
@@ -116,6 +127,9 @@
       LOGICAL           Is_SX
       COMMON  / SXCOM / Is_SX
 
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
       INTEGER, EXTERNAL :: GetCrystalSystem, GETTIC
       CHARACTER(LEN = MaxPathLength) :: line
       INTEGER nl
@@ -128,6 +142,8 @@
       LOGICAL PikExists
       LOGICAL DslExists
 
+      ! Initialise to failure
+      SDIFileLoad = .FALSE.
 ! Set to success in all cases
       ihcver = 0
       iloger = 0
@@ -173,7 +189,8 @@
 ! Set the crystal system
           LatBrav = GetCrystalSystem(NumberSGTable)
 ! Update cpdbops, required by special_position.exe for most external Rietveld programs 
-          CALL DecodeSGSymbol(SGShmStr(NumberSGTable))
+! Call FillSymmetry_2() instead and move to DealWithWizardRietveldRefinement()
+!          CALL DecodeSGSymbol(SGShmStr(NumberSGTable))
           CALL Upload_CrystalSystem
         CASE ('paw')
           CALL INextReal(line, PAWLEYCHISQ)
@@ -204,37 +221,47 @@
       IPTYPE = 1
       CALL Profile_Plot
 ! Enable the buttons,
-      IF (.NOT. NoData) THEN
-        IF (idsler .EQ. 0) THEN
-          CALL SetModeMenuState(0,1)
-        ELSE
-          CALL SetModeMenuState(0,-1)
+      IF ( .NOT. IN_BATCH ) THEN
+        IF (.NOT. NoData) THEN
+          IF (idsler .EQ. 0) THEN
+            CALL SetModeMenuState(0,1)
+          ELSE
+            CALL SetModeMenuState(0,-1)
+          ENDIF
         ENDIF
+        CALL SelectDASHDialog(IDD_ViewPawley)
+        CALL WDialogPutReal(IDF_Sigma1, PeakShapeSigma(1), '(F10.4)')
+        CALL WDialogPutReal(IDF_Sigma2, PeakShapeSigma(2), '(F10.4)')
+        CALL WDialogPutReal(IDF_Gamma1, PeakShapeGamma(1), '(F10.4)')
+        CALL WDialogPutReal(IDF_Gamma2, PeakShapeGamma(2), '(F10.4)')
+        CALL WDialogPutReal(IDF_HPSL,   PeakShapeHPSL,     '(F10.4)')
+        CALL WDialogPutReal(IDF_HMSL,   PeakShapeHMSL,     '(F10.4)')
+        CALL WDialogPutInteger(IDF_Pawley_Cycle_NumPts, NOBS)
+        CALL WDialogPutInteger(IDF_Pawley_Cycle_NumRefs, NumOfRef)
       ENDIF
-      CALL WDialogSelect(IDD_ViewPawley)
-      CALL WDialogPutReal(IDF_Sigma1, PeakShapeSigma(1), '(F10.4)')
-      CALL WDialogPutReal(IDF_Sigma2, PeakShapeSigma(2), '(F10.4)')
-      CALL WDialogPutReal(IDF_Gamma1, PeakShapeGamma(1), '(F10.4)')
-      CALL WDialogPutReal(IDF_Gamma2, PeakShapeGamma(2), '(F10.4)')
-      CALL WDialogPutReal(IDF_HPSL,   PeakShapeHPSL,     '(F10.4)')
-      CALL WDialogPutReal(IDF_HMSL,   PeakShapeHMSL,     '(F10.4)')
-      CALL WDialogPutInteger(IDF_Pawley_Cycle_NumPts, NOBS)
-      CALL WDialogPutInteger(IDF_Pawley_Cycle_NumRefs, NumOfRef)
+
       MAXK = NumOfRef
       WLGTH = ALambda
-      CALL WDialogPutReal(IDF_Pawley_Cycle_ChiSq, PAWLEYCHISQ, '(F12.3)')
+      
+      IF ( .NOT. IN_BATCH ) &
+        CALL WDialogPutReal(IDF_Pawley_Cycle_ChiSq, PAWLEYCHISQ, '(F12.3)')
+
       CALL Clear_SA
 ! Grey out the "Previous Results >" button in the DICVOL Wizard window
-      CALL WDialogSelect(IDD_PW_Page8)
-      CALL WDialogFieldState(IDB_PrevRes, Disabled)
+      IF ( .NOT. IN_BATCH ) THEN
+        CALL SelectDASHDialog(IDD_PW_Page8)
+        CALL WDialogFieldState(IDB_PrevRes, Disabled)
+      ENDIF
+
       DefaultMaxResolution = 0.1 ! Force using maximum attainable
       CALL Update_TruncationLimits
       CALL GET_LOGREF
+      SDIFileLoad = .TRUE.
       RETURN
  999  CALL ErrorMessage('Error reading .sdi file.')
       CLOSE(iHandle) 
 
-      END SUBROUTINE SDIFileLoad
+      END FUNCTION SDIFileLoad
 !
 !*****************************************************************************
 !
@@ -262,6 +289,10 @@
       CHARACTER*3   KeyChar
       REAL          Temp
       INTEGER       nl, iTem, I, hFile
+
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
 
       iErr = 1
 ! Open the file
@@ -315,16 +346,21 @@
             CALL INextReal(line,Temp) ! HPSL
             IF (InfoError(1) .NE. 0) GOTO 999                          
             PeakShapeHPSL = Temp
-            CALL WDialogSelect(IDD_HPSL_info)
-            CALL WDialogPutReal(IDF_HPSL, PeakShapeHPSL, '(F10.4)')
+            IF ( .NOT. IN_BATCH ) THEN
+              CALL SelectDASHDialog(IDD_HPSL_info)
+              CALL WDialogPutReal(IDF_HPSL, PeakShapeHPSL, '(F10.4)')
+            ENDIF
+            I = InfoError(1) ! reset the errors
             CALL INextReal(line,Temp) ! ESD
             IF (InfoError(1) .NE. 0) GOTO 999  
 ! HMSL
             CALL INextReal(line,Temp)
             IF (InfoError(1) .NE. 0) GOTO 999                          
             PeakShapeHMSL = Temp
-            CALL WDialogSelect(IDD_HMSL_info)
-            CALL WDialogPutReal(IDF_HMSL, PeakShapeHMSL, '(F10.4)')
+            IF ( .NOT. IN_BATCH ) THEN
+              CALL SelectDASHDialog(IDD_HMSL_info)
+              CALL WDialogPutReal(IDF_HMSL, PeakShapeHMSL, '(F10.4)')
+            ENDIF
           CASE ('zer')
 ! Zero point
             I = InfoError(1) ! reset the errors
@@ -338,8 +374,10 @@
             CALL INextReal(line,Temp)
             IF (InfoError(1) .NE. 0) GOTO 999                          
             SlimValue = Temp 
-            CALL WDialogSelect(IDD_Pawley_Status)
-            CALL WDialogPutReal(IDF_Slim_Parameter,Temp,'(F7.3)')
+            IF ( .NOT. IN_BATCH ) THEN
+              CALL SelectDASHDialog(IDD_Pawley_Status)
+              CALL WDialogPutReal(IDF_Slim_Parameter,Temp,'(F7.3)')
+            ENDIF
           CASE ('sca')
             I = InfoError(1) ! reset the errors
             CALL INextReal(line,Temp)
@@ -509,8 +547,8 @@
 ! JCC Another error: it seems that EOBS can be zero,
 !
         EOBSSQ = EOBS(I)**2
-		IF ( EOBSSQ .LT. 0.0000001 ) THEN
-		   EOBSSQ = 0.0000001
+        IF ( EOBSSQ .LT. 0.0000001 ) THEN
+          EOBSSQ = 0.0000001
         ENDIF
 
         WTSA(I) = 1.0/EOBSSQ

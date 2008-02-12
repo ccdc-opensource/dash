@@ -289,7 +289,7 @@
       CALL ScrUpdateFileName
 ! Grey out the "Previous Results >" button in the DICVOL Wizard window
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_PW_Page8)
+      CALL SelectDASHDialog(IDD_PW_Page8)
       CALL WDialogFieldState(IDB_PrevRes, Disabled)
       CALL PopActiveWindowID
 
@@ -2535,7 +2535,7 @@
       REAL ESD_SUM
  
       XPMIN = XBIN(1)
-      XPMAX = XBIN(NBIN)
+      XPMAX = XBIN(MAX(NBIN,1)) ! prevent down-flow when NBIN=0
       YPMIN = YOBIN(1)
       YPMAX = YOBIN(1)
       DO I = 2, NBIN

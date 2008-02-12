@@ -47,35 +47,35 @@
 
       IMPLICIT NONE
 
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
       INTEGER tInt1, tInt2
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Background_Fit)
+      CALL SelectDASHDialog(IDD_Background_Fit)
       SELECT CASE (EventType)
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDB_Preview)
-              CALL WDialogGetInteger(IDF_NumOfIterations, tInt2)
-              CALL WDialogGetInteger(IDF_WindowWidth, tInt1)
+              CALL DASHWDialogGetInteger(IDF_NumOfIterations, tInt2)
+              CALL DASHWDialogGetInteger(IDF_WindowWidth, tInt1)
               CALL CalculateBackground(tInt1, tInt2, &
-                                       WDialogGetCheckBoxLogical(IDF_UseMCYN), &
+                                       DASHWDialogGetCheckBoxLogical(IDF_UseMCYN), &
                                        .FALSE., 5)
               CALL Profile_Plot
             CASE (IDOK)
-              CALL WDialogGetInteger(IDF_NumOfIterations, tInt2)
-              CALL WDialogGetInteger(IDF_WindowWidth, tInt1)
+              CALL DASHWDialogGetInteger(IDF_NumOfIterations, tInt2)
+              CALL DASHWDialogGetInteger(IDF_WindowWidth, tInt1)
               CALL SubtractBackground(tInt1, tInt2, &
-                                      WDialogGetCheckBoxLogical(IDF_UseMCYN), &
+                                      DASHWDialogGetCheckBoxLogical(IDF_UseMCYN), &
                                       .FALSE., 5)
               CALL WDialogHide
-              CALL WDialogUnload(IDD_Background_Fit)
+              CALL UnloadDASHDialog(IDD_Background_Fit)
               CALL Profile_Plot
             CASE (IDCANCEL)
 ! If user Cancels, assume no knowledge on background
               CALL Clear_BackGround
               CALL WDialogHide
-              CALL WDialogUnload(IDD_Background_Fit)
+              CALL UnloadDASHDialog(IDD_Background_Fit)
           END SELECT
       END SELECT
       CALL PopActiveWindowID

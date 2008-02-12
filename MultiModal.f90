@@ -301,10 +301,10 @@
 !C      Zero = 0.0
 !C      OneEighty = 180.0
 !C      ! Remember current setings, that will be restored when user presses "Cancel" or "non-modal"
-!C      CALL WDialogSelect(IDD_SA_Modal_input2)
-!C      CALL WGridGetCellReal(IDF_parameter_grid_modal, 1, IFRow, iX)
-!C      CALL WGridGetCellReal(IDF_parameter_grid_modal, 2, IFRow, iLB)
-!C      CALL WGridGetCellReal(IDF_parameter_grid_modal, 3, IFRow, iUB)
+!C      CALL SelectDASHDialog(IDD_SA_Modal_input2)
+!C      CALL DASHWGridGetCellReal(IDF_parameter_grid_modal, 1, IFRow, iX)
+!C      CALL DASHWGridGetCellReal(IDF_parameter_grid_modal, 2, IFRow, iLB)
+!C      CALL DASHWGridGetCellReal(IDF_parameter_grid_modal, 3, IFRow, iUB)
 !C      RowNumber = IFRow
 !C      iRadio = ModalFlag(IFRow)
 !C!     Given the number of the parameter want to know
@@ -320,7 +320,7 @@
 !C        ENDDO
 !C        IF (frag .NE. 0) EXIT
 !C      ENDDO
-!C      CALL WDialogSelect(IDD_ModalDialog)
+!C      CALL SelectDASHDialog(IDD_ModalDialog)
 !C!     Clear Fields
 !C      IF (.NOT. UseMogul) CALL WDialogClearField(IDF_MogulText)
 !C      CALL WDialogClearField(IDF_ModalUpper)
@@ -352,21 +352,21 @@
 !C        IF (ModalFlag(IFRow) .EQ. 2) THEN
 !C          CALL WDialogPutRadioButton(IDF_BiModalRadio)
 !C          IF ((UB(IFRow) * LB(IFRow)) .LT. 0.00) THEN
-!C            CALL WDialogGetReal(IDF_ModalUpper, xtem)
+!C            CALL DASHWDialogGetReal(IDF_ModalUpper, xtem)
 !C            CALL WDialogPutReal(IDF_ReportLower1, (xtem - 180.0))
-!C            CALL WDialogGetReal(IDF_ModalLower, xtem)
+!C            CALL DASHWDialogGetReal(IDF_ModalLower, xtem)
 !C            CALL WDialogPutReal(IDF_ReportUpper1, (xtem + 180.0))
 !C          ELSE
-!C            CALL WDialogGetReal(IDF_ModalUpper, xtem)
+!C            CALL DASHWDialogGetReal(IDF_ModalUpper, xtem)
 !C            CALL WDialogPutReal(IDF_ReportLower1, -xtem)
-!C            CALL WDialogGetReal(IDF_ModalLower, xtem)
+!C            CALL DASHWDialogGetReal(IDF_ModalLower, xtem)
 !C            CALL WDialogPutReal(IDF_ReportUpper1, -xtem)
 !C          ENDIF
 !C        ELSEIF (ModalFlag(IFRow) .EQ. 3) THEN
 !C          CALL WDialogPutRadioButton(IDF_TriModalRadio)          
-!C          CALL WDialogGetReal(IDF_ModalUpper, xtem)
+!C          CALL DASHWDialogGetReal(IDF_ModalUpper, xtem)
 !C          CALL DetermineTrimodalBounds(xtem, Upper)              
-!C          CALL WDialogGetReal(IDF_ModalLower, xtem)
+!C          CALL DASHWDialogGetReal(IDF_ModalLower, xtem)
 !C          CALL DetermineTrimodalBounds(xtem, Lower)
 !C          CALL WDialogPutReal(IDF_ReportUpper1, Tempbounds(2,Upper))
 !C          CALL WDialogPutReal(IDF_ReportUpper2, Tempbounds(3,Upper))
@@ -420,15 +420,15 @@
 !C      Zero = 0.0
 !C      OneEighty = 180.0
 !C      CALL PushActiveWindowID
-!C      CALL WDialogSelect(IDD_ModalDialog)
+!C      CALL SelectDASHDialog(IDD_ModalDialog)
 !C      SELECT CASE (EventType)
 !C        CASE (FieldChanged)
 !C          SELECT CASE (EventInfo%VALUE1)
 !C            CASE (IDF_BiModalRadio)
 !C              CALL WDialogClearField(IDF_ReportLower2)
 !C              CALL WDialogClearField(IDF_ReportUpper2)
-!C              CALL WDialogGetReal(IDF_ModalLower, lower1)
-!C              CALL WDialogGetReal(IDF_ModalUpper, upper1)
+!C              CALL DASHWDialogGetReal(IDF_ModalLower, lower1)
+!C              CALL DASHWDialogGetReal(IDF_ModalUpper, upper1)
 !C              CALL BiModalCalculateOtherPairOfBounds(lower1, upper1, lower2, upper2)
 !C              CALL WDialogPutReal(IDF_ModalLower, lower1)
 !C              CALL WDialogPutReal(IDF_ModalUpper, upper1)
@@ -436,9 +436,9 @@
 !C              CALL WDialogPutReal(IDF_ReportUpper1, upper2)
 !C              ModalFlag(RowNumber) = 2
 !C            CASE (IDF_TriModalRadio)
-!C              CALL WDialogGetReal(IDF_ModalLower, lower1)
+!C              CALL DASHWDialogGetReal(IDF_ModalLower, lower1)
 !C              CALL DetermineTrimodalBounds(lower1, Lower)
-!C              CALL WDialogGetReal(IDF_ModalUpper, upper1)
+!C              CALL DASHWDialogGetReal(IDF_ModalUpper, upper1)
 !C              CALL DetermineTrimodalBounds(upper1, Upper)
 !C              CALL WDialogPutReal(IDF_ReportUpper1, Tempbounds(2,Upper))
 !C              CALL WDialogPutReal(IDF_ReportUpper2, Tempbounds(3,Upper))
@@ -446,31 +446,31 @@
 !C              CALL WDialogPutReal(IDF_ReportLower2, Tempbounds(3,Lower))
 !C              ModalFlag(RowNumber) = 3
 !C            CASE (IDF_Initial)
-!C              CALL WDialogGetReal(IDF_Initial, x_unique(RowNumber))
+!C              CALL DASHWDialogGetReal(IDF_Initial, x_unique(RowNumber))
 !C              x_unique(RowNumber) = MAX(lb(RowNumber),x_unique(RowNumber))
 !C              x_unique(RowNumber) = MIN(ub(RowNumber),x_unique(RowNumber))
 !C              CALL WDialogPutReal(IDF_Initial, x_unique(RowNumber), '(F12.5)')
 !C            CASE (IDF_ModalLower)
-!C              CALL WDialogGetReal(IDF_ModalLower, lower1)
+!C              CALL DASHWDialogGetReal(IDF_ModalLower, lower1)
 !C              lower1 = MIN(ub(RowNumber), lower1) ! Why?
 !C              lb(RowNumber) = lower1 ! Why?
 !C              CALL WDialogPutReal(IDF_ModalLower,lb(RowNumber),'(F12.5)')
 !C! How ranges are calculated depends on state of Modal RadioButton  
-!C              CALL WDialogGetRadioButton(IDF_BimodalRadio, ISET)
+!C              CALL DASHWDialogGetRadioButton(IDF_BimodalRadio, ISET)
 !C              SELECT CASE (ISET) ! Bimodal radiobutton active
 !C                CASE (1)
 !C                  ! This is an exact duplication of the code above
-!C                  CALL WDialogGetReal(IDF_ModalLower, lower1)
-!C                  CALL WDialogGetReal(IDF_ModalUpper, upper1)
+!C                  CALL DASHWDialogGetReal(IDF_ModalLower, lower1)
+!C                  CALL DASHWDialogGetReal(IDF_ModalUpper, upper1)
 !C                  CALL BiModalCalculateOtherPairOfBounds(lower1, upper1, lower2, upper2)
 !C                  CALL WDialogPutReal(IDF_ModalLower, lower1)
 !C                  CALL WDialogPutReal(IDF_ModalUpper, upper1)
 !C                  CALL WDialogPutReal(IDF_ReportLower1, lower2)
 !C                  CALL WDialogPutReal(IDF_ReportUpper1, upper2)
 !C                CASE (2) !Trimodal radiobutton active           
-!C                  CALL WDialogGetReal(IDF_ModalLower, lower1)
+!C                  CALL DASHWDialogGetReal(IDF_ModalLower, lower1)
 !C                  CALL DetermineTrimodalBounds(lower1, Lower)
-!C                  CALL WDialogGetReal(IDF_ModalUpper, upper1)
+!C                  CALL DASHWDialogGetReal(IDF_ModalUpper, upper1)
 !C                  CALL DetermineTrimodalBounds(upper1, Upper)
 !C                  CALL WDialogPutReal(IDF_ReportUpper1, Tempbounds(2,Upper))
 !C                  CALL WDialogPutReal(IDF_ReportUpper2, Tempbounds(3,Upper))
@@ -479,26 +479,26 @@
 !C              END SELECT
 !C            CASE (IDF_ModalUpper)
 !C! Check the bounding - only update if parameter is set to vary
-!C              CALL WDialogGetReal(IDF_ModalUpper, upper1)
+!C              CALL DASHWDialogGetReal(IDF_ModalUpper, upper1)
 !C              upper1 = MAX(lb(RowNumber), upper1) ! Why?
 !C              ub(RowNumber) = upper1 ! Why?
 !C              CALL WDialogPutReal(IDF_ModalUpper, ub(RowNumber), '(F12.5)')
 !C!             How ranges are calculated depends on state of Modal RadioButton      
-!C              CALL WDialogGetRadioButton(IDF_BimodalRadio, ISET)
+!C              CALL DASHWDialogGetRadioButton(IDF_BimodalRadio, ISET)
 !C              SELECT CASE (ISET) ! Bimodal Radiobutton active
 !C                CASE (1)
 !C                ! This is the second copy of the code above
-!C                  CALL WDialogGetReal(IDF_ModalLower, lower1)
-!C                  CALL WDialogGetReal(IDF_ModalUpper, upper1)
+!C                  CALL DASHWDialogGetReal(IDF_ModalLower, lower1)
+!C                  CALL DASHWDialogGetReal(IDF_ModalUpper, upper1)
 !C                  CALL BiModalCalculateOtherPairOfBounds(lower1, upper1, lower2, upper2)
 !C                  CALL WDialogPutReal(IDF_ModalLower, lower1)
 !C                  CALL WDialogPutReal(IDF_ModalUpper, upper1)
 !C                  CALL WDialogPutReal(IDF_ReportLower1, lower2)
 !C                  CALL WDialogPutReal(IDF_ReportUpper1, upper2)
 !C                CASE (2) !Trimodal Radiobutton active
-!C                  CALL WDialogGetReal(IDF_ModalLower, lower1)
+!C                  CALL DASHWDialogGetReal(IDF_ModalLower, lower1)
 !C                  CALL DetermineTrimodalBounds(lower1, Lower)
-!C                  CALL WDialogGetReal(IDF_ModalUpper, upper1)
+!C                  CALL DASHWDialogGetReal(IDF_ModalUpper, upper1)
 !C                  CALL DetermineTrimodalBounds(upper1, Upper)               
 !C                  CALL WDialogPutReal(IDF_ReportUpper1, Tempbounds(2,Upper))
 !C                  CALL WDialogPutReal(IDF_ReportUpper2, Tempbounds(3,Upper))
@@ -510,9 +510,9 @@
 !C          SELECT CASE (EventInfo%VALUE1)
 !C            CASE (IDOK)
 !C!             Record parameters in appropriate arrays
-!C              CALL WDialogGetReal(IDF_Initial, x_unique(RowNumber))
-!C              CALL WDialogGetReal(IDF_ModalLower, lb(RowNumber))
-!C              CALL WDialogGetReal(IDF_ModalUpper, ub(RowNumber))
+!C              CALL DASHWDialogGetReal(IDF_Initial, x_unique(RowNumber))
+!C              CALL DASHWDialogGetReal(IDF_ModalLower, lb(RowNumber))
+!C              CALL DASHWDialogGetReal(IDF_ModalUpper, ub(RowNumber))
 !C!             Check that x is in bounds
 !C
 !C
@@ -526,7 +526,7 @@
 !C
 !C
 !C              CALL WDialogHide
-!C              CALL WDialogSelect(IDD_SA_Modal_Input2)
+!C              CALL SelectDASHDialog(IDD_SA_Modal_Input2)
 !C              CALL WGridColourRow(IDF_parameter_grid_modal, RowNumber, WIN_RGB(255, 0, 0), WIN_RGB(256, 256, 256))
 !C              LimsChanged = .TRUE.
 !C!           Return bounds to previous values
@@ -543,13 +543,13 @@
 !C              x_unique(RowNumber) = iX
 !C              ModalFlag(RowNumber) = 1 
 !C              CALL WDialogHide
-!C              CALL WDialogSelect(IDD_SA_Modal_Input2)
+!C              CALL SelectDASHDialog(IDD_SA_Modal_Input2)
 !C              CALL WGridColourRow(IDF_parameter_grid_modal, RowNumber, WIN_RGB(256, 256, 256), WIN_RGB(256, 256, 256))                                              
 !C          END SELECT
 !C          CALL WDialogClearField(IDF_MogulText)
 !C          prevub(RowNumber) = UB(RowNumber)
 !C          prevlb(RowNumber) = LB(RowNumber)
-!C          CALL WDialogSelect(IDD_SA_Modal_Input2)
+!C          CALL SelectDASHDialog(IDD_SA_Modal_Input2)
 !C          CALL WGridPutCellReal(IDF_parameter_grid_modal, 1, RowNumber, x_unique(RowNumber))
 !C          CALL WGridPutCellReal(IDF_parameter_grid_modal, 2, RowNumber, LB(RowNumber))
 !C          CALL WGridPutCellReal(IDF_parameter_grid_modal, 3, RowNumber, UB(RowNumber)) 

@@ -90,7 +90,7 @@
       REAL             PAWLEYCHISQ, RWPOBS, RWPEXP
       COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP
 
-      REAL, EXTERNAL :: EXPREP
+      REAL, EXTERNAL :: EXPREP, RANMAR_2, GetMaxwellRandomNumber
       LOGICAL, EXTERNAL :: IsEventWaiting, Get_AutoAlign
       LOGICAL, EXTERNAL :: CheckTerm, OutOfBounds
       INTEGER NumTrialsPar(MVAR), NumParPerTrial, iParNum
@@ -98,16 +98,12 @@
       LOGICAL MAKET0
       REAL FPSUM0, FPSUM1, FPSUM2, FPAV, FPSD
       REAL RATIO, DX, F, FP, P, PP
-      REAL RANIN
       INTEGER NUP, NDOWN, H, I, J, M, II
-      INTEGER MRAN, MRAN1, IARR, IAR1
       REAL T
-      REAL RANARR(30000), RANAR1(30000)
       REAL DXVAV(mvar), XVSIG(mvar), FLAV(mvar)
       REAL X0SUM(mvar), XSUM(mvar), XXSUM(mvar)
       REAL XDSS(mvar), A0SUM(mvar)
-      INTEGER IM, IA, IC
-      INTEGER JRAN, NTOTMOV
+      INTEGER NTOTMOV
       INTEGER III, IH, KK, iFrg
       INTEGER Last_NUP, Last_NDOWN
       CHARACTER*3 CNruns,CMruns
@@ -132,22 +128,7 @@
         ENDDO
       ENDIF
       iSolTicked = 1
-! Set up a random number generator store
-! Use a quick and dirty one from Numerical Recipes
       CALL RANX2Init
-      IM = 29282
-      IA = 1255
-      IC = 6173
-      JRAN = 1
-      DO I = 1, 30000
-        JRAN = MOD(JRAN*IA+IC,IM)
-        RANARR(I) = FLOAT(JRAN)/FLOAT(IM) ! RANARR now between  0.0 and 1.0
-        RANIN = 2.0 * RANARR(I) - 1.0     ! RANIN  now between -1.0 and 1.0
-        CALL RANX2E(RANIN,RANAR1(I))      ! RANAR1(I) now follows a Maxwell distribution
-      ENDDO
-      IM = 7875
-      IA = 211
-      IC = 1663
       CALL FillRULB(nvar) !calcs upper and lower bounds for parameters
       NPAR = 0
       DO I = 1, nvar
@@ -197,10 +178,10 @@
 ! Set initial values.
       iMyExit = 0
       Curr_SA_Run = Curr_SA_Run + 1
+      WRITE (SA_RunNumberStr, '(I3.3)') Curr_SA_Run
       IF ( .NOT. in_batch ) THEN
-        WRITE (SA_RunNumberStr, '(I3.3)') Curr_SA_Run
         CALL PushActiveWindowID
-        CALL WDialogSelect(IDD_SA_Action1)
+        CALL SelectDASHDialog(IDD_SA_Action1)
         WRITE(CNruns, '(I3)') Curr_SA_Run
         WRITE(CMruns, '(I3)') MaxRuns
         CNruns = ADJUSTL(CNruns)
@@ -216,7 +197,6 @@
       ELSE
         T = T0
       ENDIF
-! Initialise the random number generator RANMAR.
 ! Increment the seeds for each SA run
       CALL RMARInit(iSEED1+Curr_SA_Run, iSEED2+Curr_SA_Run)
 ! Initialise all degrees of freedom either to a preset value or to
@@ -242,7 +222,7 @@
       InitialProChiSqrd = CHIPROBEST
       IF ( .NOT. in_batch ) THEN
         CALL ChiSqPlot_UpdateIterAndChiProBest(1)
-        CALL WDialogSelect(IDD_Summary)
+        CALL SelectDASHDialog(IDD_Summary)
         CALL WGridRows(IDF_SA_Summary, Curr_SA_Run)
         WRITE(RowLabelStr,'(I3)') Curr_SA_Run
         CALL WGridLabelRow(IDF_SA_summary, Curr_SA_Run, RowLabelStr)
@@ -256,8 +236,8 @@
         CALL Profile_Plot
       ENDIF
       PrevRejected = .TRUE.
-      MRAN  = ISEED1 + Curr_SA_Run
-      MRAN1 = ISEED2 + Curr_SA_Run
+! Initialise Marsaglia random number generator
+      CALL RMARInit_2(ISEED1 + Curr_SA_Run, ISEED2 + Curr_SA_Run)
       Last_NUP   = nmpert / 2
       Last_NDOWN = nmpert / 2
       Curr_SA_Iteration = 0
@@ -291,11 +271,6 @@
 !   Starting point for multiple moves
 ! ##########################################
       DO M = 1, NT
-! MRAN RANGE IS 0 -> IM=7875
-        MRAN = MOD(MRAN*IA+IC,IM)
-        IARR = MRAN + 1
-        MRAN1 = MOD(MRAN1*IA+IC,IM)
-        IAR1 = MRAN1 + 1
         DO J = 1, NS
           DO IH = 1, NPAR
             DO I = 1, nvar
@@ -303,35 +278,32 @@
             ENDDO
             CurrParsInclPO = .FALSE.
             DO iParNum = 1, NumParPerTrial
-              H = IP(1+INT(RANARR(IARR)*NPAR))
-              IARR = IARR + 1
+              H = IP(1+INT(RANMAR_2()*NPAR))
               NumTrialsPar(H) = NumTrialsPar(H) + 1
               TotNumTrials = TotNumTrials + 1
 ! Generate XP, the trial value of X. Note use of VM to choose XP.
-              DX = RANAR1(IAR1) * VM(H)
-              IAR1 = IAR1 + 1
+              DX = GetMaxwellRandomNumber() * VM(H)
               XP(H) = XP(H) + DX
 ! If modal ranges defined for torsions use random number to
 ! select from which range the value of XP will be derived.
               IF (ModalFlag(H) .EQ. 2) THEN ! Bimodal
-                IF (RANARR(IARR) .GT. 0.5) THEN
+                IF (RANMAR_2() .GT. 0.5) THEN
                   IF (UB(H) * LB(H) .LT. 0.0) THEN
                     XP(H) = XP(H) + 180.0
                   ELSE
                     XP(H) = -XP(H)
                   ENDIF
                 ENDIF            
-                IARR = IARR + 1 
                 CALL ThreeSixtyToOneEighty(XP(H))
               ELSEIF (ModalFlag(H) .EQ. 3) THEN ! Trimodal
                 xtem = XP(H)
                 CALL OneEightyToThreeSixty(xtem)
-                IF ((RANARR(IARR) .GE. 1.0/3.0) .AND. (RANARR(IARR).LT. 2.0/3.0)) THEN
+                PP = RANMAR_2()
+                IF ((PP .GE. 1.0/3.0) .AND. (PP .LT. 2.0/3.0)) THEN
                   xtem = xtem + 120.00
-                ELSEIF ( RANARR(IARR) .GE. 2.0/3.0 ) THEN
+                ELSEIF ( PP .GE. 2.0/3.0 ) THEN
                   xtem = xtem + 240.00
                 ENDIF
-                IARR = IARR + 1
                 IF (Xtem .GE. 360.00) THEN
                    Xtem = xtem - 360.00
                 endif
@@ -352,8 +324,7 @@
                     IF (XP(H) .GT. +180.0) XP(H) = XP(H) - 360.0
                   ELSE
                     IF ((XP(H).LT.LB(H)) .OR. (XP(H).GT.UB(H))) THEN
-                      XP(H) = LB(H) + RULB(H) * RANARR(IARR)
-                      IARR = IARR + 1
+                      XP(H) = LB(H) + RULB(H) * RANMAR_2()
                     ENDIF
                   ENDIF
                 CASE (2) ! Bimodal ranges
@@ -366,35 +337,29 @@
                       TempUpper2 = TempLower + 180.0
                       CALL OneEightyToThreeSixty(TempUpper)
                       CALL OneEightyToThreeSixty(TempUpper2)
-                      IF (RANARR(IARR) .LT. 0.5) THEN 
-                        IARR = IARR + 1               
-                        XP(H) = MAX(TempUpper, TempUpper2) + (RULB(H) * RANARR(IARR))
+                      IF (RANMAR_2() .LT. 0.5) THEN 
+                        XP(H) = MAX(TempUpper, TempUpper2) + (RULB(H) * RANMAR_2())
                       ELSE
-                        IARR = IARR + 1
-                        XP(H) = MIN(TempUpper, TempUpper2) - (RULB(H) * RANARR(IARR))
+                        XP(H) = MIN(TempUpper, TempUpper2) - (RULB(H) * RANMAR_2())
                       ENDIF
-                      IARR = IARR + 1 
                     ELSEIF (UB(H) * LB(H) .GE. 0.0) THEN ! Range such as 30 to 90 degs or -30 to -90 defined
-                      XP(H) = LB(H) + (RULB(H) * RANARR(IARR))
-                      IARR = IARR + 1
-                      IF (RANARR(IARR) .LT. 0.5) XP(H) = -XP(H)
-                      IARR = IARR + 1 
+                      XP(H) = LB(H) + (RULB(H) * RANMAR_2())
+                      IF (RANMAR_2() .LT. 0.5) XP(H) = -XP(H)
                     ENDIF
                     CALL ThreeSixtyToOneEighty(XP(H))
                   ENDIF
                 CASE (3) ! Trimodal ranges
                   IF (OutOfBounds(H, XP(H))) THEN ! Calculate new value in one of three allowed ranges
-                    xtem = MINVAL(Tempbounds, MASK = Tempbounds .GE. 0.0) + RULB(H) * RANARR(IARR) 
-                    IARR = IARR + 1
-                    IF ((RANARR(IARR) .GT. 1.0/3.0) .AND. (RANARR(IARR) .LE. 2.0/3.0)) THEN
+                    xtem = MINVAL(Tempbounds, MASK = Tempbounds .GE. 0.0) + RULB(H) * RANMAR_2() 
+                    PP = RANMAR_2()
+                    IF ((PP .GT. 1.0/3.0) .AND. (PP .LE. 2.0/3.0)) THEN
                       xtem = xtem - 120.00
-                    ELSEIF ( RANARR(IARR) .GT. 2.0/3.0 ) THEN
+                    ELSEIF ( PP .GT. 2.0/3.0 ) THEN
                       xtem = xtem -240.00
                       IF (xtem .LT. -180.00) THEN
                         xtem = 360.00 + xtem
                       ENDIF
                     ENDIF
-                    IARR = IARR + 1
                   ENDIF
                   XP(H) = xtem
               END SELECT
@@ -448,19 +413,19 @@
                 CALL valchipro(CHIPROBEST)
                 ProgressIndicator = 1.0 -( (CHIPROBEST - (ChiMult*PAWLEYCHISQ)) / (InitialProChiSqrd - (ChiMult*PAWLEYCHISQ)))
                 FOPT = FP
-                CALL WDialogSelect(IDD_Summary)
-                CALL WGridPutCellReal(IDF_SA_Summary, 4, Curr_SA_Run, CHIPROBEST, '(F7.2)')
-                CALL WGridPutCellReal(IDF_SA_Summary, 5, Curr_SA_Run, FOPT, '(F7.2)')
+                IF ( .NOT. in_batch ) THEN
+                  CALL SelectDASHDialog(IDD_Summary)
+                  CALL WGridPutCellReal(IDF_SA_Summary, 4, Curr_SA_Run, CHIPROBEST, '(F7.2)')
+                  CALL WGridPutCellReal(IDF_SA_Summary, 5, Curr_SA_Run, FOPT, '(F7.2)')
 ! Update the SA status window
+                ENDIF
                 CALL SA_OUTPUT(T,FOPT,FPAV,FPSD,dxvav,xvsig,flav,NVAR,Last_NUP,Last_NDOWN,ntotmov)
               ENDIF
 ! If the point is greater, use the Metropolis criterion to decide on
 ! acceptance or rejection.
             ELSE
               P = EXPREP((F-FP)/T)
-              PP = RANARR(IARR)
-              IARR = IARR + 1
-              IF (PP .LT. P) THEN
+              IF (RANMAR_2() .LT. P) THEN
                 x_unique(H) = XP(H)
                 F = FP
                 NACP(H) = NACP(H) + 1
@@ -504,9 +469,8 @@
         DO WHILE (iMyExit .EQ. 6) ! Pause
           CALL GetEvent
           IF (EventInfo%WIN .EQ. IDD_Pause) THEN
-            CALL WDialogSelect(IDD_Pause)
-            CALL WDialogUnload
-            CALL WDialogSelect(IDD_SA_Action1)
+            CALL UnloadDASHDialog(IDD_Pause)
+            CALL SelectDASHDialog(IDD_SA_Action1)
             CALL WDialogFieldState(IDF_Pause_Annealing, Enabled)
             iMyExit = 0
           ENDIF
@@ -691,6 +655,87 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE RMARInit_2(IJ_in,KL_in)
+! RMARInit_2 and RANMAR_2 are another instances of RMARInit and RANMAR, by
+! using a set of global varibles in common block raset2.
+!
+! See comments in RMARInit and RANMAR for details. 
+!
+      IMPLICIT NONE
+      
+      INTEGER, INTENT (IN   ) :: IJ_in, KL_in
+      
+      REAL            U,     C, CD, CM
+      INTEGER                           I97, J97
+      COMMON /raset2/ U(97), C, CD, CM, I97, J97
+
+      INTEGER IJ, KL
+      INTEGER ii, jj, i, j, k, l, m
+      REAL    s, t
+
+      IJ = ABS(IJ_in)
+      IF ( IJ.GT.31328 ) IJ = ABS(31328 - MOD( IJ, 31328 ) )
+      
+      KL = ABS(KL_in)
+      IF ( KL.GT.30081 ) KL = ABS(30081 - MOD( KL, 30081 ) )
+
+      i = MOD(IJ/177,177) + 2
+      j = MOD(IJ,177) + 2
+      k = MOD(KL/169,178) + 1
+      l = MOD(KL,169)
+      DO ii = 1, 97
+        s = 0.0
+        t = 0.5
+        DO jj = 1, 24
+          m = MOD(MOD(i*j,179)*k,179)
+          i = j
+          j = k
+          k = m
+          l = MOD(53*l+1,169)
+          IF (MOD(l*m,64).GE.32) THEN
+            s = s + t
+          ENDIF
+          t = 0.5*t
+        ENDDO
+        U(ii) = s
+      ENDDO
+      C = 362436.0/16777216.0
+      CD = 7654321.0/16777216.0
+      CM = 16777213.0/16777216.0
+      I97 = 97
+      J97 = 33
+
+      END SUBROUTINE RMARInit_2
+!
+!*****************************************************************************
+!
+      REAL FUNCTION RANMAR_2
+
+      IMPLICIT NONE
+
+      REAL            U,     C, CD, CM
+      INTEGER                           I97, J97
+      COMMON /raset2/ U(97), C, CD, CM, I97, J97
+
+      REAL uni
+
+      uni = U(I97) - U(J97)
+      IF (uni.LT.0.0) uni = uni + 1.0
+      U(I97) = uni
+      I97 = I97 - 1
+      IF (I97.EQ.0) I97 = 97
+      J97 = J97 - 1
+      IF (J97.EQ.0) J97 = 97
+      C = C - CD
+      IF (C.LT.0.0) C = C + CM
+      uni = uni - C
+      IF (uni.LT.0.0) uni = uni + 1.0
+      RANMAR_2 = uni
+
+      END FUNCTION RANMAR_2
+
+!*****************************************************************************
+!
       SUBROUTINE RANX2Init
 !
 ! Fills yran with an integrated Maxwell distribution that will be used to bias the step size during the SA
@@ -810,8 +855,15 @@
       REAL xtem, tempupper, templower, tempupper2
       INTEGER I, II
 
-      CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SA_Modal_input2)
+
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+      IF ( .NOT. IN_BATCH ) THEN
+        CALL PushActiveWindowID
+        CALL SelectDASHDialog(IDD_SA_Modal_input2)
+      ENDIF
+
       DO I = 1, NVAR
         x_unique(I) = X_init(I)
       ENDDO
@@ -862,7 +914,8 @@
           ENDIF
         ENDDO
       ENDIF
-      CALL PopActiveWindowID
+      IF ( .NOT. IN_BATCH ) &
+        CALL PopActiveWindowID
 
       END SUBROUTINE MAKXIN
 !
@@ -960,6 +1013,27 @@
       ENDDO
 
       END SUBROUTINE FillRULB
+!
+!*****************************************************************************
+!
+      REAL FUNCTION GetMaxwellRandomNumber()
+
+! Extracted from SimulatedAnnealing()
+! This function returns a pseudo random number which made following
+! a Maxwell distribution by calling to RANX2E().
+! Note: before use this function, RANX2Init() MUST be called to initialise the arrays
+! required by RANX2E(), and RMARInit_2() to initialise common block for RANMAR_2()
+
+      IMPLICIT NONE
+
+      REAL, EXTERNAL :: RANMAR_2
+      REAL RANIN, RANAR1
+
+      RANIN = 2.0 * RANMAR_2() - 1.0     ! RANIN  now between -1.0 and 1.0
+      CALL RANX2E(RANIN,RANAR1)          ! RANAR1 now follows a Maxwell distribution
+      GetMaxwellRandomNumber = RANAR1
+
+      END FUNCTION GetMaxwellRandomNumber
 !
 !*****************************************************************************
 !

@@ -384,7 +384,13 @@
       IF (IADD.EQ.-1) GOTO 100
 ! IT IS A REALLY NEW CONSTRAINT - ADD IT:
       CALL ERRCHK(2,NUMCON,MaxConstraints,0,'LSQ constraints')
-      IF (IBMBER .NE. 0) RETURN
+!WD Check for array upper bounds for KKCON and AMCON: as NPAR is usually 2, 
+!   their size should be at least 2*MaxConstraints, but only 500 now.
+      CALL ERRCHK(1,KPTCON(NUMCON)+NPAR,500,0,'LSQ constraints parameters')
+      IF (IBMBER .NE. 0) THEN
+        NUMCON = NUMCON - 1 ! NUMCON got increment in ERRCHK(2,NUMCON,....)
+        RETURN
+      ENDIF
       KPTCON(NUMCON+1) = KPTCON(NUMCON) + NPAR
       DO I = 1, NPAR
         KKCON(KPTCON(NUMCON)+I-1) = KK3(I)
@@ -545,8 +551,8 @@
 ! by the shift applied being too large, this would be the right place to adjust that.
 ! Rather than setting FUDGE1 factors, how about just multiplying everything by a user set
 ! damping factor.
-      CALL WDialogSelect(IDD_Pawley_Status)
-      CALL WDialogGetReal(IDF_FudgeFactor,FudgeFactor)
+      CALL SelectDASHDialog(IDD_Pawley_Status)
+      CALL DASHWDialogGetReal(IDF_FudgeFactor,FudgeFactor)
       XNEW = XOLD + FudgeFactor*SHIFT
 ! EXIT IF NO FUDGES AT ALL:
       IF (NFUDGE.EQ.0) GOTO 101
@@ -2519,7 +2525,7 @@
       ENDIF
       WRITE (LPT,3000) NBOUND, (MESS(I:I),I=1,L)
       IF (NACT.EQ.0) CALL BMBOUT
- 3001 FORMAT (/' ',I6,80A1)
+ 3001 FORMAT (/' ',I6,X,80A1)
  3000 FORMAT (/' ERROR ** there is an upper limit of',I6,' on number of ',80A1)
 
       END SUBROUTINE ERRCHK
@@ -6723,7 +6729,7 @@
 !
       FUNCTION ISCAT(FNAME)
 
-	  USE ATMVAR
+      USE ATMVAR
 !
 ! *** ISCAT updated by JCM 23 Sep 86 ***
 !
@@ -7080,7 +7086,7 @@
 !
       SUBROUTINE LFCALC(H)
 
-	  USE ATMVAR
+      USE ATMVAR
 !
 ! *** LFCALC updated by JCM 22 Sep 87 ***
 !
@@ -9347,7 +9353,7 @@
 !
       SUBROUTINE PARNAM(IPNAM1,IPNAM2,N,M)
 
-	  USE ATMVAR
+      USE ATMVAR
 !
 ! *** PARNAM updated by JCM 8 May 90 ***
 !
@@ -10647,7 +10653,7 @@
 !
       SUBROUTINE RDATOM(IPT,IA,XACT,ISYMM,ILATT,CS)
 
-	  USE ATMVAR
+      USE ATMVAR
 !
 ! *** RDATOM updated by JCM 7 Sep 90 ***
 !
@@ -10751,7 +10757,7 @@
 !
       SUBROUTINE RDBOND(IPT,NEND,IE)
 
-	  USE ATMVAR
+      USE ATMVAR
 !
 ! *** RDBOND by JCM 15 Oct 1990 ***
 !
@@ -12510,7 +12516,7 @@
 !
       SUBROUTINE SETANI
 
-	  USE ATMVAR
+      USE ATMVAR
 !
 ! *** SETANI by JCM 23 Sep 83 ***
 !
@@ -12633,7 +12639,7 @@
 !
       SUBROUTINE SETFOR
 
-	  USE ATMVAR
+      USE ATMVAR
 !
 ! *** SETFOR updated by JCM 24 Nov 91 ***
 !
@@ -15640,13 +15646,18 @@
         LV = KREDUN(I)
         IF (LV.EQ.0) GOTO 30
         CALL ERRCHK(2,JCONST,300,0,'strict constraints')
-        IF (IBMBER .NE. 0) RETURN
+        IF (IBMBER .NE. 0) THEN
+          JCONST = JCONST - 1 ! JCONST got increment in ERRCHK(2,JCONST,....)
+          RETURN
+        ENDIF
 ! RECORD CROSS POINTERS FOR VARIABLES AND REDUNDANT VARIABLES:
         LVRBS(LV) = -JCONST
         LRDVR(JCONST) = LV
         DO J = NCON + 1, NPAR
           IF (ABS(A(J,I)).LT.SMALL) GOTO 31
 ! PUT CONSTRAINT INTO TABLE TO USE THIS CYCLE:
+          CALL ERRCHK(1,NEXTJ,200,0,'strict constraints')
+          IF (IBMBER .NE. 0) RETURN
           JCMAT(NEXTJ) = KBVCOL(J)
           AMOUNT(NEXTJ) = -A(J,I)
           NEXTJ = NEXTJ + 1
@@ -15846,7 +15857,7 @@
 !
       SUBROUTINE XROOT(IA,XX,IS,IL,C)
 
-	  USE ATMVAR
+      USE ATMVAR
 !
 ! *** XROOT updated by JCM 18 Oct 87 ***
 !
@@ -15919,7 +15930,7 @@
 !
       SUBROUTINE XTRANS(IAT,XX,IS,IL,C)
 
-	  USE ATMVAR
+      USE ATMVAR
 !
 ! *** XTRANS corrected by JCM 18 Oct 87 ***
 !

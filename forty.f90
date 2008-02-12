@@ -227,10 +227,10 @@
       DO ICYC = NCYC1, LASTCY
  !D     DO ICYC = 1, 1
 ! *** Winteracter calls ***
-        CALL WDialogSelect(IDD_ViewPawley)
+        CALL SelectDASHDialog(IDD_ViewPawley)
         CALL WDialogPutInteger(IDF_Pawley_Cycle_NumPts,NPTS)
         CALL WDialogPutInteger(IDF_Pawley_Cycle_NumRefs,MAXK)
-        CALL WDialogSelect(IDD_Pawley_Status)
+        CALL SelectDASHDialog(IDD_Pawley_Status)
         CALL WDialogPutInteger(IDF_Pawley_Cycle_Number,ICYC)
         CALL WDialogPutInteger(IDF_Pawley_Total_Cycles,LASTCY)
         CALL WDialogPutInteger(IDF_Pawley_Cycle_NumPts,NPTS)
@@ -414,9 +414,9 @@
 ! OUTPUT NEW CRYSTAL DATA FOR PENULTIMATE CYCLE:
         IF (DONE) CALL NWINPR(PCXX,PFXX,MAGROU)
 ! *** Winteracter calls ***
-        CALL WDialogSelect(IDD_ViewPawley)
+        CALL SelectDASHDialog(IDD_ViewPawley)
         CALL WDialogPutReal(IDF_Pawley_Cycle_ChiSq,PAWLEYCHISQ,'(F12.3)')
-        CALL WDialogSelect(IDD_Pawley_Status)
+        CALL SelectDASHDialog(IDD_Pawley_Status)
         CALL WDialogPutReal(IDF_Pawley_Cycle_ChiSq,PAWLEYCHISQ,'(F12.3)')
         CALL WDialogPutReal(IDF_Pawley_Cycle_Rwp,RWPOBS,'(F12.2)')
         CALL WDialogPutReal(IDF_Pawley_Cycle_RwpExp,RWPEXP,'(F12.2)')
@@ -430,7 +430,7 @@
       IF (PRNCYC(4)) CALL CLOFIL(IOP2)
       CLOSE (IPK)
 ! JCC Trap for any problems
-	IF (IBMBER .NE. 0) CALL DebugErrorMessage('Error in FORTY after HKLOUT')
+      IF (IBMBER .NE. 0) CALL DebugErrorMessage('Error in FORTY after HKLOUT')
   !    CALL DebugRoutine
       RETURN
 ! JCC Added in error handling here
@@ -589,6 +589,9 @@
 
       INTEGER         KREFT
       COMMON /FPINF2/ KREFT(MOBS)
+
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
 
       REAL ZTEM(MOBS), RTEM(3,MFCSTO), TF4PAR(MF4PAR)
       REAL ARTEM(6)
@@ -945,6 +948,9 @@
 ! When we arrive here, the limits of the peak were actually outside the powder pattern
         IIMIN = 1
  3544   DO II = IIMIN, IIMAX
+!WD Tracked a crash to array upper bounds here; to be safe side, check it for KARGO and KARGK.
+          CALL ERRCHK(1,KOUNT+1,MAXPIK,0,' Pawley peaks')
+          IF (IBMBER .NE. 0) GOTO 100 ! Nothing but return
           KOUNT = KOUNT + 1 ! IF (KOUNT .GT. MAXPIK) CALL DebugErrorMessage('KOUNT .GT. MAXPIK')
           KARGO(KOUNT) = II
           KARGK(KOUNT) = KNOW

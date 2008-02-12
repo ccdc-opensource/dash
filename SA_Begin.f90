@@ -42,10 +42,14 @@
 
       INTEGER, EXTERNAL :: CheckOverwriteSaOutput, DateToday, DateDaysElapsed, &
                            TimeNowSeconds
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
       CHARACTER*100 SA_DurationStr
       INTEGER StartDate, EndDate, DSLen
       INTEGER StartTime, EndTime
+
+
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
 
       IF ( CheckOverwriteSaOutput() .EQ. 0 ) THEN
         CALL WizardWindowShow(IDD_SA_input4)
@@ -55,24 +59,28 @@
       ! angle that is allowed to vary over its full range. Because if so, e.g. a translation of, say, 1.10
       ! should be renormalised to 0.10 during the SA
       CALL InitRenormalisationLogicals
+
       LOG_HYDROGENS = (HydrogenTreatment .EQ. 3)
       CALL CREATE_FOB(HydrogenTreatment .EQ. 2)
       CALL Create_AtomicWeightings(HydrogenTreatment)
       CALL FillSymmetry_2
       CALL GET_LOGREF
 ! Ungrey the "Save... chi sqrd progress"
-      CALL WDialogSelect(IDD_OutputSolutions)
-      CALL WDialogFieldState(IDF_GROUP2, Enabled)
-      CALL WDialogFieldState(IDB_OutputChiSqd, Enabled)
-      CALL WDialogFieldState(IDF_LABEL5, Enabled)
-      CALL WDialogFieldState(IDF_LABEL3, Enabled)
+      IF ( .NOT. IN_BATCH ) THEN
+        CALL SelectDASHDialog(IDD_OutputSolutions)
+        CALL WDialogFieldState(IDF_GROUP2, Enabled)
+        CALL WDialogFieldState(IDB_OutputChiSqd, Enabled)
+        CALL WDialogFieldState(IDF_LABEL5, Enabled)
+        CALL WDialogFieldState(IDF_LABEL3, Enabled)
 ! Pop up the SA status window
-      CALL WizardWindowShow(IDD_SA_Action1)
-!O      CALL WDialogSelect(IDD_Parameter_Status_2)
+        CALL WizardWindowShow(IDD_SA_Action1)
+!O      CALL SelectDASHDialog(IDD_Parameter_Status_2)
 !O      CALL WDialogShow(-1, -1, 0, Modeless)
+        CALL WDialogFieldState(IDB_Summary, Enabled)
+      ENDIF
+
       StartDate = DateToday()
       StartTime = TimeNowSeconds()
-      CALL WDialogFieldState(IDB_Summary, Enabled)
       IPTYPE = 2
 !C Clear Chi-sqd array between starting sets of SA Runs
       Chi_sqd = 0.0
@@ -87,6 +95,7 @@
 !C After completion, save the list of solutions
       CALL SaveMultiRun_LogData
       CALL OutputChi2vsMoves
+      CALL SaveParamAtEnd
       CALL SavePrjAtEnd
       CALL InfoMessage('The Simulated Annealing took '//SA_DurationStr(1:DSLen))
       CALL SetModeMenuState(0,0)
@@ -98,18 +107,20 @@
 !O      DO WHILE (WinfoWindow(WindowState) .EQ. WinMinimised)
 !O        CALL IOsWait(50) ! wait half a sec
 !O      ENDDO
-      CALL WDialogSelect(IDD_Summary)
-      CALL WDialogHide
-      IF (iMyExit .EQ. 5) THEN
-        CALL WizardWindowShow(IDD_SA_Modal_input2)
-      ELSE
-        CALL SelectMode(IDB_AnalyseSolutions)
-        CALL WDialogSelect(IDD_SAW_Page5)
-        CALL WDialogPutInteger(IDF_Limit1,1)
-        CALL WDialogPutInteger(IDF_Limit2, NumOf_SA_Runs)
-        CALL WizardWindowShow(IDD_SAW_Page5)
-      ENDIF
 
+      IF ( .NOT. IN_BATCH ) THEN
+        CALL SelectDASHDialog(IDD_Summary)
+        CALL WDialogHide
+        IF (iMyExit .EQ. 5) THEN
+          CALL WizardWindowShow(IDD_SA_Modal_input2)
+        ELSE
+          CALL SelectMode(IDB_AnalyseSolutions)
+          CALL SelectDASHDialog(IDD_SAW_Page5)
+          CALL WDialogPutInteger(IDF_Limit1,1)
+          CALL WDialogPutInteger(IDF_Limit2, NumOf_SA_Runs)
+          CALL WizardWindowShow(IDD_SAW_Page5)
+        ENDIF
+      ENDIF
       END SUBROUTINE BeginSA
 !
 !*****************************************************************************
@@ -128,6 +139,9 @@
       CHARACTER(MaxPathLength)           OutputFilesBaseName
       CHARACTER(3)                                            SA_RunNumberStr
       COMMON /basnam/          OFBN_Len, OutputFilesBaseName, SA_RunNumberStr
+
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
 
       INTEGER I, iFlags
       CHARACTER(MaxPathLength) filehead, tDirName, tFileName
@@ -162,7 +176,11 @@
       RETURN
 ! When we are here, at least one of the filenames we generated clashed
 ! ask user if (s)he wants to overwrite
-   10 CALL SplitPath(OutputFilesBaseName,tDirName,filehead)
+   10 IF ( in_batch ) THEN
+        CheckOverwriteSaOutput = 1
+        RETURN 
+      ENDIF
+      CALL SplitPath(OutputFilesBaseName,tDirName,filehead)
       CALL WMessageBox(YesNoCancel, QuestionIcon, CommonYes, &
                     "Do you wish to overwrite existing files?"//CHAR(13)//CHAR(13)// &
                     "Current base for filenames: "//filehead(1:LEN_TRIM(filehead))//CHAR(13)//CHAR(13)// &

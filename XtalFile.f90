@@ -184,7 +184,7 @@
       iHandle = 10
       OPEN(iHandle, FILE=globFile(1:LEN_TRIM(globFile)), STATUS='OLD', ERR=999)
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SAW_Page6)
+      CALL SelectDASHDialog(IDD_SAW_Page6)
       CALL WDialogPutString(IDF_Xtal_File_Name, TheFileName)
       CALL PopActiveWindowID
       iFrg = 0
@@ -204,8 +204,12 @@
             DO I = 1, 6
               IF (.NOT. nearly_equal(CellPar(i), unit_cell_parameters(i), 0.5)) OK = .FALSE.
             ENDDO
-            IF (.NOT. OK) CALL WarningMessage("Unit-cell parameters from .sdi file and from crystal structure are inconsistent."//  &
+            IF (.NOT. OK) THEN
+              CALL ErrorMessage("Unit-cell parameters from .sdi file and from crystal structure are inconsistent."//  &
               CHAR(13)//CHAR(10)//"The chi-squared values will be nonsensical.")
+              CLOSE(iHandle)
+              RETURN
+            ENDIF
           ENDIF
         CASE ('spa')
      ! Ignore
@@ -218,6 +222,7 @@
           IF (Read_One_ZM(iFrg) .NE. 0) THEN ! successful read
             CALL ErrorMessage("Error while reading Z-matrix file "//frag_file(iFrg)(1:LEN_TRIM(frag_file(iFrg))))
             iFrg = iFrg - 1 
+            CLOSE(iHandle)
             RETURN
           ENDIF ! If the read on the Z-matrix was ok
         CASE ('cen')                                ! "Centre of mass"
@@ -288,7 +293,7 @@
         ENDDO
       ENDDO
       CALL UpdateZmatrixSelection
-      CALL SA_Parameter_Set
+      CALL SA_Parameter_Set1(3) ! Has to be setup with explict hydrogen treatment
       CALL Clear_SA
       XtalFileLoad = 0
       RETURN

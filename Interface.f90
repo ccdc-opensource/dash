@@ -69,9 +69,9 @@
 !
 !*****************************************************************************
 !
-        LOGICAL FUNCTION WDialogGetCheckBoxLogical(TheFieldIdentifier)
+      LOGICAL FUNCTION DASHWDialogGetCheckBoxLogical(TheFieldIdentifier)
 !
-! This function provides a wrapper around the Winteracter WDialogGetCheckBox routine,
+! This function provides a wrapper around the Winteracter DASHWDialogGetCheckBox routine,
 ! which takes the state of a check box and stores it in an integer.
 ! As a checkbox is the front-end equivalent of a variable of type LOGICAL,
 ! it is more natural to have a routine that takes returns the state of a check box in a logical.
@@ -85,16 +85,16 @@
 
       INTEGER I
 
-      CALL WDialogGetCheckBox(TheFieldIdentifier, I)
-      WDialogGetCheckBoxLogical = (I .EQ. Checked)
+      CALL DASHWDialogGetCheckBox(TheFieldIdentifier, I)
+      DASHWDialogGetCheckBoxLogical = (I .EQ. Checked)
 
-      END FUNCTION WDialogGetCheckBoxLogical
+      END FUNCTION DASHWDialogGetCheckBoxLogical
 !
 !*****************************************************************************
 !
-        INTEGER FUNCTION WDialogGetRadioButtonInt(TheFieldIdentifier)
+      INTEGER FUNCTION DASHWDialogGetRadioButtonInt(TheFieldIdentifier)
 !
-! This function provides a wrapper around the Winteracter WDialogGetRadioButton routine,
+! This function provides a wrapper around the Winteracter DASHWDialogGetRadioButton routine,
 ! which takes the state of a set of radio buttons and stores it in an integer.
 ! This function returns the integer instead of storing it, eliminating the temporary
 ! variable in the calling code.
@@ -107,10 +107,10 @@
 
       INTEGER I
 
-      CALL WDialogGetRadioButton(TheFieldIdentifier, I)
-      WDialogGetRadioButtonInt = I
+      CALL DASHWDialogGetRadioButton(TheFieldIdentifier, I)
+      DASHWDialogGetRadioButtonInt = I
 
-      END FUNCTION WDialogGetRadioButtonInt
+      END FUNCTION DASHWDialogGetRadioButtonInt
 !
 !*****************************************************************************
 !
@@ -127,17 +127,23 @@
 
       IMPLICIT NONE
 
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+
+      IF ( IN_BATCH ) RETURN
 ! Note that FNAME is a global variable in VARIABLES
 
 ! Remember current dialogue window
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_PW_Page3)
+      CALL SelectDASHDialog(IDD_PW_Page3)
       CALL WDialogPutString(IDF_PWa_DataFileName_String, FNAME)
       CALL PopActiveWindowID
 ! Update the status bar at the bottom of the screen.
       CALL WindowOutStatusBar(1, FNAME)
 
       END SUBROUTINE ScrUpdateFileName
+
 !
 !*****************************************************************************
 !
@@ -154,9 +160,9 @@
       CHARACTER*(*), INTENT (IN   ) :: filename
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SAW_Page1)
+      CALL SelectDASHDialog(IDD_SAW_Page1)
       CALL WDialogPutString(IDF_SA_Project_Name, filename)
-      CALL WDialogSelect(IDD_SAW_Page6)
+      CALL SelectDASHDialog(IDD_SAW_Page6)
       CALL WDialogPutString(IDF_SDI_File_Name, filename)
       CALL PopActiveWindowID
 ! Update the status bar at the bottom of the screen.
@@ -271,11 +277,11 @@
 
       IMPLICIT NONE
 
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Plot_Option_Dialog)
-      Get_ShowCumChiSqd = WDialogGetCheckBoxLogical(IDF_ShowCumChiSqd)
+      CALL SelectDASHDialog(IDD_Plot_Option_Dialog)
+      Get_ShowCumChiSqd = DASHWDialogGetCheckBoxLogical(IDF_ShowCumChiSqd)
       CALL PopActiveWindowID
 
       END FUNCTION Get_ShowCumChiSqd
@@ -291,11 +297,11 @@
 
       IMPLICIT NONE
 
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Plot_Option_Dialog)
-      Get_DivideByEsd = WDialogGetCheckBoxLogical(IDF_DivDiffByEsd)
+      CALL SelectDASHDialog(IDD_Plot_Option_Dialog)
+      Get_DivideByEsd = DASHWDialogGetCheckBoxLogical(IDF_DivDiffByEsd)
       CALL PopActiveWindowID
 
       END FUNCTION Get_DivideByEsd
@@ -311,14 +317,52 @@
 
       IMPLICIT NONE
 
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
 
-      CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SA_input4)
-      Get_OutputChi2vsMoves = WDialogGetCheckBoxLogical(IDF_OutputChi2vsMoves)
-      CALL PopActiveWindowID
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+      LOGICAL SAVE_CVM
+      COMMON / CSAVECVM / SAVE_CVM
+
+      IF ( .NOT. IN_BATCH ) THEN
+        CALL PushActiveWindowID
+        CALL SelectDASHDialog(IDD_SA_input4)
+        SAVE_CVM = DASHWDialogGetCheckBoxLogical(IDF_OutputChi2vsMoves)
+        CALL PopActiveWindowID
+      ENDIF
+
+      Get_OutputChi2vsMoves = SAVE_CVM
 
       END FUNCTION Get_OutputChi2vsMoves
+
+      SUBROUTINE Set_OutputChi2vsMoves(Setting)
+
+! When .TRUE., the profile chi**2 versus moves graph is written out to a file
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      LOGICAL Setting
+
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+      LOGICAL SAVE_CVM
+      COMMON / CSAVECVM / SAVE_CVM
+
+      IF ( .NOT. IN_BATCH ) THEN
+        CALL PushActiveWindowID
+        CALL SelectDASHDialog(IDD_SA_input4)
+        CALL WDialogPutCheckBoxLogical(IDF_OutputChi2vsMoves, Setting)
+        CALL PopActiveWindowID
+      ENDIF
+
+      SAVE_CVM = Setting
+
+      END SUBROUTINE Set_OutputChi2vsMoves
 !
 !*****************************************************************************
 !
@@ -340,18 +384,27 @@
       INTEGER                                                                    HydrogenTreatment
       COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign, HydrogenTreatment
 
-      CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SA_input4)
-      CALL WDialogPutCheckBoxLogical(IDF_AutoLocalOptimise, TheValue)
-      AutoMinimise = TheValue
-      IF ( AutoMinimise ) THEN
-! If hydrogens are used during SA, force use of hydrogens during autominimise
-        CALL WDialogFieldStateLogical(IDF_UseHydrogensAuto, .NOT. LOG_HYDROGENS)
-      ELSE
-        CALL WDialogFieldState(IDF_UseHydrogensAuto, Disabled)
-      ENDIF
-      CALL PopActiveWindowID
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
 
+
+
+      IF ( .NOT. IN_BATCH ) THEN
+        CALL PushActiveWindowID
+        CALL SelectDASHDialog(IDD_SA_input4)
+        CALL WDialogPutCheckBoxLogical(IDF_AutoLocalOptimise, TheValue)
+      ENDIF
+
+      AutoMinimise = TheValue
+      IF (.NOT. IN_BATCH ) THEN
+        IF ( AutoMinimise ) THEN
+!   If hydrogens are used during SA, force use of hydrogens during autominimise
+          CALL WDialogFieldStateLogical(IDF_UseHydrogensAuto, .NOT. LOG_HYDROGENS)
+        ELSE
+          CALL WDialogFieldState(IDF_UseHydrogensAuto, Disabled)
+        ENDIF
+        CALL PopActiveWindowID
+      ENDIF
       END SUBROUTINE Set_AutoLocalMinimisation
 !
 !*****************************************************************************
@@ -371,11 +424,18 @@
       INTEGER                                                                    HydrogenTreatment
       COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign, HydrogenTreatment
 
-      CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SA_input4)
-      CALL WDialogPutCheckBoxLogical(IDF_UseHydrogensAuto, TheValue)
+
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
       UseHAutoMin = TheValue
-      CALL PopActiveWindowID
+
+      IF ( .NOT. IN_BATCH ) THEN
+        CALL PushActiveWindowID
+        CALL SelectDASHDialog(IDD_SA_input4)
+        CALL WDialogPutCheckBoxLogical(IDF_UseHydrogensAuto, TheValue)
+        CALL PopActiveWindowID
+      ENDIF
 
       END SUBROUTINE Set_UseHydrogensDuringAutoLocalMinimise
 !
@@ -397,12 +457,18 @@
       INTEGER                                                                    HydrogenTreatment
       COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign, HydrogenTreatment
 
-      CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SA_input4)
-      CALL WDialogPutCheckBoxLogical(IDF_CrystallographicCoM, TheValue)
-      UseCCoM = TheValue
-      CALL PopActiveWindowID
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
 
+
+      UseCCoM = TheValue
+
+      IF ( .NOT. IN_BATCH ) THEN
+        CALL PushActiveWindowID
+        CALL SelectDASHDialog(IDD_SA_input4)
+        CALL WDialogPutCheckBoxLogical(IDF_CrystallographicCoM, TheValue)
+        CALL PopActiveWindowID
+      ENDIF
       END SUBROUTINE Set_UseCrystallographicCoM
 !
 !*****************************************************************************
@@ -422,11 +488,18 @@
       INTEGER                                                                    HydrogenTreatment
       COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign, HydrogenTreatment
 
-      CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SA_input4)
-      CALL WDialogPutCheckBoxLogical(IDF_Align, TheValue)
+
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
       LAlign = TheValue
-      CALL PopActiveWindowID
+
+      IF ( .NOT. IN_BATCH ) THEN
+        CALL PushActiveWindowID
+        CALL SelectDASHDialog(IDD_SA_input4)
+        CALL WDialogPutCheckBoxLogical(IDF_Align, TheValue)
+        CALL PopActiveWindowID
+      ENDIF
 
       END SUBROUTINE Set_AutoAlign
 !
@@ -466,27 +539,36 @@
       INTEGER                                                                    HydrogenTreatment
       COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign, HydrogenTreatment
 
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
 
-      CALL PushActiveWindowID
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+
       HydrogenTreatment = iState
-      CALL WDialogSelect(IDD_SA_input4)
-      SELECT CASE (HydrogenTreatment)
-        CASE (1)
-          CALL WDialogPutRadioButton(IDR_HydrogensIgnore)
-        CASE (2)
-          CALL WDialogPutRadioButton(IDR_HydrogensAbsorb)
-        CASE (3)
-          CALL WDialogPutRadioButton(IDR_HydrogensExplicit)
-      END SELECT
       LOG_HYDROGENS = (HydrogenTreatment .EQ. 3)
-      IF ( LOG_HYDROGENS ) THEN
+
+      IF ( .NOT. IN_BATCH ) THEN
+        CALL PushActiveWindowID
+        CALL SelectDASHDialog(IDD_SA_input4)
+        SELECT CASE (HydrogenTreatment)
+          CASE (1)
+            CALL WDialogPutRadioButton(IDR_HydrogensIgnore)
+          CASE (2)
+            CALL WDialogPutRadioButton(IDR_HydrogensAbsorb)
+          CASE (3)
+            CALL WDialogPutRadioButton(IDR_HydrogensExplicit)
+        END SELECT
+
+
+        IF ( LOG_HYDROGENS ) THEN
 ! If hydrogens are used during SA, force use of hydrogens during autominimise
-        CALL WDialogFieldState(IDF_UseHydrogensAuto, Disabled)
-      ELSE
-        CALL WDialogFieldStateLogical(IDF_UseHydrogensAuto, WDialogGetCheckBoxLogical(IDF_AutoLocalOptimise))
+          CALL WDialogFieldState(IDF_UseHydrogensAuto, Disabled)
+        ELSE
+          CALL WDialogFieldStateLogical(IDF_UseHydrogensAuto, DASHWDialogGetCheckBoxLogical(IDF_AutoLocalOptimise))
+        ENDIF
+        CALL PopActiveWindowID
       ENDIF
-      CALL PopActiveWindowID
 
       END SUBROUTINE Set_HydrogenTreatment
 !
@@ -501,14 +583,53 @@
 
       IMPLICIT NONE
 
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
 
-      CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SA_input4)
-      SavePDB = WDialogGetCheckBoxLogical(IDF_OutputPDB)
-      CALL PopActiveWindowID
+
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+      LOGICAL SAVE_PDB
+      COMMON / CSAVEPDB / SAVE_PDB
+
+      IF ( .NOT. IN_BATCH ) THEN
+        CALL PushActiveWindowID
+        CALL SelectDASHDialog(IDD_SA_input4)
+        SAVE_PDB = DASHWDialogGetCheckBoxLogical(IDF_OutputPDB)
+        CALL PopActiveWindowID
+      ENDIF
+
+      SavePDB = SAVE_PDB
 
       END FUNCTION SavePDB
+
+      SUBROUTINE Set_SavePDB(Setting)
+
+! When .TRUE., a file in .pdb format is written out for each SA solution
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      LOGICAL Setting
+
+      LOGICAL SAVE_PDB
+      COMMON / CSAVEPDB / SAVE_PDB
+
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+      IF ( .NOT. IN_BATCH ) THEN
+        CALL PushActiveWindowID
+        CALL SelectDASHDialog(IDD_SA_input4)
+        CALL WDialogPutCheckBoxLogical(IDF_OutputPDB, Setting)
+        CALL PopActiveWindowID
+      ENDIF
+
+      SAVE_PDB = Setting
+
+      END SUBROUTINE Set_SavePDB
 !
 !*****************************************************************************
 !
@@ -521,14 +642,51 @@
 
       IMPLICIT NONE
 
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
 
-      CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SA_input4)
-      Get_SavePRO = WDialogGetCheckBoxLogical(IDF_OutputPRO)
-      CALL PopActiveWindowID
+      LOGICAL SAVE_PRO
+      COMMON / CSAVEPRO / SAVE_PRO
+
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+      IF ( .NOT. IN_BATCH ) THEN
+        CALL PushActiveWindowID
+        CALL SelectDASHDialog(IDD_SA_input4)
+        SAVE_PRO = DASHWDialogGetCheckBoxLogical(IDF_OutputPRO)
+        CALL PopActiveWindowID
+      ENDIF
+      Get_SavePRO = SAVE_PRO
 
       END FUNCTION Get_SavePRO
+
+      SUBROUTINE Set_SavePRO(Setting)
+
+! When .TRUE., a file containing the calculated profile is saved for each SA run
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+      LOGICAL Setting
+
+      LOGICAL SAVE_PRO
+      COMMON / CSAVEPRO / SAVE_PRO
+
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+      IF ( .NOT. IN_BATCH ) THEN
+        CALL PushActiveWindowID
+        CALL SelectDASHDialog(IDD_SA_input4)
+        CALL WDialogPutCheckBoxLogical(IDF_OutputPRO, Setting)
+        CALL PopActiveWindowID
+      ENDIF
+
+      SAVE_PRO = Setting
+      
+
+      END SUBROUTINE Set_SavePRO
+
 !
 !*****************************************************************************
 !
@@ -541,14 +699,110 @@
 
       IMPLICIT NONE
 
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
 
-      CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SA_input4)
-      Get_SavePrjAtEnd = WDialogGetCheckBoxLogical(IDC_OuputDASH)
-      CALL PopActiveWindowID
+      LOGICAL SAVE_PRJ
+      COMMON / CSAVEPRJ / SAVE_PRJ
+
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+
+      IF ( .NOT. IN_BATCH ) THEN
+        CALL PushActiveWindowID
+        CALL SelectDASHDialog(IDD_SA_input4)
+        SAVE_PRJ = DASHWDialogGetCheckBoxLogical(IDC_OuputDASH)
+        CALL PopActiveWindowID
+      ENDIF
+      Get_SavePrjAtEnd = SAVE_PRJ
 
       END FUNCTION Get_SavePrjAtEnd
+
+      SUBROUTINE Set_SavePrjAtEnd(Setting)
+
+! When .TRUE., a file containing the calculated profile is saved for each SA run
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      LOGICAL Setting
+
+      LOGICAL SAVE_PRJ
+      COMMON / CSAVEPRJ / SAVE_PRJ
+
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+
+      IF ( .NOT. IN_BATCH ) THEN
+        CALL PushActiveWindowID
+        CALL SelectDASHDialog(IDD_SA_input4)
+        CALL WDialogPutCheckBoxLogical(IDC_OuputDASH, Setting)
+        CALL PopActiveWindowID
+      ENDIF
+
+      SAVE_PRJ = Setting
+
+      END SUBROUTINE Set_SavePrjAtEnd
+!
+!*****************************************************************************
+!
+      LOGICAL FUNCTION Get_SaveParamAtEnd
+
+! When .TRUE., a file containing the calculated profile is saved for each SA run
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
+
+      LOGICAL SAVE_PAE
+      COMMON / CSAVEPAE / SAVE_PAE
+
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+      IF ( .NOT. IN_BATCH ) THEN
+        CALL PushActiveWindowID
+        CALL SelectDASHDialog(IDD_SA_input4)
+        SAVE_PAE = DASHWDialogGetCheckBoxLogical(IDF_OutputTbl)
+        CALL PopActiveWindowID
+      ENDIF
+      Get_SaveParamAtEnd = SAVE_PAE
+      END FUNCTION Get_SaveParamAtEnd
+
+      SUBROUTINE Set_SaveParamAtEnd(Setting)
+
+! When .TRUE., a file containing the calculated profile is saved for each SA run
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
+
+      LOGICAL Setting
+
+      LOGICAL SAVE_PAE
+      COMMON / CSAVEPAE / SAVE_PAE
+
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+      IF ( .NOT. IN_BATCH ) THEN
+        CALL PushActiveWindowID
+        CALL SelectDASHDialog(IDD_SA_input4)
+        CALL WDialogPutCheckBoxLogical(IDF_OutputTbl, Setting)
+        CALL PopActiveWindowID
+      ENDIF
+      SAVE_PAE = Setting
+
+      END SUBROUTINE Set_SaveParamAtEnd
 !
 !*****************************************************************************
 !
@@ -561,11 +815,11 @@
 
       IMPLICIT NONE
 
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Configuration)
-      Get_ColourFlexibleTorsions = WDialogGetCheckBoxLogical(IDF_ColFlexTors)
+      CALL SelectDASHDialog(IDD_Configuration)
+      Get_ColourFlexibleTorsions = DASHWDialogGetCheckBoxLogical(IDF_ColFlexTors)
       CALL PopActiveWindowID
 
       END FUNCTION Get_ColourFlexibleTorsions
@@ -583,11 +837,11 @@
 
       IMPLICIT NONE
 
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Configuration)
-      Get_WriteWavelength2XYEFile = WDialogGetCheckBoxLogical(IDC_wl_in_xye)
+      CALL SelectDASHDialog(IDD_Configuration)
+      Get_WriteWavelength2XYEFile = DASHWDialogGetCheckBoxLogical(IDC_wl_in_xye)
       CALL PopActiveWindowID
 
       END FUNCTION Get_WriteWavelength2XYEFile
@@ -606,16 +860,16 @@
 
       IMPLICIT NONE
 
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Plot_Option_Dialog)
-      PlotObservedErrorBars = WDialogGetCheckBoxLogical(IDF_ErrorBar_Check) 
+      CALL SelectDASHDialog(IDD_Plot_Option_Dialog)
+      PlotObservedErrorBars = DASHWDialogGetCheckBoxLogical(IDF_ErrorBar_Check) 
       CALL PopActiveWindowID
 
       END FUNCTION PlotObservedErrorBars
 
-	  LOGICAL FUNCTION PlotDifferenceErrorBars
+      LOGICAL FUNCTION PlotDifferenceErrorBars
 !
 ! This function retrieves the value of the 'plot difference error bars' checkbox in the plot options panel
 !
@@ -627,16 +881,16 @@
 
       IMPLICIT NONE
 
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Plot_Option_Dialog)
-      PlotDifferenceErrorBars = WDialogGetCheckBoxLogical(IDF_DifferenceErrorBar_Check) 
+      CALL SelectDASHDialog(IDD_Plot_Option_Dialog)
+      PlotDifferenceErrorBars = DASHWDialogGetCheckBoxLogical(IDF_DifferenceErrorBar_Check) 
       CALL PopActiveWindowID
       END FUNCTION PlotDifferenceErrorBars
 
 
-	  REAL FUNCTION PlotEsdMultiplier
+      REAL FUNCTION PlotEsdMultiplier
 !
 ! This function retrieves the value of the 'plot error multiplier field' checkbox in the plot options panel
 !
@@ -649,8 +903,8 @@
       IMPLICIT NONE
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Plot_Option_Dialog)
-      CALL WDialogGetReal(IDF_ErrorMultiplier_RealEntry, PlotEsdMultiplier) 
+      CALL SelectDASHDialog(IDD_Plot_Option_Dialog)
+      CALL DASHWDialogGetReal(IDF_ErrorMultiplier_RealEntry, PlotEsdMultiplier) 
       CALL PopActiveWindowID
       END FUNCTION PlotEsdMultiplier
 !
@@ -668,11 +922,11 @@
 
       IMPLICIT NONE
 
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Plot_Option_Dialog)
-      PlotBackground = WDialogGetCheckBoxLogical(IDF_background_check)
+      CALL SelectDASHDialog(IDD_Plot_Option_Dialog)
+      PlotBackground = DASHWDialogGetCheckBoxLogical(IDF_background_check)
       CALL PopActiveWindowID
 
       END FUNCTION PlotBackground
@@ -688,11 +942,11 @@
 
       IMPLICIT NONE
 
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Plot_Option_Dialog)
-      ConnectPointsObs = WDialogGetCheckBoxLogical(IDF_ConnectObsPoints)
+      CALL SelectDASHDialog(IDD_Plot_Option_Dialog)
+      ConnectPointsObs = DASHWDialogGetCheckBoxLogical(IDF_ConnectObsPoints)
       CALL PopActiveWindowID
 
       END FUNCTION ConnectPointsObs
@@ -708,11 +962,11 @@
 
       IMPLICIT NONE
 
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Plot_Option_Dialog)
-      PlotPeakFitDifferenceProfile = WDialogGetCheckBoxLogical(IDF_PlotPeakFitDif)
+      CALL SelectDASHDialog(IDD_Plot_Option_Dialog)
+      PlotPeakFitDifferenceProfile = DASHWDialogGetCheckBoxLogical(IDF_PlotPeakFitDif)
       CALL PopActiveWindowID
 
       END FUNCTION PlotPeakFitDifferenceProfile
@@ -728,14 +982,55 @@
 
       IMPLICIT NONE
 
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
 
-      CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SA_input4)
-      SaveCSSR = WDialogGetCheckBoxLogical(IDF_OutputCSSR)
-      CALL PopActiveWindowID
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+      LOGICAL SAVE_CSSR
+      COMMON / CSAVECSSR / SAVE_CSSR
+
+      IF ( .NOT. IN_BATCH ) THEN
+        CALL PushActiveWindowID
+        CALL SelectDASHDialog(IDD_SA_input4)
+        SAVE_CSSR = DASHWDialogGetCheckBoxLogical(IDF_OutputCSSR)
+        CALL PopActiveWindowID
+      ENDIF
+
+      SaveCSSR = SAVE_CSSR
 
       END FUNCTION SaveCSSR
+
+      SUBROUTINE Set_SaveCSSR(Setting)
+
+! When .TRUE., a file in .cssr format is written out for each SA solution
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
+      
+      LOGICAL Setting
+
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+      LOGICAL SAVE_CSSR
+      COMMON / CSAVECSSR / SAVE_CSSR
+
+      IF ( .NOT. IN_BATCH ) THEN
+        CALL PushActiveWindowID
+        CALL SelectDASHDialog(IDD_SA_input4)
+        CALL WDialogPutCheckBoxLogical(IDF_OutputCSSR, Setting)
+        CALL PopActiveWindowID
+      ENDIF
+
+      SAVE_CSSR = Setting
+
+      END SUBROUTINE Set_SaveCSSR
+!
 !
 !*****************************************************************************
 !
@@ -748,14 +1043,52 @@
 
       IMPLICIT NONE
 
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
 
-      CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SA_input4)
-      SaveCCL = WDialogGetCheckBoxLogical(IDF_OutputCCL)
-      CALL PopActiveWindowID
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+      LOGICAL SAVE_CCL
+      COMMON / CSAVECCL / SAVE_CCL
+
+      IF ( .NOT. IN_BATCH ) THEN
+        CALL PushActiveWindowID
+        CALL SelectDASHDialog(IDD_SA_input4)
+        SAVE_CCL = DASHWDialogGetCheckBoxLogical(IDF_OutputCCL)
+        CALL PopActiveWindowID
+      ENDIF
+
+      SaveCCL = SAVE_CCL
 
       END FUNCTION SaveCCL
+
+      SUBROUTINE Set_SaveCCL(Setting)
+
+! When .TRUE., a file in .ccl format is written out for each SA solution
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      LOGICAL Setting
+
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+      LOGICAL SAVE_CCL
+      COMMON / CSAVECCL / SAVE_CCL
+
+      IF ( .NOT. IN_BATCH ) THEN
+        CALL PushActiveWindowID
+        CALL SelectDASHDialog(IDD_SA_input4)
+        CALL WDialogPutCheckBoxLogical(IDF_OutputCCL, Setting)
+        CALL PopActiveWindowID
+      ENDIF
+
+      SAVE_CCL = Setting
+
+      END SUBROUTINE Set_SaveCCL
 !
 !*****************************************************************************
 !
@@ -768,14 +1101,52 @@
 
       IMPLICIT NONE
 
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
 
-      CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SA_input4)
-      SaveCIF = WDialogGetCheckBoxLogical(IDF_OutputCIF)
-      CALL PopActiveWindowID
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
 
+      LOGICAL SAVE_CIF
+      COMMON / CSAVECIF / SAVE_CIF
+
+      IF ( .NOT. IN_BATCH ) THEN
+        CALL PushActiveWindowID
+        CALL SelectDASHDialog(IDD_SA_input4)
+        SAVE_CIF = DASHWDialogGetCheckBoxLogical(IDF_OutputCIF)
+        CALL PopActiveWindowID
+      ENDIF
+
+      SaveCIF = SAVE_CIF
       END FUNCTION SaveCIF
+
+      SUBROUTINE Set_SaveCIF(Setting)
+
+! When .TRUE., a file in .cif format is written out for each SA solution
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      LOGICAL Setting
+
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+      LOGICAL SAVE_CIF
+      COMMON / CSAVECIF / SAVE_CIF
+
+      IF ( .NOT. IN_BATCH ) THEN
+        CALL PushActiveWindowID
+        CALL SelectDASHDialog(IDD_SA_input4)
+        CALL WDialogPutCheckBoxLogical(IDF_OutputCIF, Setting)
+        CALL PopActiveWindowID
+      ENDIF
+
+      SAVE_CIF = Setting
+
+      END SUBROUTINE Set_SaveCIF
+!
 !
 !*****************************************************************************
 !
@@ -788,14 +1159,51 @@
 
       IMPLICIT NONE
 
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
 
-      CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SA_input4)
-      SaveRES = WDialogGetCheckBoxLogical(IDF_OutputRES)
-      CALL PopActiveWindowID
+      LOGICAL SAVE_RES
+      COMMON / CSAVERES / SAVE_RES
 
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
+
+      IF ( .NOT. IN_BATCH ) THEN
+        CALL PushActiveWindowID
+        CALL SelectDASHDialog(IDD_SA_input4)
+        SAVE_RES = DASHWDialogGetCheckBoxLogical(IDF_OutputRES)
+        CALL PopActiveWindowID
+      ENDIF
+
+      SaveRES = SAVE_RES
       END FUNCTION SaveRES
+
+      SUBROUTINE Set_SaveRES(Setting)
+
+! When .TRUE., a file in .res format is written out for each SA solution
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      LOGICAL Setting
+
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+      LOGICAL SAVE_RES
+      COMMON / CSAVERES / SAVE_RES
+
+
+      IF ( .NOT. IN_BATCH ) THEN
+        CALL PushActiveWindowID
+        CALL SelectDASHDialog(IDD_SA_input4)
+        CALL WDialogPutCheckBoxLogical(IDF_OutputRES, Setting)
+        CALL PopActiveWindowID
+      ENDIF
+
+      SAVE_RES = Setting
+      END SUBROUTINE Set_SaveRES
 !
 !*****************************************************************************
 !
@@ -809,16 +1217,22 @@
 
       INCLUDE 'Lattice.inc'
 
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+      IF ( IN_BATCH ) RETURN
+
+
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Peak_Positions)
+      CALL SelectDASHDialog(IDD_Peak_Positions)
       CALL WDialogPutReal(IDF_ZeroPoint, ZeroPoint, '(F10.4)')
-      CALL WDialogSelect(IDD_Crystal_Symmetry)
+      CALL SelectDASHDialog(IDD_Crystal_Symmetry)
       CALL WDialogPutReal(IDF_ZeroPoint, ZeroPoint, '(F10.4)')
-      CALL WDialogSelect(IDD_Index_Preparation)
+      CALL SelectDASHDialog(IDD_Index_Preparation)
       CALL WDialogPutReal(IDF_ZeroPoint, ZeroPoint, '(F10.4)')
-      CALL WDialogSelect(IDD_PW_Page1)
+      CALL SelectDASHDialog(IDD_PW_Page1)
       CALL WDialogPutReal(IDF_ZeroPoint, ZeroPoint, '(F10.4)')
-      CALL WDialogSelect(IDD_PW_Page8)
+      CALL SelectDASHDialog(IDD_PW_Page8)
       CALL WDialogPutReal(IDF_ZeroPoint, ZeroPoint, '(F10.4)')
       CALL PopActiveWindowID
 
@@ -845,6 +1259,11 @@
       INTEGER CellParID(6)
       INTEGER I
 
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+      IF ( in_batch ) return
+
       CellParID(1) = IDF_a_latt
       CellParID(2) = IDF_b_latt
       CellParID(3) = IDF_c_latt
@@ -855,13 +1274,13 @@
       DO WindowNr = 1, 4
         SELECT CASE (WindowNr)
           CASE (1) 
-            CALL WDialogSelect(IDD_Crystal_Symmetry)
+            CALL SelectDASHDialog(IDD_Crystal_Symmetry)
           CASE (2) 
-            CALL WDialogSelect(IDD_PW_Page1)
+            CALL SelectDASHDialog(IDD_PW_Page1)
           CASE (3) 
-            CALL WDialogSelect(IDD_SX_Page1)
+            CALL SelectDASHDialog(IDD_SX_Page1)
           CASE (4) 
-            CALL WDialogSelect(IDD_Peak_Positions)
+            CALL SelectDASHDialog(IDD_Peak_Positions)
         END SELECT
 ! Update all the unit cell lengths ...
         DO I = 1, 3
@@ -893,7 +1312,7 @@
         ENDIF
       ENDDO
 ! Update volume in View dialogue
-      CALL WDialogSelect(IDD_Crystal_Symmetry)
+      CALL SelectDASHDialog(IDD_Crystal_Symmetry)
       IF (FnUnitCellOK()) THEN
         V = UnitCellVolume(CellPar(1), CellPar(2), CellPar(3), CellPar(4), CellPar(5), CellPar(6))
         CALL WDialogPutReal(IDF_UCVol, V, '(F10.3)')
@@ -919,13 +1338,13 @@
 
       CALL PushActiveWindowID
 ! Get all the cell constants from the selected area
-      CALL WDialogSelect(IDownFrom)
-      CALL WDialogGetReal(IDF_a_latt, CellPar(1))
-      CALL WDialogGetReal(IDF_b_latt, CellPar(2))      
-      CALL WDialogGetReal(IDF_c_latt, CellPar(3))      
-      CALL WDialogGetReal(IDF_alp_latt, CellPar(4))      
-      CALL WDialogGetReal(IDF_bet_latt, CellPar(5))      
-      CALL WDialogGetReal(IDF_gam_latt, CellPar(6))
+      CALL SelectDASHDialog(IDownFrom)
+      CALL DASHWDialogGetReal(IDF_a_latt, CellPar(1))
+      CALL DASHWDialogGetReal(IDF_b_latt, CellPar(2))      
+      CALL DASHWDialogGetReal(IDF_c_latt, CellPar(3))      
+      CALL DASHWDialogGetReal(IDF_alp_latt, CellPar(4))      
+      CALL DASHWDialogGetReal(IDF_bet_latt, CellPar(5))      
+      CALL DASHWDialogGetReal(IDF_gam_latt, CellPar(6))
       CALL UpdateCell
       CALL CheckIfWeCanDoAPawleyRefinement
       CALL PopActiveWindowID
@@ -945,8 +1364,8 @@
       REAL Temp
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(From)
-      CALL WDialogGetReal(IDF_wavelength1,Temp)
+      CALL SelectDASHDialog(From)
+      CALL DASHWDialogGetReal(IDF_wavelength1,Temp)
       CALL Set_Wavelength(Temp)
       CALL PopActiveWindowID
 
@@ -1011,9 +1430,9 @@
       INTEGER, INTENT (IN   ) :: IRadSelection
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Data_Properties)
+      CALL SelectDASHDialog(IDD_Data_Properties)
       CALL WDialogPutOption(IDF_Wavelength_Menu, IRadSelection)
-      CALL WDialogSelect(IDD_PW_Page4)
+      CALL SelectDASHDialog(IDD_PW_Page4)
       CALL WDialogPutOption(IDF_Wavelength_Menu, IRadSelection)
       CALL PopActiveWindowID
 
@@ -1033,17 +1452,23 @@
       REAL, EXTERNAL :: FnWavelengthOfMenuOption
       INTEGER I, IRadSelection
 
+
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+      IF ( IN_BATCH ) RETURN
+
       CALL PushActiveWindowID
 ! This is the right place to update the maximum resolution (even if it's not necessary)
 ! In principle, set resolution so as to truncate after DefaultMaxResolution.
 ! However, if truncation resolution not attainable with current data range / wavelength,
 ! adjust the setting of the maximum resolution to maximum possible.
       CALL Update_TruncationLimits
-      CALL WDialogSelect(IDD_Data_Properties)
+      CALL SelectDASHDialog(IDD_Data_Properties)
       CALL WDialogPutReal(IDF_wavelength1, ALambda, '(F10.5)')
-      CALL WDialogSelect(IDD_PW_Page4)
+      CALL SelectDASHDialog(IDD_PW_Page4)
       CALL WDialogPutReal(IDF_wavelength1, ALambda, '(F10.5)')
-      CALL WDialogSelect(IDD_Index_Preparation)
+      CALL SelectDASHDialog(IDD_Index_Preparation)
       CALL WDialogPutReal(IDF_wavelength1, ALambda, '(F10.5)')
 ! Now add in a test: if lab data, and wavelength close to known material,
 ! set anode material in Winteracter menus. Otherwise, anode is unknown.
@@ -1124,9 +1549,16 @@
       REAL    xnew, anew, SigmDif, PfTDMin, PfTDMax, DifTem, ProbTot, ProbTop, DifMin
       REAL    DifMinSq, ArgBot, ArgTop, ProbAdd
 
-      CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Peak_Positions)
-      CALL WDialogClearField(IDF_Peak_Positions_Grid)
+
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+      IF ( .NOT. IN_BATCH ) THEN
+        CALL PushActiveWindowID
+        CALL SelectDASHDialog(IDD_Peak_Positions)
+        CALL WDialogClearField(IDF_Peak_Positions_Grid)
+      ENDIF
+
       NTPeak = 0
 ! Loop over all hatched areas. Per area, count all peaks that the user has indicated to be present.
 ! Store all peak positions thus found in one flat array: AllPkPosVal
@@ -1145,9 +1577,11 @@
       IF (NTPeak .EQ. 0) THEN
 ! Winteracter doesn't seem able to cope with setting the number of rows in a grid to zero,
 ! so instead I set it such that it fills the screen but doesn't allow scrolling down.
-        CALL WGridRows(IDF_Peak_Positions_Grid,4)
-        CALL WDialogFieldState(ID_Index_Output,Disabled)
-        CALL PopActiveWindowID
+        IF ( .NOT. IN_BATCH ) THEN
+          CALL WGridRows(IDF_Peak_Positions_Grid,4)
+          CALL WDialogFieldState(ID_Index_Output,Disabled)
+          CALL PopActiveWindowID
+        ENDIF
         RETURN
       ENDIF
       CALL SORT_REAL(AllPkPosVal,IOrdTem,NTPeak)
@@ -1215,8 +1649,11 @@
         ENDDO
       ENDIF
 ! Write out all the peak positions in an ordered list ...
+
+      IF ( IN_BATCH ) RETURN
       CALL WGridRows(IDF_Peak_Positions_Grid,NTPeak)
       CALL WDialogFieldState(ID_Index_Output,Enabled)
+
       DO I = 1, NTPeak
         iOrd = IOrdTem(I)
         CALL WGridPutCellReal(IDF_Peak_Positions_Grid, 1, I, AllPkPosVal(iOrd), '(F12.4)')
@@ -1256,6 +1693,11 @@
       INTEGER WindowNr
       INTEGER NotDisabled
 
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+      IF  ( IN_BATCH ) RETURN
+
       CALL PushActiveWindowID
       IF ( PastPawley ) THEN
         NotDisabled = DialogReadOnly
@@ -1265,10 +1707,10 @@
       DO WindowNr = 1, 2
         SELECT CASE (WindowNr)
           CASE (1) 
-            CALL WDialogSelect(IDD_PW_Page4)
+            CALL SelectDASHDialog(IDD_PW_Page4)
             IF ( iRietveldMethod .NE. INTERNAL_RB ) NotDisabled = Enabled
           CASE (2) 
-            CALL WDialogSelect(IDD_Data_Properties)
+            CALL SelectDASHDialog(IDD_Data_Properties)
             IF ( iRietveldMethod .NE. INTERNAL_RB ) NotDisabled = DialogReadOnly
         END SELECT
         SELECT CASE (JRadOption)
@@ -1331,7 +1773,9 @@
 
       LOGICAL, EXTERNAL :: FnUnitCellOK
 
-      CALL PushActiveWindowID
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
 ! Update values of constrained cell parameters to match the parameters they're constrained to
       SELECT CASE (LatBrav)
         CASE ( 1) ! Triclinic
@@ -1352,16 +1796,20 @@
           CellPar(2) = CellPar(1)
           CellPar(3) = CellPar(1)
       END SELECT
+
+      IF ( IN_BATCH ) RETURN
+
+      CALL PushActiveWindowID
 ! Update all windows so that they show the contents of the global variables.
 ! This is in the cell parameters tab, in the two wizard windows, and in the peak positions tab.
       CALL Upload_Cell_Constants
-      CALL WDialogSelect(IDD_PW_Page1)
+      CALL SelectDASHDialog(IDD_PW_Page1)
 ! Enable/disable the wizard next button
       CALL WDialogFieldStateLogical(IDNEXT, FnUnitCellOK())
 !!Enable/disable the space group determination button
       CALL WDialogFieldStateLogical(IDF_SGDet, FnUnitCellOK())
 ! Enable/disable the single xtal wizard next button
-      CALL WDialogSelect(IDD_SX_Page1)
+      CALL SelectDASHDialog(IDD_SX_Page1)
       CALL WDialogFieldStateLogical(IDNEXT, FnUnitCellOK())
       CALL Generate_TicMarks
       CALL PopActiveWindowID
@@ -1451,11 +1899,11 @@
       ELSE
         ISPosSG = NumberSGTable - LPosSG(LatBrav) + 1
       ENDIF
-      CALL WDialogSelect(IDD_Crystal_Symmetry)
+      CALL SelectDASHDialog(IDD_Crystal_Symmetry)
       CALL WDialogPutMenu(IDF_Space_Group_Menu, SGHMaBrStr, NumBrSG, ISPosSG)
-      CALL WDialogSelect(IDD_PW_Page1)
+      CALL SelectDASHDialog(IDD_PW_Page1)
       CALL WDialogPutMenu(IDF_Space_Group_Menu, SGHMaBrStr, NumBrSG, ISPosSG)
-      CALL WDialogSelect(IDD_SX_Page1)
+      CALL SelectDASHDialog(IDD_SX_Page1)
       CALL WDialogPutMenu(IDF_Space_Group_Menu, SGHMaBrStr, NumBrSG, ISPosSG)
       CALL PopActiveWindowID
 
@@ -1478,14 +1926,14 @@
       INTEGER ISPosSG
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IUploadFrom)
-      CALL WDialogGetMenu(IDF_Space_Group_Menu, ISPosSG)
+      CALL SelectDASHDialog(IUploadFrom)
+      CALL DASHWDialogGetMenu(IDF_Space_Group_Menu, ISPosSG)
       NumberSGTable = SGNrMenu2Table(ISPosSG)
-      CALL WDialogSelect(IDD_Crystal_Symmetry)
+      CALL SelectDASHDialog(IDD_Crystal_Symmetry)
       CALL WDialogPutOption(IDF_Space_Group_Menu, ISPosSG)
-      CALL WDialogSelect(IDD_PW_Page1)
+      CALL SelectDASHDialog(IDD_PW_Page1)
       CALL WDialogPutOption(IDF_Space_Group_Menu, ISPosSG)
-      CALL WDialogSelect(IDD_SX_Page1)
+      CALL SelectDASHDialog(IDD_SX_Page1)
       CALL WDialogPutOption(IDF_Space_Group_Menu, ISPosSG)
       CALL PopActiveWindowID
 
@@ -1503,7 +1951,9 @@
 
       INCLUDE 'Lattice.inc'
 
-      CALL PushActiveWindowID
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
       CellParConstrained = .FALSE.
       SELECT CASE (LatBrav)
         CASE ( 1) ! Triclinic
@@ -1554,12 +2004,19 @@
           CellParConstrained = .TRUE.
           CellParConstrained(1) = .FALSE.
       END SELECT
+
+      IF ( .NOT. in_batch ) &
+        CALL PushActiveWindowID
       CALL UpdateCell
-      CALL WDialogSelect(IDD_Crystal_Symmetry)
+
+      IF ( in_batch ) &
+         RETURN
+
+      CALL SelectDASHDialog(IDD_Crystal_Symmetry)
       CALL WDialogPutOption(IDF_Crystal_System_Menu, LatBrav)
-      CALL WDialogSelect(IDD_PW_Page1)
+      CALL SelectDASHDialog(IDD_PW_Page1)
       CALL WDialogPutOption(IDF_Crystal_System_Menu, LatBrav)
-      CALL WDialogSelect(IDD_SX_Page1)
+      CALL SelectDASHDialog(IDD_SX_Page1)
       CALL WDialogPutOption(IDF_Crystal_System_Menu, LatBrav)
       CALL SetSpaceGroupMenu
       CALL PopActiveWindowID
@@ -1684,6 +2141,12 @@
       LOGICAL         InSA
       COMMON /SADATA/ InSA
 
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+      IF ( in_batch ) &
+        RETURN
+
       IF (PeakOn .GT. 0) THEN
         CALL WMenuSetState(ID_Peak_Fitting_Mode, ItemEnabled, WintOn)
       ELSE IF (PeakOn .LT. 0) THEN
@@ -1726,7 +2189,7 @@
       ENDIF
 ! Update the status bar
       IF (TheMode .EQ. ID_Structure_Solution_Mode) THEN
-        CALL WDialogSelect(IDD_Polyfitter_Wizard_01)
+        CALL SelectDASHDialog(IDD_Polyfitter_Wizard_01)
         CALL WDialogPutRadioButton(IDF_PW_Option3)
       ENDIF
 ! Update the menu + the toolbar
@@ -1889,3 +2352,178 @@
 !
 !*****************************************************************************
 !
+
+      SUBROUTINE LogRetrieval(IFIELD)
+
+      USE WINTERACTER
+      INTEGER IFIELD
+
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+      CHARACTER*20, EXTERNAL :: Integer2String
+
+      IF ( IN_BATCH ) THEN
+         CALL DebugErrorMessage('Dialog Access in Batch Mode: Field number '//Integer2String(IFIELD) )
+      ENDIF
+
+      END SUBROUTINE
+
+      SUBROUTINE DASHWDialogGetInteger(IFIELD, IVALUE)
+
+
+      INTEGER, INTENT (IN   ) :: IFIELD
+      INTEGER, INTENT (INOUT) :: IVALUE
+
+      CALL LogRetrieval(IFIELD)
+
+      CALL WDialogGetInteger(IFIELD,IVALUE)
+
+      END SUBROUTINE
+
+      SUBROUTINE DASHWDialogGetRadioButton(IFIELD, ISET)
+
+      USE WINTERACTER
+
+      INTEGER, INTENT (IN   ) :: IFIELD
+      INTEGER, INTENT (INOUT) :: ISET
+
+      CALL LogRetrieval(IFIELD)
+
+      CALL WDialogGetRadioButton(IFIELD,ISET)
+
+      END SUBROUTINE
+
+
+      SUBROUTINE DASHWDialogGetCheckBox(IFIELD, ISTATE)
+
+      USE WINTERACTER
+
+      INTEGER, INTENT (IN   ) :: IFIELD
+      INTEGER, INTENT (INOUT) :: ISTATE
+
+      CALL LogRetrieval(IFIELD)
+
+      CALL WDialogGetCheckBox(IFIELD,ISTATE)
+
+      END SUBROUTINE
+
+
+      SUBROUTINE DASHWDialogGetMenu(IFIELD, IOPTION)
+      
+      USE WINTERACTER
+
+      INTEGER,             INTENT (IN   ) :: IFIELD
+      INTEGER,             INTENT (INOUT) :: IOPTION
+!      CHARACTER*(*), OPTIONAL, INTENT (INOUT) :: CVALUE
+
+      CALL LogRetrieval(IFIELD)
+
+      CALL WDialogGetMenu(IFIELD,IOPTION)
+
+      END SUBROUTINE
+
+      SUBROUTINE DASHWDialogGetReal(IFIELD, RVALUE)
+
+      USE WINTERACTER
+
+      INTEGER, INTENT (IN   ) :: IFIELD
+      REAL,    INTENT (INOUT) :: RVALUE
+
+      CALL LogRetrieval(IFIELD)
+
+      CALL WDialogGetReal(IFIELD,RVALUE)
+
+      END SUBROUTINE
+
+
+      SUBROUTINE DASHWDialogGetDouble(IFIELD, DVALUE)
+
+      USE WINTERACTER
+
+      INTEGER,            INTENT (IN   ) :: IFIELD
+      DOUBLE PRECISION    , INTENT (INOUT) :: DVALUE
+
+      CALL LogRetrieval(IFIELD)
+
+      CALL WDialogGetDouble(IFIELD,DVALUE)
+
+      END SUBROUTINE
+
+
+      SUBROUTINE DASHWDialogGetString(IFIELD, CVALUE)
+
+      USE WINTERACTER
+
+      INTEGER,   INTENT (IN   ) :: IFIELD
+      CHARACTER*(*), INTENT (INOUT) :: CVALUE
+
+      INTEGER IERROR
+
+      CALL LogRetrieval(IFIELD)
+      
+      IERROR = InfoError(1)
+      CVALUE = ''
+      CALL WDialogGetString(IFIELD,CVALUE)
+
+      IERROR = InfoError(1)
+      IF ( IERROR .GT. 0 ) THEN
+         CVALUE = ''
+      ENDIF
+
+      END SUBROUTINE
+
+      SUBROUTINE DASHWGridGetCellCheckBox(IFIELD,ICOL,IROW,IVALUE)
+
+      USE WINTERACTER
+      INTEGER,             INTENT (IN   ) :: IFIELD
+      INTEGER,             INTENT (IN   ) :: IROW
+      INTEGER,             INTENT (IN   ) :: ICOL
+      INTEGER,             INTENT (INOUT) :: IVALUE
+
+      CALL LogRetrieval(IFIELD)
+
+      CALL WGridGetCellCheckBox(IFIELD,ICOL,IROW,IVALUE)
+      
+      END SUBROUTINE
+
+      SUBROUTINE DASHWGridGetCheckBox(IFIELD,ICOL,IVALUES,NVALUES)
+
+      USE WINTERACTER
+      INTEGER,             INTENT (IN   ) :: IFIELD
+      INTEGER,             INTENT (IN   ) :: ICOL
+      INTEGER,             INTENT (INOUT) :: IVALUES(*)
+      INTEGER,             INTENT (INOUT) :: NVALUES
+
+      CALL LogRetrieval(IFIELD)
+
+      CALL WGridGetCheckBox(IFIELD,ICOL,IVALUES,NVALUES)
+      
+      END SUBROUTINE
+
+      SUBROUTINE DASHWGridGetCellReal(IFIELD,ICOL,IROW,RVALUE)
+
+      USE WINTERACTER
+      INTEGER,             INTENT (IN   ) :: IFIELD
+      INTEGER,             INTENT (IN   ) :: IROW
+      INTEGER,             INTENT (IN   ) :: ICOL
+      REAL,                INTENT (INOUT) :: RVALUE
+
+      CALL LogRetrieval(IFIELD)
+
+      CALL WGridGetCellReal(IFIELD,ICOL,IROW,RVALUE)
+      
+      END SUBROUTINE
+
+      SUBROUTINE DASHWGridGetCellString(IFIELD,ICOL,IROW,CVALUE)
+
+      USE WINTERACTER
+      INTEGER,             INTENT (IN   ) :: IFIELD
+      INTEGER,             INTENT (IN   ) :: IROW
+      INTEGER,             INTENT (IN   ) :: ICOL
+      CHARACTER*(*),       INTENT (INOUT) :: CVALUE
+
+      CALL LogRetrieval(IFIELD)
+
+      CALL WGridGetCellString(IFIELD,ICOL,IROW,CVALUE)
+      
+      END SUBROUTINE

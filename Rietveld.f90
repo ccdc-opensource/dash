@@ -52,7 +52,7 @@
       IF ( iRietveldMethod .EQ. INTERNAL_RB ) THEN
 
 
-      CALL WDialogSelect(IDD_Rietveld2)
+      CALL SelectDASHDialog(IDD_Rietveld2)
 
 
       ENDIF  ! iRietveldMethod
@@ -132,6 +132,7 @@
       RR_ioptITF = 1
       RR_ioptPO = 0
       ! Fill RR_Show_bond etc.
+! Are the three calls redundant?
       CALL Set_Show_bond
       CALL Set_Show_angle
       CALL Set_Show_torsion
@@ -174,7 +175,7 @@
       IF (PrefParExists) THEN
         CALL WDialogFieldState(IDC_PO, Enabled)
         CALL WDialogFieldState(IDR_PO, Enabled)
-        CALL WDialogSelect(IDD_RR_PO_Dialog)
+        CALL SelectDASHDialog(IDD_RR_PO_Dialog)
         CALL WDialogPutInteger(IDF_PO_a, PO_Direction(1))
         CALL WDialogPutInteger(IDF_PO_b, PO_Direction(2))
         CALL WDialogPutInteger(IDF_PO_c, PO_Direction(3))
@@ -182,7 +183,7 @@
       ELSE
         CALL WDialogFieldState(IDC_PO, Disabled)
         CALL WDialogFieldState(IDR_PO, Disabled)
-        CALL WDialogSelect(IDD_RR_PO_Dialog)
+        CALL SelectDASHDialog(IDD_RR_PO_Dialog)
         CALL WDialogPutInteger(IDF_PO_a, 0)
         CALL WDialogPutInteger(IDF_PO_b, 0)
         CALL WDialogPutInteger(IDF_PO_c, 1)
@@ -195,7 +196,7 @@
       CALL WDialogFieldState(IDF_LABELa, tFieldState)
       CALL WDialogFieldState(IDF_LABELb, tFieldState)
       CALL WDialogFieldState(IDF_LABELc, tFieldState)
-      CALL WDialogSelect(IDD_Rietveld2)
+      CALL SelectDASHDialog(IDD_Rietveld2)
       ! Initialise PO
       IF (PrefParExists) CALL PO_PRECFC(RR_PO)
       ! Initialise ITF
@@ -236,20 +237,21 @@
 !
       SUBROUTINE Set_Show_bond
 
+      USE WINTERACTER
       USE DRUID_HEADER
       USE RRVAR
       USE ZMVAR
 
       IMPLICIT NONE
 
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
       INTEGER iFrg, i
       INTEGER iRow, iCol, iField
       INTEGER Num
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Rietveld2)
-      IF (WDialogGetCheckBoxLogical(IDC_HideH4)) THEN
+      CALL SelectDASHDialog(IDD_Rietveld2)
+      IF (DASHWDialogGetCheckBoxLogical(IDC_HideH4)) THEN
         DO iFrg = 1, nFrag
           DO I = 2, natoms(iFrg)
             RR_Show_bond(I,iFrg) = (zmElementCSD(I,iFrg) .NE. 2) .AND. &
@@ -270,7 +272,15 @@
           ENDIF
         ENDDO
       ENDDO
-      CALL WGridRows(iField, iRow-1)
+      ! WGridRows refuse to set 0 raw and sets ErrGridSize; 
+      ! Set to 1 raw and clear it
+      IF ( iRow .GT. 1) THEN
+        CALL WGridRows(iField, iRow-1)
+      ELSE
+        CALL WGridRows(iField, 1)
+        CALL WGridDeleteRows(iField, 1)
+        CALL WGridLabelRow(iField, 1, '')
+      ENDIF
       ! Fill the rows
       iRow = 1
       iCol = 1
@@ -297,20 +307,21 @@
 !
       SUBROUTINE Set_Show_angle
 
+      USE WINTERACTER
       USE DRUID_HEADER
       USE RRVAR
       USE ZMVAR
 
       IMPLICIT NONE
 
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
       INTEGER iFrg, i
       INTEGER iRow, iCol, iField
       INTEGER Num
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Rietveld2)
-      IF (WDialogGetCheckBoxLogical(IDC_HideH3)) THEN
+      CALL SelectDASHDialog(IDD_Rietveld2)
+      IF (DASHWDialogGetCheckBoxLogical(IDC_HideH3)) THEN
         DO iFrg = 1, nFrag
           DO I = 3, natoms(iFrg)
             RR_Show_angle(I,iFrg) = (zmElementCSD(I,iFrg) .NE. 2) .AND. &
@@ -332,7 +343,15 @@
           ENDIF
         ENDDO
       ENDDO
-      CALL WGridRows(iField, iRow-1)
+      ! WGridRows refuse to set 0 raw and sets ErrGridSize; 
+      ! Set to 1 raw and clear it
+      IF ( iRow .GT. 1) THEN
+        CALL WGridRows(iField, iRow-1)
+      ELSE
+        CALL WGridRows(iField, 1)
+        CALL WGridDeleteRows(iField, 1)
+        CALL WGridLabelRow(iField, 1, '')
+      ENDIF
       ! Fill the rows
       iRow = 1
       iCol = 1
@@ -360,20 +379,21 @@
 !
       SUBROUTINE Set_Show_torsion
 
+      USE WINTERACTER
       USE DRUID_HEADER
       USE RRVAR
       USE ZMVAR
 
       IMPLICIT NONE
 
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
       INTEGER iFrg, i
       INTEGER iRow, iCol, iField
       INTEGER Num
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Rietveld2)
-      IF (WDialogGetCheckBoxLogical(IDC_HideH2)) THEN
+      CALL SelectDASHDialog(IDD_Rietveld2)
+      IF (DASHWDialogGetCheckBoxLogical(IDC_HideH2)) THEN
         DO iFrg = 1, nFrag
           DO I = 4, natoms(iFrg)
             RR_Show_torsion(I,iFrg) = (ioptt(I,iFrg) .EQ. 1)
@@ -393,7 +413,15 @@
           ENDIF
         ENDDO
       ENDDO
-      CALL WGridRows(iField, iRow-1)
+      ! WGridRows refuse to set 0 raw and sets ErrGridSize; 
+      ! Set to 1 raw and clear it
+      IF ( iRow .GT. 1) THEN
+        CALL WGridRows(iField, iRow-1)
+      ELSE
+        CALL WGridRows(iField, 1)
+        CALL WGridDeleteRows(iField, 1)
+        CALL WGridLabelRow(iField, 1, '')
+      ENDIF
       ! Fill the rows
       iRow = 1
       iCol = 1
@@ -452,7 +480,7 @@
       CHARACTER*(15) file_name
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Rietveld2)
+      CALL SelectDASHDialog(IDD_Rietveld2)
       SELECT CASE (EventType)
         CASE (PushButton)
           SELECT CASE (EventInfo%VALUE1)
@@ -493,7 +521,7 @@
               ENDDO
 !             CALL SA_STRUCTURE_OUTPUT_PDB(0, file_name)
               CALL SA_STRUCTURE_OUTPUT_NON_OVERLAP(0, file_name)
-              CALL ViewStructure(file_name)
+              CALL ViewStructure(file_name, .FALSE.)
             CASE (IDB_Compare)
               CALL Dialog2RRVAR
               CALL RR_MAKEFRAC
@@ -525,28 +553,28 @@
               iValues = 1
               NVALUES = 100
               CALL WGridPutCheckBox(IDF_RR_ZmatrixGrid, 2, iValues, NVALUES)
-              CALL WGridGetCheckBox(IDF_RR_ZmatrixGrid, 2, iValues, NVALUES)
+              CALL DASHWGridGetCheckBox(IDF_RR_ZmatrixGrid, 2, iValues, NVALUES)
               CALL WDialogPutInteger(IDI_Num1, NVALUES)
             CASE (IDB_Set2)
               iValues = 1
               NVALUES = 100
               CALL WGridPutCheckBox(IDF_RR_TorsionGrid, 2, iValues, NVALUES)
-              CALL WGridGetCheckBox(IDF_RR_TorsionGrid, 2, iValues, NVALUES)
+              CALL DASHWGridGetCheckBox(IDF_RR_TorsionGrid, 2, iValues, NVALUES)
               CALL WDialogPutInteger(IDI_Num2, NVALUES)
             CASE (IDB_Set3)
               iValues = 1
               NVALUES = 100
               CALL WGridPutCheckBox(IDF_RR_AngleGrid, 2, iValues, NVALUES)
-              CALL WGridGetCheckBox(IDF_RR_AngleGrid, 2, iValues, NVALUES)
+              CALL DASHWGridGetCheckBox(IDF_RR_AngleGrid, 2, iValues, NVALUES)
               CALL WDialogPutInteger(IDI_Num3, NVALUES)
             CASE (IDB_Set4)
               iValues = 1
               NVALUES = 100
               CALL WGridPutCheckBox(IDF_RR_BondGrid, 2, iValues, NVALUES)
-              CALL WGridGetCheckBox(IDF_RR_BondGrid, 2, iValues, NVALUES)
+              CALL DASHWGridGetCheckBox(IDF_RR_BondGrid, 2, iValues, NVALUES)
               CALL WDialogPutInteger(IDI_Num4, NVALUES)
             CASE (IDB_PO_Settings)
-              CALL WDialogSelect(IDD_RR_PO_Dialog)
+              CALL SelectDASHDialog(IDD_RR_PO_Dialog)
               CALL WDialogShow(-1, -1, 0, SemiModeLess)
           END SELECT
         CASE (FieldChanged)
@@ -559,7 +587,7 @@
               CALL Set_Show_bond
             CASE (IDF_RR_ZmatrixGrid)
               NVALUES = 100
-              CALL WGridGetCheckBox(IDF_RR_ZmatrixGrid, 2, iValues, NVALUES)
+              CALL DASHWGridGetCheckBox(IDF_RR_ZmatrixGrid, 2, iValues, NVALUES)
               Num = 0
               DO i = 1, NVALUES
                 IF (iValues(i) .EQ. 1) Num = Num + 1
@@ -567,7 +595,7 @@
               CALL WDialogPutInteger(IDI_Num1,Num)
             CASE (IDF_RR_TorsionGrid)
               NVALUES = 100
-              CALL WGridGetCheckBox(IDF_RR_TorsionGrid, 2, iValues, NVALUES)
+              CALL DASHWGridGetCheckBox(IDF_RR_TorsionGrid, 2, iValues, NVALUES)
               Num = 0
               DO i = 1, NVALUES
                 IF (iValues(i) .EQ. 1) Num = Num + 1
@@ -575,7 +603,7 @@
               CALL WDialogPutInteger(IDI_Num2,Num)
             CASE (IDF_RR_AngleGrid)
               NVALUES = 100
-              CALL WGridGetCheckBox(IDF_RR_AngleGrid, 2, iValues, NVALUES)
+              CALL DASHWGridGetCheckBox(IDF_RR_AngleGrid, 2, iValues, NVALUES)
               Num = 0
               DO i = 1, NVALUES
                 IF (iValues(i) .EQ. 1) Num = Num + 1
@@ -583,7 +611,7 @@
               CALL WDialogPutInteger(IDI_Num3,Num)
             CASE (IDF_RR_BondGrid)
               NVALUES = 100
-              CALL WGridGetCheckBox(IDF_RR_BondGrid, 2, iValues, NVALUES)
+              CALL DASHWGridGetCheckBox(IDF_RR_BondGrid, 2, iValues, NVALUES)
               Num = 0
               DO i = 1, NVALUES
                 IF (iValues(i) .EQ. 1) Num = Num + 1
@@ -607,33 +635,33 @@
 
       IMPLICIT NONE      
 
-      LOGICAL, EXTERNAL :: Confirm, WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: Confirm, DASHWDialogGetCheckBoxLogical
       INTEGER tFieldState
       REAL ChiSqd, ChiProSqd 
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_RR_PO_Dialog)
+      CALL SelectDASHDialog(IDD_RR_PO_Dialog)
       SELECT CASE (EventType)
         CASE (PushButton)
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDOK, IDCANCEL)
               CALL WDialogHide
-              PrefParExists = WDialogGetCheckBoxLogical(IDF_Use_PO)
+              PrefParExists = DASHWDialogGetCheckBoxLogical(IDF_Use_PO)
               !C Initialise preferred orientation and recalculate pattern + chi-sqrds
               !C Initialise PO
               IF (PrefParExists) THEN
-                CALL WDialogGetInteger(IDF_PO_a, PO_Direction(1))
-                CALL WDialogGetInteger(IDF_PO_b, PO_Direction(2))
-                CALL WDialogGetInteger(IDF_PO_c, PO_Direction(3))
-                CALL WDialogSelect(IDD_Rietveld2)
-                CALL WDialogGetReal(IDR_PO, RR_PO)
+                CALL DASHWDialogGetInteger(IDF_PO_a, PO_Direction(1))
+                CALL DASHWDialogGetInteger(IDF_PO_b, PO_Direction(2))
+                CALL DASHWDialogGetInteger(IDF_PO_c, PO_Direction(3))
+                CALL SelectDASHDialog(IDD_Rietveld2)
+                CALL DASHWDialogGetReal(IDR_PO, RR_PO)
                 CALL FillSymmetry_2
                 CALL PO_PRECFC(RR_PO)
               ENDIF
               CALL RR_VALCHI(ChiSqd)
               CALL VALCHIPRO(ChiProSqd)
               !C Update the main Rietveld window
-              CALL WDialogSelect(IDD_Rietveld2)
+              CALL SelectDASHDialog(IDD_Rietveld2)
               IF (PrefParExists) THEN
                 tFieldState = Enabled
               ELSE
@@ -649,7 +677,7 @@
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDF_Use_PO)
-              IF (WDialogGetCheckBoxLogical(IDF_Use_PO)) THEN
+              IF (DASHWDialogGetCheckBoxLogical(IDF_Use_PO)) THEN
                 tFieldState = Enabled
               ELSE
                 tFieldState = Disabled
@@ -717,35 +745,35 @@
       INTEGER i, iRow, iCol, iField, iFrg
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Rietveld2)
+      CALL SelectDASHDialog(IDD_Rietveld2)
       iRow = 1
       iCol = 1
       iField = IDF_RR_ZmatrixGrid
       DO iFrg = 1, nFrag
         ! Translations
-        CALL WGridGetCellReal(iField, iCol, iRow, RR_tran(1,iFrg))
-        CALL WGridGetCellCheckBox(iField, iCol+1, iRow, RR_iopttran(1,iFrg))
+        CALL DASHWGridGetCellReal(iField, iCol, iRow, RR_tran(1,iFrg))
+        CALL DASHWGridGetCellCheckBox(iField, iCol+1, iRow, RR_iopttran(1,iFrg))
         iRow = iRow + 1
-        CALL WGridGetCellReal(iField, iCol, iRow, RR_tran(2,iFrg))
-        CALL WGridGetCellCheckBox(iField, iCol+1, iRow, RR_iopttran(2,iFrg))
+        CALL DASHWGridGetCellReal(iField, iCol, iRow, RR_tran(2,iFrg))
+        CALL DASHWGridGetCellCheckBox(iField, iCol+1, iRow, RR_iopttran(2,iFrg))
         iRow = iRow + 1
-        CALL WGridGetCellReal(iField, iCol, iRow, RR_tran(3,iFrg))
-        CALL WGridGetCellCheckBox(iField, iCol+1, iRow, RR_iopttran(3,iFrg))
+        CALL DASHWGridGetCellReal(iField, iCol, iRow, RR_tran(3,iFrg))
+        CALL DASHWGridGetCellCheckBox(iField, iCol+1, iRow, RR_iopttran(3,iFrg))
         iRow = iRow + 1
         ! Rotations
         IF (natoms(iFrg) .NE. 1) THEN
-          CALL WGridGetCellReal(iField, iCol, iRow, RR_rot(1,iFrg))
-          CALL WGridGetCellCheckBox(iField, iCol+1, iRow, RR_ioptrot(1,iFrg))
+          CALL DASHWGridGetCellReal(iField, iCol, iRow, RR_rot(1,iFrg))
+          CALL DASHWGridGetCellCheckBox(iField, iCol+1, iRow, RR_ioptrot(1,iFrg))
           iRow = iRow + 1
-          CALL WGridGetCellReal(iField, iCol, iRow, RR_rot(2,iFrg))
-          CALL WGridGetCellCheckBox(iField, iCol+1, iRow, RR_ioptrot(2,iFrg))
+          CALL DASHWGridGetCellReal(iField, iCol, iRow, RR_rot(2,iFrg))
+          CALL DASHWGridGetCellCheckBox(iField, iCol+1, iRow, RR_ioptrot(2,iFrg))
           iRow = iRow + 1
           IF (UseQuaternions(iFrg)) THEN
-            CALL WGridGetCellReal(iField, iCol, iRow, RR_rot(3,iFrg))
-            CALL WGridGetCellCheckBox(iField, iCol+1, iRow, RR_ioptrot(3,iFrg))
+            CALL DASHWGridGetCellReal(iField, iCol, iRow, RR_rot(3,iFrg))
+            CALL DASHWGridGetCellCheckBox(iField, iCol+1, iRow, RR_ioptrot(3,iFrg))
             iRow = iRow + 1
-            CALL WGridGetCellReal(iField, iCol, iRow, RR_rot(4,iFrg))
-            CALL WGridGetCellCheckBox(iField, iCol+1, iRow, RR_ioptrot(4,iFrg))
+            CALL DASHWGridGetCellReal(iField, iCol, iRow, RR_rot(4,iFrg))
+            CALL DASHWGridGetCellCheckBox(iField, iCol+1, iRow, RR_ioptrot(4,iFrg))
             iRow = iRow + 1
           ENDIF
         ENDIF
@@ -756,8 +784,8 @@
       DO iFrg = 1, nFrag
         DO i = 2, natoms(iFrg)
           IF (RR_Show_bond(i, iFrg)) THEN
-            CALL WGridGetCellReal(iField, iCol, iRow, RR_blen(i,iFrg))
-            CALL WGridGetCellCheckBox(iField, iCol+1, iRow, RR_ioptb(i,iFrg))
+            CALL DASHWGridGetCellReal(iField, iCol, iRow, RR_blen(i,iFrg))
+            CALL DASHWGridGetCellCheckBox(iField, iCol+1, iRow, RR_ioptb(i,iFrg))
             iRow = iRow + 1
           ENDIF
         ENDDO
@@ -768,8 +796,8 @@
       DO iFrg = 1, nFrag
         DO i = 3, natoms(iFrg)
           IF (RR_Show_angle(i, iFrg)) THEN
-            CALL WGridGetCellReal(iField, iCol, iRow, RR_alph(i,iFrg))
-            CALL WGridGetCellCheckBox(iField, iCol+1, iRow, RR_iopta(i,iFrg))
+            CALL DASHWGridGetCellReal(iField, iCol, iRow, RR_alph(i,iFrg))
+            CALL DASHWGridGetCellCheckBox(iField, iCol+1, iRow, RR_iopta(i,iFrg))
             iRow = iRow + 1
           ENDIF
         ENDDO
@@ -780,16 +808,16 @@
       DO iFrg = 1, nFrag
         DO i = 4, natoms(iFrg)
           IF (RR_Show_torsion(i, iFrg)) THEN
-            CALL WGridGetCellReal(iField, iCol, iRow, RR_bet(i,iFrg))
-            CALL WGridGetCellCheckBox(iField, iCol+1, iRow, RR_ioptt(i,iFrg))
+            CALL DASHWGridGetCellReal(iField, iCol, iRow, RR_bet(i,iFrg))
+            CALL DASHWGridGetCellCheckBox(iField, iCol+1, iRow, RR_ioptt(i,iFrg))
             iRow = iRow + 1
           ENDIF
         ENDDO
       ENDDO
-      CALL WDialogGetCheckBox(IDC_ITF, RR_ioptITF)
-      CALL WDialogGetReal(IDR_ITF, RR_ITF)
-      CALL WDialogGetCheckBox(IDC_PO, RR_ioptPO)
-      CALL WDialogGetReal(IDR_PO, RR_PO)
+      CALL DASHWDialogGetCheckBox(IDC_ITF, RR_ioptITF)
+      CALL DASHWDialogGetReal(IDR_ITF, RR_ITF)
+      CALL DASHWDialogGetCheckBox(IDC_PO, RR_ioptPO)
+      CALL DASHWDialogGetReal(IDR_PO, RR_PO)
       CALL PopActiveWindowID
 
       END SUBROUTINE Dialog2RRVAR
@@ -809,7 +837,7 @@
 
 ! Fill and display dialogue
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Rietveld2)
+      CALL SelectDASHDialog(IDD_Rietveld2)
       iRow = 1
       iCol = 1
       iField = IDF_RR_ZmatrixGrid
@@ -1239,7 +1267,7 @@
       REAL            f2cpdb
       COMMON /pdbcat/ f2cpdb(1:3,1:3)
 
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
       INTEGER, EXTERNAL :: WritePDBCommon, WriteCIFCommon
       INTEGER iSol
       INTEGER pdbBond(1:maxbnd_2*maxfrg,1:2)
@@ -1257,8 +1285,8 @@
       CHARACTER*(*), PARAMETER :: PDBFileName = 'Overlap_Temp.pdb', CIFFileName =  'Overlap_Temp.cif'
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Configuration)
-      tUseCif = WDialogGetCheckBoxLogical(IDC_cif_for_viewer)
+      CALL SelectDASHDialog(IDD_Configuration)
+      tUseCif = DASHWDialogGetCheckBoxLogical(IDC_cif_for_viewer)
       IF ( tUseCif ) THEN
         OPEN (UNIT=chFile, FILE=CIFFileName, STATUS='unknown', ERR=999)
         WRITE (chFile, 1036, ERR=999) '# CIF '
@@ -1273,12 +1301,12 @@
 !C! Get atom label option from dialogue. Two options: 
 !C! 1. "Element + solution #"
 !C! 2. "Original atom labels"
-!C      CALL WDialogGetRadioButton(IDF_UseSolutionNr,AtomLabelOption)
+!C      CALL DASHWDialogGetRadioButton(IDF_UseSolutionNr,AtomLabelOption)
       AtomLabelOption = 2
 !C! Get atom colour option from dialogue. Two options: 
 !C! 1. "By solution number"
 !C! 2. "By element"
-!C      CALL WDialogGetRadioButton(IDF_ColourBySolution,AtomColourOption)
+!C      CALL DASHWDialogGetRadioButton(IDF_ColourBySolution,AtomColourOption)
       AtomColourOption = 2
 
       iiact = 0
@@ -1356,9 +1384,9 @@
       WRITE (chFile,"('END')",ERR=999)
   200 CLOSE (chFile)
       IF ( tUseCif ) THEN
-        CALL ViewStructure(CIFFileName)
+        CALL ViewStructure(CIFFileName, .FALSE.)
       ELSE
-        CALL ViewStructure(PDBFileName)
+        CALL ViewStructure(PDBFileName, .FALSE.)
       ENDIF
       CALL PopActiveWindowID
       RETURN
@@ -1671,14 +1699,14 @@
       IMPLICIT NONE
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SAW_Page6a)
+      CALL SelectDASHDialog(IDD_SAW_Page6a)
       SELECT CASE (EventType)
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
               CALL WizardWindowShow(IDD_SAW_Page5)
             CASE (IDNEXT)
-              CALL WDialogGetRadioButton(IDF_RADIO1, iRietveldMethodOpt)
+              CALL DASHWDialogGetRadioButton(IDF_RADIO1, iRietveldMethodOpt)
               SELECT CASE (iRietveldMethodOpt)
                 CASE (2)
                   iRietveldMethod = FOR_TOPAS
@@ -1696,6 +1724,7 @@
                 ! External
                 ext_RR_stage = 1
                 CALL CopyPattern2Backup()
+                ext_RR_start_dialog_id = IDD_SAW_Page6a
                 CALL WizardWindowShow(IDD_RR_External)
               ENDIF
             CASE (IDCANCEL, IDCLOSE)
@@ -1722,22 +1751,61 @@
       COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
 
       INTEGER, EXTERNAL :: XtalFileOpen, XtalFileBrowse 
+      LOGICAL, EXTERNAL :: FnUnitCellOK, SDIFileOpen
       CHARACTER(MaxPathLength) SDIFile, XtalFile
       INTEGER iStat, IV, iOpt
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SAW_Page6)
+      CALL SelectDASHDialog(IDD_SAW_Page6)
       SELECT CASE (EventType)
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
 ! Go back to the first Wizard window
               CALL EndWizardPastPawley
-              CALL WDialogSelect(IDD_Polyfitter_Wizard_01)
+              CALL SelectDASHDialog(IDD_Polyfitter_Wizard_01)
               CALL WDialogPutRadioButton(IDF_PW_Option6)
               CALL WizardWindowShow(IDD_Polyfitter_Wizard_01)
-            CASE (IDNEXT)
-              CALL WDialogGetRadioButton(IDF_RADIO1, iOpt)
+            CASE (IDNEXT, IDB_Restart)
+! As Xtal file is compulsory, it may be more meaningful by calling it:
+! 'Rietveld refinement using external structure'
+!
+! Check if we have reasonable data left. If not, don't go ahead
+              IF ( .NOT. FnUnitCellOK()) THEN
+                CALL DASHWDialogGetString(IDF_SDI_File_Name, SDIFile)
+                IF (LEN_TRIM(SDIFile) .LE. 0) THEN
+                  CALL ErrorMessage('Invalid unit cell parameters.'//CHAR(13)//&
+                                    'Have you opened a SDI file?')
+                  GOTO 230
+                ENDIF
+                IF ( .NOT. SDIFileOpen(SDIFile) ) GOTO 230
+                CALL SelectDASHDialog(IDD_SAW_Page6) ! SDIFileOpen may change current selection
+              ENDIF
+              CALL DASHWDialogGetString(IDF_Xtal_File_Name, XtalFile)
+              IF (LEN_TRIM(XtalFile) .LE. 0) THEN
+                CALL ErrorMessage('Have you chosen a crystal structure file?')
+                GOTO 230
+              ENDIF
+! Redo XtalFileOpen to ensure:
+!    1. unit cell from xtal is consistent 
+!    2. SA_Parameter_Set called after .sdi
+!    3. in case user typed xtal path but not click open
+              IF (XtalFileOpen(XtalFile) .NE. 0) GOTO 230
+              IF (EventInfo%VALUE1 .EQ. IDB_Restart) THEN
+! Fill SA Parameter Bounds Wizard Window with the values from this solution.
+                CALL SelectDASHDialog(IDD_SA_Modal_input2)
+                DO IV = 1, NVAR
+                  CALL WGridPutCellReal(IDF_parameter_grid_modal, 1, IV, BestValuesDoF(IV,1))
+                ENDDO
+! Untick "Randomise initial values"
+                CALL WDialogPutCheckBoxLogical(IDF_RandomInitVal, .FALSE.)
+                ! Change mode to structure solution
+                CALL SelectMode(ID_Structure_Solution_Mode)
+                CALL ShowWizardWindowParameterBounds
+                GOTO 230
+              ENDIF !IDB_Restart
+! 
+              CALL DASHWDialogGetRadioButton(IDF_RADIO1, iOpt)
               SELECT CASE (iOpt)
                 CASE (2)
                   iRietveldMethod = FOR_TOPAS
@@ -1749,6 +1817,8 @@
                   iRietveldMethod = INTERNAL_RB
               END SELECT
               RR_SA_Sol = 1
+              ! Update SPG related global variables, eg. NOPC, cpdbops etc.
+              CALL FillSymmetry_2
               IF ( iRietveldMethod .EQ. INTERNAL_RB ) THEN
                 ! Rigid-body Rietveld refinement in DASH
                 CALL ShowWizardWindowRietveld(RR_SA_Sol)
@@ -1756,35 +1826,31 @@
                 ! External
                 ext_RR_stage = 1
                 CALL CopyPattern2Backup()
+                ext_RR_start_dialog_id = IDD_SAW_Page6
                 CALL WizardWindowShow(IDD_RR_External)
               ENDIF
+ 230          CONTINUE
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizardPastPawley
             CASE (IDB_SDI_file_Browse)
               CALL SDIFileBrowse
             CASE (IDB_SDI_file_Open)
-              CALL WDialogGetString(IDF_SDI_File_Name, SDIFile)
+              CALL DASHWDialogGetString(IDF_SDI_File_Name, SDIFile)
               CALL SDIFileOpen(SDIFile)
             CASE (IDB_xtal_file_Browse)
               iStat = XtalFileBrowse()
               CALL WDialogFieldStateLogical(IDNEXT, (iStat .EQ. 0))
               CALL WDialogFieldStateLogical(IDB_Restart, (iStat .EQ. 0))
             CASE (IDB_xtal_file_Open)
-              CALL WDialogGetString(IDF_Xtal_File_Name, XtalFile)
-              iStat = XtalFileOpen(XtalFile)
+              CALL DASHWDialogGetString(IDF_Xtal_File_Name, XtalFile)
+! XtalFileOpen return 0 even when filename string empty
+              IF (LEN_TRIM(XtalFile) .GT. 0) THEN
+                iStat = XtalFileOpen(XtalFile)
+              ELSE
+                iStat = 1
+              ENDIF
               CALL WDialogFieldStateLogical(IDNEXT, (iStat .EQ. 0))
               CALL WDialogFieldStateLogical(IDB_Restart, (iStat .EQ. 0))
-            CASE (IDB_Restart)
-! Fill SA Parameter Bounds Wizard Window with the values from this solution.
-              CALL WDialogSelect(IDD_SA_Modal_input2)
-              DO IV = 1, NVAR
-                CALL WGridPutCellReal(IDF_parameter_grid_modal, 1, IV, BestValuesDoF(IV,1))
-              ENDDO
-! Untick "Randomise initial values"
-              CALL WDialogPutCheckBoxLogical(IDF_RandomInitVal, .FALSE.)
-              ! Change mode to structure solution
-              CALL SelectMode(ID_Structure_Solution_Mode)
-              CALL ShowWizardWindowParameterBounds
           END SELECT
       END SELECT
       CALL PopActiveWindowID

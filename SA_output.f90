@@ -48,7 +48,7 @@
 
       IF ( in_batch ) &
         RETURN
-      CALL WDialogSelect(IDD_SA_Action1)
+      CALL SelectDASHDialog(IDD_SA_Action1)
       CALL WDialogPutReal(IDF_curr_temp, T, '(F8.2)')
       CALL WDialogPutReal(IDF_min_chisq, chimin, '(F8.2)')
       CALL WDialogPutReal(IDF_profile_chisq2, CHIPROBEST, '(F8.2)')
@@ -143,7 +143,7 @@
       CALL IGrArea(0.0,0.0,1.0,1.0)
 ! Following lines write values to dialogue that hasn't been loaded into memory,
 ! nor is it displayed.
-!U      CALL WDialogSelect(IDD_Parameter_Status_2)
+!U      CALL SelectDASHDialog(IDD_Parameter_Status_2)
 !U      DO I = 1, N
 !U        CALL WGridPutCellReal(IDF_CPL_grid,1,I,xopt(i),'(F12.5)')
 !U      ENDDO

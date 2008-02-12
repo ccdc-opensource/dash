@@ -42,6 +42,7 @@
       COMMON /BATEXE/ in_batch
 
       IF ( in_batch ) THEN
+        CALL AppendBatchLogFile("Error: "//TheMessage)
       ELSE
         CALL WMessageBox(OkOnly,ExclamationIcon,CommonOk,TheMessage(1:LEN_TRIM(TheMessage)),"Error")
       ENDIF
@@ -73,6 +74,7 @@
 
 !DEC$ IF DEFINED (ONTBUG)
       IF ( in_batch ) THEN
+        CALL AppendBatchLogFile("Debug error: "//TheMessage)
       ELSE
         IF (ShowAgain) THEN
           ShowAgain = Confirm('Debug error : '//TheMessage(1:LEN_TRIM(TheMessage))//CHAR(13)//'More Debug Error messages?')
@@ -132,6 +134,7 @@
       COMMON /BATEXE/ in_batch
 
       IF ( in_batch ) THEN
+        CALL AppendBatchLogFile("Warning: "//TheMessage)
       ELSE
         CALL WMessageBox(OkOnly,ExclamationIcon,CommonOk,TheMessage(1:LEN_TRIM(TheMessage)),"Warning")
       ENDIF
@@ -156,6 +159,7 @@
       COMMON /BATEXE/ in_batch
 
       IF ( in_batch ) THEN
+        CALL AppendBatchLogFile("Info: "//TheMessage)
       ELSE
         CALL WMessageBox(OkOnly,InformationIcon,CommonOk,TheMessage(1:LEN_TRIM(TheMessage)),"Info")
       ENDIF
@@ -422,6 +426,9 @@
         CASE (IDD_PW_Page8b)
           CALL DealWithWizardWindowExtDICVOL
           GOTO 10
+        CASE (IDD_PW_Page8c)
+          CALL DealWithWizardWindowMcMaille
+          GOTO 10
         CASE (IDD_PW_Page9)
           CALL DealWithWizardWindowDICVOLResults
           GOTO 10
@@ -671,9 +678,67 @@
 ! If not, Inc(StackPtr)
       WinStackPtr = WinStackPtr + 1
 ! Restore current window ID
-      CALL WDialogSelect(WinStack(WinStackPtr))
+      IF ( WinStack(WinStackPtr) .GT. 0 ) &
+        CALL SelectDASHDialog(WinStack(WinStackPtr))
 
       END SUBROUTINE PopActiveWindowID
+!
+!*****************************************************************************
+!
+      SUBROUTINE AppendBatchLogFile(TheMessage)
+
+! Append the message to log file, return on any open/write error
+! It is intended for batch mode only
+
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      CHARACTER*(*), INTENT (IN   ) :: TheMessage
+
+      CHARACTER(MaxPathLength) BatchLogName
+      COMMON /BATLOG/ BatchLogName
+
+      INTEGER, PARAMETER :: chLogFile = 119
+
+      IF (LEN_TRIM(BatchLogName) .LE. 0) &
+        RETURN
+      
+      OPEN(UNIT=chLogFile,FILE=BatchLogName,STATUS='UNKNOWN', POSITION='APPEND', ERR=99)
+      WRITE (chLogFile, '(A)', ERR=99) TRIM(TheMessage)
+ 99   CLOSE(chLogFile)
+
+      RETURN
+
+      END SUBROUTINE AppendBatchLogFile
+!
+!*****************************************************************************
+!
+      SUBROUTINE ClearBatchLogFile()
+
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      CHARACTER(MaxPathLength) BatchLogName
+      COMMON /BATLOG/ BatchLogName
+
+      INTEGER, PARAMETER :: chLogFile = 119
+      LOGICAL Exists
+
+      IF (LEN_TRIM(BatchLogName) .LE. 0) &
+        RETURN
+      
+      INQUIRE(FILE=BatchLogName, EXIST=exists)
+      IF (.NOT. exists) &
+        RETURN
+      
+      OPEN(UNIT=chLogFile,FILE=BatchLogName, STATUS='UNKNOWN', POSITION='REWIND', ERR=99)
+      ENDFILE(chLogFile, ERR=99)
+ 99   CLOSE(chLogFile)
+
+      RETURN
+      END SUBROUTINE ClearBatchLogFile
 !
 !*****************************************************************************
 !

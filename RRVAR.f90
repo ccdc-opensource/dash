@@ -6,7 +6,7 @@
       IMPLICIT NONE
 
       INTEGER     RR_MVAR
-      PARAMETER ( RR_MVAR = 200 )
+      PARAMETER ( RR_MVAR = 300 )
 
       INTEGER     RR_maxatm
       PARAMETER ( RR_maxatm = 300 )

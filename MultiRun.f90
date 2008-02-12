@@ -36,11 +36,18 @@
       REAL QQSUM, QDEN
       REAL Duonion(0:1)
 
-      CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_Summary)
-      DO iSol = 1, NumOf_SA_Runs-1
-        CALL WGridGetCellCheckBox(IDF_SA_Summary, 3, iSol, iSolTicked(iSol2Run(iSol)))
-      ENDDO
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+      IF ( .NOT. IN_BATCH ) THEN
+        CALL PushActiveWindowID
+        CALL SelectDASHDialog(IDD_Summary)
+
+        DO iSol = 1, NumOf_SA_Runs-1
+          CALL DASHWGridGetCellCheckBox(IDF_SA_Summary, 3, iSol, iSolTicked(iSol2Run(iSol)))
+        ENDDO
+
+      ENDIF
 ! Add this solution to the list
       DO I = 1, nvar
         BestValuesDoF(I,Curr_SA_Run) = XOPT(I)
@@ -100,8 +107,11 @@
       ProfileChiSqd(Curr_SA_Run) = CHIPROBEST
 ! Now sort the list according to intensity chi sqd
       CALL SORT_REAL(IntensityChiSqd, iSol2Run, NumOf_SA_Runs)
-      CALL Update_Solutions
-      CALL PopActiveWindowID
+
+      IF ( .NOT. IN_BATCH ) THEN
+        CALL Update_Solutions
+        CALL PopActiveWindowID
+      ENDIF
 
       END SUBROUTINE Log_SARun_Entry
 !
@@ -188,6 +198,47 @@
       CALL PrjReadWrite(tPrjFileName, cWrite)
 
       END SUBROUTINE SavePrjAtEnd
+!
+!*****************************************************************************
+!
+      SUBROUTINE SaveParamAtEnd
+
+      USE VARIABLES
+      USE SOLVAR
+
+      IMPLICIT NONE
+
+      INCLUDE 'PARAMS.INC'
+
+      INTEGER         Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
+      REAL                                                           ChiMult
+      COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
+
+      INTEGER                  OFBN_Len
+      CHARACTER(MaxPathLength)           OutputFilesBaseName
+      CHARACTER(3)                                            SA_RunNumberStr
+      COMMON /basnam/          OFBN_Len, OutputFilesBaseName, SA_RunNumberStr
+
+      INTEGER         nvar, ns, nt, iseed1, iseed2
+      COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
+
+      LOGICAL, EXTERNAL :: Get_SaveParamAtEnd
+      INTEGER hFile, iSol, J
+      CHARACTER(MaxPathLength) tFileName
+
+      IF (.NOT. Get_SaveParamAtEnd()) RETURN
+      hFile = 10
+      tFileName = OutputFilesBaseName(1:OFBN_Len)//'.tbl'
+      OPEN(UNIT=hFile,FILE=tFileName(1:OFBN_Len+4),ERR=999)
+      DO iSol = 1, NumOf_SA_Runs
+        WRITE(hFile,'(100(F9.4,1X))',ERR=999) (BestValuesDoF(J,iSol2Run(iSol)),J=1,nvar)
+      ENDDO
+      CLOSE(hFile)
+      RETURN
+  999 CALL ErrorMessage('Could not access parameters(.tbl) file.')
+      CLOSE(hFile)
+
+      END SUBROUTINE SaveParamAtEnd
 !
 !*****************************************************************************
 !

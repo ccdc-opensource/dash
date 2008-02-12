@@ -47,45 +47,42 @@
       LOGICAL         in_batch
       COMMON /BATEXE/ in_batch
 
+      CHARACTER(MaxPathLength) BatchLogName
+      COMMON /BATLOG/ BatchLogName
+
       in_batch = .FALSE.
+      BatchLogName = ''
+
+      CALL WInitialise(' ')
+
       IF (NARGS() .GT. 1) THEN
         CALL GetArg(1, ArgString)
         CALL StrUpperCase(ArgString)
         IF ( ArgString .EQ. "MERGE" ) THEN
-          IF ( NARGS() .EQ. 2 ) STOP
           in_batch = .TRUE.
-          CALL GetArg(2, tDirName)
-          tFileName = ""
-          IF ( NARGS() .GT. 3 ) &
-            CALL GetArg(3, tFileName)
-          CALL MergeDASHFiles(tDirName, tFileName);
+          CALL RunMerge
           STOP
         ELSE
           ExtLen = 7
           CALL FileGetExtension(ArgString, StrFileExtension, ExtLen)
           CALL StrUpperCase(StrFileExtension)
-          IF (StrFileExtension .EQ. 'DUFF   ') &
+          IF (StrFileExtension .EQ. 'DBF   ') THEN
             in_batch = .TRUE.
+            BatchLogName = TRIM(ArgString)//'.log'
+            CALL ClearBatchLogFile()
+          ENDIF
         ENDIF
       ENDIF
       first_zm_in_win = 1
 ! Initialise Winteracter
-      CALL WInitialise(' ')
+
+      CALL InitialiseDASHDialogState
+
       CALL GetInstallationDirectory
 ! Check if there are any command line arguments
 ! Try to redirect stdout - change working directory if unsuccessful
       IF (NARGS() .EQ. 0) CALL Init_StdOut
-      IF ( in_batch ) THEN
-! Open root window in hidden mode to allow dialogs being initialised properly.
-! This is required, as set in 3.1.1 of Winteracter User Guide.
-! Otherwise WDialogLoad will generate ErrLoadDialog while
-! loading most dialogs. As error-check is usually not carried out,
-! further operations on these dialogs may lead to more errors, even crash.
-        CALL WindowOpen(FLAGS = HideWindow + SysMenuOn + MinButton + MaxButton + StatusBar, X = WInfoScreen(1)/10, &
-                        Y = (WInfoScreen(2)/100) + 365, WIDTH = (WInfoScreen(1)*4)/5, &
-                        HEIGHT = (WInfoScreen(2)*3)/8, MENUID = IDR_MENU1, &
-                        TITLE = "DASH", NCOL256=128)
-      ELSE
+      IF ( .NOT. in_batch ) THEN
 ! Open root window
         CALL WindowOpen(FLAGS = SysMenuOn + MinButton + MaxButton + StatusBar, X = WInfoScreen(1)/10, &
                         Y = (WInfoScreen(2)/100) + 365, WIDTH = (WInfoScreen(1)*4)/5, &
@@ -108,15 +105,20 @@
         CALL WMessageEnable(PushButton, Enabled)
         CALL WMessageEnable(FieldChanged, Enabled)
       ENDIF
+
       CALL CheckLicence
-! Load all Winteracter dialogues into memory
-      CALL PolyFitter_UploadDialogues
+
 ! Initialise space group information
       CALL PolyFitterInitialise
-      CALL InitialiseVariables
-      CALL WMessageEnable(TabChanged, Enabled)
-      CALL WMessageEnable(MouseMove, Enabled)
+      CALL InitialiseVariables(in_batch)
+
+      IF ( .NOT. IN_BATCH ) THEN
+        CALL WMessageEnable(TabChanged, Enabled)
+        CALL WMessageEnable(MouseMove, Enabled)
+      ENDIF
+
       CALL IOsDirChange(StartUpDirectory)
+
 ! Main message loop
       IF (NARGS() .GT. 1) THEN
         CALL GetArg(1,ArgString) 
@@ -130,7 +132,7 @@
         SELECT CASE (StrFileExtension)
           CASE ('DASH   ')
             CALL PrjFileOpen(ArgString)
-          CASE ('DUFF   ')
+          CASE ('DBF   ')
             CALL BatchMode(ArgString)
           CASE ('ZMATRIX')
             iFrg = 1
@@ -146,7 +148,8 @@
             CALL SDIFileOpen(ArgString)
             CALL ShowWizardWindowZmatrices
           CASE ('PDB    ', 'MOL    ', 'MOL2   ', 'ML2    ', 'MDL    ', 'RES    ', 'XYZ    ', 'CSSR   ', 'CIF    ')
-            CALL WDialogSelect(IDD_SAW_Page1)
+            CALL ViewStructure(ArgString, .TRUE.)
+            CALL SelectDASHDialog(IDD_SAW_Page1)
             iFrg = 1
             CALL zmConvert(ArgString, tNumZMatrices, tZmatrices)
             IF (tNumZMatrices .EQ. 0) GOTO 999
@@ -174,7 +177,7 @@
           CASE ('RAW    ', 'CPI    ', 'DAT    ', 'TXT    ', 'MDI    ', 'POD    ', &
                 'RD     ', 'SD     ', 'UDF    ', 'UXD    ', 'XYE    ', 'X01    ', 'ASC    ')
             iDummy = DiffractionFileOpen(ArgString)
-            CALL WDialogSelect(IDD_PW_Page3)
+            CALL SelectDASHDialog(IDD_PW_Page3)
             CALL WDialogFieldStateLogical(IDNEXT,FnPatternOK())
             CALL WDialogFieldStateLogical(IDB_Bin, FnPatternOK())
             CALL WizardWindowShow(IDD_PW_Page3)
@@ -218,7 +221,7 @@
       COMMON /PROFIPM/ IPMIN, IPMAX, iStart, iStop, nPoints
 
       LOGICAL, EXTERNAL :: Confirm
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
       INTEGER, EXTERNAL :: DiffractionFileBrowse
       REAL xpgdif, ypgdif
       INTEGER ISTAT, tInt1, tInt2
@@ -234,12 +237,12 @@
           CALL SDIFileBrowse
         CASE (ID_Remove_Background)
           CALL PushActiveWindowID
-          CALL WDialogLoad(IDD_Background_Fit)
+          CALL LoadDASHDialog(IDD_Background_Fit)
 ! Initialise the background
-          CALL WDialogGetInteger(IDF_NumOfIterations, tInt2)
-          CALL WDialogGetInteger(IDF_WindowWidth, tInt1)
+          CALL DASHWDialogGetInteger(IDF_NumOfIterations, tInt2)
+          CALL DASHWDialogGetInteger(IDF_WindowWidth, tInt1)
           CALL CalculateBackground(tInt1, tInt2, &
-                                   WDialogGetCheckBoxLogical(IDF_UseMCYN), &
+                                   DASHWDialogGetCheckBoxLogical(IDF_UseMCYN), &
                                    .FALSE., 5)
           CALL Profile_Plot
           CALL WDialogShow(-1, -1, 0, Modeless)
@@ -254,12 +257,12 @@
           CALL WExit
         CASE (ID_Plot_Options)
           CALL PushActiveWindowID
-          CALL WDialogSelect(IDD_Plot_Option_Dialog)
+          CALL SelectDASHDialog(IDD_Plot_Option_Dialog)
           CALL WDialogShow(-1, -1, 0, Modeless)
           CALL PopActiveWindowID
         CASE (ID_Configuration)
           CALL PushActiveWindowID
-          CALL WDialogSelect(IDD_Configuration)
+          CALL SelectDASHDialog(IDD_Configuration)
           CALL WDialogShow(-1, -1, 0, Modeless)
           CALL PopActiveWindowID
         CASE (ID_Peak_Fitting_Mode)
@@ -270,7 +273,7 @@
           CALL ShowWizardWindowZmatrices
         CASE (IDB_AnalyseSolutions)
           CALL SelectMode(IDB_AnalyseSolutions)
-          CALL WDialogSelect(IDD_Polyfitter_Wizard_01)
+          CALL SelectDASHDialog(IDD_Polyfitter_Wizard_01)
           CALL WDialogPutRadioButton(IDF_PW_Option4)
           CALL WizardWindowShow(IDD_SAW_Page5)
         CASE (ID_FitPeaks)
@@ -281,31 +284,31 @@
           CALL Clear_UnitCell_WithConfirmation
         CASE (ID_get_crystal_symmetry)
           CALL PushActiveWindowID
-          CALL WDialogSelect(IDD_Structural_Information)
+          CALL SelectDASHDialog(IDD_Structural_Information)
           CALL WDialogShow(-1, -1, 0, Modeless)
           CALL WDialogSetTab(IDF_Structural_Information_tab, IDD_Crystal_Symmetry)
           CALL PopActiveWindowID
         CASE (ID_get_data_properties)
           CALL PushActiveWindowID
-          CALL WDialogSelect(IDD_Structural_Information)
+          CALL SelectDASHDialog(IDD_Structural_Information)
           CALL WDialogShow(-1, -1, 0, Modeless)
           CALL WDialogSetTab(IDF_Structural_Information_tab, IDD_Data_Properties)
           CALL PopActiveWindowID
         CASE (ID_get_peak_positions)
           CALL PushActiveWindowID
-          CALL WDialogSelect(IDD_Structural_Information)
+          CALL SelectDASHDialog(IDD_Structural_Information)
           CALL WDialogShow(-1, -1, 0, Modeless)
           CALL WDialogSetTab(IDF_Structural_Information_tab, IDD_Peak_Positions)
           CALL PopActiveWindowID
         CASE (ID_get_peak_widths)
           CALL PushActiveWindowID
-          CALL WDialogSelect(IDD_Structural_Information)
+          CALL SelectDASHDialog(IDD_Structural_Information)
           CALL WDialogShow(-1, -1, 0, Modeless)
           CALL WDialogSetTab(IDF_Structural_Information_tab, IDD_Peak_Widths)
           CALL PopActiveWindowID
         CASE (IDM_ViewPawley)
           CALL PushActiveWindowID
-          CALL WDialogSelect(IDD_Structural_Information)
+          CALL SelectDASHDialog(IDD_Structural_Information)
           CALL WDialogShow(-1, -1, 0, Modeless)
           CALL WDialogSetTab(IDF_Structural_Information_tab, IDD_ViewPawley)
           CALL PopActiveWindowID
@@ -347,7 +350,7 @@
           CALL Profile_Plot 
         CASE (ID_PolyFitter_Help)
           CALL LaunchHelp
-        CASE (ID_Tutorial_1, ID_Tutorial_2, ID_Tutorial_3, ID_Tutorial_4, ID_Tutorial_5)
+        CASE (ID_Tutorial_1, ID_Tutorial_2, ID_Tutorial_3, ID_Tutorial_4, ID_Tutorial_5, ID_Tutorial_6)
           CALL LaunchTutorial(EventInfo%VALUE1)
         CASE (ID_help_about_Polyfitter)
           CALL About
@@ -404,11 +407,28 @@
 
       USE WINTERACTER
       USE VARIABLES
-
+      use kernel32
+      use dfwinty
+ 
       IMPLICIT NONE
 
-      CALL WHelpFile(InstallationDirectory(1:LEN_TRIM(InstallationDirectory))// &
-       'Documentation'//DIRSPACER//'Manual'//DIRSPACER//'DASH User Guide.chm')
+      CHARACTER(MaxPathLength) WorkingDir
+      CHARACTER(MaxPathLength) ManualDir
+
+      INTEGER d
+
+      CALL IOsDirName(WorkingDir)
+
+      ManualDir = TRIM(InstallationDirectory)//&
+                  'Documentation'//DIRSPACER//&
+                  'manual'//DIRSPACER//'portable_html'
+
+      CALL IOsDirChange(TRIM(ManualDir))      
+
+     
+      d=WinExec('cmd /c "TOC.html" 'C,SW_HIDE)
+
+      CALL IOsDirChange(TRIM(WorkingDir))
 
       END SUBROUTINE LaunchHelp
 !
@@ -428,11 +448,13 @@
 
       CABOUT = 'DASH: A structure solution package for X-ray powder '//CHAR(13)//&
                'diffraction, developed and distributed in collaboration'//CHAR(13)//&
-               'between the ISIS Facility of the Rutherford Appleton'//CHAR(13)//&
-               'Laboratory and the Cambridge Crystallographic Data Centre.'//CHAR(13)//&
+               'between the Council for the Central Laboratory of the Research '//CHAR(13)//&
+               'Councils (CCLRC) at the ISIS Facility of the Rutherford Appleton '//CHAR(13)//&
+               'Laboratory and CCDC Software Ltd. (CCDC).'//CHAR(13)//&
+               CHAR(13)//&
                'Access to this software product is permitted only under the'//CHAR(13)//&
                'terms and conditions of a valid software licence, obtainable'//CHAR(13)//&
-               'from the Cambridge Crystallographic Data Centre.'//CHAR(13)//&
+               'from the CCDC Software Ltd.'//CHAR(13)//&
                CHAR(13)//&
                'Reference:'//CHAR(13)//&
                'W.I.F. David, K. Shankland, J. van de Streek, E. Pidcock,'//CHAR(13)//&
@@ -442,11 +464,14 @@
       tLen = LEN_TRIM(CABOUT)
 !DEC$ IF DEFINED (ONTBUG)
       CABOUT = CABOUT(1:tLen)//' (Debug version)'
-      tLen = LEN_TRIM(CABOUT)
+!DEC$ ELSE
+      CABOUT = CABOUT(1:tLen)//' Release'
 !DEC$ ENDIF
+      tLen = LEN_TRIM(CABOUT)
       CABOUT = CABOUT(1:tLen)//CHAR(13)//CHAR(13)//&
-               'Copyright November 2007'
-      CALL WMessageBox(OkOnly, InformationIcon, CommonOk, CABOUT, 'About DASH')
+               'Copyright CCDC and CCLRC, February 2008'//CHAR(13)//CHAR(13)//&
+               'Licence file:'//CHAR(13)
+      CALL WMessageBox(OkOnly, InformationIcon, CommonOk, TRIM(CABOUT)//TRIM(PathToLicenseFile), 'About DASH')
 
       END SUBROUTINE About
 !
@@ -515,3 +540,43 @@
 !
 !*****************************************************************************
 !
+
+      SUBROUTINE RunMerge
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+      USE DFLIB
+      USE ZMVAR
+
+      IMPLICIT NONE
+
+      INTEGER iLen
+      CHARACTER(MaxPathLength) tDirName, tFileName
+
+      CALL IOsDirName(tDirName)          
+          
+      IF ( NARGS() .EQ. 2 ) THEN 
+
+        CALL WSelectDir(DirChange,tDirName,"Select Input Directory")
+        IF (WInfoDialog(4).NE.IDOK) RETURN
+      ELSE
+        CALL GetArg(2, tDirName)
+      ENDIF
+
+      tFileName = ""
+      IF ( NARGS() .GT. 3 ) THEN
+        CALL GetArg(3, tFileName)
+      ELSE
+        iLen = LEN_TRIM(tDirName)
+        IF ( tDirName(iLen:iLen) .NE. "\" ) &
+          tDirName = tDirName(1:iLen)//"\"
+
+        tFileName = tDirName(1:LEN_TRIM(tDirName))//"output.dash"
+        CALL WSelectFile("*.dash",SaveDialog + NonExPath + DirChange + AppendExt,tFileName,"Selct Output File" )
+        IF (WInfoDialog(4) .NE. IDOK ) RETURN          
+      ENDIF
+
+      CALL MergeDASHFiles(tDirName, tFileName);
+
+      END SUBROUTINE

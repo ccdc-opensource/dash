@@ -16,7 +16,7 @@
       CHARACTER(3)                                            SA_RunNumberStr
       COMMON /basnam/          OFBN_Len, OutputFilesBaseName, SA_RunNumberStr
 
-      LOGICAL, EXTERNAL :: CheckTOPASFileName, WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: CheckTOPASFileName, DASHWDialogGetCheckBoxLogical
       INTEGER, EXTERNAL :: WriteTOPASFilePawley, WriteGSASFiles, Launch_GSAS
       INTEGER, EXTERNAL :: WriteRIETANFiles, Launch_RIETAN
       CHARACTER(LEN=45) :: FILTER
@@ -27,7 +27,7 @@
       ext_RR_stage = 1
       SELECT CASE ( iRietveldMethod ) 
         CASE ( FOR_TOPAS )
-          CALL WDialogGetInteger(IDF_BKG_TERM_TOPAS, NumOfBkgTerm)
+          CALL DASHWDialogGetInteger(IDF_BKG_TERM_TOPAS, NumOfBkgTerm)
           ext_RR_input_file_name = TRIM(OutputFilesBaseName)//'.inp'
 !         CALL CheckTOPASFileName(ext_RR_input_file_name)
           FILTER = 'TOPAS input file (*.inp)|*.inp|'
@@ -38,7 +38,7 @@
 !                              "DASH has replaced these by underscores.")
           IF ( WriteTOPASFilePawley(ext_RR_input_file_name) .EQ. 0 ) THEN
             ext_RR_stage = ext_RR_stage + 1
-            CALL WDialogSelect(IDD_SAW_Page7_TOPAS)
+            CALL SelectDASHDialog(IDD_SAW_Page7_TOPAS)
             CALL WDialogPutString(IDF_Ext_RR_inp_file_name, ext_RR_input_file_name)
             CALL WDialogPutCheckBoxLogical(IDC_UseDASHRecommendation, .TRUE.)
             CALL WDialogFieldState(IDC_Anisotropic_broadening, Enabled)
@@ -52,20 +52,20 @@
           ENDIF
         ENDIF
       CASE ( FOR_GSAS )
-        CALL WDialogGetInteger(IDF_BKG_TERM_GSAS, NumOfBkgTerm)
+        CALL DASHWDialogGetInteger(IDF_BKG_TERM_GSAS, NumOfBkgTerm)
         ext_RR_input_file_name = TRIM(OutputFilesBaseName)//'.exp'
         FILTER = 'GSAS exp file (*.exp)|*.exp|'
         CALL WSelectFile(FILTER, iFlags, ext_RR_input_file_name, 'Save GSAS exp file')
         IF ((WinfoDialog(4) .EQ. CommonOk) .AND. (LEN_TRIM(ext_RR_input_file_name) .NE. 0)) THEN
           CALL SplitPath(ext_RR_input_file_name, tDirName, tFileName)
           IF ( scan(TRIM(tFileName), ' ') .NE. 0 ) GOTO 999
-          CALL WDialogSelect(IDD_SAW_Page7_GSAS)
+          CALL SelectDASHDialog(IDD_SAW_Page7_GSAS)
           CALL UpdateGSASCheckBoxes()
           CALL WDialogPutInteger(IDF_NCYCL, 3)
           IF ( WriteGSASFiles(ext_RR_input_file_name) .EQ. 0 ) THEN
             IF ( Launch_GSAS(ext_RR_input_file_name, .FALSE.) .EQ. 0 ) THEN
               ext_RR_stage = ext_RR_stage + 1
-              CALL WDialogSelect(IDD_SAW_Page7_GSAS)
+              CALL SelectDASHDialog(IDD_SAW_Page7_GSAS)
               CALL WDialogPutString(IDF_Ext_RR_inp_file_name, ext_RR_input_file_name)
               CALL WDialogPutCheckBoxLogical(IDC_UseDASHRecommendation, .TRUE.)
               CALL UpdateGSASCheckBoxes()
@@ -79,9 +79,9 @@
           ENDIF
         ENDIF
       CASE ( FOR_RIETAN )
-!        CALL WDialogSelect(IDD_PW_Page6)
-        CALL WDialogGetInteger(IDF_BKG_TERM_RIETAN, NumOfBkgTerm)
-        IF ( .NOT. Rietan_FP .AND. WDialogGetCheckBoxLogical(IDF_SubtractBackground) ) THEN
+!        CALL SelectDASHDialog(IDD_PW_Page6)
+        CALL DASHWDialogGetInteger(IDF_BKG_TERM_RIETAN, NumOfBkgTerm)
+        IF ( .NOT. Rietan_FP .AND. DASHWDialogGetCheckBoxLogical(IDF_SubtractBackground) ) THEN
           CALL WMessageBox(YesNo, ExclamationIcon, CommonNo, &
                'As RIETAN-2000 .int file does not include ESD data,'//CHAR(13)// &
                'subtracting background will affect counting statistics.'//CHAR(13)// &
@@ -92,13 +92,13 @@
         FILTER = 'RIETAN ins file (*.ins)|*.ins|'
         CALL WSelectFile(FILTER, iFlags, ext_RR_input_file_name, 'Save RIETAN ins file')
         IF ((WinfoDialog(4) .EQ. CommonOk) .AND. (LEN_TRIM(ext_RR_input_file_name) .NE. 0)) THEN
-          CALL WDialogSelect(IDD_SAW_Page7_RIETAN)
+          CALL SelectDASHDialog(IDD_SAW_Page7_RIETAN)
           CALL UpdateRIETANCheckBoxes()
           CALL WDialogPutInteger(IDF_NCYCL, 10)
           IF ( WriteRIETANFiles(ext_RR_input_file_name) .EQ. 0 ) THEN
             IF ( Launch_RIETAN(ext_RR_input_file_name) .EQ. 0 ) THEN
               ext_RR_stage = ext_RR_stage + 1
-              CALL WDialogSelect(IDD_SAW_Page7_RIETAN)
+              CALL SelectDASHDialog(IDD_SAW_Page7_RIETAN)
               CALL WDialogPutString(IDF_Ext_RR_inp_file_name, ext_RR_input_file_name)
               CALL WDialogPutCheckBoxLogical(IDC_UseDASHRecommendation, .TRUE.)
               CALL UpdateRIETANCheckBoxes()
@@ -130,23 +130,30 @@
 
       IMPLICIT NONE
 
+      CHARACTER(MaxPathLength) tFileName
+
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_RR_External)
+      CALL SelectDASHDialog(IDD_RR_External)
       SELECT CASE (EventType)
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
-              CALL WizardWindowShow(IDD_SAW_Page6a)
+              CALL CopyBackup2Pattern()
+              iRietveldMethod = INTERNAL_RB
+              CALL WizardWindowShow(ext_RR_start_dialog_id)
             CASE (IDCANCEL, IDCLOSE)
-              IF ( iRietveldMethod .NE. INTERNAL_RB ) THEN
-                CALL CopyBackup2Pattern()
-                iRietveldMethod = INTERNAL_RB
-              ENDIF
+              CALL CopyBackup2Pattern()
+              iRietveldMethod = INTERNAL_RB
               CALL EndWizardPastPawley
             CASE (IDNEXT)
-!              iRietveldMethod = FOR_TOPAS
               ext_RR_stage = 1
               CALL WizardWindowShow(IDD_PW_Page3)
+              CALL DASHWDialogGetString(IDF_PWa_DataFileName_String, tFileName)
+              IF (LEN_TRIM(tFileName) .GT. 0) THEN
+                CALL WDialogFieldState(IDNEXT, Enabled)
+              ELSE
+                CALL WDialogFieldState(IDNEXT, Disabled)
+              ENDIF
           END SELECT
       END SELECT
       CALL PopActiveWindowID
@@ -177,7 +184,7 @@
       COMMON /TAPROFOBS/ TALAMBDA, TARADIATION, TANOBS, TAXOBS(MOBS), TAYOBS(MOBS), TAEOBS(MOBS)
 
       INTEGER ExtLength
-      CHARACTER(MaxPathLength) tDirName, tFileNameRoot
+      CHARACTER(MaxPathLength) tDirName, tFileName
       CHARACTER*8 tExtension
       LOGICAL exists
 
@@ -190,53 +197,58 @@
       TARADIATION = JRadOption
       old_NumOfRef = NumOfRef 
       NumOfRef = 0
+      old_FNAME = FNAME
       CALL Profile_Plot
       CALL PushActiveWindowID
       ! Must clear old file name and grey out the 'Next' button
-      CALL WDialogSelect(IDD_PW_Page3)
-      CALL WDialogGetString(IDF_PWa_DataFileName_String, old_diffraction_data_file_name)
+      CALL SelectDASHDialog(IDD_PW_Page3)
+      CALL DASHWDialogGetString(IDF_PWa_DataFileName_String, old_diffraction_data_file_name)
 !      CALL WDialogClearField(IDF_PWa_DataFileName_String)
-      IF ( LEN_TRIM(old_diffraction_data_file_name) .GT. 0 ) THEN
-        ExtLength = MIN(LEN_TRIM(old_diffraction_data_file_name), LEN(tExtension))
-        CALL SplitPath2(old_diffraction_data_file_name, tDirName, tFileNameRoot, &
-                        tExtension, ExtLength)
-        IF ( tExtension .EQ. 'dash' ) THEN
-          tFileNameRoot = TRIM(tFileNameRoot)//'.xye'
-          INQUIRE(FILE=tFileNameRoot, EXIST=exists)
-          IF ( .NOT. exists ) tFileNameRoot = ' '
-          CALL WDialogPutString(IDF_PWa_DataFileName_String, TRIM(tFileNameRoot))
-        ENDIF
-      ELSE IF ( LEN_TRIM(DashRawFile) .GT. 0 ) THEN
-        CALL WDialogPutString(IDF_PWa_DataFileName_String, DashRawFile)
+      ExtLength = MIN(LEN_TRIM(FNAME), LEN(tExtension))
+      CALL SplitPath2(FNAME, tDirName, tFileName, tExtension, ExtLength)
+      tFileName = TRIM(tDirName)//tFileName
+      IF (tExtension .EQ. 'dash') THEN
+        tFileName = TRIM(tFileName)//'.xye' ! try xye file
+        INQUIRE(FILE=tFileName, EXIST=exists)
+        IF ( .NOT. exists ) tFileName = ' '
+      ELSE IF (tExtension .EQ. 'sdi') THEN
+        tFileName = DashRawFile
       ENDIF
-      CALL WDialogFieldState(IDNEXT, Disabled)
+      CALL WDialogPutString(IDF_PWa_DataFileName_String, TRIM(tFileName))
+      IF (LEN_TRIM(tFileName) .GT. 0) THEN
+        CALL WDialogFieldState(IDNEXT, Enabled)
+      ELSE
+        CALL WDialogFieldState(IDNEXT, Disabled)
+      ENDIF
       ! Uncheck the "Truncate pattern at end" checkbox (but we don't store its current state)
-      CALL WDialogSelect(IDD_PW_Page5)
+      CALL SelectDASHDialog(IDD_PW_Page5)
       CALL WDialogPutCheckBoxLogical(IDF_TruncateEndYN, .FALSE.)
       CALL WDialogFieldState(IDF_Max2Theta, Disabled)
       CALL WDialogFieldState(IDF_MaxResolution, Disabled)
       CALL WDialogFieldState(IDB_Convert, Disabled)
       ! Enable the "Monochromated" checkbox
-      CALL WDialogSelect(IDD_PW_Page4)
+      CALL SelectDASHDialog(IDD_PW_Page4)
       CALL WDialogFieldState(IDC_Monochromated, Enabled)
-      CALL WDialogSelect(IDD_PW_Page6)
+      IF ( iRietveldMethod .EQ. FOR_GSAS  ) &
+        CALL WDialogFieldState(IDF_GSAS_Import_ins, Enabled)
+      CALL SelectDASHDialog(IDD_PW_Page6)
       ! Save "Subtract background" checkbox
-      CALL WDialogGetCheckBox(IDF_SubtractBackground, old_SubtractBkg)
-      ! Uncheck and disable "Subtract background" checkbox for Rietan-2000
+      CALL DASHWDialogGetCheckBox(IDF_SubtractBackground, old_SubtractBkg)
+      CALL WDialogPutCheckBox(IDF_SubtractBackground, Unchecked)
+      ! Disable "Subtract background" checkbox for Rietan-2000
       IF ( iRietveldMethod .EQ. FOR_RIETAN .AND. ( .NOT. Rietan_FP ) ) THEN
-        CALL WDialogPutCheckBox(IDF_SubtractBackground, Unchecked)
         CALL WDialogFieldState(IDF_SubtractBackground, Disabled)
-        CALL WDialogFieldState(IDF_LABEL7, Disabled)
-        CALL WDialogFieldState(IDF_NumOfIterations, Disabled)
-        CALL WDialogFieldState(IDF_LABEL8, Disabled)
-        CALL WDialogFieldState(IDF_WindowWidth, Disabled)
-        CALL WDialogFieldState(IDF_UseMCYN, Disabled)
-        CALL WDialogFieldState(IDB_Preview, Disabled)
-        CALL WDialogFieldState(IDAPPLY, Disabled)
-        CALL WDialogFieldState(IDF_UseSmooth, Disabled)
-        CALL WDialogFieldState(IDF_LABEL3, Disabled)
-        CALL WDialogFieldState(IDF_SmoothWindow, Disabled)
       ENDIF
+      CALL WDialogFieldState(IDF_LABEL7, Disabled)
+      CALL WDialogFieldState(IDF_NumOfIterations, Disabled)
+      CALL WDialogFieldState(IDF_LABEL8, Disabled)
+      CALL WDialogFieldState(IDF_WindowWidth, Disabled)
+      CALL WDialogFieldState(IDF_UseMCYN, Disabled)
+      CALL WDialogFieldState(IDB_Preview, Disabled)
+      CALL WDialogFieldState(IDAPPLY, Disabled)
+      CALL WDialogFieldState(IDF_UseSmooth, Disabled)
+      CALL WDialogFieldState(IDF_LABEL3, Disabled)
+      CALL WDialogFieldState(IDF_SmoothWindow, Disabled)
 ! Show bkg term
       IF ( iRietveldMethod .EQ. FOR_TOPAS ) THEN
        CALL WDialogFieldState(IDF_LABEL4, Enabled)
@@ -260,6 +272,7 @@
       USE WINTERACTER
       USE TAVAR
       USE REFVAR
+      USE VARIABLES
 
       IMPLICIT NONE
 
@@ -269,6 +282,10 @@
       INTEGER          NOBS
       REAL                   XOBS,       YOBS,       EOBS
       COMMON /PROFOBS/ NOBS, XOBS(MOBS), YOBS(MOBS), EOBS(MOBS)
+
+      INTEGER                BackupNOBS
+      REAL                               BackupXOBS,       BackupYOBS,       BackupEOBS
+      COMMON /BackupPROFOBS/ BackupNOBS, BackupXOBS(MOBS), BackupYOBS(MOBS), BackupEOBS(MOBS)
 
       REAL               TALAMBDA
       INTEGER                      TARADIATION, TANOBS
@@ -285,23 +302,30 @@
       XOBS(1:NOBS) = TAXOBS(1:NOBS)
       YOBS(1:NOBS) = TAYOBS(1:NOBS)
       EOBS(1:NOBS) = TAEOBS(1:NOBS)
+      BackupXOBS(1:NOBS) = XOBS(1:NOBS)
+      BackupYOBS(1:NOBS) = YOBS(1:NOBS)
+      BackupEOBS(1:NOBS) = EOBS(1:NOBS)
+      BackupNOBS = NOBS
       ALambda = TALAMBDA
       JRadOption = TARADIATION
       NumOfRef = old_NumOfRef
+      FNAME = old_FNAME
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_PW_Page3)
+      CALL WindowOutStatusBar(1, FNAME)
+      CALL SelectDASHDialog(IDD_PW_Page3)
       CALL WDialogPutString(IDF_PWa_DataFileName_String, old_diffraction_data_file_name)
-      CALL WDialogSelect(IDD_PW_Page5)
+      CALL SelectDASHDialog(IDD_PW_Page5)
       CALL WDialogPutCheckBoxLogical(IDF_TruncateEndYN, .TRUE.)
       CALL WDialogFieldState(IDF_Max2Theta, Enabled)
       CALL WDialogFieldState(IDF_MaxResolution, Enabled)
       CALL WDialogFieldState(IDB_Convert, Enabled)
       ! Disable the "Monochromated" checkbox
-      CALL WDialogSelect(IDD_PW_Page4)
+      CALL SelectDASHDialog(IDD_PW_Page4)
       CALL WDialogPutCheckBox(IDC_Monochromated, Checked)
       CALL WDialogFieldState(IDC_Monochromated, Disabled)
+      CALL WDialogFieldState(IDF_GSAS_Import_ins, DialogHidden)
       ! Restore "Subtract background" checkbox
-      CALL WDialogSelect(IDD_PW_Page6)
+      CALL SelectDASHDialog(IDD_PW_Page6)
       CALL WDialogPutCheckBox(IDF_SubtractBackground, old_SubtractBkg)
       tFieldState = Enabled
       IF ( old_SubtractBkg .EQ. Unchecked ) tFieldState = Disabled
@@ -697,7 +721,7 @@
       tFileName = TRIM(tDirName)//TRIM(tFileName)//ext_str
       INQUIRE(FILE=tFileName, EXIST=exists)
       IF ( .NOT. exists ) GOTO 999
-      CALL ViewStructure(tFileName)
+      CALL ViewStructure(tFileName, .FALSE.)
       RETURN
 999   CALL ErrorMessage('DASH could not launch viewer because the required file does not '//&
                         'exist:'//CHAR(13)//&
@@ -708,6 +732,36 @@
       RETURN
 
       END SUBROUTINE Launch_Viewer
+!
+!*****************************************************************************
+!
+      LOGICAL FUNCTION IsConstantStepWidth(max_diff)
+
+      IMPLICIT NONE
+
+      REAL, INTENT (IN   ) :: max_diff
+
+      INCLUDE 'PARAMS.INC'
+
+      INTEGER          NBIN, LBIN
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS), AVGESD
+
+      INTEGER I
+      REAL width_1
+
+      IsConstantStepWidth = .FALSE.
+      IF (NBIN .GE. 3) THEN
+        width_1 = XBIN(2) - XBIN(1)
+        DO I = 3, NBIN
+          IF (ABS(XBIN(I) - XBIN(I-1) - width_1) .GT. max_diff) RETURN
+        ENDDO
+      ENDIF
+      IsConstantStepWidth = .TRUE.
+
+      RETURN
+
+      END FUNCTION IsConstantStepWidth
 !
 !*****************************************************************************
 !

@@ -44,13 +44,13 @@
       CALL WMenuSetState(ID_import_xye_file, ItemEnabled, WintOff)
 ! Make unit cell etc. read only under 'View' 
       CALL Upload_Cell_Constants
-      CALL WDialogSelect(IDD_Crystal_Symmetry)
+      CALL SelectDASHDialog(IDD_Crystal_Symmetry)
       CALL WDialogFieldState(IDF_Space_Group_Menu, DialogReadOnly)
       CALL WDialogFieldState(IDF_Crystal_System_Menu, DialogReadOnly)
       CALL WDialogFieldState(IDF_ZeroPoint, DialogReadOnly)
       CALL WDialogFieldState(IDAPPLY, DialogReadOnly)
       CALL WDialogFieldState(IDB_Delabc, Disabled)
-      CALL WDialogSelect(IDD_Data_Properties)
+      CALL SelectDASHDialog(IDD_Data_Properties)
       CALL WDialogFieldState(IDAPPLY, DialogReadOnly)
       CALL WDialogFieldState(IDF_wavelength1, DialogReadOnly)
       CALL WDialogFieldState(IDF_Wavelength_Menu, DialogReadOnly)
@@ -58,9 +58,9 @@
       CALL WDialogFieldState(IDF_SynX_Source, DialogReadOnly)
       CALL WDialogFieldState(IDF_CWN_Source, DialogReadOnly)
       CALL WDialogFieldState(IDF_TOF_source, DialogReadOnly)
-      CALL WDialogSelect(IDD_Peak_Positions)
+      CALL SelectDASHDialog(IDD_Peak_Positions)
       CALL WDialogFieldState(ID_Index_Output, DialogReadOnly)
-      CALL WDialogSelect(IDD_ViewPawley)
+      CALL SelectDASHDialog(IDD_ViewPawley)
       CALL WDialogFieldState(IDF_Sigma1, DialogReadOnly)
       CALL WDialogFieldState(IDF_Sigma2, DialogReadOnly)
       CALL WDialogFieldState(IDF_Gamma1, DialogReadOnly)
@@ -104,7 +104,7 @@
                      first_zm_in_win
 
       INTEGER, EXTERNAL :: Read_One_Zm
-      LOGICAL, EXTERNAL :: Confirm, WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: Confirm, DASHWDialogGetCheckBoxLogical
       INTEGER        iFlags
       INTEGER        zmread
       INTEGER        iFrg, iSelection, DelFrg
@@ -120,7 +120,7 @@
       COMMON /RESUMESA/ Resume_SA
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SAW_Page1)
+      CALL SelectDASHDialog(IDD_SAW_Page1)
       SELECT CASE (EventType)
         CASE (PushButton)
           SELECT CASE (EventInfo%VALUE1)
@@ -134,8 +134,8 @@
 ! Grey out 'Load DASH Pawley file' button on toolbar
               CALL WMenuSetState(ID_import_dpj_file, ItemEnabled, WintOff)
 ! If the user has requested preferred orientation, make sure we pass the pertinent Wizard window
-              CALL WDialogSelect(IDD_SAW_Page2)
-              IF ((EventInfo%VALUE1 .EQ. IDB_PO) .OR. WDialogGetCheckBoxLogical(IDF_Use_PO)) THEN
+              CALL SelectDASHDialog(IDD_SAW_Page2)
+              IF ((EventInfo%VALUE1 .EQ. IDB_PO) .OR. DASHWDialogGetCheckBoxLogical(IDF_Use_PO)) THEN
                 CALL WizardWindowShow(IDD_SAW_Page2)
               ELSE
                 CALL SA_Parameter_Set
@@ -148,7 +148,7 @@
             CASE (IDB_SA_Project_Browse)
               CALL SDIFileBrowse
             CASE (IDB_SA_Project_Open)
-              CALL WDialogGetString(IDF_SA_Project_Name, SDIFile)
+              CALL DASHWDialogGetString(IDF_SA_Project_Name, SDIFile)
               CALL SDIFileOpen(SDIFile)
             CASE (IDB_zmDelete1, IDB_zmDelete2, IDB_zmDelete3, IDB_zmDelete4)
               IF (Confirm('Do you want to clear this Z-matrix?')) THEN
@@ -267,7 +267,7 @@
 
       INTEGER I, BondNr
 
-      CALL WDialogSelect(IDD_zmEdit)
+      CALL SelectDASHDialog(IDD_zmEdit)
       CurrentlyEditedFrag = iFrg
 ! Make temporary copy
       CALL zmCopy(iFrg,0)
@@ -316,14 +316,14 @@
       CHARACTER(MaxPathLength) temp_file
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_zmEdit)
+      CALL SelectDASHDialog(IDD_zmEdit)
       iFrg = 0
       SELECT CASE (EventType)
         CASE (PushButton)
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDB_Set)
-              CALL WDialogGetReal(IDF_BisoOccValue, tReal)
-              CALL WDialogGetMenu(IDF_BisoOccMenu, iOption)
+              CALL DASHWDialogGetReal(IDF_BisoOccValue, tReal)
+              CALL DASHWDialogGetMenu(IDF_BisoOccMenu, iOption)
               SELECT CASE (iOption)
                 CASE (1)
                   iColumn = 4 ! Biso
@@ -334,7 +334,7 @@
                   IF (tReal .LT.   0.0) tReal =  0.0
                   IF (tReal .GT.  10.0) tReal = 10.0
               END SELECT              
-              CALL WDialogGetMenu(IDF_WhichAtomMenu, iOption)
+              CALL DASHWDialogGetMenu(IDF_WhichAtomMenu, iOption)
               DO iAtomNr = 1, natoms(iFrg)
 ! Biso / occupancies
                 SELECT CASE (iOption)
@@ -392,7 +392,7 @@
 !C! Takes bonds              from bond      in SAMVAR
 !C! Takes bond types         from btype     in SAMVAR
 !C! and writes out a .mol2 file
-              IF (WriteMol2(temp_file, .TRUE., iFrg) .EQ. 1) CALL ViewStructure(temp_file)
+              IF (WriteMol2(temp_file, .TRUE., iFrg) .EQ. 1) CALL ViewStructure(temp_file, .FALSE.)
 !O              CALL IOSDeleteFile(temp_file)
             CASE (IDB_Rotations)
               CALL ShowEditZMatrixRotationsWindow
@@ -527,7 +527,7 @@
       ENDIF
       CALL zmCopyDialog2Temp
       CALL zmRotCopyTemp2Dialog
-      CALL WDialogSelect(IDD_zmEditRotations)
+      CALL SelectDASHDialog(IDD_zmEditRotations)
       CALL WDialogShow(-1, -1, 0, SemiModeLess)
 
       END SUBROUTINE ShowEditZMatrixRotationsWindow
@@ -548,8 +548,8 @@
       INTEGER                                                                    HydrogenTreatment
       COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign, HydrogenTreatment
 
-      INTEGER, EXTERNAL :: WriteMol2, WDialogGetRadioButtonInt
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      INTEGER, EXTERNAL :: WriteMol2, DASHWDialogGetRadioButtonInt
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
       REAL, EXTERNAL :: Degrees2Radians
       INTEGER I, iFrg, iOption, iOpt1State, iOpt2State, iOpt3State
       INTEGER iAtomNr
@@ -564,7 +564,7 @@
 
       iFrg = 0
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_zmEditRotations)
+      CALL SelectDASHDialog(IDD_zmEditRotations)
       SELECT CASE (EventType)
         CASE (PushButton)
           SELECT CASE (EventInfo%VALUE1)
@@ -586,7 +586,7 @@
                 taxyzo(3,iAtomNr) = axyzo(3,iAtomNr)
               ENDDO
 ! Subtract origin from co-ordinates
-              CALL WDialogGetRadioButton(IDF_RotOrgCOM, iOption)
+              CALL DASHWDialogGetRadioButton(IDF_RotOrgCOM, iOption)
               SELECT CASE (iOption)
                 CASE (1) ! C.O.M.
 ! If user set centre of mass flag to 0, then use the molecule's centre of mass
@@ -605,7 +605,7 @@
                   ENDDO
 ! Otherwise, use atom number ICFRG
                 CASE (2) ! Use atom nr.
-                  CALL WDialogGetInteger(IDF_RotOrgAtomNr, iAtomNr)
+                  CALL DASHWDialogGetInteger(IDF_RotOrgAtomNr, iAtomNr)
                   IF ((iAtomNr .LT. 1) .OR. (iAtomNr .GT. natoms(CurrentlyEditedFrag))) THEN
                     CALL ErrorMessage("Please enter a correct atom number for the centre of rotation.")
                     CALL PopActiveWindowID
@@ -677,7 +677,7 @@
 !C! Takes bonds              from bond      in SAMVAR
 !C! Takes bond types         from btype     in SAMVAR
 !C! and writes out a .mol2 file
-              IF (WriteMol2(temp_file, .TRUE., iFrg) .EQ. 1) CALL ViewStructure(temp_file)
+              IF (WriteMol2(temp_file, .TRUE., iFrg) .EQ. 1) CALL ViewStructure(temp_file, .FALSE.)
 !O              CALL IOSDeleteFile(temp_file)
               DO iAtomNr = 1, natcry
                 axyzo(1,iAtomNr) = taxyzo(1,iAtomNr)
@@ -688,10 +688,10 @@
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDF_RotOrgCOM, IDF_RotOrgAtom)
-              CALL WDialogGetRadioButton(IDF_RotOrgCOM, iOption)
+              CALL DASHWDialogGetRadioButton(IDF_RotOrgCOM, iOption)
               CALL WDialogFieldStateLogical(IDF_RotOrgAtomNr, iOption .EQ. 2)
             CASE (IDF_UseSingleAxis, IDF_RotAxAtom, IDF_RotAxFrac, IDF_RotAxPln, IDF_IniOrAxis, IDF_IniOrEuler, IDF_IniOrQuater)
-              tUseSingleAxis = WDialogGetCheckBoxLogical(IDF_UseSingleAxis)
+              tUseSingleAxis = DASHWDialogGetCheckBoxLogical(IDF_UseSingleAxis)
               CALL WDialogFieldStateLogical(IDF_GROUP2,      tUseSingleAxis)
               CALL WDialogFieldStateLogical(IDF_RotAxAtom,   tUseSingleAxis)
               CALL WDialogFieldStateLogical(IDF_RotAxFrac,   tUseSingleAxis)
@@ -704,13 +704,13 @@
               iOpt2State = Disabled
               iOpt3State = Disabled
               IF (tUseSingleAxis) THEN
-                CALL WDialogGetRadioButton(IDF_RotAxAtom, iOption)
-                SELECT CASE (WDialogGetRadioButtonInt(IDF_RotAxAtom))
+                CALL DASHWDialogGetRadioButton(IDF_RotAxAtom, iOption)
+                SELECT CASE (DASHWDialogGetRadioButtonInt(IDF_RotAxAtom))
                   CASE (1)
                     iOpt1State = Enabled
                   CASE (2)
                     iOpt2State = Enabled
-                    IF (WDialogGetRadioButtonInt(IDF_IniOrAxis) .EQ. 1) CALL WDialogPutRadioButton(IDF_IniOrQuater)
+                    IF (DASHWDialogGetRadioButtonInt(IDF_IniOrAxis) .EQ. 1) CALL WDialogPutRadioButton(IDF_IniOrQuater)
                     CALL WDialogFieldStateLogical(IDF_IniOrAxis, .FALSE.)
                   CASE (3)
                     iOpt3State = Enabled
@@ -732,7 +732,7 @@
               iOpt2State = Disabled
               iOpt3State = Disabled
               IF (tUseSingleAxis) THEN
-                SELECT CASE (WDialogGetRadioButtonInt(IDF_IniOrAxis))
+                SELECT CASE (DASHWDialogGetRadioButtonInt(IDF_IniOrAxis))
                   CASE (1)
                     iOpt1State = Enabled
                   CASE (2)
@@ -896,7 +896,7 @@
       INTEGER iFrg, iRow, iAtomNr     
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_zmEdit)
+      CALL SelectDASHDialog(IDD_zmEdit)
       iFrg = 0
 ! Fill grid with atom properties
 ! Set number of rows
@@ -936,7 +936,7 @@
       LOGICAL tUseSingleAxis
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_zmEditRotations)
+      CALL SelectDASHDialog(IDD_zmEditRotations)
       iFrg = 0
       CALL WDialogFieldStateLogical(IDF_RotOrgAtomNr, icomflg(iFrg) .NE. 0)
       IF (icomflg(iFrg) .EQ. 0) THEN ! Use centre of mass
@@ -1042,7 +1042,7 @@
       INTEGER iFrg, iRow, iAtomNr
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_zmEdit)
+      CALL SelectDASHDialog(IDD_zmEdit)
       iFrg = 0
 ! Fill grid with atom properties
 !U! Set number of rows
@@ -1050,14 +1050,14 @@
       DO iRow = 1, natoms(iFrg)
         iAtomNr = izmbid(iRow, iFrg)
 ! atom labels
-        CALL WGridGetCellString(IDF_AtomPropGrid, 1, iRow, OriginalLabel(iAtomNr, iFrg))
+        CALL DASHWGridGetCellString(IDF_AtomPropGrid, 1, iRow, OriginalLabel(iAtomNr, iFrg))
 ! atom elements
-        CALL WGridGetCellString(IDF_AtomPropGrid, 3, iRow, ElSym(iAtomNr, iFrg))
+        CALL DASHWGridGetCellString(IDF_AtomPropGrid, 3, iRow, ElSym(iAtomNr, iFrg))
         zmElementCSD(iAtomNr, iFrg) = ElmSymbol2CSD(ElSym(iAtomNr, iFrg))
 ! Biso
-        CALL WGridGetCellReal(IDF_AtomPropGrid, 4, iRow, tiso(iAtomNr, iFrg))
+        CALL DASHWGridGetCellReal(IDF_AtomPropGrid, 4, iRow, tiso(iAtomNr, iFrg))
 ! occupancies
-        CALL WGridGetCellReal(IDF_AtomPropGrid, 5, iRow, occ(iAtomNr, iFrg))
+        CALL DASHWGridGetCellReal(IDF_AtomPropGrid, 5, iRow, occ(iAtomNr, iFrg))
       ENDDO
       CALL PopActiveWindowID
 
@@ -1073,46 +1073,46 @@
 
       IMPLICIT NONE 
       
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
       INTEGER iFrg, iOption, tInteger
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_zmEditRotations)
+      CALL SelectDASHDialog(IDD_zmEditRotations)
       iFrg = 0
-      CALL WDialogGetRadioButton(IDF_RotOrgCOM, iOption)
+      CALL DASHWDialogGetRadioButton(IDF_RotOrgCOM, iOption)
       SELECT CASE (iOption)
         CASE (1) ! C.O.M.
           icomflg(iFrg) = 0
         CASE (2) ! Atom number
-          CALL WDialogGetInteger(IDF_RotOrgAtomNr,tInteger)
+          CALL DASHWDialogGetInteger(IDF_RotOrgAtomNr,tInteger)
           icomflg(iFrg) = izmbid(tInteger, iFrg)
       END SELECT
-      UseQuaternions(iFrg) = .NOT. WDialogGetCheckBoxLogical(IDF_UseSingleAxis)
-      CALL WDialogGetRadioButton(IDF_RotAxAtom, zmSingleRotAxDef(iFrg))
-      CALL WDialogGetInteger(IDF_AtomNr1, tInteger)
+      UseQuaternions(iFrg) = .NOT. DASHWDialogGetCheckBoxLogical(IDF_UseSingleAxis)
+      CALL DASHWDialogGetRadioButton(IDF_RotAxAtom, zmSingleRotAxDef(iFrg))
+      CALL DASHWDialogGetInteger(IDF_AtomNr1, tInteger)
       zmSingleRotAxAtm(1, iFrg) = izmbid(tInteger, iFrg)
-      CALL WDialogGetInteger(IDF_AtomNr2, tInteger)
+      CALL DASHWDialogGetInteger(IDF_AtomNr2, tInteger)
       zmSingleRotAxAtm(2, iFrg) = izmbid(tInteger, iFrg)
-      CALL WDialogGetReal(IDF_a1, zmSingleRotAxFrac(1, iFrg))
-      CALL WDialogGetReal(IDF_b1, zmSingleRotAxFrac(2, iFrg))
-      CALL WDialogGetReal(IDF_c1, zmSingleRotAxFrac(3, iFrg))
-      CALL WDialogGetInteger(IDF_RotAxPlnAtm1, tInteger)
+      CALL DASHWDialogGetReal(IDF_a1, zmSingleRotAxFrac(1, iFrg))
+      CALL DASHWDialogGetReal(IDF_b1, zmSingleRotAxFrac(2, iFrg))
+      CALL DASHWDialogGetReal(IDF_c1, zmSingleRotAxFrac(3, iFrg))
+      CALL DASHWDialogGetInteger(IDF_RotAxPlnAtm1, tInteger)
       zmSingleRotAxPlnAtm(1, iFrg) = izmbid(tInteger, iFrg)
-      CALL WDialogGetInteger(IDF_RotAxPlnAtm2, tInteger)
+      CALL DASHWDialogGetInteger(IDF_RotAxPlnAtm2, tInteger)
       zmSingleRotAxPlnAtm(2, iFrg) = izmbid(tInteger, iFrg)
-      CALL WDialogGetInteger(IDF_RotAxPlnAtm3, tInteger)
+      CALL DASHWDialogGetInteger(IDF_RotAxPlnAtm3, tInteger)
       zmSingleRotAxPlnAtm(3, iFrg) = izmbid(tInteger, iFrg)
-      CALL WDialogGetRadioButton(IDF_IniOrAxis, zmSingleRAIniOrDef(iFrg))
-      CALL WDialogGetReal(IDF_a2, zmSingleRAIniOrFrac(1, iFrg))
-      CALL WDialogGetReal(IDF_b2, zmSingleRAIniOrFrac(2, iFrg))
-      CALL WDialogGetReal(IDF_c2, zmSingleRAIniOrFrac(3, iFrg))
-      CALL WDialogGetReal(IDF_Alpha, zmSingleRAIniOrEuler(1, iFrg))
-      CALL WDialogGetReal(IDF_Beta , zmSingleRAIniOrEuler(2, iFrg))
-      CALL WDialogGetReal(IDF_Gamma, zmSingleRAIniOrEuler(3, iFrg))
-      CALL WDialogGetReal(IDF_Q0, zmSingleRAIniOrQuater(0, iFrg))
-      CALL WDialogGetReal(IDF_Q1, zmSingleRAIniOrQuater(1, iFrg))
-      CALL WDialogGetReal(IDF_Q2, zmSingleRAIniOrQuater(2, iFrg))
-      CALL WDialogGetReal(IDF_Q3, zmSingleRAIniOrQuater(3, iFrg))
+      CALL DASHWDialogGetRadioButton(IDF_IniOrAxis, zmSingleRAIniOrDef(iFrg))
+      CALL DASHWDialogGetReal(IDF_a2, zmSingleRAIniOrFrac(1, iFrg))
+      CALL DASHWDialogGetReal(IDF_b2, zmSingleRAIniOrFrac(2, iFrg))
+      CALL DASHWDialogGetReal(IDF_c2, zmSingleRAIniOrFrac(3, iFrg))
+      CALL DASHWDialogGetReal(IDF_Alpha, zmSingleRAIniOrEuler(1, iFrg))
+      CALL DASHWDialogGetReal(IDF_Beta , zmSingleRAIniOrEuler(2, iFrg))
+      CALL DASHWDialogGetReal(IDF_Gamma, zmSingleRAIniOrEuler(3, iFrg))
+      CALL DASHWDialogGetReal(IDF_Q0, zmSingleRAIniOrQuater(0, iFrg))
+      CALL DASHWDialogGetReal(IDF_Q1, zmSingleRAIniOrQuater(1, iFrg))
+      CALL DASHWDialogGetReal(IDF_Q2, zmSingleRAIniOrQuater(2, iFrg))
+      CALL DASHWDialogGetReal(IDF_Q3, zmSingleRAIniOrQuater(3, iFrg))
       CALL zmDoAdmin(iFrg)
       CALL PopActiveWindowID
 
@@ -1193,7 +1193,7 @@
       temp_file = frag_file(iFrg)(1:tLength-8)//'_temp.mol2'
 ! Show the mol2 file
       IF (WriteMol2(temp_file,.TRUE., iFrg) .EQ. 1) THEN
-        CALL ViewStructure(temp_file)
+        CALL ViewStructure(temp_file, .FALSE.)
       ELSE
         CALL DebugErrorMessage('Error writing temporary file.')
       ENDIF
@@ -1420,12 +1420,12 @@
 
       IMPLICIT NONE      
 
-      LOGICAL, EXTERNAL :: Confirm, WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: Confirm, DASHWDialogGetCheckBoxLogical
       INTEGER tFieldState
       INTEGER h, k, l
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SAW_Page2)
+      CALL SelectDASHDialog(IDD_SAW_Page2)
       SELECT CASE (EventType)
         CASE (PushButton)
           SELECT CASE (EventInfo%VALUE1)
@@ -1434,10 +1434,10 @@
               CALL WMenuSetState(ID_import_dpj_file, ItemEnabled, WintOn)
               CALL WizardWindowShow(IDD_SAW_Page1)
             CASE (IDNEXT)
-              IF (WDialogGetCheckBoxLogical(IDF_Use_PO)) THEN
-                CALL WDialogGetInteger(IDF_PO_a, h)
-                CALL WDialogGetInteger(IDF_PO_b, k)
-                CALL WDialogGetInteger(IDF_PO_c, l)
+              IF (DASHWDialogGetCheckBoxLogical(IDF_Use_PO)) THEN
+                CALL DASHWDialogGetInteger(IDF_PO_a, h)
+                CALL DASHWDialogGetInteger(IDF_PO_b, k)
+                CALL DASHWDialogGetInteger(IDF_PO_c, l)
                 IF ((h .EQ. 0) .AND. (k .EQ. 0) .AND. (l .EQ. 0)) THEN
                   CALL ErrorMessage("h, k and l cannot all be zero.")
                   RETURN
@@ -1451,7 +1451,7 @@
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDF_Use_PO)
-              IF (WDialogGetCheckBoxLogical(IDF_Use_PO)) THEN
+              IF (DASHWDialogGetCheckBoxLogical(IDF_Use_PO)) THEN
                 tFieldState = Enabled
               ELSE
                 tFieldState = Disabled
@@ -1497,13 +1497,13 @@
       CHARACTER*20 tStr
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SA_Modal_input2)
+      CALL SelectDASHDialog(IDD_SA_Modal_input2)
       DO I = 1, NVAR
-        CALL WGridGetCellReal(IDF_parameter_grid_modal, 1, I, prevx(I))
-        CALL WGridGetCellCheckBox(IDF_parameter_grid_modal, 4, I, iCheck)
+        CALL DASHWGridGetCellReal(IDF_parameter_grid_modal, 1, I, prevx(I))
+        CALL DASHWGridGetCellCheckBox(IDF_parameter_grid_modal, 4, I, iCheck)
         IF (iCheck .EQ. UnChecked) THEN
-          CALL WGridGetCellReal(IDF_parameter_grid_modal, 2, I, prevlb(I))
-          CALL WGridGetCellReal(IDF_parameter_grid_modal, 3, I, prevub(I))
+          CALL DASHWGridGetCellReal(IDF_parameter_grid_modal, 2, I, prevlb(I))
+          CALL DASHWGridGetCellReal(IDF_parameter_grid_modal, 3, I, prevub(I))
         ENDIF
 ! Disable modal button for everything but torsion angles, angles and bonds
 ! This allows angles and bonds to be searched in Mogul too.
@@ -1562,7 +1562,7 @@
       INTEGER                                                                    HydrogenTreatment
       COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign, HydrogenTreatment
 
-      LOGICAL, EXTERNAL :: Confirm, WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: Confirm, DASHWDialogGetCheckBoxLogical
       LOGICAL, EXTERNAL :: NearlyEqual
       REAL    xtem
       INTEGER IFCOl, IFRow, ICHK
@@ -1570,11 +1570,12 @@
       INTEGER iRow, iStatus
       INTEGER iFrg
       INTEGER kk, iOption, jFrg
+      INTEGER UndoModalFlag
       CHARACTER*36 parlabel(mvar)
 
 ! We are now on window number 2
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SA_Modal_input2)
+      CALL SelectDASHDialog(IDD_SA_Modal_input2)
       SELECT CASE (EventType)
         CASE (PushButton)
           SELECT CASE (EventInfo%VALUE1)
@@ -1592,8 +1593,8 @@
               ENDIF
               IF (.NOT. LimsChanged) THEN
 ! If the user has requested preferred orientation, make sure we pass the pertinent Wizard window
-                CALL WDialogSelect(IDD_SAW_Page2)
-                IF (WDialogGetCheckBoxLogical(IDF_Use_PO)) THEN
+                CALL SelectDASHDialog(IDD_SAW_Page2)
+                IF (DASHWDialogGetCheckBoxLogical(IDF_Use_PO)) THEN
                   CALL WizardWindowShow(IDD_SAW_Page2)
                 ELSE
                   CALL WizardWindowShow(IDD_SAW_Page1)
@@ -1601,18 +1602,18 @@
               ENDIF
             CASE (IDNEXT)
 ! Go to the next stage of the SA input
-              RandomInitVal = WDialogGetCheckBoxLogical(IDF_RandomInitVal)
+              RandomInitVal = DASHWDialogGetCheckBoxLogical(IDF_RandomInitVal)
               DO I = 1, NVAR
-                CALL WGridGetCellReal(IDF_parameter_grid_modal, 1, I, X_init(I))
-                CALL WGridGetCellReal(IDF_parameter_grid_modal, 2, I, LB(I))
-                CALL WGridGetCellReal(IDF_parameter_grid_modal, 3, I, UB(I))
+                CALL DASHWGridGetCellReal(IDF_parameter_grid_modal, 1, I, X_init(I))
+                CALL DASHWGridGetCellReal(IDF_parameter_grid_modal, 2, I, LB(I))
+                CALL DASHWGridGetCellReal(IDF_parameter_grid_modal, 3, I, UB(I))
                 CALL ParseRawInput(I)
               ENDDO
               CALL ShowWithWizardWindowSASettings
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizardPastPawley
             CASE (IDB_Relabel)
-              CALL WDialogGetMenu(IDF_MENU1, iOption)
+              CALL DASHWDialogGetMenu(IDF_MENU1, iOption)
               ! Update memory
               IF (iOption .EQ. nfrag+1) THEN
                 CALL zmRelabelAll
@@ -1640,7 +1641,7 @@
                 CALL WGridLabelRow(IDF_parameter_grid_modal, i, parlabel(i))
               ENDDO
             CASE (IDB_View)
-              CALL WDialogGetMenu(IDF_MENU1, iOption)
+              CALL DASHWDialogGetMenu(IDF_MENU1, iOption)
               ! Update memory
               IF (iOption .EQ. nFrag+1) THEN ! "All"
                 DO iFrg = 1, nFrag
@@ -1656,9 +1657,9 @@
               CALL WGridPos(EventInfo%X,IFCol,IFRow)
               SELECT CASE (IFCol)
                 CASE (1) ! parameter
-                  CALL WGridGetCellCheckBox(IDF_parameter_grid_modal, 4, IFRow, ICHK)
+                  CALL DASHWGridGetCellCheckBox(IDF_parameter_grid_modal, 4, IFRow, ICHK)
                   IF (ICHK .EQ. UnChecked) THEN
-                    CALL WGridGetCellReal(IDF_parameter_grid_modal, IFCol, IFRow, xtem)
+                    CALL DASHWGridGetCellReal(IDF_parameter_grid_modal, IFCol, IFRow, xtem)
                     xtem = MAX(xtem,prevlb(IFRow))
                     xtem = MIN(xtem,prevub(IFRow))
                     IF (.NOT. NearlyEqual(xtem,prevx(IFRow))) THEN
@@ -1668,9 +1669,9 @@
                     ENDIF
                   ENDIF
                 CASE (2) ! lower bound
-                  CALL WGridGetCellCheckBox(IDF_parameter_grid_modal, 4, IFRow, ICHK)
+                  CALL DASHWGridGetCellCheckBox(IDF_parameter_grid_modal, 4, IFRow, ICHK)
                   IF (ICHK .EQ. UnChecked) THEN
-                    CALL WGridGetCellReal(IDF_parameter_grid_modal, IFCol, IFRow, xtem)
+                    CALL DASHWGridGetCellReal(IDF_parameter_grid_modal, IFCol, IFRow, xtem)
                     xtem = MIN(xtem,prevub(IFRow))
                     IF (.NOT. NearlyEqual(xtem,prevlb(IFRow))) THEN
                       LimsChanged = .TRUE.
@@ -1684,9 +1685,9 @@
                   ENDIF
                 CASE (3) ! upper bound
 ! Check the bounding - only update if parameter is set to vary
-                  CALL WGridGetCellCheckBox(IDF_parameter_grid_modal, 4, IFRow, ICHK)
+                  CALL DASHWGridGetCellCheckBox(IDF_parameter_grid_modal, 4, IFRow, ICHK)
                   IF (ICHK .EQ. UnChecked) THEN
-                    CALL WGridGetCellReal(IDF_parameter_grid_modal, IFCol, IFRow, xtem)
+                    CALL DASHWGridGetCellReal(IDF_parameter_grid_modal, IFCol, IFRow, xtem)
                     xtem = MAX(xtem,prevlb(IFRow))
                     IF (.NOT. NearlyEqual(xtem,prevub(IFRow))) THEN
                       LimsChanged = .TRUE.
@@ -1699,9 +1700,9 @@
                     prevx(IFRow) = xtem
                   ENDIF
                 CASE (4) ! fix or vary
-                  CALL WGridGetCellCheckBox(IDF_parameter_grid_modal, IFCol, IFRow, ICHK)
+                  CALL DASHWGridGetCellCheckBox(IDF_parameter_grid_modal, IFCol, IFRow, ICHK)
                   IF (ICHK .EQ. Checked) THEN
-                    CALL WGridGetCellReal(IDF_parameter_grid_modal,1,IFRow,xtem)
+                    CALL DASHWGridGetCellReal(IDF_parameter_grid_modal,1,IFRow,xtem)
                     lb(IFRow) = xtem-1.0E-5
                     ub(IFRow) = xtem+1.0E-5
                     CALL WGridStateCell(IDF_parameter_grid_modal, 1, IFRow, DialogReadOnly)
@@ -1726,16 +1727,19 @@
       END SELECT  ! EventType
 ! Modal Button
       DO iRow = 1, NVAR
-	    iStatus = 0
-        CALL WGridGetCellCheckBox(IDF_parameter_grid_modal, 5, iRow, iStatus)
+        iStatus = 0
+        CALL DASHWGridGetCellCheckBox(IDF_parameter_grid_modal, 5, iRow, iStatus)
         IF (iStatus .EQ. Checked) THEN
-          CALL WGridGetCellReal(IDF_parameter_grid_modal, 1, IFRow, xtem)
+          CALL DASHWGridGetCellReal(IDF_parameter_grid_modal, 1, IFRow, xtem)
           CALL CheckMogulUse
-          IF (UseMogul) THEN  	      
-		    CALL WriteMogulMol2(iFRow) !Call Mogul
+          IF (kzmpar2(IFrow) .EQ. 3) THEN
+            UndoModalFlag = ModalFlag(iFRow)
+          ENDIF
+          IF (UseMogul) THEN
+            CALL WriteMogulMol2(iFRow) !Call Mogul
           ENDIF
           IF (kzmpar2(IFrow) .EQ. 3) THEN ! Modal Torsion Angle so show dialog
-            CALL ShowBiModalDialog(IFRow, xtem)
+            CALL ShowBiModalDialog(IFRow, xtem, UndoModalFlag)
           ELSE
             CALL WGridPutCellCheckBox(IDF_parameter_grid_modal, 5, iRow, 0)
           ENDIF
@@ -1765,7 +1769,7 @@
       INTEGER NMoves
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SA_input3_2)
+      CALL SelectDASHDialog(IDD_SA_input3_2)
       CALL WDialogPutReal(IDF_SA_T0, T0, '(F7.2)')
       CALL WDialogPutReal(IDF_SA_Tredrate, RT, '(F6.3)')
       CALL WDialogPutInteger(IDF_SA_NS, NS)
@@ -1809,7 +1813,7 @@
 
 ! We are now on window number 3
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SA_input3_2)
+      CALL SelectDASHDialog(IDD_SA_input3_2)
       SELECT CASE (EventType)
         CASE (PushButton)
           SELECT CASE (EventInfo%VALUE1)
@@ -1817,17 +1821,24 @@
 ! Go back to the 2nd window
               CALL WizardWindowShow(IDD_SA_Modal_input2)
             CASE (IDNEXT)
-              CALL WDialogGetReal(IDF_MaxMoves1, MaxMoves1)
-              CALL WDialogGetInteger(IDF_MaxMoves2, MaxMoves2)
+              CALL DASHWDialogGetReal(IDF_MaxMoves1, MaxMoves1)
+              CALL DASHWDialogGetInteger(IDF_MaxMoves2, MaxMoves2)
               CALL RealInt2NMoves(MaxMoves1, MaxMoves2, MaxMoves)
-              CALL WDialogGetReal(IDF_SA_ChiTest, ChiMult)
+              CALL DASHWDialogGetReal(IDF_SA_ChiTest, ChiMult)
               ! It is possible to click "Resume SA" after having completed all runs and to
               ! forget to specify more runs. That way, we will already have completed all runs.
-              CALL WDialogGetInteger(IDF_SA_MaxRepeats, MaxRuns)
+              CALL DASHWDialogGetInteger(IDF_SA_MaxRepeats, MaxRuns)
+
+              ! If we are not resuming the simulated annealing, upload the seeds
+              IF ( .NOT. Resume_SA ) THEN
+                CALL DASHWDialogGetInteger(IDF_SA_RandomSeed1, iSeed1)
+                CALL DASHWDialogGetInteger(IDF_SA_RandomSeed2, iSeed2)
+              ENDIF
+
               IF (Resume_SA .AND. (NumOf_SA_Runs .GE. MaxRuns)) THEN
                 CALL InfoMessage("Number of requested runs already completed: please increase number of runs.")
               ELSE
-                CALL WDialogSelect(IDD_SAW_Page5)
+                CALL SelectDASHDialog(IDD_SAW_Page5)
                 CALL WDialogClearField(IDF_SA_Summary)
                 CALL WizardWindowShow(IDD_SA_input4)
               ENDIF
@@ -1851,21 +1862,21 @@
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDF_SA_T0) 
-              CALL WDialogGetReal(IDF_SA_T0, T0)
+              CALL DASHWDialogGetReal(IDF_SA_T0, T0)
             CASE (IDF_SA_NS) 
-              CALL WDialogGetInteger(IDF_SA_NS, NS)
+              CALL DASHWDialogGetInteger(IDF_SA_NS, NS)
               KPOS = NS * NT * NVAR
               CALL WDialogPutInteger(IDF_SA_Moves, KPOS)
             CASE (IDF_SA_NT) 
-              CALL WDialogGetInteger(IDF_SA_NT, NT)
+              CALL DASHWDialogGetInteger(IDF_SA_NT, NT)
               KPOS = NS * NT * NVAR
               CALL WDialogPutInteger(IDF_SA_Moves, KPOS)
             CASE (IDF_SA_RandomSeed1) 
-              CALL WDialogGetInteger(IDF_SA_RandomSeed1, ISeed1)
+              CALL DASHWDialogGetInteger(IDF_SA_RandomSeed1, ISeed1)
             CASE (IDF_SA_RandomSeed2) 
-              CALL WDialogGetInteger(IDF_SA_RandomSeed2, ISeed2)
+              CALL DASHWDialogGetInteger(IDF_SA_RandomSeed2, ISeed2)
             CASE (IDF_SA_Tredrate)
-              CALL WDialogGetReal(IDF_SA_Tredrate, RT)
+              CALL DASHWDialogGetReal(IDF_SA_Tredrate, RT)
           END SELECT
       END SELECT
       CALL PopActiveWindowID
@@ -1883,14 +1894,14 @@
       IMPLICIT NONE      
 
       INTEGER, EXTERNAL :: BatchFileSaveAs
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
       INTEGER tInteger
 
 ! ##### TODO: when *resuming* the SA, it is probably smart not to allow changing of the settings for
 ! hydrogen treatment.
 ! We are now on window number 4
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SA_input4)
+      CALL SelectDASHDialog(IDD_SA_input4)
       SELECT CASE (EventType)
         CASE (PushButton)
           SELECT CASE (EventInfo%VALUE1)
@@ -1911,10 +1922,10 @@
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDR_HydrogensIgnore, IDR_HydrogensAbsorb, IDR_HydrogensExplicit)
-              CALL WDialogGetRadioButton(IDR_HydrogensIgnore, tInteger)
+              CALL DASHWDialogGetRadioButton(IDR_HydrogensIgnore, tInteger)
               CALL Set_HydrogenTreatment(tInteger)
             CASE (IDF_AutoLocalOptimise)
-              CALL Set_AutoLocalMinimisation(WDialogGetCheckBoxLogical(IDF_AutoLocalOptimise))
+              CALL Set_AutoLocalMinimisation(DASHWDialogGetCheckBoxLogical(IDF_AutoLocalOptimise))
           END SELECT
       END SELECT
       CALL PopActiveWindowID
@@ -1945,15 +1956,15 @@
       COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
       INTEGER, EXTERNAL :: BatchFileSaveAs
-      LOGICAL, EXTERNAL :: WDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
       INTEGER iFrg, nRuns, nRunsPerNode, iPackage, nPackages
       CHARACTER*(3) PackageStr
       CHARACTER(MaxPathLength) Old_OutputFilesBaseName
       CHARACTER(MaxPathLength) Rel_OutputFilesBaseName
-      INTEGER Old_OFBN_Len, Old_MaxRuns
+      INTEGER Old_OFBN_Len, Old_MaxRuns, nReminders
       INTEGER Rel_OFBN_Len
       INTEGER Old_iSeed1, Old_iSeed2, iHandle
-      CHARACTER(MaxPathLength) DuffFileName
+      CHARACTER(MaxPathLength) tGrdFileBaseName
       CHARACTER*255 tDirName, tDirName_2, tFileName, tFileName_2, tExtension, current_directory
       INTEGER ExtLength
       CHARACTER(LEN=45) :: FILTER
@@ -1961,7 +1972,7 @@
 
       CALL PushActiveWindowID
       CALL IOsDirName(current_directory)
-      CALL WDialogSelect(IDD_SA_input5)
+      CALL SelectDASHDialog(IDD_SA_input5)
       SELECT CASE (EventType)
         CASE (PushButton)
           SELECT CASE (EventInfo%VALUE1)
@@ -1976,11 +1987,12 @@
               FILTER = 'DASH grid files (*.grd)|*.grd|'
               tFileName_2 = OutputFilesBaseName(1:OFBN_Len)//'.grd'
               CALL WSelectFile(FILTER, iFlags, tFileName_2, 'Save DASH grid file')
-              IF ((WInfoDialog(4) .NE. CommonOK) .OR. (LEN_TRIM(tFileName) .EQ. 0)) THEN
+              IF ((WInfoDialog(4) .NE. CommonOK) .OR. (LEN_TRIM(tFileName_2) .EQ. 0)) THEN
                  CALL PopActiveWindowID
                  RETURN
               ENDIF
-              CALL SplitPath(tFileName_2, tDirName, tFileName)
+              ExtLength = LEN(tExtension)
+              CALL SplitPath2(tFileName_2, tDirName, tGrdFileBaseName, tExtension, ExtLength)
               ! Copy .sdi files
               CALL IOsCopyFile(OutputFilesBaseName(1:OFBN_Len)//'.sdi', tDirName)
               CALL IOsCopyFile(OutputFilesBaseName(1:OFBN_Len)//'.tic', tDirName)
@@ -1996,10 +2008,12 @@
                 ! ######### We probably have a problem here if two Z-matrices have the same file name?
                 CALL IOsCopyFile(frag_file(iFrg), tDirName)
               ENDDO
-              CALL WDialogGetInteger(IDF_NumOfRuns, nRuns)
-              CALL WDialogGetInteger(IDF_NumOfRunsPerNode, nRunsPerNode)
+              CALL DASHWDialogGetInteger(IDF_NumOfRuns, nRuns)
+              CALL DASHWDialogGetInteger(IDF_NumOfRunsPerNode, nRunsPerNode)
               ! This gives rounding problems, of course
               nPackages = nRuns / nRunsPerNode
+              nReminders = mod(nRuns, nRunsPerNode)
+              IF (nReminders .GT. 0) nPackages = nPackages + 1
               Old_MaxRuns = MaxRuns
               MaxRuns = nRunsPerNode
               Old_OutputFilesBaseName = OutputFilesBaseName
@@ -2014,6 +2028,8 @@
               Old_iSeed2 = iSeed2
               CALL IOsDirChange(tDirName)
               DO iPackage = 1, nPackages
+                ! The last pass for the reminder
+                IF (nReminders .GT. 0 .AND. iPackage .EQ. nPackages) MaxRuns = nReminders
                 ! Need to make paths of Z-matrix files relative.
                 ! Perhaps this is easy because we have just copied them and so can now rename them?
 
@@ -2022,16 +2038,14 @@
                 OutputFilesBaseName = Rel_OutputFilesBaseName(1:Rel_OFBN_Len)//'_'//PackageStr
                 iSeed1 = Old_iSeed1 + (iPackage-1)*nRunsPerNode
                 iSeed2 = Old_iSeed2 + (iPackage-1)*nRunsPerNode
-                DuffFileName = Rel_OutputFilesBaseName(1:Rel_OFBN_Len)//'_'//PackageStr//'.duff'
-                CALL WriteBatchFile(DuffFileName, .TRUE.)
+                CALL WriteBatchFile(TRIM(tGrdFileBaseName)//'_'//PackageStr//'.dbf', .TRUE.)
               ENDDO
               ! Write out .grd file
               iHandle = 10
-              OPEN(UNIT=iHandle, FILE=Rel_OutputFilesBaseName(1:Rel_OFBN_Len)//'.grd', ERR=999)
+              OPEN(UNIT=iHandle, FILE=TRIM(tGrdFileBaseName)//'.grd', ERR=999)
               DO iPackage = 1, nPackages
                 WRITE (PackageStr,'(I3.3)') iPackage
-                tFileName = Rel_OutputFilesBaseName(1:Rel_OFBN_Len)//'_'//PackageStr//'.duff'
-                WRITE(iHandle,'(A)',ERR=999) tFileName(1:LEN_TRIM(tFileName))
+                WRITE(iHandle,'(A)',ERR=999) TRIM(tGrdFileBaseName)//'_'//PackageStr//'.dbf'
               ENDDO
               CALL IOsDirChange(current_directory)
               CLOSE(iHandle)
@@ -2058,7 +2072,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE ShowBimodalDialog(IFrow, Xinitial)
+      SUBROUTINE ShowBimodalDialog(IFrow, Xinitial, UndoModalFlag)
 
       USE WINTERACTER
       USE DRUID_HEADER
@@ -2067,7 +2081,7 @@
 
       IMPLICIT NONE      
 
-      INTEGER, INTENT (IN   ) :: IFrow
+      INTEGER, INTENT (IN   ) :: IFrow, UndoModalFlag
       REAL,    INTENT (IN   ) :: Xinitial
 
       INCLUDE 'PARAMS.INC'
@@ -2114,7 +2128,7 @@
         ENDDO
         IF (frag .NE. 0) EXIT
       ENDDO
-      CALL WDialogSelect(IDD_ModalDialog)
+      CALL SelectDASHDialog(IDD_ModalDialog)
 !     Clear Fields
       IF (.NOT. UseMogul) CALL WDialogClearField(IDF_MogulText)
       CALL WDialogClearField(IDF_ModalUpper)
@@ -2146,21 +2160,21 @@
         IF (ModalFlag(IFRow) .EQ. 2) THEN
           CALL WDialogPutRadioButton(IDF_BiModalRadio)
           IF ((UB(IFRow) * LB(IFRow)) .LT. 0.00) THEN
-            CALL WDialogGetReal(IDF_ModalUpper, xtem)
+            CALL DASHWDialogGetReal(IDF_ModalUpper, xtem)
             CALL WDialogPutReal(IDF_ReportLower1, (xtem - 180.0))
-            CALL WDialogGetReal(IDF_ModalLower, xtem)
+            CALL DASHWDialogGetReal(IDF_ModalLower, xtem)
             CALL WDialogPutReal(IDF_ReportUpper1, (xtem + 180.0))
           ELSE
-            CALL WDialogGetReal(IDF_ModalUpper, xtem)
+            CALL DASHWDialogGetReal(IDF_ModalUpper, xtem)
             CALL WDialogPutReal(IDF_ReportLower1, -xtem)
-            CALL WDialogGetReal(IDF_ModalLower, xtem)
+            CALL DASHWDialogGetReal(IDF_ModalLower, xtem)
             CALL WDialogPutReal(IDF_ReportUpper1, -xtem)
           ENDIF
         ELSEIF (ModalFlag(IFRow) .EQ. 3) THEN
           CALL WDialogPutRadioButton(IDF_TriModalRadio)          
-          CALL WDialogGetReal(IDF_ModalUpper, xtem)
+          CALL DASHWDialogGetReal(IDF_ModalUpper, xtem)
           CALL DetermineTrimodalBounds(xtem, Upper)              
-          CALL WDialogGetReal(IDF_ModalLower, xtem)
+          CALL DASHWDialogGetReal(IDF_ModalLower, xtem)
           CALL DetermineTrimodalBounds(xtem, Lower)
           CALL WDialogPutReal(IDF_ReportUpper1, Tempbounds(2,Upper))
           CALL WDialogPutReal(IDF_ReportUpper2, Tempbounds(3,Upper))
@@ -2169,12 +2183,12 @@
         ENDIF
       ENDIF
       CALL WDialogShow(-1, -1, 0, SemiModeless)
-      CALL WDialogSelect(IDD_SA_Modal_input2)
+      CALL SelectDASHDialog(IDD_SA_Modal_input2)
       RowNumber = IFRow
-      CALL WGridGetCellReal(IDF_parameter_grid_modal, 1, RowNumber, iX)
-      CALL WGridGetCellReal(IDF_parameter_grid_modal, 2, RowNumber, iLB)
-      CALL WGridGetCellReal(IDF_parameter_grid_modal, 3, RowNumber, iUB) 
-      iRadio = ModalFlag(IFRow)
+      CALL DASHWGridGetCellReal(IDF_parameter_grid_modal, 1, RowNumber, iX)
+      CALL DASHWGridGetCellReal(IDF_parameter_grid_modal, 2, RowNumber, iLB)
+      CALL DASHWGridGetCellReal(IDF_parameter_grid_modal, 3, RowNumber, iUB) 
+      iRadio = UndoModalFlag
 
       END SUBROUTINE ShowBimodalDialog
 !
@@ -2222,15 +2236,15 @@
       Zero = 0.0000
       OneEighty = 180.0000
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_ModalDialog)
+      CALL SelectDASHDialog(IDD_ModalDialog)
       SELECT CASE (EventType) 
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDF_BiModalRadio)
               CALL WDialogClearField(IDF_ReportUpper2)
               CALL WDialogClearField(IDF_ReportLower2)
-              CALL WDialogGetReal(IDF_ModalUpper, xtem)
-              CALL WDialogGetReal(IDF_ModalLower, ttem)
+              CALL DASHWDialogGetReal(IDF_ModalUpper, xtem)
+              CALL DASHWDialogGetReal(IDF_ModalLower, ttem)
               IF (xtem*ttem .LT. 0.00) THEN
                 xtem = MAX(xtem, ttem)
                 xtem = xtem - 180.00
@@ -2238,16 +2252,16 @@
                 ttem = ttem + 180.00
                 CALL WDialogPutReal(IDF_ReportUpper1, ttem)
               ELSE
-                CALL WDialogGetReal(IDF_ModalUpper, xtem)
+                CALL DASHWDialogGetReal(IDF_ModalUpper, xtem)
                 CALL WDialogPutReal(IDF_ReportLower1, -xtem)
-                CALL WDialogGetReal(IDF_ModalLower, xtem)
+                CALL DASHWDialogGetReal(IDF_ModalLower, xtem)
                 CALL WDialogPutReal(IDF_ReportUpper1, -xtem)
               ENDIF
               ModalFlag(RowNumber) = 2
             CASE (IDF_TriModalRadio)
-              CALL WDialogGetReal(IDF_ModalUpper, xtem)
+              CALL DASHWDialogGetReal(IDF_ModalUpper, xtem)
               CALL DetermineTrimodalBounds(xtem, Upper)               
-              CALL WDialogGetReal(IDF_ModalLower, xtem)
+              CALL DASHWDialogGetReal(IDF_ModalLower, xtem)
               CALL DetermineTrimodalBounds(xtem, Lower)
               CALL WDialogPutReal(IDF_ReportUpper1, Tempbounds(2,Upper))
               CALL WDialogPutReal(IDF_ReportUpper2, Tempbounds(3,Upper))
@@ -2255,25 +2269,25 @@
               CALL WDialogPutReal(IDF_ReportLower2, Tempbounds(3,Lower))            
               ModalFlag(RowNumber) = 3 
             CASE (IDF_Initial)
-              CALL WDialogGetReal(IDF_Initial, xtem)       
+              CALL DASHWDialogGetReal(IDF_Initial, xtem)       
               TempPrevx = xtem
               xtem = MAX(lb(RowNumber),xtem)
               X_init(RowNumber) = (MIN(ub(RowNumber),xtem))
               CALL WDialogPutReal(IDF_Initial, X_init(RowNumber), '(F12.5)')
             CASE (IDF_ModalLower)
-              CALL WDialogGetReal(IDF_ModalLower, xtem)
+              CALL DASHWDialogGetReal(IDF_ModalLower, xtem)
               xtem = MIN(ub(RowNumber),xtem)
               TempPrevlb = LB(RowNumber)               
               lb(RowNumber) = xtem
               CALL WDialogPutReal(IDF_ModalLower,lb(RowNumber),'(F12.5)')
 ! How ranges are calculated depends on state of Modal RadioButton  
-              CALL WDialogGetRadioButton(IDF_BimodalRadio, ISET)
+              CALL DASHWDialogGetRadioButton(IDF_BimodalRadio, ISET)
               SELECT CASE (ISET) ! Bimodal radiobutton active
                 CASE (1)
                   CALL WDialogClearField(IDF_ReportLower2)
                   CALL WDialogClearField(IDF_ReportUpper2)
-                  CALL WDialogGetReal(IDF_ModalUpper, xtem)
-                  CALL WDialogGetReal(IDF_ModalLower, ttem)
+                  CALL DASHWDialogGetReal(IDF_ModalUpper, xtem)
+                  CALL DASHWDialogGetReal(IDF_ModalLower, ttem)
                   IF (xtem*ttem .LT. 0.00) THEN
                     xtem = MAX(xtem, ttem)
                     xtem = xtem - 180.00
@@ -2281,16 +2295,16 @@
                     ttem = ttem + 180.00
                     CALL WDialogPutReal(IDF_ReportUpper1, ttem)
                   ELSE
-                    CALL WDialogGetReal(IDF_ModalUpper, xtem)
+                    CALL DASHWDialogGetReal(IDF_ModalUpper, xtem)
                     CALL WDialogPutReal(IDF_ReportLower1, (xtem * (-1)))
-                    CALL WDialogGetReal(IDF_ModalLower, xtem)
+                    CALL DASHWDialogGetReal(IDF_ModalLower, xtem)
                     CALL WDialogPutReal(IDF_ReportUpper1, (xtem * (-1)))
                   ENDIF
                   ModalFlag(RowNumber) = 2  
                 CASE (2) !Trimodal radiobutton active           
-                  CALL WDialogGetReal(IDF_ModalLower, xtem)
+                  CALL DASHWDialogGetReal(IDF_ModalLower, xtem)
                   CALL DetermineTrimodalBounds(xtem, Lower)
-                  CALL WDialogGetReal(IDF_ModalUpper, xtem)
+                  CALL DASHWDialogGetReal(IDF_ModalUpper, xtem)
                   CALL DetermineTrimodalBounds(xtem, Upper)
                   CALL WDialogPutReal(IDF_ReportUpper1, Tempbounds(2,Upper))
                   CALL WDialogPutReal(IDF_ReportUpper2, Tempbounds(3,Upper))
@@ -2300,19 +2314,19 @@
               END SELECT
             CASE (IDF_ModalUpper)
 ! Check the bounding - only update if parameter is set to vary
-              CALL WDialogGetReal(IDF_ModalUpper,xtem)
+              CALL DASHWDialogGetReal(IDF_ModalUpper,xtem)
               xtem = MAX(lb(RowNumber),xtem)
               TempPrevUb = UB(RowNumber)             
               ub(RowNumber) = xtem
               CALL WDialogPutReal(IDF_ModalUpper, ub(RowNumber), '(F12.5)')
 !             How ranges are calculated depends on state of Modal RadioButton      
-              CALL WDialogGetRadioButton(IDF_BimodalRadio, ISET)
+              CALL DASHWDialogGetRadioButton(IDF_BimodalRadio, ISET)
                  SELECT CASE (ISET) ! Bimodal Radiobutton active
                    CASE (1)
                      CALL WDialogClearField(IDF_ReportLower2)
                      CALL WDialogClearField(IDF_ReportUpper2)
-                     CALL WDialogGetReal(IDF_ModalUpper, xtem)
-                     CALL WDialogGetReal(IDF_ModalLower, ttem)
+                     CALL DASHWDialogGetReal(IDF_ModalUpper, xtem)
+                     CALL DASHWDialogGetReal(IDF_ModalLower, ttem)
                       IF (xtem*ttem .LT. 0.00) THEN
                         xtem = MAX(xtem, ttem)
                         xtem = xtem - 180.00
@@ -2320,16 +2334,16 @@
                         ttem = ttem + 180.00
                         CALL WDialogPutReal(IDF_ReportUpper1, ttem)
                       ELSE
-                        CALL WDialogGetReal(IDF_ModalUpper, xtem)
+                        CALL DASHWDialogGetReal(IDF_ModalUpper, xtem)
                         CALL WDialogPutReal(IDF_ReportLower1, (xtem * (-1)))
-                        CALL WDialogGetReal(IDF_ModalLower, xtem)
+                        CALL DASHWDialogGetReal(IDF_ModalLower, xtem)
                         CALL WDialogPutReal(IDF_ReportUpper1, (xtem * (-1)))
                       ENDIF
                       ModalFlag(RowNumber) = 2
                    CASE (2) !Trimodal Radiobutton active
-                     CALL WDialogGetReal(IDF_ModalUpper, xtem)
+                     CALL DASHWDialogGetReal(IDF_ModalUpper, xtem)
                      CALL DetermineTrimodalBounds(xtem, Upper)               
-                     CALL WDialogGetReal(IDF_ModalLower, xtem)
+                     CALL DASHWDialogGetReal(IDF_ModalLower, xtem)
                      CALL DetermineTrimodalBounds(xtem, Lower)
                      ModalFlag(RowNumber) = 3
                      CALL WDialogPutReal(IDF_ReportUpper1, Tempbounds(2,Upper))
@@ -2342,12 +2356,12 @@
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDOK)
 !             Record parameters in appropriate arrays
-              CALL WDialogGetReal(IDF_Initial, X_init(RowNumber))
-              CALL WDialogGetReal(IDF_ModalLower, lb(RowNumber))
-              CALL WDialogGetReal(IDF_ModalUpper, ub(RowNumber))
+              CALL DASHWDialogGetReal(IDF_Initial, X_init(RowNumber))
+              CALL DASHWDialogGetReal(IDF_ModalLower, lb(RowNumber))
+              CALL DASHWDialogGetReal(IDF_ModalUpper, ub(RowNumber))
 !             Check that x is in bounds
               CALL WDialogHide
-              CALL WDialogSelect(IDD_SA_Modal_Input2)
+              CALL SelectDASHDialog(IDD_SA_Modal_Input2)
               CALL WGridColourRow(IDF_parameter_grid_modal, RowNumber, WIN_RGB(255, 0, 0), WIN_RGB(256, 256, 256))  
               LimsChanged = .TRUE.
 !           Return bounds to previous values
@@ -2364,16 +2378,16 @@
               X_init(RowNumber) = iX
               ModalFlag(RowNumber) = 1 
               CALL WDialogHide
-              CALL WDialogSelect(IDD_SA_Modal_Input2)
+              CALL SelectDASHDialog(IDD_SA_Modal_Input2)
               CALL WGridColourRow(IDF_parameter_grid_modal, RowNumber, WIN_RGB(256, 256, 256), WIN_RGB(256, 256, 256))                                              
           END SELECT
           IF  (.NOT. UseMogul) THEN
-            CALL WDialogSelect(IDD_ModalDialog)
+            CALL SelectDASHDialog(IDD_ModalDialog)
             CALL WDialogClearField(IDF_MogulText)
           ENDIF
           prevub(RowNumber) = UB(RowNumber)
           prevlb(RowNumber) = LB(RowNumber)
-          CALL WDialogSelect(IDD_SA_Modal_Input2)
+          CALL SelectDASHDialog(IDD_SA_Modal_Input2)
           CALL WGridPutCellReal(IDF_parameter_grid_modal, 1, RowNumber, X_init(RowNumber))
           CALL WGridPutCellReal(IDF_parameter_grid_modal, 2, RowNumber, LB(RowNumber))
           CALL WGridPutCellReal(IDF_parameter_grid_modal, 3, RowNumber, UB(RowNumber)) 
