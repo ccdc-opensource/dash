@@ -1,7 +1,162 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE LocalMinimise(Auto)
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+      USE ATMVAR
+      USE SOLVAR
+      USE PO_VAR
+
+      IMPLICIT NONE
+
+      LOGICAL, INTENT (IN   ) :: Auto
+
+      INCLUDE 'PARAMS.INC'
+
+      REAL              XOPT,       C,       FOPT
+      COMMON / sacmn /  XOPT(MVAR), C(MVAR), FOPT
+
+      REAL            X_init,       x_unique,       lb,       ub
+      COMMON /values/ X_init(MVAR), x_unique(MVAR), lb(MVAR), ub(MVAR)
+
+      REAL          RULB
+      COMMON /RULB/ RULB(Mvar)
+
+      INTEGER         NPAR, IP
+      COMMON /SIMSTO/ NPAR, IP(MVAR)
+
+      INTEGER              iMyExit 
+      LOGICAL                       NewOptimumFound, WasMinimised
+      COMMON / CMN000001 / iMyExit, NewOptimumFound, WasMinimised
+
+      INTEGER         nvar, ns, nt, iseed1, iseed2
+      COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
+
+      INTEGER         NATOM
+      REAL                   XATO
+      INTEGER                          KX
+      REAL                                        AMULT,      TF
+      INTEGER         KTF
+      REAL                      SITE
+      INTEGER                              KSITE,      ISGEN
+      REAL            SDX,        SDTF,      SDSITE
+      INTEGER                                             KOM17
+      COMMON /POSNS / NATOM, XATO(3,MaxAtm_3), KX(3,MaxAtm_3), AMULT(MaxAtm_3), TF(MaxAtm_3),  &
+     &                KTF(MaxAtm_3), SITE(MaxAtm_3), KSITE(MaxAtm_3), ISGEN(3,MaxAtm_3),    &
+     &                SDX(3,MaxAtm_3), SDTF(MaxAtm_3), SDSITE(MaxAtm_3), KOM17
+
+      INTEGER           TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm
+      COMMON  /ORDRATM/ TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm(1:MaxAtm_3)
+
+      INTEGER         Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
+      REAL                                                           ChiMult
+      COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
+
+      REAL             CHIPROBEST
+      COMMON /PLTSTO2/ CHIPROBEST
+
+      LOGICAL           LOG_HYDROGENS
+      COMMON /HYDROGEN/ LOG_HYDROGENS
+
+      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign
+      INTEGER                                                                    HydrogenTreatment
+      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign, HydrogenTreatment
+
+      LOGICAL, EXTERNAL :: Confirm
+      REAL, EXTERNAL :: SA_FCN
+      CHARACTER*80 chistr
+      INTEGER I, II, III, N
+      LOGICAL tAccept, tLOG_HYDROGENS
+      REAL    FTEM
+      REAL    DFTEM
+      LOGICAL DesorbHydrogens
+      REAL    XSIM(MVAR), DXSIM(MVAR)
+
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+      IF (Auto .AND. (.NOT. AutoMinimise)) RETURN
+ 
+      IF ( .NOT. IN_BATCH ) &
+        CALL WCursorShape(CurHourGlass)
+
+      tLOG_HYDROGENS = LOG_HYDROGENS
+      DesorbHydrogens = .FALSE.
+      IF (Auto .AND. UseHAutoMin) THEN
+        LOG_HYDROGENS = .TRUE.
+!C If we have absorbed the hydrogens and want to use them now, we must do some re-administrating.
+        IF (HydrogenTreatment .EQ. 2) THEN
+          DesorbHydrogens = .TRUE.
+          CALL create_fob(.FALSE.)
+        ENDIF
+      ENDIF
+      N = NPAR
+      DO II = 1, N
+        I = IP(II)
+        XSIM(II) = XOPT(I)
+!C DXSIM = initial step sizes.
+        DXSIM(II) = SA_SimplexDampingFactor*0.1*RULB(I)
+      ENDDO
+      CALL SA_SIMOPT(XSIM,DXSIM,N,FTEM)
+      IF (Auto) THEN
+        tAccept = .TRUE.
+      ELSE
+        chistr = 'Chi-squared = 0000.00'
+        WRITE(chistr(15:21),'(F7.2)') FTEM
+        tAccept = Confirm(CHISTR//CHAR(13)//'Press Yes to proceed with Simplex results.')
+      ENDIF
+      LOG_HYDROGENS = tLOG_HYDROGENS
+      IF (DesorbHydrogens) CALL create_fob(.TRUE.)
+      IF (tAccept) THEN
+        IF (.NOT. Auto) WasMinimised = .TRUE.
+        DO II = 1, N
+          I = IP(II)
+          XOPT(I) = XSIM(II)
+          x_unique(I) = XSIM(II)
+        ENDDO
+        FOPT = FTEM
+        DO II = 1, NATOM
+          DO III = 1, 3
+            XAtmCoords(III,II,Curr_SA_Run) = XATO(III,II)
+          ENDDO
+        ENDDO
+        CALL valchipro(CHIPROBEST)
+        NewOptimumFound = .TRUE.
+        IF ( .NOT. IN_BATCH ) THEN
+          CALL SelectDASHDialog(IDD_SA_Action1)
+          CALL WDialogPutReal(IDF_min_chisq, FOPT, '(F8.2)')
+          CALL WDialogPutReal(IDF_profile_chisq2, CHIPROBEST, '(F8.2)')
+          CALL SelectDASHDialog(IDD_Summary)
+          CALL WGridPutCellReal(IDF_SA_Summary, 4, Curr_SA_Run, CHIPROBEST, '(F7.2)')
+          CALL WGridPutCellReal(IDF_SA_Summary, 5, Curr_SA_Run, FOPT, '(F7.2)')
+  !U      CALL SelectDASHDialog(IDD_Parameter_Status)
+  !U      DO i = 1, nvar
+  !U        CALL WGridPutCellReal(IDF_CPL_grid,1,i,xopt(i),'(F12.5)')
+  !U        DO icol = 2, 7
+  !U          CALL WGridClearCell(IDF_CPL_grid,icol,i)
+  !U        ENDDO
+  !U      ENDDO
+        ENDIF
+      ELSE
+        IF (PrefParExists) THEN
+          CALL PO_PRECFC(x_unique(iPrfPar))
+          CALL FCN(x_unique,DFTEM,0)
+        ENDIF
+      ENDIF
+
+      IF ( .NOT. IN_BATCH ) &
+        CALL WCursorShape(CurCrossHair)
+
+      END SUBROUTINE LocalMinimise
+!
+!*****************************************************************************
+!
       REAL FUNCTION SA_FCN(N,P)
+
+      USE PO_VAR
 
       IMPLICIT NONE
 
@@ -10,8 +165,11 @@
       REAL P(MVAR)
       INTEGER N
 
-      DOUBLE PRECISION XOPT,       C,       FOPT
-      COMMON /sacmn /  XOPT(MVAR), C(MVAR), FOPT
+      REAL            X_init,       x_unique,       lb,       ub
+      COMMON /values/ X_init(MVAR), x_unique(MVAR), lb(MVAR), ub(MVAR)
+
+      REAL              XOPT,       C,       FOPT
+      COMMON / sacmn /  XOPT(MVAR), C(MVAR), FOPT
 
       INTEGER         NPAR, IP
       COMMON /SIMSTO/ NPAR, IP(MVAR)
@@ -19,19 +177,20 @@
       INTEGER         nvar, ns, nt, iseed1, iseed2
       COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
 
-      DOUBLE PRECISION CHIANS, DBLEP(MVAR)
+      REAL DBLEP(MVAR)
+      REAL CHIANS
       INTEGER I, II
 
       DO I = 1, NVAR
         DBLEP(I) = XOPT(I)
       ENDDO
-      DO II = 1, NPAR
+      DO II = 1, N
         I = IP(II)
-        DBLEP(I) = DBLE(P(II))
+        DBLEP(I) = P(II)
       ENDDO
-!O      CALL PO_PRECFC
-      CALL FCN(DBLEP,CHIANS,0)
-      SA_FCN = SNGL(CHIANS)
+      IF (PrefParExists) CALL PO_PRECFC(DBLEP(iPrfPar))
+      CALL FCN(DBLEP, CHIANS, 0)
+      SA_FCN = CHIANS
 
       END FUNCTION SA_FCN
 !
@@ -51,8 +210,8 @@
 !    DX       R*4    I       N      Initial step-lengths for X.
 !
 ! Other Requirements
-!     The user must provide a FUNCTION SA_FCN(X) which evalutes
-! Chi-squared (un-normalised) given the vector X.
+!     The user must provide a FUNCTION SA_FCN(N,X) which evalutes
+! Chi-squared (un-normalised) given the vector X(N).
 !
 ! History
 !     D. S. Sivia    9 Feb 1995  Initial release.

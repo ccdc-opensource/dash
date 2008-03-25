@@ -1,7 +1,6 @@
-!*==MAJUST.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-! LEVEL 5      SUBROUTINE MAJUST
       SUBROUTINE MAJUST
 !
 ! *** MAJUST updated by JCM May 88 ***
@@ -31,13 +30,14 @@
       CHARACTER*4 MWORD, MTBL1(8), MTBL2(4), MNEW(20)
       CHARACTER*80 MCARD(20), NEWNCD
       CHARACTER*10 FILNOM
-      COMMON /CARDRC/ ICRYDA, NTOTAL(9), NYZ, NTOTL, INREA(26,9),       &
-     &                ICDN(26,9), IERR, IO10, SDREAD
-      LOGICAL SDREAD
+      INTEGER         ICRYDA, NTOTAL,    NYZ, NTOTL, INREA,       ICDN,       IERR, IO10
+      LOGICAL                                                                             SDREAD
+      COMMON /CARDRC/ ICRYDA, NTOTAL(9), NYZ, NTOTL, INREA(26,9), ICDN(26,9), IERR, IO10, SDREAD
       DIMENSION INREAD(26), ICDNO(26)
       EQUIVALENCE (INREAD(1),INREA(1,1))
       EQUIVALENCE (ICDNO(1),ICDN(1,1))
-      COMMON /IOUNIT/ LPT, ITI, ITO, IPLO, LUNI, IOUT
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
       COMMON /MAPGT / ZGTVAL(20), ZCGT, IGT, IZGT, IDUMPG
       COMMON /SCRACH/ MESSAG, NAMFIL
       CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
@@ -119,28 +119,23 @@
         DO II = 1, 4
           IF (MWORD.EQ.MTBL2(II)) GOTO 9
         ENDDO
-!
 ! INSIST ON COPYING NDIM, AXES, FTYP, MESH:
         DO II = 1, 4
           IF (MWORD.EQ.MTBL1(II)) GOTO 8
         ENDDO
-!
 ! THIS LEAVES CONT AND CM/A;  ONLY COPY IF THEY ARE OLD BUT NOT NEW:
         DO J = 1, NEWMC
           IF (MWORD.EQ.MNEW(J)) GOTO 9
         ENDDO
-!
 ! OLD CARD STILL WANTED:
     8   INEW = INEW + 1
         WRITE (IO10,2000) ICARD
-!
 ! OLD CARD OCCURS AGAIN IN NEW SET - DISCARD OLD:
 ! COUNT INPUT OLD CARDS
     9   I = I + 1
         IF (I.GT.NCDS) GOTO 101
         READ (IDUMPG) ICARD
       ENDDO
-!
 ! END OF SCANNING OLD M CARDS - NOW ADD ALL NEW ONES:
       DO K = 1, NEWMC
         INEW = INEW + 1
@@ -148,7 +143,6 @@
       ENDDO
       ICDNO(13) = INEW - INREAD(13)
       GOTO 14
-!
   101 IF (ICDNO(14).NE.0 .OR. NONEWN) GOTO 100
       INREAD(14) = INEW
       INEW = INEW + 1
@@ -159,13 +153,8 @@
      &        ' and given relevant new M cards')
       RETURN
  2000 FORMAT (A80)
+
       END SUBROUTINE MAJUST
-!*==FFTADD.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-      BLOCKDATA FFTADD
-      COMMON /FFTDA / KJUMP, UR(15), UI(15)
-      DATA KJUMP/1/
-      END BLOCKDATA FFTADD

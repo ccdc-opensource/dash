@@ -1,11 +1,12 @@
-!*==MODHKL1.f90  processed by SPAG 6.11Dc at 15:36 on 20 Sep 2001
+!
+!*****************************************************************************
+!
       SUBROUTINE MODHKL2(Kram,Krap,Krcm,Krcp,Kracm,Kracp,Krbm,Krbp,Kamcp,Kapcm,Csm,Csp,Amoi,Aplu,Cmoi,Cplu,Kracms, &
      &                   Kracps,K1)
  
       USE DICVAR
+
       IMPLICIT NONE
-!
-!*** Start of declarations rewritten by SPAG
 !
 ! Dummy arguments
 !
@@ -20,9 +21,7 @@
       REAL :: F
       INTEGER :: I, J, Jj, K, Kj, Kk, Kqqm, Kqqp, La1, Lc0, M, Mcarh, Mcark, Mcarl, Mm1, Mm2, Mm3,&
      &           Mp1, Mp2, Mp3, Mprohl, Mxl, Ne, Ng, Nx, Ny, Nz
-!
-!*** End of declarations rewritten by SPAG
-!
+
       F(Nx,Ny,Nz,Dd,Ne,Ng) = Nx + Ny + Nz - Dd*Ne*Ng
       nt = 0
       Kk = K1 - 1
@@ -120,16 +119,18 @@
           GOTO 99999
         ENDIF
       ENDDO
+
 99999 END SUBROUTINE MODHKL2
-
-
-
-!*==CUBIQU.f90  processed by SPAG 6.11Dc at 15:36 on 20 Sep 2001
+!
+!*****************************************************************************
+!
 !     ------------------------------------------------------------------
 !     |                         C U B I Q U E                          |
 !     ------------------------------------------------------------------
       SUBROUTINE CUBIQU(Na)
+
       USE DICVAR
+
       IMPLICIT NONE
 !
 ! Dummy arguments
@@ -139,12 +140,10 @@
 !
 ! Local variables
 !
-      REAL :: Aare,     &
-     &        Aw, Carl, Ram7, Rap7, Vap, Vtestm, Vtestp
-      INTEGER :: I, Ia, Ia2, Ia3, Ia4, Ia5, Ia6, Ia7, Ind, Jj, Kram1, Kram2, Kram3, Kram4,       &
+      REAL :: Aare, Aw, Ram7, Rap7, Vap, Vtestm, Vtestp
+      INTEGER :: I, Ia, Ia2, Ia3, Ia4, Ia5, Ia6, Ia7, Ind, Kram1, Kram2, Kram3, Kram4,       &
      &           Kram5, Kram6, Kram7, Krap1, Krap2, Krap3, Krap4, Krap5, Krap6, Krap7, Nrind
 
-!99001 FORMAT (' ',8X,'A=',F8.5,8X,'VOLUME DE LA MAILLE ELEMENTAIRE =',F9.3,5X,'Z=',I2)
       DO I = 1, 7
         Ndich(I) = 0
       ENDDO
@@ -168,6 +167,7 @@
                   IF ( irj(I,1).EQ.0 ) GOTO 100
                 ENDDO
                 Ndich(1) = Ndich(1) + 1
+      CALL PeekEvent
                 DO Ia2 = 1, 2
                   Aw = Ia2 - 1
                   Amoi2 = Amoi1 + (Aw*pas2)
@@ -182,6 +182,7 @@
                       CALL CUDHKL1(Kram2,Krap2,2)
                       IF ( nt.NE.-1 ) THEN
                         Ndich(2) = Ndich(2) + 1
+      CALL PeekEvent
                         DO Ia3 = 1, 2
                           Aw = Ia3 - 1
                           Amoi3 = Amoi2 + (Aw*pas4)
@@ -196,6 +197,7 @@
                               CALL CUDHKL1(Kram3,Krap3,3)
                               IF ( nt.NE.-1 ) THEN
                                 Ndich(3) = Ndich(3) + 1
+      CALL PeekEvent
                                 DO Ia4 = 1, 2
                                   Aw = Ia4 - 1
                                   Amoi4 = Amoi3 + (Aw*pas8)
@@ -210,6 +212,7 @@
                                       CALL CUDHKL1(Kram4,Krap4,4)
                                       IF ( nt.NE.-1 ) THEN
                                         Ndich(4) = Ndich(4) + 1
+      CALL PeekEvent
                                         DO Ia5 = 1, 2
                                          Aw = Ia5 - 1
                                          Amoi5 = Amoi4 + (Aw*pas16)
@@ -224,6 +227,7 @@
                                          CALL CUDHKL1(Kram5,Krap5,5)
                                          IF ( nt.NE.-1 ) THEN
                                          Ndich(5) = Ndich(5) + 1
+      CALL PeekEvent
                                          DO Ia6 = 1, 2
                                          Aw = Ia6 - 1
                                          Amoi6 = Amoi5 + (Aw*pas32)
@@ -238,6 +242,7 @@
                                          CALL CUDHKL1(Kram6,Krap6,6)
                                          IF ( nt.NE.-1 ) THEN
                                          Ndich(6) = Ndich(6) + 1
+      CALL PeekEvent
                                          DO Ia7 = 1, 2
                                          Aw = Ia7 - 1
                                          Amoi7 = Amoi6 + (Aw*pas64)
@@ -254,21 +259,15 @@
                                          CALL CUDHKL1(Kram7,Krap7,7)
                                          IF ( nt.NE.-1 ) THEN
                                          Ndich(7) = Ndich(7) + 1
+      CALL PeekEvent
                                          Aare = aa
                                          aa = Amoi7 + (pas64/2.)
                                          Vap = aa*aa*aa
-                                         DO I = 1, n
-                                           Jj = irj(I,7)
-                                   !        DO J = 1, Jj
-                                    !         Carl = ih(I,J,7)**2 + ik(I,J,7)**2 + il(I,J,7)**2
-                                     !      ENDDO
-                                         ENDDO
                                          Ind = 1
                                          Nrind = 1
                                          CALL AFFPAR(Ind,Nrind,Vap)
+                                         IF (DICVOL_Error .NE. 0) RETURN
                                          IF ( fwolff.NE.-1000. ) THEN
-!                                         WRITE (iw,99002)
-!99002                                    FORMAT (' ',50X,9('-')/)
                                          ELSE
                                          aa = Aare
                                          ENDIF
@@ -303,13 +302,16 @@
  100  ENDDO
 !      WRITE (iw,99003) (Ndich(I),I=1,7)
 !99003 FORMAT (//,2X,'ITERATION NUMBER AT EACH DICHOTOMY LEVEL :',7I5)
+
       END SUBROUTINE CUBIQU
-!*==CUDHKL.f90  processed by SPAG 6.11Dc at 15:36 on 20 Sep 2001
-      SUBROUTINE CUDHKL(Kram,Krap)
-      USE DICVAR
-      IMPLICIT NONE
 !
-!*** Start of declarations rewritten by SPAG
+!*****************************************************************************
+!
+      SUBROUTINE CUDHKL(Kram,Krap)
+
+      USE DICVAR
+
+      IMPLICIT NONE
 !
 ! Dummy arguments
 !
@@ -319,9 +321,7 @@
 ! Local variables
 !
       INTEGER :: I, Jj, K, Kqqm, Kqqp, M, Mcarh, Mcark, Mcarl, Mxl
-!
-!*** End of declarations rewritten by SPAG
-!
+
       nt = 0
       DO I = 1, n
         irj(I,1) = 0
@@ -382,13 +382,16 @@
           ENDDO
  100    ENDDO
       ENDDO
+
 99999 END SUBROUTINE CUDHKL
-!*==CUDHKL1.f90  processed by SPAG 6.11Dc at 15:36 on 20 Sep 2001
-      SUBROUTINE CUDHKL1(Kram,Krap,K1)
-      USE DICVAR
-      IMPLICIT NONE
 !
-!*** Start of declarations rewritten by SPAG
+!*****************************************************************************
+!
+      SUBROUTINE CUDHKL1(Kram,Krap,K1)
+
+      USE DICVAR
+
+      IMPLICIT NONE
 !
 ! Dummy arguments
 !
@@ -398,9 +401,7 @@
 ! Local variables
 !
       INTEGER :: I, J, Jj, K, Kj, Kk, Kqqm, Kqqp, M, Mcarl, Mxl
-!
-!*** End of declarations rewritten by SPAG
-!
+
       nt = 0
       Kk = K1 - 1
       DO I = 1, n
@@ -428,16 +429,19 @@
           GOTO 99999
         ENDIF
       ENDDO
+
 99999 END SUBROUTINE CUDHKL1
-!*==TETHEX.f90  processed by SPAG 6.11Dc at 15:36 on 20 Sep 2001
+!
+!*****************************************************************************
+!
 !     ------------------------------------------------------------------
 !     |          T E T R A G O N A L   E T   H E X A G O N A L         |
 !     ------------------------------------------------------------------
       SUBROUTINE TETHEX(Nc,Ichoix)
+
       USE DICVAR
+
       IMPLICIT NONE
-!
-!*** Start of declarations rewritten by SPAG
 !
 ! Dummy arguments
 !
@@ -446,18 +450,13 @@
 !
 ! Local variables
 !
-      REAL :: Aare,       &
-     &         Atest, Aw, Ccre,   &
-     &        Const, Contr, Contr1, Covol, Ctest, Cw,&
+      REAL :: Aare, Atest, Aw, Ccre, Const, Contr, Contr1, Covol, Ctest, Cw,&
      &        Ra, Ram7, Rap7, Rcm7, Rcp7, Sam, Vap, Vtestm, Vtestp
-      INTEGER :: I, Ia, Ia2, Ia3, Ia4, Ia5, Ia6, Ia7, Ic, Ic2, Ic3, Ic4, Ic5, Ic6, Ic7, Ind, J,   &
-     &           Jj, Kram1, Kram2, Kram3, Kram4, Kram5, Kram6, Kram7, Krap1, Krap2, Krap3, Krap4,      &
+      INTEGER :: I, Ia, Ia2, Ia3, Ia4, Ia5, Ia6, Ia7, Ic, Ic2, Ic3, Ic4, Ic5, Ic6, Ic7, Ind,  &
+     &           Kram1, Kram2, Kram3, Kram4, Kram5, Kram6, Kram7, Krap1, Krap2, Krap3, Krap4,      &
      &           Krap5, Krap6, Krap7, Krcm1, Krcm2, Krcm3, Krcm4, Krcm5, Krcm6, Krcm7, Krcp1, Krcp2,   &
-     &           Krcp3, Krcp4, Krcp5, Krcp6, Krcp7, Nphk, Nrind
-!
-!*** End of declarations rewritten by SPAG
-!
-! FORMAT (' ',10X,'A=',F8.5,10X,'C=',F8.5/10X,'VOLUME DE LA MAILLEELEMENTAIRE =,'F10.3,5X,'Z=',I2)
+     &           Krcp3, Krcp4, Krcp5, Krcp6, Krcp7, Nrind
+
       DO I = 1, 7
         Ndich(I) = 0
       ENDDO
@@ -501,6 +500,7 @@
                   IF ( irj(I,1).EQ.0 ) GOTO 50
                 ENDDO
                 Ndich(1) = Ndich(1) + 1
+      CALL PeekEvent
                 DO Ia2 = 1, 2
                   Aw = Ia2 - 1
                   Amoi2 = Amoi1 + (Aw*pas2)
@@ -523,6 +523,7 @@
                         CALL TEDHKL1(Kram2,Krap2,Krcm2,Krcp2,Ichoix,2)
                         IF ( nt.NE.-1 ) THEN
                           Ndich(2) = Ndich(2) + 1
+      CALL PeekEvent
                           DO Ia3 = 1, 2
                             Aw = Ia3 - 1
                             Amoi3 = Amoi2 + (Aw*pas4)
@@ -545,6 +546,7 @@
                                   CALL TEDHKL1(Kram3,Krap3,Krcm3,Krcp3,Ichoix,3)
                                   IF ( nt.NE.-1 ) THEN
                                     Ndich(3) = Ndich(3) + 1
+      CALL PeekEvent
                                     DO Ia4 = 1, 2
                                       Aw = Ia4 - 1
                                       Amoi4 = Amoi3 + (Aw*pas8)
@@ -567,6 +569,7 @@
                                          CALL TEDHKL1(Kram4,Krap4,Krcm4,Krcp4,Ichoix,4)
                                          IF ( nt.NE.-1 ) THEN
                                          Ndich(4) = Ndich(4) + 1
+      CALL PeekEvent
                                          DO Ia5 = 1, 2
                                          Aw = Ia5 - 1
                                          Amoi5 = Amoi4 + (Aw*pas16)
@@ -589,6 +592,7 @@
                                          CALL TEDHKL1(Kram5,Krap5,Krcm5,Krcp5,Ichoix,5)
                                          IF ( nt.NE.-1 ) THEN
                                          Ndich(5) = Ndich(5) + 1
+      CALL PeekEvent
                                          DO Ia6 = 1, 2
                                          Aw = Ia6 - 1
                                          Amoi6 = Amoi5 + (Aw*pas32)
@@ -611,6 +615,7 @@
                                          CALL TEDHKL1(Kram6,Krap6,Krcm6,Krcp6,Ichoix,6)
                                          IF ( nt.NE.-1 ) THEN
                                          Ndich(6) = Ndich(6) + 1
+      CALL PeekEvent
                                          DO Ia7 = 1, 2
                                          Aw = Ia7 - 1
                                          Amoi7 = Amoi6 + (Aw*pas64)
@@ -637,6 +642,7 @@
                                          CALL TEDHKL1(Kram7,Krap7,Krcm7,Krcp7,Ichoix,7)
                                          IF ( nt.NE.-1 ) THEN
                                          Ndich(7) = Ndich(7) + 1
+      CALL PeekEvent
                                          Aare = aa
                                          Ccre = cc
                                          aa = Amoi7 + (pas64/2.)
@@ -645,19 +651,12 @@
                                          IF ( Ichoix.EQ.1 ) Vap = Vap*SQRT(3.)/2.
                                          Sam = 0.
                                          IF ( Ichoix.EQ.1 ) Sam = 1.
-                                         DO I = 1, n
-                                         Jj = irj(I,7)
-                                           DO J = 1, Jj
-                                             Nphk = Sam*ih(I,J,7)*ik(I,J,7)
-                                           ENDDO
-                                         ENDDO
                                          Ind = 2
                                          Nrind = 2
                                          IF ( Ichoix.GT.0 ) Ind = 3
                                          CALL AFFPAR(Ind,Nrind,Vap)
+                                         IF (DICVOL_Error .NE. 0) RETURN
                                          IF ( fwolff.NE.-1000. ) THEN
-!                                         WRITE (iw,99002)
-!99002                                    FORMAT (' ',50X,9('-')/)
                                          ELSE
                                          aa = Aare
                                          cc = Ccre
@@ -699,13 +698,16 @@
  100  ENDDO
 !      WRITE (iw,99003) (Ndich(I),I=1,7)
 !99003 FORMAT (//,2X,'ITERATION NUMBER AT EACH DICHOTOMY LEVEL :',7I5)
+
       END SUBROUTINE TETHEX
-!*==TEDHKL.f90  processed by SPAG 6.11Dc at 15:36 on 20 Sep 2001
-      SUBROUTINE TEDHKL(Kram,Krap,Krcm,Krcp,Ichoix)
-      USE DICVAR
-      IMPLICIT NONE
 !
-!*** Start of declarations rewritten by SPAG
+!*****************************************************************************
+!
+      SUBROUTINE TEDHKL(Kram,Krap,Krcm,Krcp,Ichoix)
+
+      USE DICVAR
+
+      IMPLICIT NONE
 !
 ! Dummy arguments
 !
@@ -715,9 +717,7 @@
 ! Local variables
 !
       INTEGER :: I, Jj, K, Kqqm, Kqqp, Ksom, M, Mcarh, Mcark, Mcarl, Mxl
-!
-!*** End of declarations rewritten by SPAG
-!
+
       nt = 0
       DO I = 1, n
         irj(I,1) = 0
@@ -790,25 +790,25 @@
           ENDDO
  100    ENDDO
       ENDDO
+
 99999 END SUBROUTINE TEDHKL
-!*==TEDHKL1.f90  processed by SPAG 6.11Dc at 15:36 on 20 Sep 2001
-      SUBROUTINE TEDHKL1(Kram,Krap,Krcm,Krcp,Ichoix,K1)
-      USE DICVAR
-      IMPLICIT NONE
 !
-!*** Start of declarations rewritten by SPAG
+!*****************************************************************************
+!
+      SUBROUTINE TEDHKL1(Kram,Krap,Krcm,Krcp,Ichoix,K1)
+
+      USE DICVAR
+
+      IMPLICIT NONE
 !
 ! Dummy arguments
 !
-      INTEGER :: Ichoix, K1, Kram, Krap, Krcm, Krcp
-      INTENT (IN) Ichoix, K1, Kram, Krap, Krcm, Krcp
+      INTEGER, INTENT (IN   ) :: Kram, Krap, Krcm, Krcp, Ichoix, K1
 !
 ! Local variables
 !
       INTEGER :: I, J, Jj, K, Kj, Kk, Kqqm, Kqqp, Ksom, M, Mcark, Mcarl, Mxl
-!
-!*** End of declarations rewritten by SPAG
-!
+
       nt = 0
       Kk = K1 - 1
       DO I = 1, n
@@ -843,16 +843,19 @@
           GOTO 99999
         ENDIF
       ENDDO
+
 99999 END SUBROUTINE TEDHKL1
-!*==ORTHOR.f90  processed by SPAG 6.11Dc at 15:36 on 20 Sep 2001
+!
+!*****************************************************************************
+!
 !     ------------------------------------------------------------------
 !     |                   O R T H O R H O M B I Q U E                  |
 !     ------------------------------------------------------------------
       SUBROUTINE ORTHOR(Na,Nb,Nc)
+
       USE DICVAR
+
       IMPLICIT NONE
-!
-!*** Start of declarations rewritten by SPAG
 !
 ! Dummy arguments
 !
@@ -861,8 +864,7 @@
 !
 ! Local variables
 !
-      REAL :: Aare,  Atest, Aw, Bbre,  &
-     &        Btest, Bw, Ccre, Ctest, Cw, &
+      REAL :: Aare,  Atest, Aw, Bbre, Btest, Bw, Ccre, Ctest, Cw, &
      &        Ram7, Rap7, Rbm7, Rbp7, Rcm7, Rcp7, Vap, Vtestm, Vtestp
       INTEGER :: I, Ia, Ia2, Ia3, Ia4, Ia5, Ia6, Ia7, Ib, Ib2, Ib3, Ib4, Ib5, Ib6, Ib7, Ic, Ic2,  &
      &           Ic3, Ic4, Ic5, Ic6, Ic7, Ind, Kram1, Kram2, Kram3, Kram4, Kram5, Kram6,      &
@@ -870,11 +872,7 @@
      &           Krbm5, Krbm6, Krbm7, Krbp1, Krbp2, Krbp3, Krbp4, Krbp5, Krbp6, Krbp7, Krcm1, Krcm2,   &
      &           Krcm3, Krcm4, Krcm5, Krcm6, Krcm7, Krcp1, Krcp2, Krcp3, Krcp4, Krcp5, Krcp6, Krcp7,   &
      &           Nrind
-!
-!*** End of declarations rewritten by SPAG
-!
-!99001 FORMAT (' ',10X,'A=',F8.5,10X,'B=',F8.5,10X,'C=',F8.5/10X,'VOLUME DE LA MAILLE ELEMENTAIRE =',F10.3,5X,'Z=', &
-!     &        I2)
+
       DO I = 1, 7
         Ndich(I) = 0
       ENDDO
@@ -919,6 +917,7 @@
                     IF ( irj(I,1).EQ.0 ) GOTO 20
                   ENDDO
                   Ndich(1) = Ndich(1) + 1
+      CALL PeekEvent
                   DO Ia2 = 1, 2
                     Aw = Ia2 - 1
                     Amoi2 = Amoi1 + (Aw*pas2)
@@ -948,6 +947,7 @@
                             CALL ORDHKL1(Kram2,Krap2,Krbm2,Krbp2,Krcm2,Krcp2,2)
                             IF ( nt.NE.-1 ) THEN
                               Ndich(2) = Ndich(2) + 1
+      CALL PeekEvent
                               DO Ia3 = 1, 2
                                 Aw = Ia3 - 1
                                 Amoi3 = Amoi2 + (Aw*pas4)
@@ -977,6 +977,7 @@
                                         CALL ORDHKL1(Kram3,Krap3,Krbm3,Krbp3,Krcm3,Krcp3,3)
                                         IF ( nt.NE.-1 ) THEN
                                          Ndich(3) = Ndich(3) + 1
+      CALL PeekEvent
                                          DO Ia4 = 1, 2
                                          Aw = Ia4 - 1
                                          Amoi4 = Amoi3 + (Aw*pas8)
@@ -1006,6 +1007,7 @@
                                          CALL ORDHKL1(Kram4,Krap4,Krbm4,Krbp4,Krcm4,Krcp4,4)
                                          IF ( nt.NE.-1 ) THEN
                                          Ndich(4) = Ndich(4) + 1
+      CALL PeekEvent
                                          DO Ia5 = 1, 2
                                          Aw = Ia5 - 1
                                          Amoi5 = Amoi4 + (Aw*pas16)
@@ -1037,6 +1039,7 @@
                                          CALL ORDHKL1(Kram5,Krap5,Krbm5,Krbp5,Krcm5,Krcp5,5)
                                          IF ( nt.NE.-1 ) THEN
                                          Ndich(5) = Ndich(5) + 1
+      CALL PeekEvent
                                          DO Ia6 = 1, 2
                                          Aw = Ia6 - 1
                                          Amoi6 = Amoi5 + (Aw*pas32)
@@ -1066,6 +1069,7 @@
                                          CALL ORDHKL1(Kram6,Krap6,Krbm6,Krbp6,Krcm6,Krcp6,6)
                                          IF ( nt.NE.-1 ) THEN
                                          Ndich(6) = Ndich(6) + 1
+      CALL PeekEvent
                                          DO Ia7 = 1, 2
                                          Aw = Ia7 - 1
                                          Amoi7 = Amoi6 + (Aw*pas64)
@@ -1101,6 +1105,7 @@
                                          CALL ORDHKL1(Kram7,Krap7,Krbm7,Krbp7,Krcm7,Krcp7,7)
                                          IF ( nt.NE.-1 ) THEN
                                          Ndich(7) = Ndich(7) + 1
+      CALL PeekEvent
                                          Aare = aa
                                          Bbre = bb
                                          Ccre = cc
@@ -1111,9 +1116,8 @@
                                          Ind = 4
                                          Nrind = 3
                                          CALL AFFPAR(Ind,Nrind,Vap)
+                                         IF (DICVOL_Error .NE. 0) RETURN
                                          IF ( fwolff.NE.-1000. ) THEN
-!                                         WRITE (iw,99002)
-!99002                                    FORMAT (' ',50X,9('-')/)
                                          ELSE
                                          aa = Aare
                                          bb = Bbre
@@ -1163,8 +1167,11 @@
  100  ENDDO
 !      WRITE (iw,99003) (Ndich(I),I=1,7)
 !99003 FORMAT (//,2X,'ITERATION NUMBER AT EACH DICHOTOMY LEVEL :',7I5)
+
       END SUBROUTINE ORTHOR
-!*==ORDHKL.f90  processed by SPAG 6.11Dc at 15:36 on 20 Sep 2001
+!
+!*****************************************************************************
+!
       SUBROUTINE ORDHKL(Kram,Krap,Krbm,Krbp,Krcm,Krcp)
 
       USE DICVAR
@@ -1260,10 +1267,15 @@
           ENDDO
  150    ENDDO
  200  ENDDO
+
 99999 END SUBROUTINE ORDHKL
-!*==ORDHKL1.f90  processed by SPAG 6.11Dc at 15:36 on 20 Sep 2001
+!
+!*****************************************************************************
+!
       SUBROUTINE ORDHKL1(Kram,Krap,Krbm,Krbp,Krcm,Krcp,K1)
+
       USE DICVAR
+
       IMPLICIT NONE
 !
 ! Dummy arguments
@@ -1301,16 +1313,17 @@
           GOTO 99999
         ENDIF
       ENDDO
+
 99999 END SUBROUTINE ORDHKL1
-!*==MONOC1.f90  processed by SPAG 6.11Dc at 15:36 on 20 Sep 2001
+!
+!*****************************************************************************
+!
 !     ------------------------------------------------------------------
 !     | 		   M O N O C L I N I C 1		       |
 !     ------------------------------------------------------------------
       SUBROUTINE MONOC1(Na,Nb,Nc)
       USE DICVAR
       IMPLICIT NONE
-!
-!*** Start of declarations rewritten by SPAG
 !
 ! Dummy arguments
 !
@@ -1326,13 +1339,11 @@
       REAL :: Db, Dc, Pab16, Pab2, Pab32, Pab4, Pab8, Pasbe, Pp, Vap, Vtestm, Vtestp
       INTEGER :: I, Ia, Ia2, Ia3, Ia4, Ia5, Ia6, Ia7, Ib, Ib2, Ib3, Ib4, Ib5, Ib6, Ib7, Ibet1,     &
      &           Ibet2, Ibet3, Ibet4, Ibet5, Ibet6, Ibet7, Ic, Ic2, Ic3, Ic4, Ic5, Ic6, Ic7, Ind, J,&
-     &           Jj, Kamcp, Kapcm, Kracm, Kracms, Kracp, Kracps, Kram1, Kram2, Kram3, Kram4, Kram5,    &
+     &           Kamcp, Kapcm, Kracm, Kracms, Kracp, Kracps, Kram1, Kram2, Kram3, Kram4, Kram5,    &
      &           Kram6, Kram7, Krap1, Krap2, Krap3, Krap4, Krap5, Krap6, Krap7, Krbm1, Krbm2, Krbm3,   &
      &           Krbm4, Krbm5, Krbm6, Krbm7, Krbp1, Krbp2, Krbp3, Krbp4, Krbp5, Krbp6, Krbp7, Krcm,    &
      &           Krcp, Nbeta, Nrind
-!
-!*** End of declarations rewritten by SPAG
-!
+
       DO I = 1, 7
         Ndich(I) = 0
       ENDDO
@@ -1441,6 +1452,7 @@
      &                           .EQ.ik(J,1,1) .AND. il(I,1,1).EQ.il(J,1,1) ) GOTO 85
                           ENDDO
                           Ndich(1) = Ndich(1) + 1
+      CALL PeekEvent
                           DO Ibet2 = 0, 1
                             Beinf2 = Beinf1 + (Ibet2*Pab2)
                             Besup2 = Beinf2 + Pab2
@@ -1488,6 +1500,7 @@
      &                                     ik(I,1,2).EQ.ik(J,1,2) .AND. il(I,1,2).EQ.il(J,1,2) ) GOTO 76
                                          ENDDO
                                          Ndich(2) = Ndich(2) + 1
+      CALL PeekEvent
                                          DO Ibet3 = 0, 1
                                          Beinf3 = Beinf2 + (Ibet3*Pab4)
                                          Besup3 = Beinf3 + Pab4
@@ -1536,6 +1549,7 @@
      &                                     ik(I,1,3).EQ.ik(J,1,3) .AND. il(I,1,3).EQ.il(J,1,3) ) GOTO 72
                                          ENDDO
                                          Ndich(3) = Ndich(3) + 1
+      CALL PeekEvent
                                          DO Ibet4 = 0, 1
                                          Beinf4 = Beinf3 + (Ibet4*Pab8)
                                          Besup4 = Beinf4 + Pab8
@@ -1584,6 +1598,7 @@
      &                                     ik(I,1,4).EQ.ik(J,1,4) .AND. il(I,1,4).EQ.il(J,1,4) ) GOTO 68
                                          ENDDO
                                          Ndich(4) = Ndich(4) + 1
+      CALL PeekEvent
                                          DO Ibet5 = 0, 1
                                          Beinf5 = Beinf4 + (Ibet5*Pab16)
                                          Besup5 = Beinf5 + Pab16
@@ -1632,6 +1647,7 @@
      &                                     ik(I,1,5).EQ.ik(J,1,5) .AND. il(I,1,5).EQ.il(J,1,5) ) GOTO 64
                                          ENDDO
                                          Ndich(5) = Ndich(5) + 1
+      CALL PeekEvent
                                          DO Ibet6 = 0, 1
                                          beinf6 = Beinf5 + (Ibet6*Pab32)
                                          Besup6 = beinf6 + Pab32
@@ -1680,6 +1696,7 @@
      &                                     ik(I,1,6).EQ.ik(J,1,6) .AND. il(I,1,6).EQ.il(J,1,6) ) GOTO 60
                                          ENDDO
                                          Ndich(6) = Ndich(6) + 1
+      CALL PeekEvent
                                          DO Ibet7 = 0, 1
                                          Beinf7 = beinf6 + (Ibet7*pab64)
                                          Besup7 = Beinf7 + pab64
@@ -1728,6 +1745,7 @@
      &                                     ik(I,1,7).EQ.ik(J,1,7) .AND. il(I,1,7).EQ.il(J,1,7) ) GOTO 56
                                          ENDDO
                                          Ndich(7) = Ndich(7) + 1
+      CALL PeekEvent
                                          Aare = aa
                                          Bbre = bb
                                          Ccre = cc
@@ -1738,23 +1756,13 @@
                                          bebe = Beinf7 + (pab64/2.)
                                          Vap = aa*bb*cc/SIN(bebe)
                                          beta = pideg*bebe
-                                         DO I = 1, n
-                                           Jj = irj(I,7)
-                                        !   DO J = 1, Jj
-                                        !     Carh  = ih(I,J,7)*ih(I,J,7)
-                                        !     Cark  = ik(I,J,7)*ik(I,J,7)
-                                        !     Carl  = il(I,J,7)*il(I,J,7)
-                                        !     Prohl = il(I,J,7)*ih(I,J,7)
-                                        !   ENDDO
-                                         ENDDO
                                          Ind = 5
                                          Nrind = 4
                                          CALL AFFPAR(Ind,Nrind,Vap)
+                                         IF (DICVOL_Error .NE. 0) RETURN
                                          aa = aa*SIN(bebe)
                                          cc = cc*SIN(bebe)
                                          IF ( fwolff.NE.-1000. ) THEN
-                                         WRITE (iw,99001)
-99001                                    FORMAT (' ',50X,9('-')/)
                                          ELSE
                                          aa = Aare
                                          bb = Bbre
@@ -1819,17 +1827,21 @@
  100      ENDDO
         ENDDO
  200  ENDDO
- 300  CONTINUE ! WRITE (iw,99003) (Ndich(I),I=1,7)
+ 300  CONTINUE
+!      WRITE (iw,99003) (Ndich(I),I=1,7)
 !99003 FORMAT (//,2X,'ITERATION NUMBER AT EACH DICHOTOMY LEVEL :',7I5)
 !99002 FORMAT (' ',2X,'ANGLE RANGE SCANNED :',2X,'BETA MIN=',F7.3,' Deg.  BETA MAX=',F7.3,' Deg.')
+
       END SUBROUTINE MONOC1
-!*==MODHKL.f90  processed by SPAG 6.11Dc at 15:36 on 20 Sep 2001
+!
+!*****************************************************************************
+!
       SUBROUTINE MODHKL(Kram,Krap,Krcm,Krcp,Kracm,Kracp,Krbm,Krbp,Kamcp,Kapcm,Csm,Csp,Amoi,Aplu,Cmoi,Cplu,Kracms,  &
      &                  Kracps)
+
       USE DICVAR
+
       IMPLICIT NONE
-!
-!*** Start of declarations rewritten by SPAG
 !
 ! Dummy arguments
 !
@@ -1844,9 +1856,7 @@
       REAL :: F
       INTEGER :: I, Jj, K, Kborin, Kborsu, Kqqm, Kqqp, La1, Lc0, M, Mcarh, Mcark, Mcarl, Mdl, Mdl2, &
      &           Mm1, Mm2, Mm3, Mp1, Mp2, Mp3, Mprohl, Mxl, Ne, Ng, Nx, Ny, Nz
-!
-!*** End of declarations rewritten by SPAG
-!
+
       F(Nx,Ny,Nz,Dd,Ne,Ng) = Nx + Ny + Nz - Dd*Ne*Ng
       nt = 0
       DO I = 1, n
@@ -1953,7 +1963,7 @@
  100    ENDDO
       ENDDO
       DO I = 1, 5
-        IF ( irj(I,1).EQ.0. ) THEN
+        IF ( irj(I,1).EQ.0 ) THEN
           nt = -1
           GOTO 99999
         ENDIF
@@ -2058,4 +2068,8 @@
  160      ENDDO
  200    ENDDO
       ENDDO
+
 99999 END SUBROUTINE MODHKL
+!
+!*****************************************************************************
+!

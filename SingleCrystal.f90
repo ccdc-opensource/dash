@@ -14,7 +14,7 @@
       LOGICAL, EXTERNAL :: Confirm
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SX_Page1)
+      CALL SelectDASHDialog(IDD_SX_Page1)
       SELECT CASE (EventType)
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
@@ -31,45 +31,44 @@
               CALL Download_Cell_Constants(IDD_PW_Page1)
               CALL CheckUnitCellConsistency
               IF (NumberSGTable .EQ. LPosSG(LatBrav)) CALL WarningMessage('Space-group symmetry has not been reset.')
-              CALL WDialogSelect(IDD_SX_Page2)
-              CALL WDialogFieldStateLogical(IDNEXT, .FALSE.)
-              PastPawley = .TRUE.
-              CALL WizardWindowShow(IDD_SX_Page2)
+              CALL WizardWindowShow(IDD_SX_Page1a)
             CASE (IDAPPLY)
               CALL Download_SpaceGroup(IDD_SX_Page1)
               CALL Download_Cell_Constants(IDD_SX_Page1)
               CALL CheckUnitCellConsistency
             CASE (IDB_Delabc)
               CALL Clear_UnitCell_WithConfirmation
+            CASE (IDBBROWSE) ! Read unit cell
+              CALL UnitCellParametersFileBrowse
           END SELECT
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDF_a_latt)
-              CALL WDialogGetReal(IDF_a_latt,CellPar(1))
+              CALL DASHWDialogGetReal(IDF_a_latt, CellPar(1))
               CALL UpdateCell
               CALL CheckUnitCellConsistency
             CASE (IDF_b_latt)
-              CALL WDialogGetReal(IDF_b_latt,CellPar(2))
+              CALL DASHWDialogGetReal(IDF_b_latt, CellPar(2))
               CALL UpdateCell
               CALL CheckUnitCellConsistency
             CASE (IDF_c_latt)
-              CALL WDialogGetReal(IDF_c_latt,CellPar(3))
+              CALL DASHWDialogGetReal(IDF_c_latt, CellPar(3))
               CALL UpdateCell
               CALL CheckUnitCellConsistency
             CASE (IDF_alp_latt)
-              CALL WDialogGetReal(IDF_alp_latt,CellPar(4))
+              CALL DASHWDialogGetReal(IDF_alp_latt, CellPar(4))
               CALL UpdateCell
               CALL CheckUnitCellConsistency
             CASE (IDF_bet_latt)
-              CALL WDialogGetReal(IDF_bet_latt,CellPar(5))
+              CALL DASHWDialogGetReal(IDF_bet_latt, CellPar(5))
               CALL UpdateCell
               CALL CheckUnitCellConsistency
             CASE (IDF_gam_latt)
-              CALL WDialogGetReal(IDF_gam_latt,CellPar(6))
+              CALL DASHWDialogGetReal(IDF_gam_latt, CellPar(6))
               CALL UpdateCell
               CALL CheckUnitCellConsistency
             CASE (IDF_Crystal_System_Menu)
-              CALL WDialogGetMenu(IDF_Crystal_System_Menu,LatBrav)
+              CALL DASHWDialogGetMenu(IDF_Crystal_System_Menu, LatBrav)
               CALL Upload_CrystalSystem
               CALL Generate_TicMarks
             CASE (IDF_Space_Group_Menu)
@@ -80,6 +79,38 @@
       CALL PopActiveWindowID
 
       END SUBROUTINE DealWithWizardWindowSingleCrystalData1
+!
+!*****************************************************************************
+!
+      SUBROUTINE DealWithWizardWindowSingleCrystalData1a ! Resolution
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      CALL PushActiveWindowID
+      CALL SelectDASHDialog(IDD_SX_Page1a)
+      SELECT CASE (EventType)
+        CASE (PushButton) ! one of the buttons was pushed
+          SELECT CASE (EventInfo%VALUE1)
+            CASE (IDCLOSE, IDCANCEL)
+              CALL EndWizard
+            CASE (IDBACK)
+              CALL WizardWindowShow(IDD_SX_Page1)
+            CASE (IDNEXT)
+              CALL SelectDASHDialog(IDD_ViewPawley)
+              CALL WDialogPutReal(IDF_MaxResolution, SXMaxResolution)
+              CALL SelectDASHDialog(IDD_SX_Page2)
+              CALL WDialogFieldStateLogical(IDNEXT, .FALSE.)
+              PastPawley = .TRUE.
+              CALL WizardWindowShow(IDD_SX_Page2)
+          END SELECT
+      END SELECT
+      CALL PopActiveWindowID
+
+      END SUBROUTINE DealWithWizardWindowSingleCrystalData1a
 !
 !*****************************************************************************
 !
@@ -94,54 +125,35 @@
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'lattice.inc'
 
-      INTEGER IRadSelection
-      CHARACTER(LEN=MaxPathLength) CTEMP
-      REAL    Temp
-      INTEGER iErr
       INTEGER, EXTERNAL :: HKLFFileBrowse, HKLFFileOpen
       LOGICAL, EXTERNAL :: SaveProject
+      CHARACTER(LEN=MaxPathLength) CTEMP
+      INTEGER iErr
 
       CALL PushActiveWindowID
-      CALL WDialogSelect(IDD_SX_Page2)
+      CALL SelectDASHDialog(IDD_SX_Page2)
       SELECT CASE (EventType)
         CASE (PushButton) ! one of the buttons was pushed
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
-              CALL WizardWindowShow(IDD_SX_Page1)
+              CALL WizardWindowShow(IDD_SX_Page1a)
             CASE (IDNEXT)
-              CALL ShowWizardWindowZmatrices
+              IF (SaveProject()) CALL ShowWizardWindowZmatrices
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizard
             CASE (ID_PW_DF_Open)
-              CALL WDialogGetString(IDF_PW_DataFileName_String, CTEMP)
+              CALL DASHWDialogGetString(IDF_PW_DataFileName_String, CTEMP)
               iErr = HKLFFileOpen(CTEMP)
-              CALL WDialogFieldStateLogical(IDBSAVE, iErr .EQ. 1)
+              CALL WDialogFieldStateLogical(IDNEXT, iErr .EQ. 0)
             CASE (IDBBROWSE)
               iErr = HKLFFileBrowse()
 ! Don't change if the user pressed 'Cancel' (ISTAT = 2)
               IF      (iErr .EQ. 0) THEN
-                CALL WDialogFieldState(IDBSAVE, Enabled)
+                CALL WDialogFieldState(IDNEXT, Enabled)
               ELSE IF (iErr .EQ. 1) THEN
-                CALL WDialogFieldState(IDBSAVE, Disabled)
+                CALL WDialogFieldState(IDNEXT, Disabled)
               ENDIF
-            CASE (IDBSAVE)
-              IF (SaveProject()) CALL WDialogFieldState(IDNEXT, Enabled)
           END SELECT
-        CASE (FieldChanged)
-          SELECT CASE (EventInfo%VALUE1)
-            CASE (IDF_LabX_Source,IDF_SynX_Source)
-              CALL WDialogGetRadioButton(IDF_LabX_Source, JRadOption)
-              CALL Upload_Source
-              CALL Generate_TicMarks 
-            CASE (IDF_wavelength1)
-              CALL WDialogGetReal(IDF_wavelength1, Temp)
-              CALL Set_Wavelength(Temp)
-              CALL Generate_TicMarks 
-            CASE (IDF_Wavelength_Menu)
-              CALL WDialogGetMenu(IDF_Wavelength_Menu, IRadSelection)
-              CALL SetWavelengthToSelection(IRadSelection)
-              CALL Generate_TicMarks 
-          END SELECT                
       END SELECT
       CALL PopActiveWindowID
 
@@ -165,15 +177,15 @@
 
       IMPLICIT NONE
 
+      INTEGER, EXTERNAL :: HKLFFileOpen
       CHARACTER(LEN=60) FILTER
       INTEGER           IFLAGS, IFTYPE 
       CHARACTER(LEN=MaxPathLength) tFileName
-      INTEGER, EXTERNAL :: HKLFFileOpen
 
       HKLFFileBrowse = 1
       IFLAGS = LoadDialog + DirChange + PromptOn + AppendExt
       FILTER = 'All files (*.*)|*.*|'//&
-               'DASH Pawley files (*.hklf)|*.hklf|'
+               'SHELX .hkl files (*.hkl)|*.hkl|'
       tFileName = ' '
 ! IFTYPE specifies which of the file types in the list is the default
       IFTYPE = 2
@@ -211,9 +223,9 @@
 
       CHARACTER*(*), INTENT (IN   ) :: TheFileName
 
+      INTEGER, EXTERNAL :: HKLFFileLoad
       LOGICAL FExists
       INTEGER KLEN
-      INTEGER, EXTERNAL :: HKLFFileLoad
 
       HKLFFileOpen = 1
       KLEN = LEN_TRIM(TheFileName)
@@ -230,17 +242,17 @@
 ! Next line is necessary due to the way ScrUpdateFileName in SDIFileLoad works
       FNAME = TheFileName
       IF (NoData) THEN
-        CALL ErrorMessage("Could not read the hklf file "//FNAME(1:KLEN)//&
+        CALL ErrorMessage("Could not read the hkl file "//FNAME(1:KLEN)//&
                           CHAR(13)//"successfully.")
         RETURN
       ENDIF
 ! Disable Pawley refinement button
       CALL SetModeMenuState(-1,-1)
-      CALL WindowOutStatusBar(1,FNAME)
+      CALL WindowOutStatusBar(1, FNAME)
 
       ! @@ ??
 ! Update the file name
-      CALL WDialogSelect(IDD_SX_Page2)
+      CALL SelectDASHDialog(IDD_SX_Page2)
       CALL WDialogPutString(IDF_PW_DataFileName_String, FNAME(1:KLEN))
       HKLFFileOpen = 0
       
@@ -250,7 +262,7 @@
 !
       INTEGER FUNCTION HKLFFileLoad(TheFileName)
 !
-!.. Gets single crystal data and generates a false diffraction pattern
+! Gets single crystal data and generates a false diffraction pattern
 !
 ! 0 = OK
 ! 1 = error
@@ -267,19 +279,17 @@
       INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
 
-      CHARACTER*150 LINE
-      INTEGER NKKOR(MCHIHS)
+      REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
+      COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
 
       INTEGER         KKOR
       REAL                  WTIJ
       INTEGER                             IKKOR,         JKKOR
       COMMON /CHISTO/ KKOR, WTIJ(MCHIHS), IKKOR(MCHIHS), JKKOR(MCHIHS)
 
-!.. New store common ...
-!C MCHIHS can be replaced by MFCSTO in this COMMON
       INTEGER         jHKL           
       REAL                            WTJ,         AJOBS
-      COMMON /SXFSTO/ jHKL(3,MCHIHS), WTJ(MCHIHS), AJOBS(MFCSTO)
+      COMMON /SXFSTO/ jHKL(3,MFCSTO), WTJ(MFCSTO), AJOBS(MFCSTO)
 
       INTEGER          NFITA, IFITA
       REAL                                 WTSA
@@ -291,7 +301,7 @@
 
       INTEGER         KNIPT
       REAL                            PIKVAL
-      COMMON /FPINF1/ KNIPT(50,MOBS), PIKVAL(50,MOBS)
+      COMMON /FPINF1/ KNIPT(MaxKTem,MOBS), PIKVAL(MaxKTem,MOBS)
 
       INTEGER         KREFT
       COMMON /FPINF2/ KREFT(MOBS)
@@ -299,80 +309,115 @@
       REAL             PAWLEYCHISQ, RWPOBS, RWPEXP
       COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP
 
-      INTEGER IARGIMIN, IARGISTP, ISIG5, IArgKK
-      INTEGER KXIMIN(MOBS), KXIMAX(MOBS), IXKMIN(MFCSTO), IXKMAX(MFCSTO)
-      INTEGER KK, I, NLIN, iR, II, JJ, IK, MINCOR, J, K, hFile
+      LOGICAL           Is_SX
+      COMMON  / SXCOM / Is_SX
+
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
+      INTEGER ISIG5, IArgKK
+      INTEGER KXIMIN(MOBS), KXIMAX(MOBS)
+      INTEGER KK, I, NLIN, iR, jR, J, K, hFile
       INTEGER KTEM, K1, K2
-      REAL    ARGIMIN, ARGIMAX, ARGISTP, SIGMA, ADSIG, ARGT
+      REAL    ARGIMIN, ARGIMAX, ARGISTP, ARGT, FWHM, C0, Gaussian !, Lorentzian
+      CHARACTER*150 LINE
+      LOGICAL RecalculateESDs, IgnoreLT, AvgFriedelPairs
+      REAL    CutOff
+      LOGICAL Keep(1:MFCSTO)
 
       HKLFFileLoad = 1
       hFile = 121
-      OPEN(hFile,FILE=TheFileName,STATUS='OLD',ERR=999)
-      KK = 0
-      KKOR = 0
-      MINCOR = 20
-      DO iR = 1, MFCSTO
-        READ(hFile,'(Q,A)',END=100,ERR=999) NLIN, LINE
-!.. No cross correlation ...
-        READ(LINE(1:NLIN),*,END=999,ERR=999) (jHKL(I,iR),I=1,3), AJOBS(iR), WTJ(iR)
-!.. F2 and sig(F2)
- !O       AJOBS(iR) = AJOBS(iR)
-        WTJ(iR) = 1.0 / WTJ(iR)
- !O       AJOBS(iR) = AJOBS(iR)
-        KK = iR
-! Now work out which terms should be kept for the chi-squared calculation
-        KKOR = KKOR + 1
-        IKKOR(KKOR) = iR
-        JKKOR(KKOR) = iR
-        NKKOR(KKOR) = 100
-!O        WRITE(76,*) ' reflections ',kk,(jHKL(I,iR),I=1,3), AJOBS(iR)
+      CALL PushActiveWindowID
+      CALL SelectDASHDialog(IDD_SX_Page2)
+      RecalculateESDs = DASHWDialogGetCheckBoxLogical(IDF_RecalcESDs)
+      IgnoreLT = DASHWDialogGetCheckBoxLogical(IDF_IgnLT)
+      IF (IgnoreLT) CALL DASHWDialogGetReal(IDF_CutOff, CutOff)
+      AvgFriedelPairs = DASHWDialogGetCheckBoxLogical(IDF_AvgFriedelPairs)
+      CALL PopActiveWindowID
+      Is_SX = .TRUE.
+      OPEN(hFile, FILE=TheFileName, STATUS='OLD', ERR=998)
+      iR = 1
+      DO KK = 1, MFCSTO
+        READ(hFile, '(Q,A)', END=100, ERR=998) NLIN, LINE
+        IF (LEN_TRIM(LINE) .NE. 0) THEN
+!C SHELX .hkl files are terminated by a line containing h = k = l = 0 or h = k = l = 99
+          READ(LINE(1:NLIN), *, END=998, ERR=998) (jHKL(I,iR),I=1,3)
+          IF (((jHKL(1,iR) .EQ.  0) .AND. &
+               (jHKL(2,iR) .EQ.  0) .AND. &
+               (jHKL(3,iR) .EQ.  0)) .OR. &
+              ((jHKL(1,iR) .EQ. 99) .AND. &
+               (jHKL(2,iR) .EQ. 99) .AND. &
+               (jHKL(3,iR) .EQ. 99)))     &
+               GOTO 100
+!C No cross correlation ...
+          READ(LINE(1:NLIN), *, END=998, ERR=998) (jHKL(I,iR),I=1,3), AJOBS(iR), WTJ(iR)
+!C F2 and sig(F2)
+          IF (RecalculateESDs) WTJ(iR) = MAX(MAX(4.4, SQRT(MAX(0.0, AJOBS(iR)))), WTJ(iR))
+          IF (.NOT. (IgnoreLT .AND. ((AJOBS(iR)/WTJ(iR)) .LT. CutOff))) THEN
+            WTJ(iR) = 1.0 / WTJ(iR)
+            iR = iR + 1
+          ENDIF
+        ENDIF
       ENDDO
-  100 NumOfRef = KK
-!O      WRITE(76,*) ' Number of reflections ',NumOfRef
-!
-!.. We've got the lattice constants, symmetry etc. already.
-!
-!.. Let's order the reflections in increasing 2 theta and fill the array ArgKK
-      CALL OrderReflections
-      DO IK = 1, KKOR
-        II = IKKOR(IK)
-        JJ = JKKOR(IK)
+  100 NumOfRef = iR-1
+      IF (NumOfRef .EQ. 0) THEN
+        CALL ErrorMessage("No reflections found.")
+        RETURN
+      ENDIF
+! Average Friedel related pairs
+      DO iR = 1, NumOfRef
+        Keep(iR) = .TRUE.
+      ENDDO
+      IF (AvgFriedelPairs) THEN
+        DO iR = 1, NumOfRef-1
+          IF (Keep(iR)) THEN
+            DO jR = iR+1, NumOfRef
+              IF (Keep(jR)) THEN
+                IF (((jHKL(1,iR) .EQ. -jHKL(1,jR)) .AND. &
+                     (jHKL(2,iR) .EQ. -jHKL(2,jR)) .AND. &
+                     (jHKL(3,iR) .EQ. -jHKL(3,jR))) .OR. &
+                    ((jHKL(1,iR) .EQ.  jHKL(1,jR)) .AND. &
+                     (jHKL(2,iR) .EQ.  jHKL(2,jR)) .AND. &
+                     (jHKL(3,iR) .EQ.  jHKL(3,jR)))) THEN
+                  AJOBS(iR) = (AJOBS(iR) + AJOBS(jR)) / 2.0
+                  WTJ(iR) = 1.0/SQRT((1.0/WTJ(iR))**2 + (1.0/WTJ(jR))**2)
+                  Keep(jR) = .FALSE.
+                ENDIF
+              ENDIF
+            ENDDO
+          ENDIF
+        ENDDO
+      ENDIF
+!C We've got the lattice constants, symmetry etc. already.
+!C Let's order the reflections in increasing 2 theta and fill the array ArgKK
+      CALL OrderReflections(Keep)
+      DO iR = 1, NumOfRef
+        IKKOR(iR) = iR
+        JKKOR(iR) = iR
+      ENDDO
+      KKOR = NumOfRef
+      DO iR = 1, NumOfRef
 !C No correlation, so II .EQ. JJ by definition.
-        WTIJ(IK) = WTI(II) * WTI(JJ)
-!O        WRITE(76,*) IK, II, JJ, WTIJ(IK)
+        WTIJ(iR) = WTI(iR) * WTI(iR)
       ENDDO
       CLOSE(hFile)
-!O      WRITE(76,*) ' Number of reflections ', NumOfRef
-!O      DO iR = 1, NumOfRef
-!O        WRITE(76,*) (iHKL(I,iR),I=1,3), AIOBS(iR), WTI(iR)
-!O      ENDDO
-!.. Now synthesise a simple diffraction pattern at 1 Angstrom
+!C Now synthesise a simple diffraction pattern at 1 Angstrom
       NBIN = 5000
       ARGIMIN = RefArgK(1)-1.0
       ARGIMAX = RefArgK(NumOfRef)+1.0
-      IARGIMIN = 1000 * ARGIMIN
-      ARGIMIN = 0.001 * FLOAT(IARGIMIN)
-      IARGISTP = 1 + NINT(1000.0*(ARGIMAX-ARGIMIN)/FLOAT(NBIN))
-      ARGISTP = 0.001 * FLOAT(IARGISTP)
-      ARGIMAX = ARGIMIN + FLOAT(NBIN-1)*ARGISTP
-      SIGMA = 3.0 * ARGISTP
-      ADSIG = 0.39894/SIGMA
-      ISIG5 = 15 !*IARGISTP
-!O      WRITE(76,*) ' min/max argkk ',argkk(1),argkk(NumOfRef)
-!O      WRITE(76,*) ' 2 theta range ',ARGIMIN,ARGIMAX,ARGISTP,SIGMA,ISIG5
+      ARGISTP = (ARGIMAX-ARGIMIN)/FLOAT(NBIN-1)
+      FWHM = 6.0 * ARGISTP
+      C0 = 4.0 * LOG(2.0)
+      ISIG5 = 30
       DO I = 1, NBIN
         KXIMIN(I) = 0
       ENDDO
       DO K = 1, NumOfRef
-        IArgKK = 1 + (RefArgK(K)-ARGIMIN)/ARGISTP
-        IXKMIN(K) = IArgKK - ISIG5
-        IXKMAX(K) = IArgKK + ISIG5
-!O        WRITE(76,*) K, ArgKK(K), IArgKK, IXKMIN(K), IXKMAX(K)
-        DO I = IXKMIN(K), IXKMAX(K)
+        IArgKK = 1 + NINT((RefArgK(K)-ARGIMIN)/ARGISTP)
+        DO I = MAX(1, IArgKK-ISIG5), MIN(5000, IArgKK+ISIG5)
           IF (KXIMIN(I) .EQ. 0) KXIMIN(I) = K
           KXIMAX(I) = K
         ENDDO
       ENDDO
+      NFITA = 0
       DO I = 1, NBIN
         XBIN(I) = ARGIMIN + FLOAT(I-1)*ARGISTP
         YOBIN(I) = 0.0
@@ -380,31 +425,34 @@
         YBBIN(I) = 0.0
         EBIN(I)  = 0.0
         IF (KXIMIN(I) .EQ. 0) THEN
-!.. No peaks at this point
+!C No peaks at this point
           EBIN(I) = 1.0
           WTSA(I) = 1.0
           KREFT(I) = 0
         ELSE
           NFITA = NFITA + 1
           IFITA(NFITA) = I
-          KREFT(I) = 1 + KXIMAX(I) - KXIMIN(I)
+          KREFT(I) = MIN(MaxPik, 1 + KXIMAX(I) - KXIMIN(I))
           J = 0
           DO K = KXIMIN(I), KXIMAX(I)
-            ARGT = (XBIN(I)-RefArgK(K)) / SIGMA
+            ARGT = (XBIN(I)-RefArgK(K)) / (FWHM)
             J = J + 1
+!C JCC - needs bound check on J here
+            IF ( J .GT. MaxPik ) GOTO 567
+
             KNIPT(J,I) = K
-            PIKVAL(J,I) = ADSIG * EXP(-0.5*ARGT*ARGT)
+            Gaussian = (SQRT(C0)/(FWHM*SQRT(PI))) * EXP(-C0*(ARGT**2))
+        !    Lorentzian = (2.0/(PI*FWHM)) * (1.0/(1.0+(4.0*(ARGT**2))))
+            ! Now use a pseudo-Voigt
+            PIKVAL(J,I) =  Gaussian !0.125*Lorentzian + 0.875*Gaussian
             YOBIN(I) = YOBIN(I) + AIOBS(K)*PIKVAL(J,I)
-!		  EBIN(I)=EBIN(I)+PIKVAL(J,I)/WTI(I)
           ENDDO
-          EBIN(I) = 0.1 * YOBIN(I)
+          EBIN(I) = MAX(1.0, 0.1*ABS(YOBIN(I)))
           WTSA(I) = 1.0 / EBIN(I)**2
-!		EBIN(I)=SQRT(EBIN(I))
         ENDIF
       ENDDO
-
 !C Write out a fake .pik file
-      OPEN(UNIT=hFile,FILE='polyp.pik',STATUS='UNKNOWN',ERR=999)
+      OPEN(UNIT=hFile, FILE='polyp.pik', STATUS='UNKNOWN', ERR=999)
       DO I = 1, NBIN
         KTEM = KREFT(I)
         WRITE(hFile,*) XBIN(I), YOBIN(I), EBIN(I), KTEM
@@ -414,28 +462,19 @@
       ENDDO
       CLOSE(hFile)
 !C Write out a fake .hcv file
-!        READ(LINE(1:NLIN),*,END=999,ERR=999) (iHKL(I,iR),I=1,3), AIOBS(iR), WTI(iR), KL, (IHCOV(I,iR),I=1,NCOR)
-      OPEN(UNIT=hFile,FILE='polyp.hcv',STATUS='UNKNOWN',ERR=999)
+      OPEN(UNIT=hFile, FILE='polyp.hcv', STATUS='UNKNOWN', ERR=999)
       DO iR = 1, NumOfRef
-        WRITE(hFile,*) (iHKL(I,iR),I=1,3), AIOBS(iR), WTI(iR), iR
+        WRITE(hFile,101) (iHKL(I,iR),I=1,3), AIOBS(iR), WTI(iR), iR
+  101   FORMAT (3I5,1X,F12.3,1X,F12.4,1X,I5)
       ENDDO
       CLOSE(hFile)
-!C Write out a fake .hkl file
-! For powders, this is used for space group determination only
-!        READ(LINE(1:NLIN),*,END=999,ERR=999) (iHKL(I,iR),I=1,3), AIOBS(iR), WTI(iR), KL, (IHCOV(I,iR),I=1,NCOR)
-  !O    OPEN(UNIT=hFile,FILE='polyp.hcv',STATUS='UNKNOWN',ERR=999)
-  !O    DO iR = 1, NumOfRef
-  !O      WRITE(hFile,*) (iHKL(I,iR),I=1,3), AIOBS(iR), WTI(iR), iR
-  !O    ENDDO
-  !O    CLOSE(hFile)
-
       CALL Clear_BackGround
       NoData = .FALSE.
-      CALL Set_Wavelength(1.0)
       CALL GetProfileLimits
       CALL Get_IPMaxMin 
+      CALL Set_Wavelength(1.0)
       PAWLEYCHISQ = 1.0
-      CALL WDialogSelect(IDD_ViewPawley)
+      CALL SelectDASHDialog(IDD_ViewPawley)
  !     CALL WDialogPutReal(IDF_Sigma1,PeakShapeSigma(1),'(F10.4)')
  !     CALL WDialogPutReal(IDF_Sigma2,PeakShapeSigma(2),'(F10.4)')
  !     CALL WDialogPutReal(IDF_Gamma1,PeakShapeGamma(1),'(F10.4)')
@@ -446,21 +485,29 @@
       CALL GET_LOGREF
       IPTYPE = 1
       CALL Profile_Plot
+      CALL sa_SetOutputFiles(TheFileName)
       HKLFFileLoad = 0
+      RETURN
+  998 CLOSE(hFile)
+      CALL ErrorMessage("Error opening .hkl file.")
       RETURN
   999 CLOSE(hFile)
       CALL ErrorMessage("Error writing .pik/.hcv file.")
+      RETURN
+  567 CLOSE(hFile)
+      CALL ErrorMessage("Error writing .pik/.hcv file: Bounds exceeded ")
 
       END FUNCTION HKLFFileLoad
 !
 !*****************************************************************************
 !
-      SUBROUTINE OrderReflections
+      SUBROUTINE OrderReflections(Keep)
 
-! Covers the eventuality of the default space group option.
-! We need to determine the number of symmetry operators etc.
+! Calculates 2 theta for every reflection.
 
       IMPLICIT NONE
+
+      LOGICAL, INTENT (IN   ) :: Keep(*)
 
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'Lattice.inc'
@@ -473,7 +520,7 @@
       COMMON /IOUNIT/ LPT, LUNI
 
       CHARACTER*6 xxx
-      CHARACTER*10 fname
+      CHARACTER*10 fname_2
 
       INTEGER     msymmin
       PARAMETER ( msymmin = 10 )
@@ -503,9 +550,9 @@
       WRITE(42,4240) (cellpar(I),I=1,6)
  4240 FORMAT('C ',6f10.5)
       CLOSE(42)
-      fname = 'polyo'
+      fname_2 = 'polyo'
       xxx = 'ORDREF'
-      CALL FORORD(xxx,fname)
+      CALL FORORD(xxx, fname_2, Keep)
       CALL CLOFIL(ICRYDA)
       CALL CLOFIL(IO10)
       CALL CLOFIL(LPT)
@@ -514,11 +561,16 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE FORORD(pname,filnmr)
+      SUBROUTINE FORORD(pname,filnmr,Keep)
 
+      USE WINTERACTER
+      USE DRUID_HEADER
       USE REFVAR
+      USE VARIABLES
 
       IMPLICIT NONE
+
+      LOGICAL, INTENT (IN   ) :: Keep(*)
 
       CHARACTER*6 PNAME
       CHARACTER*10 filnmr
@@ -538,15 +590,14 @@
       INTEGER         IBMBER
       COMMON /CCSLER/ IBMBER
 
-!.. New store common ...
       INTEGER         jHKL           
       REAL                            WTJ,         AJOBS
-      COMMON /SXFSTO/ jHKL(3,MCHIHS), WTJ(MCHIHS), AJOBS(MFCSTO)
+      COMMON /SXFSTO/ jHKL(3,MFCSTO), WTJ(MFCSTO), AJOBS(MFCSTO)
 
       REAL   DStarTem(MFCSTO)
       INTEGER iR, jR, I, hFile
-      INTEGER iOrdTem(MFCSTO)
-      REAL    H(1:3), DERS(1:6), ArgKKtem(MFCSTO)
+      INTEGER iOrdTem(MFCSTO), KK
+      REAL    H(1:3), DERS(1:6), ArgKKtem(MFCSTO), cut_off_2theta
 
       filnam_root = filnmr
       NINIT = 1
@@ -555,14 +606,12 @@
       CALL RECIP
       IF (IBMBER .NE. 0) RETURN
       CALL OPSYM(1)
-!O      WRITE(76,*) ' Number of reflections ', NumOfRef
       DO iR = 1, NumOfRef
         DO I = 1, 3
           H(i) = FLOAT(jHKL(I,iR))
         ENDDO
         CALL CELDER(H, DERS)
 !C wavelength = 1 Angstrom
-!O        WRITE(76,*) '**',(jHKL(I,iR),I=1,3), DSTAR2, sthl
         IF (sthl .LT. -1.0) THEN
           sthl = -1.0
           CALL DebugErrorMessage("sthl .LT. -1.0")
@@ -573,20 +622,26 @@
         ENDIF
         ArgKKtem(iR) = 2.0 * ASIND(sthl)
         DStarTem(iR) = 2.0 * sthl
-!O        WRITE(76,*) '**>',ArgKKtem(iR)
       ENDDO
       CALL Sort_Real(ArgKKtem, iOrdTem, NumOfRef)
+      cut_off_2theta = 2.0 * ASIND(1.0/(2.0*SXMaxResolution))
+      KK = 0
       DO iR = 1, NumOfRef
         jR = iOrdTem(iR)
-        AIOBS(iR) = AJOBS(jR)
-        WTi(iR) = WTj(jR)
-        DSTAR(iR) = dstartem(jR)
-        RefArgK(iR) = ArgKKTem(jR)
-        DO I = 1, 3
-          iHKL(I,iR) = jHKL(i,jR)
-        ENDDO
-!O        WRITE(76,*) '>> ',iR,'>> ', (iHKL(I,iR),I=1,3), RefArgK(iR), AIOBS(iR), 1.0/(WTI(iR))
+        IF (Keep(jR)) THEN
+          IF (ArgKKTem(jR) .LE. cut_off_2theta) THEN
+            KK = KK + 1
+            AIOBS(KK) = AJOBS(jR)
+            WTi(KK) = WTj(jR)
+            DSTAR(KK) = dstartem(jR)
+            RefArgK(KK) = ArgKKTem(jR)
+            DO I = 1, 3
+              iHKL(I,KK) = jHKL(i,jR)
+            ENDDO
+          ENDIF
+        ENDIF
       ENDDO
+      NumOfRef = KK
 !C Write out a fake .tic file
       hFile = 121
       OPEN(UNIT=hFile,FILE='polyp.tic',STATUS='UNKNOWN',ERR=999)

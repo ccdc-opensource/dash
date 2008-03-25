@@ -1,6 +1,69 @@
-!*==SORT_REAL.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
-      SUBROUTINE SORT_REAL(VAL,IP,N)
 !
+!*****************************************************************************
+!
+      LOGICAL FUNCTION NearlyEqual(Value1, Value2)
+!
+! This function compares two REALs and determines if they are effectively equal
+!
+! INPUT   : Value1 and Value2 = the values to be compared
+!
+! RETURNS : .TRUE.  if Value1 and Value2 differ by less than 0.000001
+!           .FALSE. otherwise
+!
+      IMPLICIT NONE
+
+      REAL, INTENT (IN   ) :: Value1, Value2
+
+      NearlyEqual = (ABS(Value1 - Value2) .LT. 0.000001)
+
+      END FUNCTION NearlyEqual
+!
+!*****************************************************************************
+!
+      LOGICAL FUNCTION nearly_equal(value1, value2, tolerance)
+!
+! This function compares two REALs and determines if they are equal within tolerance
+!
+! INPUT   : value1 and value2 = the values to be compared
+!
+! RETURNS : .TRUE.  if value1 and value2 differ by less than tolerance
+!           .FALSE. otherwise
+!
+      IMPLICIT NONE
+
+      REAL, INTENT (IN   ) :: value1, value2, tolerance
+
+      nearly_equal = (ABS(value1 - value2) .LT. tolerance)
+
+      END FUNCTION nearly_equal
+!
+!*****************************************************************************
+!
+      REAL FUNCTION Radians2Degrees(TheAngle)     
+
+      IMPLICIT NONE
+
+      REAL, INTENT (IN   ) :: TheAngle
+
+      Radians2Degrees = TheAngle * (30.0 / ASIN(0.5))
+
+      END FUNCTION Radians2Degrees
+!
+!*****************************************************************************
+!
+      REAL FUNCTION Degrees2Radians(TheAngle)     
+
+      IMPLICIT NONE
+
+      REAL, INTENT (IN   ) :: TheAngle
+
+      Degrees2Radians = TheAngle * (ASIN(0.5) / 30.0)
+
+      END FUNCTION Degrees2Radians
+!
+!*****************************************************************************
+!
+      SUBROUTINE SORT_REAL(VAL,IP,N)
 !
 !X
 !C 16C
@@ -9,15 +72,19 @@
 !A On entry VAL is an array of N real numbers.
 !A On exit IP is an array of N pointers to VAL in ascending order
 !
+!N Copyright John Matthewman 18 July 1983
+!N  HEAPSORT
+!N  (See Knuth 'Art of Computer Programming' Vol 3, Section 5.2.3)
 !
-!
-      DIMENSION VAL(N), IP(N)
-!
+      REAL,    INTENT (IN   ) :: VAL(N)
+      INTEGER, INTENT (  OUT) :: IP(N)
+      INTEGER, INTENT (IN   ) :: N
+
 ! EXTRA PART (WHICH MAY BE REMOVED AGAIN) - SET UP POINTERS:
       DO I = 1, N
         IP(I) = I
       ENDDO
-      IF (N.LT.2) GOTO 100
+      IF (N.LT.2) RETURN
 !  INITIALISE
       L = N/2 + 1
       IR = N
@@ -25,14 +92,12 @@
       K = IP(L)
     3 J = L
       GOTO 4
-!
 !  SIFTING LOOP
     5 IF (VAL(IP(J)).LT.VAL(IP(J+1))) J = J + 1
     7 IP(I) = IP(J)
     4 I = J
       J = J + J
       IF (J-IR) 5, 7, 8
-!
 !  FLOYDS MODIFICATION
    10 IP(J) = IP(I)
     8 J = I
@@ -40,7 +105,6 @@
       IF (I) 6, 6, 9
     9 IF (J.GT.L .AND. VAL(K).GT.VAL(IP(I))) GOTO 10
     6 IP(J) = K
-!
 !  END OF A SIFT
       IF (L.GT.1) GOTO 1
       K = IP(IR)
@@ -48,40 +112,37 @@
       IR = IR - 1
       IF (IR.GT.1) GOTO 3
       IP(1) = K
-  100 RETURN
+
       END SUBROUTINE SORT_REAL
-!*==INVERSEMATRIX.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
+      SUBROUTINE InverseMatrix(A, B, N)
 !
+! Inverts matrix A into matrix B.
+! On entry A is a square NxN real matrix
+! On exit  B is its inverse
 !
-!
-! LEVEL 3      SUBROUTINE InverseMatrix(A,B,N)
-      SUBROUTINE InverseMatrix(A,B,N)
-!
-!
-!X
-!C 12C
-!H Inverts matrix A into matrix B.
-!A On entry A is a square NxN real matrix
-!A On exit  B is its inverse
-!
-      DIMENSION II(100), IL(100), IG(100), A(N,N), B(N,N)
-!
-      DO J = 1, N
-        DO I = 1, N
-          B(I,J) = A(I,J)
-        ENDDO
-      ENDDO
-      D = 1.
+      IMPLICIT NONE
+      
+      INTEGER, INTENT (IN   ) :: N
+      REAL,    INTENT (IN   ) :: A(N,N)
+      REAL,    INTENT (  OUT) :: B(N,N)
+
+      INTEGER II(N), IL(N), IG(N)
+      INTEGER I, J, IS, K, KF, KG, KL
+      REAL    D, R, W, X, P
+
+! Initialise b with values from a
+      B = A
+      D = 1.0
       IS = N - 1
       DO K = 1, N
         IL(K) = 0
         IG(K) = K
       ENDDO
-!
       DO K = 1, N
-        R = 0.
+        R = 0.0
         DO I = 1, N
           IF (IL(I).NE.0) GOTO 40
           W = B(I,K)
@@ -93,17 +154,18 @@
    40   ENDDO
         II(K) = KF
         IL(KF) = KF
-        D = D*P
-        IF (D.EQ.0.) GOTO 999
-!
+        D = D * P
+        IF (D .EQ. 0.0) THEN
+          CALL DebugErrorMessage('D .EQ. 0.0 in InverseMatrix()')
+          RETURN
+        ENDIF
         DO I = 1, N
           IF (I.EQ.KF) THEN
-            B(I,K) = 1./P
+            B(I,K) = 1.0/P
           ELSE
             B(I,K) = -B(I,K)/P
           ENDIF
         ENDDO
-!
         DO J = 1, N
           IF (J.EQ.K) GOTO 140
           W = B(KF,J)
@@ -116,10 +178,7 @@
             ENDIF
           ENDDO
   140   ENDDO
-!
       ENDDO
-!.....
-!
       DO K = 1, IS
         KF = II(K)
         KL = IL(KF)
@@ -141,5 +200,120 @@
         IG(K) = KF
         D = -D
   190 ENDDO
-  999 RETURN
-      END SUBROUTINE INVERSEMATRIX
+
+      END SUBROUTINE InverseMatrix
+!
+!*****************************************************************************
+!
+      SUBROUTINE INC(i)
+
+      IMPLICIT NONE
+
+      INTEGER, INTENT (INOUT) :: i
+
+      i = i + 1
+
+      END SUBROUTINE INC
+!
+!*****************************************************************************
+!
+      SUBROUTINE GenerateAtomLabel(TheElement, TheNumber, TheLabelStr)
+
+! Converts a CCDC element number + serial number to an atom label string, e.g.:
+! "1" + "12" gives "C12"
+
+      USE ATMVAR
+
+      IMPLICIT NONE
+
+      INTEGER,       INTENT (IN   ) :: TheElement
+      INTEGER,       INTENT (IN   ) :: TheNumber
+      CHARACTER*(*), INTENT (  OUT) :: TheLabelStr
+
+      CHARACTER*20, EXTERNAL :: Integer2String
+      CHARACTER*3 tElementStr
+      CHARACTER*20 tStr
+      INTEGER iLen1, iLen2
+
+      tStr = Integer2String(TheNumber)
+      iLen1 = LEN_TRIM(tStr)
+      tElementStr = ElementStr(TheElement)
+      iLen2 = LEN_TRIM(tElementStr)
+      TheLabelStr = tElementStr(1:iLen2)//tStr(1:iLen1)
+
+      END SUBROUTINE GenerateAtomLabel
+!
+!*****************************************************************************
+!
+      LOGICAL FUNCTION assembly_contains(the_assembly, the_value)
+
+      USE ATMVAR
+
+      IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: the_assembly(1:MaxAtm_3)
+      INTEGER, INTENT (IN   ) :: the_value
+
+      INTEGER I
+
+      DO I = 1, MaxAtm_3
+        IF ( the_assembly(I) .EQ. 0 ) THEN
+          assembly_contains = .FALSE.
+          RETURN
+        ENDIF
+        IF ( the_assembly(I) .EQ. the_value ) THEN
+          assembly_contains = .TRUE.
+          RETURN
+        ENDIF
+      ENDDO
+      assembly_contains = .FALSE.
+
+      END FUNCTION assembly_contains
+!
+!*****************************************************************************
+!
+      SUBROUTINE assembly_add(the_assembly, the_value)
+
+      USE ATMVAR
+
+      IMPLICIT NONE
+
+      INTEGER, INTENT (INOUT) :: the_assembly(1:MaxAtm_3)
+      INTEGER, INTENT (IN   ) :: the_value
+
+      INTEGER I
+
+      DO I = 1, MaxAtm_3
+        IF ( the_assembly(I) .EQ. 0 ) THEN
+          the_assembly(I) = the_value
+          RETURN
+        ENDIF
+      ENDDO
+      CALL DebugErrorMessage('assembly_add() overflow.')
+
+      END SUBROUTINE assembly_add
+!
+!*****************************************************************************
+!
+      INTEGER FUNCTION assembly_size(the_assembly)
+
+      USE ATMVAR
+
+      IMPLICIT NONE
+
+      INTEGER, INTENT (INOUT) :: the_assembly(1:MaxAtm_3)
+
+      INTEGER I
+
+      DO I = 1, MaxAtm_3
+        IF ( the_assembly(I) .EQ. 0 ) THEN
+          assembly_size = I-1
+          RETURN
+        ENDIF
+      ENDDO
+      assembly_size = MaxAtm_3
+
+      END FUNCTION assembly_size
+!
+!*****************************************************************************
+!

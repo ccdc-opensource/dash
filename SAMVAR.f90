@@ -1,32 +1,26 @@
-!*==I_PREPROCESS.f90  created by SPAG 6.11Dc at 13:53 on  5 Oct 2001
+!
+!*****************************************************************************
+!
       MODULE SAMVAR
+
       IMPLICIT NONE
-!
-! COMMON /PLUTRM/
-!
-      INTEGER :: stdoutterm
-!
+
 ! PARAMETER definitions
-!
-      INTEGER, PARAMETER :: MAXATM = 150
 
-      REAL ATCHG(1:MAXATM)
+      INTEGER, PARAMETER :: MAXATM_2 = 300
+      INTEGER, PARAMETER :: MAXBND   = 1500
 
-! ATCHG = formal charge
+      REAL atchg(1:MAXATM_2)
+! atchg = formal charge
 
-!
-! PARAMETER definitions
-!
-      INTEGER, PARAMETER :: MAXBND = 1500
-!
-! COMMON /MVADAT/
-!
-      INTEGER :: tatom
-      INTEGER, DIMENSION(MAXATM) :: aelem
-      REAL, DIMENSION(MAXATM,3) :: axyzo
-! axyzo atomic yxyz co-ordinates, orthogonal
+      CHARACTER*5 atomlabel(1:MAXATM_2)
+! atomlabel = Original atom labels
 
-!--    AELEM    element type as used by Jos
+      REAL    axyzo(1:3, 1:MAXATM_2)
+! axyzo = atomic xyz co-ordinates, orthogonal
+
+      INTEGER aelem(1:MAXATM_2)
+! aelem = element type as used by CSD
 
 !U! Elements (plus other CSD 'element' definitions What's 'ZZ'??)
 !U      DATA el  /'C ','H ','AC','AG','AL','AM','AR','AS','AT','AU','B ', &
@@ -38,7 +32,7 @@
 !U           'PR','PT','PU','RA','RB','RE','RH','RN','RU','S ','SB','SC', &
 !U           'SE','SI','SM','SN','SR','TA','TB','TC','TE','TH','TI','TL', &
 !U           'TM','U ','V ','W ','X ','XE','Y ','YB','Z ','ZN','ZR','ZZ', &
-!U           'ME'/
+!U           'ME','DU'/
 
 !U! Elements (plus other CSD 'element' definitions What's 'Zz'??)
 !U      DATA atnr/   6,   1,  89,  47,  13,  95,  18,  33,  85,  79,   5, &
@@ -50,36 +44,25 @@
 !U             59,  78,  94,  88,  37,  75,  45,  86,  44,  16,  51,  21, &
 !U             34,  14,  62,  50,  38,  73,  65,  43,  52,  90,  22,  81, &
 !U             69,  92,  23,  74,   0,  54,  39,  70,   0,  30,  40,   0, &
-!U              0/
+!U              0,   0/
 
-!--    NHYC     number of terminal H 
-!--    NCAC     number of connections other than terminal H 
-!--    ATRESN   residue number 
-!--    NATCRY   number of atoms
-!--    NBOCRY   number of bonds 
+      INTEGER, DIMENSION(MAXBND)   :: btype
+      INTEGER, DIMENSION(MAXBND, 2) :: bond
+! btype  = bond type
+! bond   = list of bonds Iat, Jat   
 
-
-!
-! COMMON /MVBDAT/
-!
-      INTEGER :: tbond
-      INTEGER, DIMENSION(MAXBND) :: btype
-      INTEGER, DIMENSION(MAXBND,2) :: bond
-!      BTYPE    nbt          
-!--    BOND     list of bonds Iat, Jat   
-!
-! COMMON /PLUTLI/
-!
-      INTEGER :: idebug
-!
-! COMMON /PLUTQY/
-!
       INTEGER :: natcry, nbocry
-!--  NBOCRY  number of bonds in list
-      INTEGER, DIMENSION(MAXATM) :: ncac, nhyc
-!
-! COMMON /PLUTW1/
-!
-      INTEGER, DIMENSION(MAXATM) :: hybr
-!-- HYBR      estimate of hybridisation 1 = sp1 2=sp2 3=sp3  >100 = metal
+! natcry = number of atoms in list
+! nbocry = number of bonds in list
+
+      INTEGER, DIMENSION(MAXATM_2) :: ncac, nhyc
+! ncac = number of connections excluding hydrogens
+! nhyc = number of connections to hydrogens
+
+      INTEGER, DIMENSION(MAXATM_2) :: hybr
+! hybr      estimate of hybridisation 1 = sp1 2=sp2 3=sp3 4 = aromatic  >100 = metal
+
       END MODULE SAMVAR
+!
+!*****************************************************************************
+!

@@ -1,13 +1,14 @@
 ###############################################################
-# This template file is part of DASH to RIETAN-2000 interface.
+# This template file is part of DASH to RIETAN interface.
 #
 # Warning: 
 #     The line begin with " #@DASH@MARK@" is for DASH ONLY.
 #     Don't change or remove!
 # 
 ###############################################################
-#### Original header #####
-# # This is a template file for RIETAN-FP for angle-dispersive X-ray and neutron
+##### Original header #####
+#
+# This is a template file for RIETAN-FP for angle-dispersive X-ray and neutron
 # diffraction.
 
 # Many comments are sprinkled in this file for beginners.  Power users may
@@ -310,14 +311,30 @@ end select
 ROUGH  0.0  0.0  0.0  0.0  0000
 
 # Background parameters, b_j (j = 0-11).
- #@DASH@MARK@P BKGD1 0.0 0.0 0.0 111
-BKGD1  114.734  -1.26692E2  139.221   111
- #@DASH@MARK@P BKGD2 0.0 0.0 0.0  111
-BKGD2  -1.01947E2  68.0669  -3.9368E1  111
- #@DASH@MARK@P BKGD3 0.0 0.0 0.0 111
-BKGD3  23.2964  -7.4435  -2.01147 111
- #@DASH@MARK@P BKGD4 0.0 0.0 0.0 111
-BKGD4  3.56749  0.0  0.0  100
+ #@DASH@MARK@P BKGD0 0.0 1
+BKGD0  114.734  1
+ #@DASH@MARK@P BKGD1 0.0 1
+BKGD1  -1.26692E2  1
+ #@DASH@MARK@P BKGD2 0.0 1
+BKGD2  139.221  1
+ #@DASH@MARK@P BKGD3 0.0 1
+BKGD3  -1.01947E2  1
+ #@DASH@MARK@P BKGD4 0.0 1
+BKGD4  68.0669  1
+ #@DASH@MARK@P BKGD5 0.0 1
+BKGD5  -3.9368E1 1
+ #@DASH@MARK@P BKGD6 0.0 1
+BKGD6  23.2964  1
+ #@DASH@MARK@P BKGD7 0.0 1
+BKGD7  -7.4435  1
+ #@DASH@MARK@P BKGD8 0.0 1
+BKGD8  -2.01147 1
+ #@DASH@MARK@P BKGD9 0.0 1
+BKGD9  3.56749  1
+ #@DASH@MARK@P BKGD10 0.0 1
+BKGD10  0.0  0
+ #@DASH@MARK@P BKGD11 0.0 1
+BKGD11  0.0  0
  
 # PPP's of relaxed reflections (input as requied.  May be lacking).
 # Format of each label: PPPn_h.k.l (n: phase number, hkl: diffraction index).
@@ -526,7 +543,7 @@ case default
    NINT =  8! HRPD (JAERI, JRR-3M) formats. Two types are supported.
    NINT =  9! RIGAKU RINT2000 ASCII format.
    NINT = 10! MAC Science format.
-   NINT = 0
+   NINT = 7
 
    NRANGE = 0: Refine background parameters.
    NRANGE = 1! Fix backgrounds at (interpolated) values at specified 2-theta's.

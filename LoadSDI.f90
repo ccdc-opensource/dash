@@ -10,7 +10,6 @@
 !
       USE WINTERACTER
       USE VARIABLES
-      USE DRUID_HEADER
 
       IMPLICIT NONE
 
@@ -38,25 +37,29 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE SDIFileOpen(TheFileName)
+      LOGICAL FUNCTION SDIFileOpen(TheFileName)
 !
 ! This routine tries to open an SDI file.
 !
 ! INPUT   : TheFileName = the file name
 !
+! RETURNS : TRUE for success
+!           FALSE for error
+
       USE WINTERACTER
-      USE DRUID_HEADER
       USE VARIABLES
 
       IMPLICIT NONE
 
       CHARACTER*(*), INTENT (IN   ) :: TheFileName
 
-      INCLUDE 'GLBVAR.INC'
+      LOGICAL, EXTERNAL :: SDIFileLoad
 
-      LOGICAL FExists
+      LOGICAL FExists, tStat
       INTEGER KLEN
 
+      ! Initialise to failure
+      SDIFileOpen = .FALSE.
       KLEN = LEN_TRIM(TheFileName)
       IF (KLEN .EQ. 0) RETURN
       INQUIRE(FILE=TheFileName(1:KLEN),EXIST=FExists)
@@ -67,151 +70,202 @@
 ! This is the point of no return: the selected file will be new file, valid data or not
 ! Change global variable FNAME
       FNAME = TheFileName
-      CALL SDIFileLoad(FNAME(1:KLEN)) 
+      tStat = SDIFileLoad(FNAME(1:KLEN))
 ! Next line is necessary due to the way ScrUpdateFileName in SDIFileLoad works
       FNAME = TheFileName
-      IF (NoData) THEN
+      IF ((.NOT. tStat) .OR. NoData) THEN
         CALL ErrorMessage("Could not read the project file "//FNAME(1:KLEN)//&
                           CHAR(13)//"successfully.")
         RETURN
       ENDIF
 ! Disable Pawley refinement button if we are 'PastPawley'
       IF (PastPawley) CALL SetModeMenuState(-1,-1)
-      STATBARSTR(1) = FNAME
-      CALL WindowOutStatusBar(1,STATBARSTR(1))
-! update the file name of the project in the SA pop up
-      CALL SetSAFileName(FNAME(1:KLEN))
+      CALL WindowOutStatusBar(1,FNAME)
+! Update the file name of the project in the SA pop up
+      CALL ScrUpdateFileNameSDIFile(FNAME(1:KLEN))
+      SDIFileOpen = .TRUE.
       
-      END SUBROUTINE SDIFileOpen
+      END FUNCTION SDIFileOpen
 !
 !*****************************************************************************
 !
-      SUBROUTINE SDIFileLoad(SDIFile)
+      LOGICAL FUNCTION SDIFileLoad(SDIFile)
 
+! RETURNS : TRUE for success
+!           FALSE for error
+
+      USE WINTERACTER
+      USE DRUID_HEADER
       USE VARIABLES
+      USE REFVAR
 
       IMPLICIT NONE
 
       CHARACTER*(*), INTENT (IN   ) ::  SDIFile
 
+      INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'Lattice.inc'
+      INCLUDE 'reflns.inc'
+
+      REAL            ALAMBD
+      INTEGER                      NLAMB
+      COMMON /DGEOM / ALAMBD(5,5), NLAMB
+      REAL WLGTH
+      EQUIVALENCE (WLGTH,ALAMBD(1,1))
 
       REAL             PAWLEYCHISQ, RWPOBS, RWPEXP
       COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP
 
-      CHARACTER(LEN = MaxPathLength) :: line
+      INTEGER          NOBS
+      REAL                         XOBS,       YOBS,       EOBS
+      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), EOBS(MOBS)
 
+      REAL               PeakShapeSigma(1:2), PeakShapeGamma(1:2), PeakShapeHPSL, PeakShapeHMSL
+      COMMON /PEAKFIT3/  PeakShapeSigma,      PeakShapeGamma,      PeakShapeHPSL, PeakShapeHMSL
+
+      LOGICAL           Is_SX
+      COMMON  / SXCOM / Is_SX
+
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+      INTEGER, EXTERNAL :: GetCrystalSystem, GETTIC
+      CHARACTER(LEN = MaxPathLength) :: line
       INTEGER nl
       CHARACTER*12 KeyChar
-
       INTEGER i
-      INTEGER ihcver,ipiker,iloger,idsler, isst, ised
-      INTEGER, EXTERNAL :: GetCrystalSystem
-      INTEGER tFileHandle
+      INTEGER ihcver,ipiker,iloger,idsler
+      INTEGER iHandle
       LOGICAL TicExists
       LOGICAL HcvExists
       LOGICAL PikExists
       LOGICAL DslExists
 
-! JCC Set to success in all cases
+      ! Initialise to failure
+      SDIFileLoad = .FALSE.
+! Set to success in all cases
       ihcver = 0
       iloger = 0
       ipiker = 0
       idsler = 0
-      IF (LEN_TRIM(SDIFile) .GT. MaxPathLength) THEN
-        CALL DebugErrorMessage('LEN_TRIM(SDIFile) too long in SDIFileLoad')
-      ENDIF
 ! Now open all the appropriate PIK and HCV files
-      tFileHandle = 10
-      OPEN(tFileHandle,FILE=SDIFile(1:LEN_TRIM(SDIFile)),STATUS='old',ERR=999)
+      iHandle = 10
+      OPEN(iHandle,FILE=SDIFile(1:LEN_TRIM(SDIFile)),STATUS='old',ERR=999)
       CALL sa_SetOutputFiles(SDIFile)
       TicExists = .FALSE.
       HcvExists = .FALSE.
       PikExists = .FALSE.
       DslExists = .FALSE.
+      CALL Clear_PeakFitRanges
+      Is_SX = .FALSE.
  10   line = ' '
-      READ(tFileHandle,'(A)',END=100) line
+      READ(iHandle,'(A)',END=100,ERR=999) line
       nl = LEN_TRIM(line)
       CALL ILowerCase(line(:nl))
       CALL INextString(line,keychar)
       SELECT CASE (KeyChar(1:3))
         CASE ('tic')
-          CALL ILocateString(line,isst,ised)
-          DashTicFile = line(isst:)
+          DashTicFile = line(ILocateChar(line):)
           TicExists = .TRUE.
         CASE ('hcv')
-          CALL ILocateString(line,isst,ised)
-          DashHcvFile = line(isst:)
+          DashHcvFile = line(ILocateChar(line):)
           HcvExists = .TRUE.
-        CASE ('hkl')
-          CALL ILocateString(line,isst,ised)
-          DashHklFile = line(isst:)
         CASE ('pik')
-          CALL ILocateString(line,isst,ised)
-          DashPikFile = line(isst:)
+          DashPikFile = line(ILocateChar(line):)
           PikExists = .TRUE.
         CASE ('raw')
-          CALL ILocateString(line,isst,ised)
-          DashRawFile = line(isst:)
+          DashRawFile = line(ILocateChar(line):)
         CASE ('dsl')
-          CALL ILocateString(line,isst,ised)
-          DashDslFile = line(isst:)
+          DashDslFile = line(ILocateChar(line):)
           DslExists = .TRUE.
         CASE ('cel') ! Cell parameters
           DO I = 1, 6
             CALL INextReal(line,CellPar(i))
           ENDDO
-          CALL Upload_Cell_Constants()
+          CALL Upload_Cell_Constants
         CASE ('spa')
           CALL INextInteger(line,NumberSGTable)
 ! Set the crystal system
           LatBrav = GetCrystalSystem(NumberSGTable)
+! Update cpdbops, required by special_position.exe for most external Rietveld programs 
+! Call FillSymmetry_2() instead and move to DealWithWizardRietveldRefinement()
+!          CALL DecodeSGSymbol(SGShmStr(NumberSGTable))
           CALL Upload_CrystalSystem
-          CALL FillSymmetry
         CASE ('paw')
-          CALL INextReal(line,PAWLEYCHISQ)
+          CALL INextReal(line, PAWLEYCHISQ)
+        CASE ('sin') ! Single crystal
+          Is_SX = .TRUE.
       END SELECT
       GOTO 10 
- 100  CONTINUE
-      CLOSE(tFileHandle)
+ 100  CLOSE(iHandle)
       IF (DslExists) THEN
-        CALL GETDSL(DashDslFile,LEN_TRIM(DashDslFile),idsler)
+        CALL GETDSL(DashDslFile, idsler)
         DslExists = (idsler .EQ. 0)
       ENDIF
       IF (TicExists) THEN
-        CALL GET_LOGREF(DashTicFile,iloger)
-        TicExists = (iloger .EQ. 0)
+        TicExists = (GETTIC(DashTicFile) .EQ. 0)
       ENDIF
       IF (HcvExists) THEN
-        CALL GETHCV(DashHcvFile,LEN_TRIM(DashHcvFile),ihcver)
+        CALL GETHCV(DashHcvFile, ihcver)
         HcvExists = (ihcver .EQ. 0)
       ENDIF
       IF (PikExists) THEN
-        CALL GETPIK(DashPikFile,LEN_TRIM(DashPikFile),ipiker)
+        CALL GETPIK(DashPikFile, ipiker)
         PikExists = (ipiker .EQ. 0)
         IF (PikExists) THEN
           FNAME = ''
           CALL ScrUpdateFileName
         ENDIF
       ENDIF
-      CALL Clear_PeakFitRanges
       IPTYPE = 1
       CALL Profile_Plot
-! enable the buttons,
-      IF (.NOT. NoData) THEN
-        IF (idsler .EQ. 0) THEN
-          CALL SetModeMenuState(0,1)
-        ELSE
-          CALL SetModeMenuState(0,-1)
+! Enable the buttons,
+      IF ( .NOT. IN_BATCH ) THEN
+        IF (.NOT. NoData) THEN
+          IF (idsler .EQ. 0) THEN
+            CALL SetModeMenuState(0,1)
+          ELSE
+            CALL SetModeMenuState(0,-1)
+          ENDIF
         ENDIF
+        CALL SelectDASHDialog(IDD_ViewPawley)
+        CALL WDialogPutReal(IDF_Sigma1, PeakShapeSigma(1), '(F10.4)')
+        CALL WDialogPutReal(IDF_Sigma2, PeakShapeSigma(2), '(F10.4)')
+        CALL WDialogPutReal(IDF_Gamma1, PeakShapeGamma(1), '(F10.4)')
+        CALL WDialogPutReal(IDF_Gamma2, PeakShapeGamma(2), '(F10.4)')
+        CALL WDialogPutReal(IDF_HPSL,   PeakShapeHPSL,     '(F10.4)')
+        CALL WDialogPutReal(IDF_HMSL,   PeakShapeHMSL,     '(F10.4)')
+        CALL WDialogPutInteger(IDF_Pawley_Cycle_NumPts, NOBS)
+        CALL WDialogPutInteger(IDF_Pawley_Cycle_NumRefs, NumOfRef)
       ENDIF
 
- 999  END SUBROUTINE SDIFileLoad
+      MAXK = NumOfRef
+      WLGTH = ALambda
+      
+      IF ( .NOT. IN_BATCH ) &
+        CALL WDialogPutReal(IDF_Pawley_Cycle_ChiSq, PAWLEYCHISQ, '(F12.3)')
+
+      CALL Clear_SA
+! Grey out the "Previous Results >" button in the DICVOL Wizard window
+      IF ( .NOT. IN_BATCH ) THEN
+        CALL SelectDASHDialog(IDD_PW_Page8)
+        CALL WDialogFieldState(IDB_PrevRes, Disabled)
+      ENDIF
+
+      DefaultMaxResolution = 0.1 ! Force using maximum attainable
+      CALL Update_TruncationLimits
+      CALL GET_LOGREF
+      SDIFileLoad = .TRUE.
+      RETURN
+ 999  CALL ErrorMessage('Error reading .sdi file.')
+      CLOSE(iHandle) 
+
+      END FUNCTION SDIFileLoad
 !
 !*****************************************************************************
 !
-      SUBROUTINE GETDSL(FileName,LenFn,Ierr)
+      SUBROUTINE GETDSL(TheFileName, iErr)
 ! Routines for reading a 'DSL' file. This file contains
 ! The additional data that is part of the Winteracter front end: Namely
 ! radiation type/wavelength etc.
@@ -225,21 +279,25 @@
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'Lattice.inc'
 
-      CHARACTER*(*), INTENT (IN   ) :: FileName
-      INTEGER,       INTENT (IN   ) :: LenFn
-      INTEGER,       INTENT (  OUT) :: Ierr
+      CHARACTER*(*), INTENT (IN   ) :: TheFileName
+      INTEGER,       INTENT (  OUT) :: iErr
+
+      REAL               PeakShapeSigma(1:2), PeakShapeGamma(1:2), PeakShapeHPSL, PeakShapeHMSL
+      COMMON /PEAKFIT3/  PeakShapeSigma,      PeakShapeGamma,      PeakShapeHPSL, PeakShapeHMSL
 
       CHARACTER*128 line
       CHARACTER*3   KeyChar
-      INTEGER       Idum, nl
       REAL          Temp
-      INTEGER       Itemp
-      INTEGER I, hFile
+      INTEGER       nl, iTem, I, hFile
 
-      Ierr = 0
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+
+      iErr = 1
 ! Open the file
       hFile = 77
-      OPEN (UNIT=hFile, FILE=FileName(1:LenFn), STATUS='OLD', ERR=999)
+      OPEN (UNIT=hFile, FILE=TheFileName, STATUS='OLD', ERR=999)
 ! Loop over all records
       DO WHILE ( .TRUE. )
  10     READ(hFile,'(A)',END=100,ERR=999) line
@@ -252,16 +310,57 @@
 ! Read the wavelength
             CALL INextReal(line,Temp)
             IF (InfoError(1) .NE. 0) GOTO 999
-            CALL INextInteger(line,itemp)
-            IF (InfoError(1) .EQ. 0) THEN
-              JRadOption = itemp
-            ELSE
-! default = X-ray lab data
-              JRadOption = 1
-            END IF
+            CALL INextInteger(line,iTem)
+            IF (InfoError(1) .NE. 0) GOTO 999
+            JRadOption = iTem
             CALL Upload_Source
 ! Now we know all there is to know about the wavelength and source: update it
             CALL Set_Wavelength(Temp)
+          CASE ('sig') ! Sigma
+            I = InfoError(1) ! reset the errors
+! Sigma 1
+            CALL INextReal(line,Temp)
+            IF (InfoError(1) .NE. 0) GOTO 999
+            PeakShapeSigma(1) = Temp
+            CALL INextReal(line,Temp) ! ESD
+            IF (InfoError(1) .NE. 0) GOTO 999  
+! Sigma 2
+            CALL INextReal(line,Temp)
+            IF (InfoError(1) .NE. 0) GOTO 999                          
+            PeakShapeSigma(2) = Temp
+          CASE ('gam') ! Gamma
+            I = InfoError(1) ! reset the errors
+! Gamma 1
+            CALL INextReal(line,Temp)
+            IF (InfoError(1) .NE. 0) GOTO 999                          
+            PeakShapeGamma(1) =  Temp
+            CALL INextReal(line,Temp) ! ESD
+            IF (InfoError(1) .NE. 0) GOTO 999  
+! Gamma 2
+            CALL INextReal(line,Temp)
+            IF (InfoError(1) .NE. 0) GOTO 999                          
+            PeakShapeGamma(2) = Temp
+          CASE ('asy') ! HMSL/HPSL asymmetry parameters
+            I = InfoError(1) ! reset the errors
+! HPSL
+            CALL INextReal(line,Temp) ! HPSL
+            IF (InfoError(1) .NE. 0) GOTO 999                          
+            PeakShapeHPSL = Temp
+            IF ( .NOT. IN_BATCH ) THEN
+              CALL SelectDASHDialog(IDD_HPSL_info)
+              CALL WDialogPutReal(IDF_HPSL, PeakShapeHPSL, '(F10.4)')
+            ENDIF
+            I = InfoError(1) ! reset the errors
+            CALL INextReal(line,Temp) ! ESD
+            IF (InfoError(1) .NE. 0) GOTO 999  
+! HMSL
+            CALL INextReal(line,Temp)
+            IF (InfoError(1) .NE. 0) GOTO 999                          
+            PeakShapeHMSL = Temp
+            IF ( .NOT. IN_BATCH ) THEN
+              CALL SelectDASHDialog(IDD_HMSL_info)
+              CALL WDialogPutReal(IDF_HMSL, PeakShapeHMSL, '(F10.4)')
+            ENDIF
           CASE ('zer')
 ! Zero point
             I = InfoError(1) ! reset the errors
@@ -275,22 +374,20 @@
             CALL INextReal(line,Temp)
             IF (InfoError(1) .NE. 0) GOTO 999                          
             SlimValue = Temp 
-            CALL WDialogSelect(IDD_Pawley_Status)
-            CALL WDialogPutReal(IDF_Slim_Parameter,Temp,'(F7.3)')
+            IF ( .NOT. IN_BATCH ) THEN
+              CALL SelectDASHDialog(IDD_Pawley_Status)
+              CALL WDialogPutReal(IDF_Slim_Parameter,Temp,'(F7.3)')
+            ENDIF
           CASE ('sca')
             I = InfoError(1) ! reset the errors
             CALL INextReal(line,Temp)
             IF (InfoError(1) .NE. 0) GOTO 999                          
             ScalFac = Temp        
         END SELECT
-      END DO       
- 100  CONTINUE
-      BACKREF = .FALSE.
-      CLOSE(77)
-      RETURN
-! Error if we get here
-  999 Ierr = 1
-      CLOSE(77,IOSTAT=IDUM)
+      ENDDO       
+ 100  BackRef = .FALSE.
+      iErr = 0
+  999 CLOSE(hFile)
 
       END SUBROUTINE GETDSL
 !
@@ -309,126 +406,102 @@
 
       CHARACTER*(*), INTENT (IN   ) :: TheFileName
 
-      INTEGER iR, I, iLen, hFile
+      INTEGER iR, I, hFile
 
 ! Initialise to failure
       GETTIC = 1
       hFile = 31
-      iLen = LEN_TRIM(TheFileName)
-      OPEN(UNIT=hFile,FILE=TheFileName(1:iLen),STATUS='OLD',ERR=999)
+      OPEN(UNIT=hFile,FILE=TheFileName,STATUS='OLD',ERR=999)
       NumOfRef = 0
       DO iR = 1, MaxRef
         READ (hFile,*,ERR=999,END=200) (iHKL(I,iR),I=1,3), RefArgK(iR), DSTAR(iR)
         CALL INC(NumOfRef)
       ENDDO
   200 CONTINUE
-      CLOSE(hFile)
       GETTIC = 0
- 999  RETURN
+ 999  CLOSE(hFile)
 
       END FUNCTION GETTIC
 !
 !*****************************************************************************
 !
-      SUBROUTINE GETHCV(FILENAM,lenfil,ier)
+      SUBROUTINE GETHCV(TheFileName,iErr)
 
       USE ATMVAR
       USE REFVAR
 
       IMPLICIT NONE
 
-      CHARACTER*(*), INTENT (IN   ) :: FILENAM
-      INTEGER,       INTENT (IN   ) :: lenfil
-      INTEGER,       INTENT (  OUT) :: ier
+      CHARACTER*(*), INTENT (IN   ) :: TheFileName
+      INTEGER,       INTENT (  OUT) :: iErr
 
       INCLUDE 'PARAMS.INC'
 
-      CHARACTER*150 LINE
-      INTEGER ICOR(20), NKKOR(MCHIHS)
-      REAL WTI(MFCSTO)
-
-      INTEGER         MAXK
-      REAL                  FOB
-      COMMON /FCSTOR/ MAXK, FOB(MaxAtm_3,MFCSTO)
-
-      INTEGER         NLGREF
-      LOGICAL                 LOGREF
-      COMMON /FCSPEC/ NLGREF, LOGREF(8,MFCSTO)
+      CHARACTER*255 LINE
+      INTEGER NKKOR(MCHIHS)
 
       INTEGER         KKOR
       REAL                  WTIJ
       INTEGER                             IKKOR,         JKKOR
       COMMON /CHISTO/ KKOR, WTIJ(MCHIHS), IKKOR(MCHIHS), JKKOR(MCHIHS)
 
-      INTEGER KK, I, NPO, NLIN, NCOR, IR, II, JJ, IK, MINCOR, KL
+      INTEGER         IHCOV
+      COMMON /CORHES/ IHCOV(30,MaxRef)
 
-      OPEN (121,FILE=FILENAM(:Lenfil),STATUS='OLD',ERR=998)
+      INTEGER, EXTERNAL :: GetNumOfColumns
+      INTEGER KK, I, NLIN, NCOR, iR, II, JJ, IK, MINCOR, KL
+      INTEGER hFile
+
+      iErr = 1
+      hFile = 121
+      OPEN(hFile,FILE=TheFileName,STATUS='OLD',ERR=999)
       KK = 0
       KKOR = 0
       MINCOR = 20
-      IER = 0
-      READ (121,2121,END=998,ERR=998) NLIN, LINE
- 2121 FORMAT (Q,A)
-      DO I = NLIN, 1, -1
-        IF (LINE(I:I).EQ.'.') THEN
-          NPO = I
-          GOTO 11
-        ENDIF
-      ENDDO
-   11 NCOR = 0
-      DO I = NPO + 1, NLIN
-        IF ((LINE(I-1:I-1).EQ.' ') .AND. (LINE(I:I).NE.' ')) THEN
-          NCOR = NCOR + 1
-        ENDIF
-      ENDDO
-      NCOR = NCOR - 1
-      BACKSPACE (121)
-      DO IR = 1, MFCSTO
-        READ (121,*,END=100,ERR=998) (iHKL(I,IR),I=1,3), AIOBS(IR), WTI(IR), KL, (ICOR(I),I=1,NCOR)
-        KK = IR
-!
-!.. Now work out which terms should be kept for the chi-squared calculation
-!
+      DO iR = 1, MFCSTO
+        READ(hFile,'(Q,A)',END=100,ERR=999) NLIN, LINE
+        NCOR = GetNumOfColumns(LINE) - 6
+        READ(LINE(1:NLIN),*,END=999,ERR=999) (iHKL(I,iR),I=1,3), AIOBS(iR), WTI(iR), KL, (IHCOV(I,iR),I=1,NCOR)
+        KK = iR
+! Now work out which terms should be kept for the chi-squared calculation
         KKOR = KKOR + 1
-        IKKOR(KKOR) = IR
-        JKKOR(KKOR) = IR
+        IKKOR(KKOR) = iR
+        JKKOR(KKOR) = iR
         NKKOR(KKOR) = 100
         DO I = 1, NCOR
-          IF (ABS(ICOR(I)).GE.MINCOR) THEN
+          IF (ABS(IHCOV(I,iR)) .GE. MINCOR) THEN
             KKOR = KKOR + 1
-            IKKOR(KKOR) = IR
-            JKKOR(KKOR) = IR + I
-            NKKOR(KKOR) = ICOR(I)
+            IKKOR(KKOR) = iR
+            JKKOR(KKOR) = iR + I
+            NKKOR(KKOR) = IHCOV(I,iR)
           ENDIF
         ENDDO
       ENDDO
-  100 MAXK = KK
+  100 NumOfRef = KK
       DO IK = 1, KKOR
         II = IKKOR(IK)
         JJ = JKKOR(IK)
-        IF (II.EQ.JJ) THEN
+        IF (II .EQ. JJ) THEN
           WTIJ(IK) = WTI(II) * WTI(JJ)
         ELSE
           WTIJ(IK) = 0.02*WTI(II)*WTI(JJ)*FLOAT(NKKOR(IK))
         ENDIF
       ENDDO
-      GOTO 999
-  998 ier = 1
-  999 CLOSE (121)
+      iErr = 0
+  999 CLOSE(hFile)
 
       END SUBROUTINE GETHCV
 !
 !*****************************************************************************
 !
-      SUBROUTINE GETPIK(FILE,lenfil,ier)
+      SUBROUTINE GETPIK(TheFileName, iErr)
 
       USE VARIABLES
       
       IMPLICIT NONE
 
-      CHARACTER*(*), INTENT (IN   ) :: FILE
-      INTEGER,       INTENT (IN   ) :: lenfil
-      INTEGER,       INTENT (  OUT) :: ier
+      CHARACTER*(*), INTENT (IN   ) :: TheFileName
+      INTEGER,       INTENT (  OUT) :: iErr
 
       INCLUDE 'PARAMS.INC'
 
@@ -436,13 +509,17 @@
       REAL                                 WTSA
       COMMON /CHISTOP/ NFITA, IFITA(MOBS), WTSA(MOBS)
 
-      INTEGER          NBIN, LBIN
-      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN
-      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS)
+      INTEGER          NOBS
+      REAL                         XOBS,       YOBS,       EOBS
+      COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), EOBS(MOBS)
+
+      INTEGER                BackupNOBS
+      REAL                               BackupXOBS,       BackupYOBS,       BackupEOBS
+      COMMON /BackupPROFOBS/ BackupNOBS, BackupXOBS(MOBS), BackupYOBS(MOBS), BackupEOBS(MOBS)
 
       INTEGER         KNIPT
       REAL                            PIKVAL
-      COMMON /FPINF1/ KNIPT(50,MOBS), PIKVAL(50,MOBS)
+      COMMON /FPINF1/ KNIPT(MaxKTem,MOBS), PIKVAL(MaxKTem,MOBS)
 
       INTEGER         KREFT
       COMMON /FPINF2/ KREFT(MOBS)
@@ -451,24 +528,33 @@
       INTEGER tKNIPT(1:500)
       REAL tPIKVAL(1:500)
       LOGICAL WrongValuesPresent
-      INTEGER KTEM
-
+      INTEGER KTEM, hFile
+      REAL EOBSSQ
+      iErr = 1
+      hFile = 21
+      OPEN (hFile,FILE=TheFileName,STATUS='OLD',ERR=999)
       WrongValuesPresent = .FALSE.
-      ier = 0
-      OPEN (21,FILE=FILE(1:Lenfil),STATUS='OLD',ERR=998)
       NFITA = 0
-      NBIN = 0
+      NOBS = 0
       DO I = 1, MOBS
-        READ (21,*,END=200,ERR=998) XBIN(I), YOBIN(I), EBIN(I), KTEM
+        READ (hFile,*,END=200,ERR=999) XOBS(I), YOBS(I), EOBS(I), KTEM
 ! JvdS Rather a serious error here, I think. KTEM can be as much as 70.
 ! Some of the reflections contribute 0.000000E+00 ???
-        IF (KTEM .GT. 50) WrongValuesPresent = .TRUE.
-        KREFT(I) = MIN(50,KTEM)
-        NBIN = NBIN + 1
-        WTSA(I) = 1.0/EBIN(I)**2
-        IF (KTEM.GT.0) THEN
-          READ (21,*,ERR=998) (tKNIPT(K),tPIKVAL(K),K=1,KTEM)
-          DO j = 1, MIN(50,KTEM)
+        IF (KTEM .GT. MaxKTem) WrongValuesPresent = .TRUE.
+        KREFT(I) = MIN(MaxKTem,KTEM)
+        NOBS = NOBS + 1
+
+! JCC Another error: it seems that EOBS can be zero,
+!
+        EOBSSQ = EOBS(I)**2
+        IF ( EOBSSQ .LT. 0.0000001 ) THEN
+          EOBSSQ = 0.0000001
+        ENDIF
+
+        WTSA(I) = 1.0/EOBSSQ
+        IF (KTEM .GT. 0) THEN
+          READ (hFile,*,ERR=999) (tKNIPT(K),tPIKVAL(K),K=1,KTEM)
+          DO j = 1, MIN(MaxPik,KTEM)
             KNIPT(j,I)  = tKNIPT(j)
             PIKVAL(j,I) = tPIKVAL(j)
           ENDDO
@@ -477,17 +563,22 @@
         ENDIF
       ENDDO
   200 CONTINUE
-      CLOSE (21)
+      BackupXOBS = 0.0
+      BackupYOBS = 0.0
+      BackupEOBS = 0.0
+      BackupNOBS = NOBS
+      DO I = 1, NOBS
+        BackupXOBS(I) = XOBS(I)
+        BackupYOBS(I) = YOBS(I)
+        BackupEOBS(I) = EOBS(I)
+      ENDDO
       CALL Clear_BackGround
-! During the SA, only profile points that have peak contributions are calculated (there is no background
-! any more at this stage). Therefore, YCBIN must be initialised to zero's
-      YCBIN = 0.0
       NoData = .FALSE.
-      CALL GetProfileLimits
+      CALL Clear_Bins
+      CALL Rebin_Profile
       IF (WrongValuesPresent) CALL DebugErrorMessage('>50 contributing reflections encountered at least once.')
-      RETURN
-  998 ier = 1
-      CLOSE (21)
+      iErr = 0
+  999 CLOSE (hFile)
 
       END SUBROUTINE GETPIK
 !

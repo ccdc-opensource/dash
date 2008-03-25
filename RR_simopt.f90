@@ -31,9 +31,9 @@
       INTEGER                              KSITE,      ISGEN
       REAL            SDX,        SDTF,      SDSITE
       INTEGER                                             KOM17
-      COMMON /POSNS / NATOM, X(3,150), KX(3,150), AMULT(150), TF(150),  &
-     &                KTF(150), SITE(150), KSITE(150), ISGEN(3,150),    &
-     &                SDX(3,150), SDTF(150), SDSITE(150), KOM17
+      COMMON /POSNS / NATOM, X(3,MaxAtm_3), KX(3,MaxAtm_3), AMULT(MaxAtm_3), TF(MaxAtm_3),  &
+     &                KTF(MaxAtm_3), SITE(MaxAtm_3), KSITE(MaxAtm_3), ISGEN(3,MaxAtm_3),    &
+     &                SDX(3,MaxAtm_3), SDTF(MaxAtm_3), SDSITE(MaxAtm_3), KOM17
 
       LOGICAL           LOG_HYDROGENS
       COMMON /HYDROGEN/ LOG_HYDROGENS
@@ -44,16 +44,17 @@
       INTEGER         NStPar
       COMMON /pextra/ NStPar
 
-      REAL    SUM1, SUM2, RESCL, DELI, DELJ, CHIADD
-      INTEGER iR, iK, II, JJ
       REAL, EXTERNAL :: FFCALC_001, FFCALC_002, FFCALC_039, FFCALC_040, FFCALC_044, FFCALC_050, &
-                        FFCALC_052, FFCALC_057, FFCALC_058, FFCALC_061, FFCALC_064, FFCALC_065
+                        FFCALC_052, FFCALC_057, FFCALC_058, FFCALC_061, FFCALC_062, FFCALC_064, FFCALC_065
       REAL, EXTERNAL :: FFCALC_066, FFCALC_067, FFCALC_069, FFCALC_112, FFCALC_115, FFCALC_116, &
                         FFCALC_143, FFCALC_164, FFCALC_176, FFCALC_212, FFCALC_266, FFCALC_269
       REAL, EXTERNAL :: FFCALC_284, FFCALC_290, FFCALC_292, FFCALC_298, FFCALC_304, FFCALC_356, &
-                        FFCALC_365, FFCALC_369, FFCALC_430, FFCALC_431, FFCALC_432, FFCALC_433
-      REAL, EXTERNAL :: FFCALC_434, FFCALC_435, FFCALC_449, FFCALC_451, FFCALC_462, FFCALC_468, &
-                        FFCALC_469, FFCALC_471, FFCALC_481, FFCALC_483, FFCALC_485, FFCALC_DEFAULT
+                        FFCALC_360, FFCALC_362, FFCALC_365, FFCALC_369, FFCALC_391, FFCALC_430
+      REAL, EXTERNAL :: FFCALC_431, FFCALC_432, FFCALC_433, FFCALC_434, FFCALC_435, FFCALC_449, &
+                        FFCALC_451, FFCALC_462, FFCALC_468, FFCALC_469, FFCALC_471, FFCALC_481, &
+                        FFCALC_483, FFCALC_485, FFCALC_DEFAULT
+      REAL    SUM1, SUM2, RESCL, DELI, DELJ, CHIADD
+      INTEGER iR, iK, II, JJ
      
       CALL PRECFC
       IF (LOG_HYDROGENS) THEN
@@ -105,6 +106,10 @@
         CASE (61)            ! P 1 2/c 1
           DO IR = 1, NumOfRef
             AICALC(IR) = FFCALC_061(IR)   
+          ENDDO
+        CASE (62)            ! P 1 2/n 1
+          DO IR = 1, NumOfRef
+            AICALC(IR) = FFCALC_062(IR)   
           ENDDO
         CASE (64)            ! P 1 21/c 1
           DO IR = 1, NumOfRef
@@ -186,6 +191,14 @@
           DO IR = 1, NumOfRef
             AICALC(IR) = FFCALC_356(IR)
           ENDDO
+        CASE (360)           ! P 4/n (origin choice 2)
+          DO IR = 1, NumOfRef
+            AICALC(IR) = FFCALC_360(IR)
+          ENDDO
+        CASE (362)           ! P 42/n (origin choice 2)
+          DO IR = 1, NumOfRef
+            AICALC(IR) = FFCALC_362(IR)
+          ENDDO
         CASE (365)           ! I 41/a (origin choice 2)
           DO IR = 1, NumOfRef
             AICALC(IR) = FFCALC_365(IR)
@@ -193,6 +206,10 @@
         CASE (369)           ! P 41 21 2
           DO IR = 1, NumOfRef
             AICALC(IR) = FFCALC_369(IR)
+          ENDDO
+        CASE (391)           ! P -4 21 c
+          DO IR = 1, NumOfRef
+            AICALC(IR) = FFCALC_391(IR)
           ENDDO
   ! Obscure from here on in !
         CASE (430)           ! P3
@@ -263,7 +280,7 @@
       NATOM = TotNumOfAtoms
 ! recalculate the preferred orientation correction factors.
 ! Fill Preferred Orientation part
-      IF (RR_ioptPO) CALL PO_PRECFC(RR_Params(RR_var2PO))
+      IF (PrefParExists .AND. RR_ioptPO) CALL PO_PRECFC(RR_PO)
 ! AICALC(1:NumOfRef) now contains the structural part of the calculated intensities
 ! XICALC(1:NumOfRef) now contains the preferred orientation part of the calculated intensities
 ! If we are using preferred orientation: correct for it.

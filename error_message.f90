@@ -1,76 +1,70 @@
-      SUBROUTINE ERROR_MESSAGE(IOPT)
 !
-      USE WINTERACTER
-!      USE DRUID_HEADER
+!*****************************************************************************
 !
-      SELECT CASE (IOPT)
-         CASE (1)
-           CALL WMessageBox(OKOnly,InformationIcon,CommonOK,  &
-           'Error reading INF file','Error')
-         CASE (2)
-           CALL WMessageBox(OKOnly,InformationIcon,CommonOK,  &
-           'Error reading CONTROL file','Error')
-      END SELECT
+      SUBROUTINE CHKMAXREF
 !
-      END
+! Checks if the maximum number of reflections has been exceeded
 !
-!
-!
-	SUBROUTINE CHKMAXREF(PCXX)
-! Checks if the maximum number of reflections have been exceeded
-!
-    USE WINTERACTER
-	external PCXX
-	include 'reflns.inc90'
-      PARAMETER (MPPTS=15000,MKPTS=150000)
-      COMMON /ZSTORE/ NPTS,ZARGI(MPPTS),ZOBS(MPPTS),ZDOBS(MPPTS),&
-     ZWT(MPPTS),ICODEZ(MPPTS),KOBZ(MPPTS)
-      COMMON /PRPKCN/ARGK,PKCNSP(6,9,5),&
-      KPCNSP(6,9,5),DTDPCN(6),DTDWL,&
-      NPKCSP(9,5),ARGMIN(5),ARGMAX(5),&
-      ARGSTP(5),PCON
-	  integer iorda(10)
-	  real ardi(10)
-	  common /mxrfcm/ aadd
+      USE REFVAR
 
-	  logical routine_called
-      save routine_called
-	  data routine_called / .false. /
+      IMPLICIT NONE
+
+      INCLUDE 'PARAMS.INC'
+      INCLUDE 'REFLNS.INC'
+      INCLUDE 'statlog.inc'
+
+      INTEGER          NBIN, LBIN
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS), AVGESD
+
+      INTEGER         NPTS
+      REAL                  ZARGI,       ZOBS,       ZDOBS,       ZWT
+      INTEGER                                                                ICODEZ,       KOBZ
+      COMMON /ZSTORE/ NPTS, ZARGI(MOBS), ZOBS(MOBS), ZDOBS(MOBS), ZWT(MOBS), ICODEZ(MOBS), KOBZ(MOBS)
+
+      REAL            ARGK, PKCNSP
+      INTEGER                              KPCNSP
+      REAL                                                DTDPCN,    DTDWL
+      INTEGER         NPKCSP
+      REAL                         ARGMIN,    ARGMAX,    ARGSTP,    PCON
+      COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
+                      NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
+
+      LOGICAL routine_called
+      SAVE    routine_called
+      DATA    routine_called / .FALSE. /
+
+      CHARACTER*20 tStr
+      CHARACTER*20, EXTERNAL :: Integer2String
+      INTEGER len
+
+      NumOfRef = maxk
+      IF (NumOfRef .GT. MaxNumRef) THEN
+        NumOfRef = MaxNumRef
+        IF (.NOT. routine_called) THEN
+          tStr = Integer2String(MaxNumRef)
+          CALL StrClean(tStr, len)
+          CALL InfoMessage('DASH has a maximum limit of '//tStr(1:len)//' reflections.'//CHAR(13)//&
+                           'Only the '//tStr(1:len)//' lowest angle reflections will be indexed and used.')
+          routine_called = .TRUE.
+        ENDIF
+        know = NumOfRef
+! Calculate peak centre of KNOW in ARGK, and its derivatives
+        CALL PCCN01(2)
+! argk now contains the peak position of the last reflection
+        NPTS = 1
+        DO WHILE ((XBIN(NPTS) .LT. argk) .AND. (NPTS .LT. MOBS))
+          CALL INC(NPTS) ! NPTS is the number of points used for Pawley refinement.
+        ENDDO
+        argmax(1) = argk
+        maxk = NumOfRef
+        NBIN = NPTS
+        DataSetChange = DataSetChange + 1
+        CALL GetProfileLimits
+        CALL Get_IPMaxMin 
+      ENDIF
+
+      END SUBROUTINE CHKMAXREF
 !
-	aadd=0.
-	if (maxk.gt.360) then
-!.. We've too many reflections ... must reduce
-       if (.not. routine_called) then
-         CALL WMessageBox(OKOnly,InformationIcon,CommonOK,  &
-         'DASH has a maximium limit of 350 reflections.'//&
-		 'Only the 350 lowest angle reflections will be indexed and used','File truncation')
-		 routine_called =.true.
-	   endif
-	  know=350
-	  call pcxx(2)
-	  arrt=argk
-	  do ii=1,1
-	    know=350+ii
-		call PCXX(2)
-		ardi(ii)=argk-arrt
-	    arrt=argk
-	  end do
-	  call sortx(ardi,iorda,10)
-	  item=iorda(10)
-	  maxk=349+item
-	  aadd=ardi(10)
-	end if
+!*****************************************************************************
 !
-	  know=maxk
-	  call pcxx(2)
-	  armx=argk+aadd
-	  ii=1
-!	  WRITE(76,*) II,ARMX
-  	  do while (zargi(ii).lt.armx)
-	    ii=ii+1
-	  end do
-	  npts=min(npts,ii)
-!	  WRITE(76,*) II,npts,maxk,ARMX
-	  if (aadd.ne.0.0) argmax(1)=armx
-!
-	END

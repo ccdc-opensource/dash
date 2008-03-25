@@ -1,206 +1,162 @@
-     subroutine SA_OUTPUT(kopt,T,CHIMIN,CHIAV,CHIESD,&
-     xopt,dxvav,xvsig,flav,lb,ub,vm,n,NUP,NDOWN,NREJ,LNOBDS,NNEW,&
-     nmpert,ntotmov,iteration)
 !
+!*****************************************************************************
 !
+      SUBROUTINE SA_OUTPUT(T,CHIMIN,CHIAV,CHIESD,dxvav,xvsig,flav,N,NUP,NDOWN,ntotmov)
+
       USE WINTERACTER
       USE DRUID_HEADER
-      COMMON /PRCHISQ/ PAWLEYCHISQ,RWPOBS,RWPEXP
-!
-	real*8 xopt(*),dxvav(*),xvsig(*),flav(*),lb(*),ub(*),vm(*)
-!
-!
-      parameter (maxiter=10000)
-      common /pltstore/ xiter(maxiter),tstore(maxiter),&
-      foptstore(maxiter),fpavstore(maxiter)
-      COMMON /PLTSTO2/ CHIPROBEST(MAXITER)
 
+      IMPLICIT NONE
 
-	  REAL temin,temax, bchmin, bpwval, bchpro, tempvl
-	  REAL avchi1, avchi2, avchi3, avchi4
-	  INTEGER nd1, nd2, nd3, nd4
-	  COMMON / sagdat / temin, temax, bchmin, bpwval, bchpro, &
-	          tempvl, avchi1, avchi2, avchi3, avchi4, nd1, &
-	          nd2, nd3, nd4
+      REAL T, CHIMIN, CHIAV, CHIESD
+      INTEGER N, NUP, NDOWN, ntotmov
+      REAL dxvav(*),xvsig(*),flav(*)
 
-	  CALL WDialogSelect(IDD_SA_Completed)
-      CALL WDialogPutReal(IDF_SA_Complete_pcs,CHIPROBEST(iteration),'(f8.2)')
-      CALL WDialogPutReal(IDF_SA_Complete_ics,chimin,'(f8.2)')
+      INCLUDE 'PARAMS.INC'
 
-      CALL WDialogSelect(IDD_SA_Action1)
-      CALL WDialogPutReal(IDF_curr_temp,T,'(f8.2)')
-      CALL WDialogPutReal(IDF_min_chisq,chimin,'(f8.2)')
-      CALL WDialogPutReal(IDF_profile_chisq2,CHIPROBEST(iteration),'(f8.2)')
+      REAL              XOPT,       C,       FOPT
+      COMMON / sacmn /  XOPT(MVAR), C(MVAR), FOPT
 
-!
+      INTEGER         Curr_SA_Iteration
+      COMMON /ITRINF/ Curr_SA_Iteration
 
+      REAL             CHIPROBEST
+      COMMON /PLTSTO2/ CHIPROBEST
 
-	
+      REAL             PAWLEYCHISQ, RWPOBS, RWPEXP
+      COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP
 
- 
-!
-!.. best chi-squared scale ...
-        bchmin=alog10(max(1.,chimin))
-        temin=0.0
-        temax=4.0
- 
-!.. profile chi-squared scale ...
-  
-        bpwval =alog10(max(1.,PawleyChiSq))
+      INTEGER         Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
+      REAL                                                           ChiMult
+      COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
+      INTEGER         nmpert, bmIHANDLE
+      COMMON /sagdat/ nmpert, bmIHANDLE
 
-        bchpro=alog10(max(1.,CHIPROBEST(iteration)))
+      REAL            X_init,       x_unique,       lb,       ub
+      COMMON /values/ X_init(MVAR), x_unique(MVAR), lb(MVAR), ub(MVAR)
 
-!
-      if (kopt.eq.1) then
-       CALL WDialogPutReal(IDF_av_chisq,chiav,'(f8.2)')
-       CALL WDialogPutReal(IDF_rms_chisq,chiesd,'(f8.2)')
-       CALL WDialogPutInteger(IDF_total_moves,ntotmov)
-       CALL WDialogPutInteger(IDF_moves_per_T,nmpert)
-       CALL WDialogPutInteger(IDF_downhill_moves,ndown)
-       CALL WDialogPutInteger(IDF_rej_up_moves,nrej)
-       CALL WDialogPutInteger(IDF_acc_up_moves,nup)
-       CALL WDialogPutInteger(IDF_SA_total_moves_label,nmpert)
-!.. Temperature scale ...
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
 
-       tempvl=alog10(max(1.,t))
-       avchi1=alog10(max(1.,chiav-chiesd))
-       ctem=max(1.,chiav+chiesd)
-       avchi2=alog10(min(10000.,ctem))
-       temin=0.0
-       temax=4.0
-       avchi3=alog10(max(1.,chiav-0.1*chiesd))
-       ctem=max(1.,chiav+0.1*chiesd)
-       avchi4=alog10(min(10000.,ctem))
-	   nd1 = ndown
-	   nd2 = nmpert
-	   nd3 = ntotmov
-	   nd4 = nup
-      end if
-!
-	  CALL Sa_Output_Gr
+      REAL ctem, tempvl
+      REAL bchpro, bchmin, bpwval, avchi1, avchi2, avchi3, avchi4
+      REAL tenow1, tenow2, ruler, rulex1, rulex2
+      REAL, PARAMETER :: rminh = 0.01
+      REAL, PARAMETER :: rmaxh = 0.99
+!      INTEGER I
 
-      CALL WDialogSelect(IDD_Parameter_Status)
-      do i=1,n
-        CALL WGridPutCellReal(IDF_CPL_grid,1,i,sngl(xopt(i)),'(f12.5)')
-      end do
-      if (kopt.eq.1) then
-       do i=1,n
-        CALL WGridPutCellReal(IDF_CPL_grid,2,i,sngl(flav(i)),'(f12.5)')
-        CALL WGridPutCellReal(IDF_CPL_grid,3,i,sngl(vm(i)),'(f12.5)')
-        CALL WGridPutCellReal(IDF_CPL_grid,4,i,sngl(dxvav(i)),'(f12.5)')
-        CALL WGridPutCellReal(IDF_CPL_grid,5,i,sngl(xvsig(i)),'(f12.5)')
-        CALL WGridPutCellReal(IDF_CPL_grid,6,i,sngl(lb(i)),'(f12.5)')
-        CALL WGridPutCellReal(IDF_CPL_grid,7,i,sngl(ub(i)),'(f12.5)')
-       end do
-      end if
-
-      END
-
-
-
-	  subroutine sa_output_gr()
-      USE WINTERACTER
-      USE DRUID_HEADER
-	  USE VARIABLES
-	  IMPLICIT NONE
-
-	  REAL temin,temax, bchmin, bpwval, bchpro, tempvl
-	  REAL avchi1, avchi2, avchi3, avchi4
-	  INTEGER ndown, nmpert, ntotmov
-	  INTEGER nd1, nd2, nd3, nd4
-	  COMMON / sagdat / temin, temax, bchmin, bpwval, bchpro, &
-	          tempvl, avchi1, avchi2, avchi3, avchi4, nd1, &
-	          nd2, nd3, nd4
-      character*255 temperfile
-	  REAL tenow1, tenow2, ruler, rulex1, rulex2
-	  integer iemax, ippm, ilt
-  
-      REAL, PARAMETER ::  rminh = 0.01
-	  REAL, PARAMETER ::  rmaxh = 0.99
-
-
-      temperfile= INSTDIR(1:len_trim(INSTDIR))//DIRSPACER//'Images'//DIRSPACER//'temperature1.bmp'
-	  ilt = len_trim(temperfile)
-
-
-	  CALL IGrSelect(3,IDF_minchisq_picture)
-	  CALL IGrFillPattern(Solid)
-      CALL IGrUnits(temin,0.0,temax,1.0)
-      CALL IGrLoadImage(temperfile(1:ilt))
-
-      CALL IGrColourN(95)
-      tenow1=bchmin-0.03
-      tenow2=bchmin+0.03
-      CALL IGrRectangle(tenow1,rminh,tenow2,rmaxh)
-
-
-      CALL IGrSelect(3,IDF_prochisq_picture)
-      CALL IGrUnits(temin,0.0,temax,1.0)
-      CALL IGrLoadImage(temperfile(1:ilt))
-      CALL IGrColourN(63)
-      tenow1=bpwval-0.03
-      tenow2=bpwval+0.03
-      CALL IGrRectangle(tenow1,rminh,tenow2,rmaxh)
-      CALL IGrColourN(95)
-
-	  tenow1=bchpro-0.03
-      tenow2=bchpro+0.03
-      CALL IGrRectangle(tenow1,rminh,tenow2,rmaxh)
-
-
+      IF ( in_batch ) &
+        RETURN
+      CALL SelectDASHDialog(IDD_SA_Action1)
+      CALL WDialogPutReal(IDF_curr_temp, T, '(F8.2)')
+      CALL WDialogPutReal(IDF_min_chisq, chimin, '(F8.2)')
+      CALL WDialogPutReal(IDF_profile_chisq2, CHIPROBEST, '(F8.2)')
+! best chi-squared scale
+      bchmin = ALOG10(MAX(1.0,chimin))
+! profile chi-squared scale
+      bpwval = ALOG10(MAX(1.0,PAWLEYCHISQ))
+      bchpro = ALOG10(MAX(1.0,CHIPROBEST))
+      CALL WDialogPutReal(IDF_av_chisq,chiav,'(F8.2)')
+      CALL WDialogPutInteger(IDF_total_moves,ntotmov)
+      CALL WDialogPutInteger(IDF_SA_total_moves_label,nmpert)
+! Temperature scale
+      tempvl = ALOG10(MAX(1.0, T))
+      avchi1 = ALOG10(MAX(1.0, chiav-chiesd))
+      ctem = MAX(1.0, chiav+chiesd)
+      avchi2 = ALOG10(MIN(10000.0, ctem))
+      avchi3 = ALOG10(MAX(1.0, chiav-0.1*chiesd))
+      ctem = MAX(1.0, chiav+0.1*chiesd)
+      avchi4 = ALOG10(MIN(10000.0, ctem))
+      CALL IGrFillPattern(Solid)
+! Temperature
       CALL IGrSelect(3,IDF_T_picture)
-      CALL IGrUnits(temin,0.0,temax,1.0)
-      CALL IGrLoadImage(temperfile(1:ilt))
-
-
-      CALL IGrColourN(95)
-      tenow1=tempvl-0.03
-      tenow2=tempvl+0.03
+      CALL IGrUnits(0.0,0.0,4.0,1.0)
+      CALL WBitmapPut(bmIHANDLE,0,1)
+      CALL IGrColourN(95) ! Lightgreen
+      tenow1 = tempvl-0.03
+      tenow2 = tempvl+0.03
       CALL IGrRectangle(tenow1,rminh,tenow2,rmaxh)
-!.. average chi-squared scale ...
+! Minimum chi squared
+      CALL IGrSelect(3,IDF_minchisq_picture)
+      CALL IGrUnits(0.0,0.0,4.0,1.0)
+      CALL WBitmapPut(bmIHANDLE,0,1)
+      CALL IGrColourN(95) ! Lightgreen
+      tenow1 = bchmin-0.03
+      tenow2 = bchmin+0.03
+      CALL IGrRectangle(tenow1,rminh,tenow2,rmaxh)
+! Average chi-squared
       CALL IGrSelect(3,IDF_avchisq_picture)
-
-      CALL IGrUnits(temin,0.0,temax,1.0)
-      CALL IGrLoadImage(temperfile(1:ilt))
-      CALL IGrColourN(95)
+      CALL IGrUnits(0.0,0.0,4.0,1.0)
+      CALL WBitmapPut(bmIHANDLE,0,1)
+      CALL IGrColourN(95) ! Lightgreen
       CALL IGrRectangle(avchi1,rminh,avchi2,rmaxh)
       CALL IGrColourN(128)
       CALL IGrRectangle(avchi3,rminh,avchi4,rmaxh)
-      CALL IGrColourN(95)
-
-      CALL IGrSelect(3,IDF_SA_move_distribution)
-      ruler=nd2
-      CALL IGrUnits(0.0,0.0,ruler,1.0)
-      CALL IGrColourN(95)
-      rulex1=0.0
-      rulex2=nd1
-      CALL IGrRectangle(rulex1,rminh,rulex2,rmaxh)
-      CALL IGrColourN(159)
-      rulex1=rulex2
-      rulex2=rulex2+nd4
-      CALL IGrRectangle(rulex1,rminh,rulex2,rmaxh)
-      CALL IGrColourN(31)
-      rulex1=rulex2
-      rulex2=nd2
-      CALL IGrRectangle(rulex1,rminh,rulex2,rmaxh)
-! total moves
+! Profile chi squared
+      CALL IGrSelect(3,IDF_prochisq_picture)
+      CALL IGrUnits(0.0,0.0,4.0,1.0)
+      CALL WBitmapPut(bmIHANDLE,0,1)
+      CALL IGrColourN(63)  ! Yellow
+      tenow1 = bpwval-0.03
+      tenow2 = bpwval+0.03
+      CALL IGrRectangle(tenow1,rminh,tenow2,rmaxh)
+      CALL IGrColourN(95) ! Lightgreen
+      tenow1 = bchpro-0.03
+      tenow2 = bchpro+0.03
+      CALL IGrRectangle(tenow1,rminh,tenow2,rmaxh)
+! Total moves
       CALL IGrSelect(3,IDF_SATotalMoves_picture)
-      iemax=1+alog10(max(1.,float(nd3)))
-      ruler=10.**iemax
+      ruler = FLOAT(MaxMoves)
       CALL IGrUnits(0.0,0.0,ruler,1.0)
-      CALL IGrColourN(52)
-      rulex1=0.0
-      rulex2=nd3
+      CALL IGrColourN(63)  ! Yellow
+      rulex1 = 0.0
+      rulex2 = FLOAT(ntotmov)
       CALL IGrRectangle(rulex1,rminh,rulex2,rmaxh)
-      CALL IGrColourN(159)
-      rulex1=rulex2
-      rulex2=ruler
+      CALL IGrColourN(159) ! Blue
+      rulex1 = rulex2
+      rulex2 = ruler
       CALL IGrRectangle(rulex1,rminh,rulex2,rmaxh)
-
+! Uphill, downhill, rejected
+      CALL IGrSelect(3,IDF_SA_move_distribution)
+      ruler = FLOAT(nmpert)
+      CALL IGrUnits(0.0,0.0,ruler,1.0)
+      IF (Curr_SA_Iteration .EQ. 1) THEN
+        CALL IGrColourN(208) ! Black
+        CALL IGrRectangle(0.0,rminh,ruler,rmaxh)
+      ELSE
+        CALL IGrColourN(95) ! Lightgreen
+        rulex1 = 0.0
+        rulex2 = FLOAT(ndown)
+        CALL IGrRectangle(rulex1,rminh,rulex2,rmaxh)
+        CALL IGrColourN(159) ! Blue
+        rulex1 = rulex2
+        rulex2 = rulex2 + FLOAT(nup)
+        CALL IGrRectangle(rulex1,rminh,rulex2,rmaxh)
+        CALL IGrColourN(31) ! Red
+        rulex1 = rulex2
+        rulex2 = ruler
+        CALL IGrRectangle(rulex1,rminh,rulex2,rmaxh)
+      ENDIF
       CALL IGrSelect(1,0)
-	  CALL IGrUnits(0.,0.,1.,1.)
-	  CALL IGrArea(0.,0.,1.,1.)
+      CALL IGrUnits(0.0,0.0,1.0,1.0)
+      CALL IGrArea(0.0,0.0,1.0,1.0)
+! Following lines write values to dialogue that hasn't been loaded into memory,
+! nor is it displayed.
+!U      CALL SelectDASHDialog(IDD_Parameter_Status_2)
+!U      DO I = 1, N
+!U        CALL WGridPutCellReal(IDF_CPL_grid,1,I,xopt(i),'(F12.5)')
+!U      ENDDO
+!U      DO I = 1, N
+!U        CALL WGridPutCellReal(IDF_CPL_grid,2,I,flav(i),'(F12.5)')
+!U        CALL WGridPutCellReal(IDF_CPL_grid,3,I,vm(i),'(F12.5)')
+!U        CALL WGridPutCellReal(IDF_CPL_grid,4,I,dxvav(i),'(F12.5)')
+!U        CALL WGridPutCellReal(IDF_CPL_grid,5,I,xvsig(i),'(F12.5)')
+!U        CALL WGridPutCellReal(IDF_CPL_grid,6,I,lb(i),'(F12.5)')
+!U        CALL WGridPutCellReal(IDF_CPL_grid,7,I,ub(i),'(F12.5)')
+!U      ENDDO
+
+      END SUBROUTINE SA_OUTPUT
 !
-	  return
-	  end subroutine sa_output_gr
+!*****************************************************************************
+!

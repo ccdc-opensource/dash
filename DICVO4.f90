@@ -1,12 +1,14 @@
-!*==TRICLINI2.f90  processed by SPAG 6.11Dc at 15:36 on 20 Sep 2001
+!
+!*****************************************************************************
+!
 !    -------------------------------------------------------
 !    |		     T R I C L I N I C 2		   |				   |
 !    -------------------------------------------------------
       SUBROUTINE TRICLINI2
+
       USE DICVAR
+
       IMPLICIT NONE
-!
-!*** Start of declarations rewritten by SPAG
 !
 ! Local variables
 !
@@ -17,9 +19,7 @@
       INTEGER :: I, Ia, Ia2, Ia3, Ia4, Ib, Ib2, Ib3, Ib4, Ic, Ic2, Ic3, Ic4, Id, Id2, Id3, Id4,   &
      &           Ie, Ie2, Ie3, Ie4, Imf, Imf2, Imf3, Imf4, J, Jj, Jjl, Jjl1, Na, Nb, Nc, Nd, Ne,  &
      &           Nf
-!
-!*** End of declarations rewritten by SPAG
-!
+
       Na = (amax-amin)/pasa
       Nb = (bmax-bmin)/pasb
       Nc = (cmax-cmin)/pasc
@@ -213,6 +213,7 @@
             ENDDO
           ENDIF
           ndich(1) = ndich(1) + 1
+      CALL PeekEvent
           DO I = 1, n - 1
             J = I + 1
             IF ( irj(I,1).EQ.1 .AND. irj(J,1).EQ.1 .AND. ih(I,1,1).EQ.ih(J,1,1) .AND. ik(I,1,1).EQ.ik(J,1,1) .AND. &
@@ -339,6 +340,7 @@
               CALL TRIHKL1(kamoi2,kbmoi2,kcmoi2,kdmoi2,kemoi2,kfmoi2,kaplu2,kbplu2,kcplu2,kdplu2,keplu2,kfplu2,2)
               IF ( nt.EQ.-1 ) GOTO 1340
               ndich(2) = ndich(2) + 1
+      CALL PeekEvent
               DO I = 1, n - 1
                 J = I + 1
                 IF ( irj(I,2).EQ.1 .AND. irj(J,2).EQ.1 .AND. ih(I,1,2).EQ.ih(J,1,2) .AND. ik(I,1,2).EQ.ik(J,1,2)   &
@@ -466,6 +468,7 @@
      &                         3)
                   IF ( nt.EQ.-1 ) GOTO 1292
                   ndich(3) = ndich(3) + 1
+      CALL PeekEvent
                   DO I = 1, n - 1
                     J = I + 1
                     IF ( irj(I,3).EQ.1 .AND. irj(J,3).EQ.1 .AND. ih(I,1,3).EQ.ih(J,1,3) .AND. ik(I,1,3)            &
@@ -593,12 +596,14 @@
      &                               kfplu4,4)
                         IF ( nt.NE.-1 ) THEN
                           ndich(4) = ndich(4) + 1
+      CALL PeekEvent
                           DO I = 1, n - 1
                             J = I + 1
                             IF ( irj(I,4).EQ.1 .AND. irj(J,4).EQ.1 .AND. ih(I,1,4).EQ.ih(J,1,4) .AND. ik(I,1,4)    &
      &                           .EQ.ik(J,1,4) .AND. il(I,1,4).EQ.il(J,1,4) ) GOTO 1272
                           ENDDO
                           CALL TRICLINI3
+                          IF (DICVOL_Error .NE. 0) RETURN
                         ENDIF
                       ENDIF
  1272                 IF ( iiff.EQ.0 ) GOTO 1274
@@ -677,4 +682,8 @@
  2300 IF ( iiaa.EQ.0 ) GOTO 99999
  2400 Ia = Ia + 1
       IF ( Ia.LE.Na ) GOTO 100
+
 99999 END SUBROUTINE TRICLINI2
+!
+!*****************************************************************************
+!

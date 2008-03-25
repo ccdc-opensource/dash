@@ -1,205 +1,371 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE BeginSa
+      SUBROUTINE BeginSA
 
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
+      USE PRJVAR
 
       IMPLICIT NONE
 
+      INCLUDE 'PARAMS.INC'
       INCLUDE 'GLBVAR.INC'
 
       LOGICAL           LOG_HYDROGENS
       COMMON /HYDROGEN/ LOG_HYDROGENS
 
-      LOGICAL         RESTART
-      INTEGER                  SA_Run_Number
-      INTEGER                                 MaxRuns, MaxMoves
-      REAL                                                       ChiMult
-      COMMON /MULRUN/ RESTART, SA_Run_Number, MaxRuns, MaxMoves, ChiMult
+      INTEGER         Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
+      REAL                                                           ChiMult
+      COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
-      INTEGER, EXTERNAL :: CheckOverwriteSaOutput
-      LOGICAL, EXTERNAL :: Get_UseHydrogens
-      REAL    T1
-      REAL    SA_Duration ! The time the SA took, in seconds
-      CHARACTER*10 SA_DurationStr
-      INTEGER Ierrflag
+      INTEGER              iMyExit 
+      LOGICAL                       NewOptimumFound, WasMinimised
+      COMMON / CMN000001 / iMyExit, NewOptimumFound, WasMinimised
 
-      IF (CheckOverwriteSaOutput() .EQ. 0) THEN
-        CALL WizardWindowShow(IDD_SA_input3)
+      REAL                    chi_sqd
+      INTEGER                                           Curr_Iter, MaxIterationSoFar
+      REAL                    chi_x_max, chi_x_min, chi_y_min, chi_y_max
+      LOGICAL                                                             Zoomed
+      INTEGER                 RunStart
+      COMMON /CHISQDPLOTDATA/ chi_sqd(MaxIter, MaxRun), Curr_Iter, MaxIterationSoFar, &
+                              chi_x_max, chi_x_min, chi_y_min, chi_y_max, Zoomed, &
+                              RunStart
+
+      LOGICAL         InSA
+      COMMON /SADATA/ InSA
+
+      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign
+      INTEGER                                                                    HydrogenTreatment
+      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign, HydrogenTreatment
+
+      INTEGER, EXTERNAL :: CheckOverwriteSaOutput, DateToday, DateDaysElapsed, &
+                           TimeNowSeconds
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
+      CHARACTER*100 SA_DurationStr
+      INTEGER StartDate, EndDate, DSLen
+      INTEGER StartTime, EndTime
+
+
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+      IF ( CheckOverwriteSaOutput() .EQ. 0 ) THEN
+        CALL WizardWindowShow(IDD_SA_input4)
         RETURN
       ENDIF
-      LOG_HYDROGENS = Get_UseHydrogens()
-      CALL WDialogSelect(IDD_Configuration)
-      CALL WDialogFieldState(IDF_UseHydrogens,Disabled)
-      CALL WDialogSelect(IDD_SA_Action1)
-! Check on viewer
-      IF (ViewOn) THEN
-        CALL WDialogFieldState(IDF_Viewer,Enabled)
-      ELSE
-        CALL WDialogFieldState(IDF_Viewer,Disabled)
-      ENDIF
-      CALL WizardWindowShow(IDD_SA_Action1)
-      DoSaRedraw = .TRUE.
-      T1 = SECNDS(0.0)
-      CALL PDB_SymmRecords()
-      CALL Init_MultiRun()
-! Grey out start next button if not multirun
-      IF (RESTART) THEN
-        CALL WDialogFieldState(IDF_StartNext,Enabled)
-      ELSE
-        CALL WDialogFieldState(IDF_StartNext,Disabled)
-      ENDIF
-      CALL SimulatedAnnealing
-      SA_Duration = SECNDS(T1)
-      WRITE(SA_DurationStr,'(F10.1)') SA_Duration
-  !    CALL DebugErrorMessage('The SA took '//SA_DurationStr(1:LEN_TRIM(SA_DurationStr))//' seconds.')
-! After completion, save the list of solutions
-      CALL SaveMultiRun_LogData
-      CALL WDialogSelect(IDD_Configuration)
-      CALL WDialogFieldState(IDF_UseHydrogens,Enabled)
-      DoSaRedraw = .FALSE.
-      Ierrflag = InfoError(1)
-      CALL WindowSelect(0)
-      Ierrflag = InfoError(1)
-! Wait for the user to raise the window. Under NT the "WindowRaise call" 
-! Does not seem to work annoyingly, so once complete, wait for the user to
-! raise the window
-      DO WHILE (WinfoWindow(WindowState) .EQ. 0)
-        CALL IOsWait(50) ! wait half a sec
-      ENDDO
-      CALL WizardWindowHide
-!ep SASummary presents a grid summarising results of the Simulated
-!   Annealing runs.  
-      CALL WDialogSelect(IDD_SA_Multi_Completed_ep)
-      CALL WDialogShow(-1,-1,0,Modeless)
-      Ierrflag =  InfoError(1)
-      DoSaRedraw = .FALSE.
+      ! Initialise LOGICALs that tell us if this parameter is either a translation or a torsion
+      ! angle that is allowed to vary over its full range. Because if so, e.g. a translation of, say, 1.10
+      ! should be renormalised to 0.10 during the SA
+      CALL InitRenormalisationLogicals
 
-      END SUBROUTINE BeginSa
+      LOG_HYDROGENS = (HydrogenTreatment .EQ. 3)
+      CALL CREATE_FOB(HydrogenTreatment .EQ. 2)
+      CALL Create_AtomicWeightings(HydrogenTreatment)
+      CALL FillSymmetry_2
+      CALL GET_LOGREF
+! Ungrey the "Save... chi sqrd progress"
+      IF ( .NOT. IN_BATCH ) THEN
+        CALL SelectDASHDialog(IDD_OutputSolutions)
+        CALL WDialogFieldState(IDF_GROUP2, Enabled)
+        CALL WDialogFieldState(IDB_OutputChiSqd, Enabled)
+        CALL WDialogFieldState(IDF_LABEL5, Enabled)
+        CALL WDialogFieldState(IDF_LABEL3, Enabled)
+! Pop up the SA status window
+        CALL WizardWindowShow(IDD_SA_Action1)
+!O      CALL SelectDASHDialog(IDD_Parameter_Status_2)
+!O      CALL WDialogShow(-1, -1, 0, Modeless)
+        CALL WDialogFieldState(IDB_Summary, Enabled)
+      ENDIF
+
+      StartDate = DateToday()
+      StartTime = TimeNowSeconds()
+      IPTYPE = 2
+!C Clear Chi-sqd array between starting sets of SA Runs
+      Chi_sqd = 0.0
+      MaxIterationSoFar = 0
+      InSA = .TRUE.
+      CALL MakRHm
+      CALL SimulatedAnnealing
+      InSA = .FALSE.
+      EndDate = DateToday()
+      EndTime = TimeNowSeconds()
+      CALL TimeElapsed(StartDate, StartTime, EndDate, EndTime, SA_DurationStr, DSLen)
+!C After completion, save the list of solutions
+      CALL SaveMultiRun_LogData
+      CALL OutputChi2vsMoves
+      CALL SaveParamAtEnd
+      CALL SavePrjAtEnd
+      CALL InfoMessage('The Simulated Annealing took '//SA_DurationStr(1:DSLen))
+      CALL SetModeMenuState(0,0)
+!O      Ierrflag = InfoError(1)
+!O      CALL WindowSelect(0)
+!O! Wait for the user to raise the window. Under NT the "WindowRaise call" 
+!O! Does not seem to work annoyingly, so once complete, wait for the user to
+!O! raise the window
+!O      DO WHILE (WinfoWindow(WindowState) .EQ. WinMinimised)
+!O        CALL IOsWait(50) ! wait half a sec
+!O      ENDDO
+
+      IF ( .NOT. IN_BATCH ) THEN
+        CALL SelectDASHDialog(IDD_Summary)
+        CALL WDialogHide
+        IF (iMyExit .EQ. 5) THEN
+          CALL WizardWindowShow(IDD_SA_Modal_input2)
+        ELSE
+          CALL SelectMode(IDB_AnalyseSolutions)
+          CALL SelectDASHDialog(IDD_SAW_Page5)
+          CALL WDialogPutInteger(IDF_Limit1,1)
+          CALL WDialogPutInteger(IDF_Limit2, NumOf_SA_Runs)
+          CALL WizardWindowShow(IDD_SAW_Page5)
+        ENDIF
+      ENDIF
+      END SUBROUTINE BeginSA
 !
 !*****************************************************************************
 !
-! JCC Check the files before we trash them  
+! Check the files before we trash them  
       INTEGER FUNCTION CheckOverwriteSaOutput()
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE VARIABLES
 
       IMPLICIT NONE
 
-      CHARACTER*85 new_fname
+      INCLUDE 'PARAMS.INC'
 
-      CHARACTER*80       cssr_file, pdb_file, ccl_file, log_file, pro_file   
-      COMMON /outfilnam/ cssr_file, pdb_file, ccl_file, log_file, pro_file
-      INTEGER            cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
-      COMMON /outfillen/ cssr_flen, pdb_flen, ccl_flen, log_flen, pro_flen
+      INTEGER                  OFBN_Len
+      CHARACTER(MaxPathLength)           OutputFilesBaseName
+      CHARACTER(3)                                            SA_RunNumberStr
+      COMMON /basnam/          OFBN_Len, OutputFilesBaseName, SA_RunNumberStr
 
-      INTEGER I, Iflags
-      CHARACTER*80 filehead, tDirName
-!ep added extpro
-      LOGICAL extcssr, extpdb, extccl, extpro
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
 
-      INQUIRE(FILE=cssr_file(1:cssr_flen),EXIST=extcssr) 
-      IF (extcssr) GOTO 10
-      DO I = 1, 30
-        CALL AppendNumToFileName(I,cssr_file,new_fname)
-        INQUIRE(FILE=new_fname(1:LEN_TRIM(new_fname)),EXIST=extcssr) 
-        IF (extcssr) GOTO 10
+      INTEGER I, iFlags
+      CHARACTER(MaxPathLength) filehead, tDirName, tFileName
+      LOGICAL OutputExists
+      CHARACTER(3) NumStr
+
+! Try all possible output names, when match, set OutputExists to .TRUE.
+    1 DO I = 1, MaxRun
+        WRITE (NumStr,'(I3.3)') I
+        tFileName = OutputFilesBaseName(1:OFBN_Len)//'_'//NumStr//'.cssr'
+        INQUIRE(FILE=tFileName,EXIST=OutputExists) 
+        IF (OutputExists) GOTO 10
+        tFileName = OutputFilesBaseName(1:OFBN_Len)//'_'//NumStr//'.pdb'
+        INQUIRE(FILE=tFileName,EXIST=OutputExists) 
+        IF (OutputExists) GOTO 10
+        tFileName = OutputFilesBaseName(1:OFBN_Len)//'_'//NumStr//'.ccl'
+        INQUIRE(FILE=tFileName,EXIST=OutputExists) 
+        IF (OutputExists) GOTO 10
+        tFileName = OutputFilesBaseName(1:OFBN_Len)//'_'//NumStr//'.cif'
+        INQUIRE(FILE=tFileName,EXIST=OutputExists) 
+        IF (OutputExists) GOTO 10
+        tFileName = OutputFilesBaseName(1:OFBN_Len)//'_'//NumStr//'.res'
+        INQUIRE(FILE=tFileName,EXIST=OutputExists) 
+        IF (OutputExists) GOTO 10
+! ep added.  Pro_file contains the powder diffraction data and fit....
+        tFileName = OutputFilesBaseName(1:OFBN_Len)//'_'//NumStr//'.pro'
+        INQUIRE(FILE=tFileName,EXIST=OutputExists) 
+        IF (OutputExists) GOTO 10
       ENDDO
-      INQUIRE(FILE=pdb_file(1:pdb_flen),  EXIST=extpdb)
-      IF (extpdb) GOTO 10
-      DO I = 1, 30
-        CALL AppendNumToFileName(I,pdb_file,new_fname)
-        INQUIRE(FILE=new_fname(1:LEN_TRIM(new_fname)),EXIST=extpdb) 
-        IF (extpdb) GOTO 10
-      ENDDO
-      INQUIRE(FILE=ccl_file(1:ccl_flen),  EXIST=extccl)
-      IF (extccl) GOTO 10
-      DO I = 1, 30
-        CALL AppendNumToFileName(I,ccl_file,new_fname)
-        INQUIRE(FILE=new_fname(1:LEN_TRIM(new_fname)),EXIST=extccl) 
-        IF (extccl) GOTO 10
-      ENDDO
-!     ep added.  Pro_file contains the powder diffraction data and fit....
-      INQUIRE(FILE=pro_file(1:pro_flen),  EXIST=extpro)
-      IF (extpro) GOTO 10
-      DO I = 1, 30
-        CALL AppendNumToFileName(I,pro_file,new_fname)
-        INQUIRE(FILE=new_fname(1:LEN_TRIM(new_fname)),EXIST=extpro) 
-        IF (extpro) GOTO 10
-      ENDDO
-   10 CheckOverwriteSaOutput = 1
-      DO WHILE (extcssr .OR. extpdb .OR. extccl .OR. extpro)
-        CALL SplitPath(pdb_file,tDirName,filehead)
-        CALL WMessageBox(YesNoCancel, QuestionIcon, CommonYes, &
+! When we are here, none of the filenames we generated clashed with an existing one
+      CheckOverwriteSaOutput = 1
+      RETURN
+! When we are here, at least one of the filenames we generated clashed
+! ask user if (s)he wants to overwrite
+   10 IF ( in_batch ) THEN
+        CheckOverwriteSaOutput = 1
+        RETURN 
+      ENDIF
+      CALL SplitPath(OutputFilesBaseName,tDirName,filehead)
+      CALL WMessageBox(YesNoCancel, QuestionIcon, CommonYes, &
                     "Do you wish to overwrite existing files?"//CHAR(13)//CHAR(13)// &
-                    "Current base for filenames: "//filehead(1:LEN_TRIM(filehead)-4)//CHAR(13)//CHAR(13)// &
+                    "Current base for filenames: "//filehead(1:LEN_TRIM(filehead))//CHAR(13)//CHAR(13)// &
                     "(Hit No to enter a new filename)", &
                     "Overwrite Output Files?")
-        IF (WInfoDialog(4) .EQ. 1) THEN ! Yes - Overwrite
-          RETURN 
-        ELSEIF (WinfoDialog(4) .EQ. 2) THEN ! No - so enter a new file name
-          Iflags = SaveDialog + NonExPath + DirChange + AppendExt
-          filehead = ' '
-!ep appended
-          CALL WSelectFile('ccl files|*.ccl|cssr files|*.cssr|pdb files|*.pdb|pro files|*.pro|',&
-                           Iflags,filehead,'Choose SA output file name')
-          IF (filehead .NE. ' ') CALL sa_SetOutputFiles(filehead)
-        ELSE ! Cancel
+      IF (WInfoDialog(4) .EQ. 1) THEN ! Yes - Overwrite
+        CheckOverwriteSaOutput = 1
+        RETURN 
+      ELSEIF (WinfoDialog(4) .EQ. 2) THEN ! No - so enter a new file name
+        iFlags = SaveDialog + NonExPath + DirChange + AppendExt
+        filehead = ''
+! ep appended
+        CALL WSelectFile('Output files (*.pdb,*.cssr,*.ccl,*.cif,*.res,*.pro)|*.pdb;*.cssr;*.ccl;*.cif;*.res;*.pro|', &
+                         iFlags,filehead,'Choose SA output file name')
+        IF ((WinfoDialog(4) .NE. CommonOk) .OR. (LEN_TRIM(filehead) .EQ. 0)) THEN ! Cancel
           CheckOverwriteSaOutput = 0
           RETURN
+        ELSE
+          CALL sa_SetOutputFiles(filehead)
+! New checks necessary: does the new name exist?
+          GOTO 1
         ENDIF
-        INQUIRE(FILE=cssr_file(1:cssr_flen),EXIST=extcssr) 
-        INQUIRE(FILE=pdb_file(1:pdb_flen),  EXIST=extpdb)
-        INQUIRE(FILE=ccl_file(1:ccl_flen),  EXIST=extccl)
-        INQUIRE(FILE=pro_file(1:pro_flen),  EXIST=extpro)
-! Read in a new file name
-      ENDDO
+      ELSE ! Cancel
+        CheckOverwriteSaOutput = 0
+        RETURN
+      ENDIF
 
       END FUNCTION CheckOverwriteSaOutput
 !
 !*****************************************************************************
 !
-      SUBROUTINE FillSymmetry()
+      SUBROUTINE FillSymmetry_2
+
+      USE PO_VAR
+      USE REFVAR
+
+      IMPLICIT NONE
+
+      INCLUDE 'Lattice.inc'
 
 ! Covers the eventuality of the default space group option.
 ! We need to determine the number of symmetry operators etc.
-      LOGICAL SDREAD
-      COMMON /CARDRC/ICRYDA,NTOTAL(9),NYZ,NTOTL,INREA(26,9),ICDN(26,9),IERR,IO10,SDREAD
-      common/iounit/lpt,iti,ito,iplo,luni,iout
-      CHARACTER*6 xxx
-      CHARACTER*10 fname
+      INTEGER         ICRYDA, NTOTAL,    NYZ, NTOTL, INREA,       ICDN,       IERR, IO10
+      LOGICAL                                                                             SDREAD
+      COMMON /CARDRC/ ICRYDA, NTOTAL(9), NYZ, NTOTL, INREA(26,9), ICDN(26,9), IERR, IO10, SDREAD
 
-      INCLUDE 'GLBVAR.INC'
-      INCLUDE 'Lattice.inc'
-      PARAMETER (msymmin=10)
-      CHARACTER*20 symline
-      COMMON /symgencmn/ nsymmin,symmin(4,4,msymmin),symline(msymmin)
- 
-      OPEN(42,file='polys.ccl',status='unknown')
-      WRITE(42,4210) 
+      INTEGER         NINIT, NBATCH, NSYSTM
+      LOGICAL                                MULFAS, MULSOU, MULONE
+      COMMON /GLOBAL/ NINIT, NBATCH, NSYSTM, MULFAS, MULSOU, MULONE
+
+      INTEGER         LPT, LUNI
+      COMMON /IOUNIT/ LPT, LUNI
+
+      INTEGER     msymmin
+      PARAMETER ( msymmin = 10 )
+      INTEGER            nsymmin
+      REAL                        symmin
+      CHARACTER*20                                           symline
+      COMMON /symgencmn/ nsymmin, symmin(1:4,1:4,1:msymmin), symline(1:msymmin)
+
+      INTEGER         IBMBER
+      COMMON /CCSLER/ IBMBER
+
+      CHARACTER*10 filnam_root
+      COMMON /commun/ filnam_root
+
+      INTEGER, EXTERNAL :: GetCrystalSystem
+      REAL, EXTERNAL :: VCTMOD, SCLPRD
+      CHARACTER*6 PNAME
+      INTEGER hFile, iSym
+      REAL phases(1:48), RefHT(1:3,1:48)
+      REAL PrfDir(1:3), H(1:3), RefLen
+      INTEGER i, ii, iR
+
+   10 IBMBER = 0
+      hFile = 42
+      OPEN(hFile,FILE='polys.ccl',status='unknown',ERR=999)
+      WRITE(hFile,4210,ERR=999) 
  4210 FORMAT('N Determining the space group ')
+      WRITE(hFile,4220,ERR=999) (CellPar(i),i=1,6)
+ 4220 FORMAT('C ',3F9.5,3F9.3)
       IF (NumberSGTable .GE. 1) THEN
         CALL DecodeSGSymbol(SGShmStr(NumberSGTable))
         IF (nsymmin .GT. 0) THEN
-          DO isym = 1, nsymmin
-            WRITE(42,4235) symline(isym)
- 4235       FORMAT('S ',a)
+          DO iSym = 1, nsymmin
+            WRITE(hFile,4235,ERR=999) symline(iSym)
+ 4235       FORMAT('S ',A)
           ENDDO
         ENDIF
       ENDIF
-      CLOSE(42)
-      fname='polys'
-      xxx='SPGMAK'
-      CALL FORSYM(xxx,fname)
+      CLOSE(hFile)
+      PNAME = 'SPGMAK'
+      filnam_root = 'polys'
+      NINIT = 1
+      CALL PREFIN(PNAME)
+      CALL SYMOP
+      IF (IBMBER .EQ. 0) THEN
+        CALL OPSYM(1)
+        CALL RECIP
+      ENDIF
       CALL CLOFIL(ICRYDA)
       CALL CLOFIL(IO10)
       CALL CLOFIL(LPT)
+      IF (IBMBER .NE. 0) THEN
+! Set the crystal system
+        LatBrav = GetCrystalSystem(NumberSGTable)
+        NumberSGTable = 1 ! P1
+        CALL Upload_CrystalSystem
+        CALL ErrorMessage('Error while determining space group: space group reset.')
+        GOTO 10
+      ENDIF
+      IF (PrefParExists) THEN
+        DO i = 1, 3
+          PrfDir(i) = FLOAT(PO_Direction(i))
+        ENDDO
+        RefLen = VCTMOD(1.0,PrfDir,2)
+        PrfDir = PrfDir / RefLen
+        DO iR = 1, NumOfRef
+          DO ii = 1, 3
+            H(ii) = FLOAT(iHKL(ii,iR))
+          ENDDO
+          RefLen = VCTMOD(1.0,H,2) ! Calculate length of reciprocal-space vector
+          CALL SYMREF(H,RefHT,iHMUL(iR),phases)
+          DO ii = 1, iHMUL(iR)
+            PrefCsqa(ii,iR) = (SCLPRD(PrfDir,RefHT(1,ii),2)/RefLen)**2
+          ENDDO
+        ENDDO
+      ENDIF
+      RETURN
+  999 CALL ErrorMessage('Error writing temporary file for space group decoding.')
+      CLOSE(hFile)
 
-      END SUBROUTINE FillSymmetry
+      END SUBROUTINE FillSymmetry_2
+!
+!*****************************************************************************
+!
+      SUBROUTINE InitRenormalisationLogicals
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE ZMVAR
+
+      IMPLICIT NONE
+
+      INCLUDE 'PARAMS.INC'
+
+      INTEGER         nvar, NS, NT, iSeed1, iSeed2
+      COMMON /sapars/ nvar, NS, NT, iSeed1, iSeed2
+
+      REAL            X_init,       x_unique,       lb,       ub
+      COMMON /values/ X_init(MVAR), x_unique(MVAR), lb(MVAR), ub(MVAR)
+
+      INTEGER                ModalFlag,       RowNumber, iRadio
+      REAL                                                                          iX, iUB, iLB  
+      COMMON /ModalTorsions/ ModalFlag(mvar), RowNumber, iRadio, iX, iUB, iLB
+
+      INTEGER iPar
+
+! Loop over parameters
+      DO iPar = 1, nvar
+           IsFullRangeTrans(iPar) = .FALSE.
+           IsFullRangeTorsion(iPar) = .FALSE.
+! Is it a translation?
+        IF (kzmpar2(iPar) .EQ. 1) THEN
+! Full range?
+          IF ((UB(iPar) - LB(iPar)) .GT. 0.9999) THEN
+            IsFullRangeTrans(iPar) = .TRUE.
+! Reset range
+            LB(iPar) = 0.0
+            UB(iPar) = 1.0
+          ENDIF
+        ENDIF
+! Is it a unimodal torsion?
+        IF (ModalFlag(iPar) .EQ. 1) THEN
+! Full range?
+          IF ((UB(iPar) - LB(iPar)) .GT. 359.9999) THEN
+            IsFullRangeTorsion(iPar) = .TRUE.
+! Reset range
+            LB(iPar) = -180.0
+            UB(iPar) = +180.0
+          ENDIF
+        ENDIF
+      ENDDO
+
+      END SUBROUTINE InitRenormalisationLogicals
 !
 !*****************************************************************************
 !

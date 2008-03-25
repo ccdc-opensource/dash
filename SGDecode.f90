@@ -1,12 +1,14 @@
-!*==DECODESGSYMBOL.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
 !*****************************************************************************
 !
       SUBROUTINE DecodeSGSymbol(SGsymb)
 !
-!... This program decodes the explicit space group symbols in Vol.B
+! This program decodes the explicit space group symbols in Vol.B
+
+      IMPLICIT NONE
+
       CHARACTER*24 SGsymb
-!
+
       REAL rotmat(3,3,10), tran(3,10), alat(3,10)
       INTEGER idol(5)
       INTEGER matsym(3,3,12)
@@ -17,16 +19,22 @@
      &     1, 1, 0, 0, 0, 1, 0, 0, -1, 0, 1, -1, 0, 0, 0, 1, 0, -1, 0,  &
      &     1, 0, 0, 0, 0, 1, 1, -1, 0, 1, 0, 0, 0, 0, 1/
       INTEGER latvec(3,7)
-!	data latvec/ 6,0,0, 0,6,0, 0,0,6, 6,6,6, 6,6,0, 6,0,6, 8,4,4/
-!	the above latvec is all wrong, but the one below only works
-!	for A,B,C and I centering
-      DATA latvec/0, 6, 6, 6, 0, 6, 6, 6, 0, 6, 6, 6, 8, 4, 4, 4, 8, 8, &
-     &     0, 0, 0/
-      PARAMETER (msymmin=10)
-      CHARACTER*20 symline
-      COMMON /symgencmn/ nsymmin, symmin(4,4,msymmin), symline(msymmin)
+!     data latvec/ 6,0,0, 0,6,0, 0,0,6, 6,6,6, 6,6,0, 6,0,6, 8,4,4/
+!     the above latvec is all wrong, but the one below only works
+!     for A,B,C and I centering
+      DATA latvec/0,6,6, 6,0,6, 6,6,0, 6,6,6, 8,4,4, 4,8,8, 0,0,0/
+
+      INTEGER     msymmin
+      PARAMETER ( msymmin = 10 )
+      INTEGER            nsymmin
+      REAL                        symmin
+      CHARACTER*20                                           symline
+      COMMON /symgencmn/ nsymmin, symmin(1:4,1:4,1:msymmin), symline(1:msymmin)
+
       CHARACTER*50 stout
-!
+      INTEGER nele, ns, I, J, iSym, iLatAr, ilat, JJ, ID1, ID2, JD, iRotMat
+      INTEGER Num12th, JS 
+
       nele = 1
       ns = 24
       DO i = 1, ns
@@ -36,41 +44,13 @@
         ENDIF
       ENDDO
       idol(nele) = Ns + 1
-!
-!... (2) Crystal system
-!
-!
-!	SELECT CASE (SGsymb(2:2))
-!	  CASE('A')
-!          write(76,*) ' Triclinic Bravais lattice'
-!	  CASE('M')
-!          write(76,*) ' Monoclinic Bravais lattice'
-!	  CASE('O')
-!          write(76,*) ' Orthorhombic Bravais lattice'
-!	  CASE('T')
-!          write(76,*) ' Tetragonal Bravais lattice'
-!	  CASE('R')
-!          write(76,*) ' Rhombohedral Bravais lattice'
-!	  CASE('H')
-!          write(76,*) ' Hexagonal/Trigonal Bravais lattice'
-!	  CASE('C')
-!          write(76,*) ' Cubic Bravais lattice'
-!	END SELECT
-!... (3) Centre of symmetry at origin or not
-!	SELECT CASE (SGsymb(3:3))
-!	  CASE('C')
-!          write(76,*) ' Centrosymmetric'
-!	  CASE('N')
-!          write(76,*) ' Non-centrosymmetric'
-!	END SELECT
-!
-!... Let's decode the first part to do with lattice translations etc.
-!... It should always be 3 letters long
-!... (1) Lattice type
-      isym = 1
+! Let's decode the first part to do with lattice translations etc.
+! It should always be 3 letters long
+! (1) Lattice type
+      iSym = 1
       SELECT CASE (SGsymb(1:1))
       CASE ('P')
-        isym = 0
+        iSym = 0
       CASE ('A')
         ilatar = 1
       CASE ('B')
@@ -84,46 +64,25 @@
       CASE ('R')
         isym = 2
       END SELECT
-      IF (Isym.EQ.1) THEN
+      IF (iSym .EQ. 1) THEN
         DO i = 1, 3
-          alat(i,isym) = float(latvec(i,ilatar))/12.
+          alat(i,iSym) = FLOAT(latvec(i,ilatar)) / 12.0
         ENDDO
-!	  write(76,*) ' '
-!	  write(76,*) ' Lattice operation ',Isym
-!        do i=1,3
-!	    write(76,1500) (matsym(j,i,1),j=1,3),alat(i,isym)
-!	  end do
-      ELSEIF (Isym.EQ.3) THEN
+      ELSEIF (iSym .EQ. 3) THEN
         DO j = 1, 3
           DO i = 1, 3
-            alat(i,j) = float(latvec(i,j))/12.
+            alat(i,j) = FLOAT(latvec(i,j)) / 12.0
           ENDDO
         ENDDO
-      ELSEIF (Isym.EQ.2) THEN
+      ELSEIF (iSym .EQ. 2) THEN
         DO j = 1, 2
           DO i = 1, 3
-            alat(i,j) = float(latvec(i,j+4))/12.
+            alat(i,j) = float(latvec(i,j+4)) / 12.0
           ENDDO
         ENDDO
-!	  write(76,*) ' '
-!	  write(76,*) ' Lattice operation ',Isym1
-!        do i=1,3
-!	    write(76,1500) (matsym(j,i,1),j=1,3),alat(i,isym1)
-!	  end do
-!	  ilatar=ilatar+1
-!	  do i=1,3
-!	    alat(i,isym)=float(latvec(i,ilatar))/12.
-!	  end do
-!	  write(76,*) ' '
-!	  write(76,*) ' Lattice operation ',Isym
-!        do i=1,3
-!	    write(76,1500) (matsym(j,i,1),j=1,3),alat(i,isym)
-!	  end do
       ENDIF
-!
-      nlat = isym
-      IF (nlat.GT.0) THEN
-        DO ilat = 1, nlat
+      IF (iSym .GT. 0) THEN
+        DO ilat = 1, iSym
           DO i = 1, 3
             DO j = 1, 3
               rotmat(i,j,ilat) = matsym(i,j,1)
@@ -132,13 +91,11 @@
           ENDDO
         ENDDO
       ENDIF
-!
       DO jj = 2, nele
         id1 = idol(jj-1) + 1
         id2 = idol(jj) - 1
 ! 1+id2-id1=6 always
-!
-        isym = isym + 1
+        iSym = iSym + 1
         SELECT CASE (SGsymb(id1+1:id1+2))
         CASE ('1A')
           irotmat = 1
@@ -167,38 +124,27 @@
         END SELECT
         DO j = 1, 3
           DO i = 1, 3
-            rotmat(i,j,isym) = float(matsym(j,i,irotmat))
+            rotmat(i,j,iSym) = FLOAT(matsym(j,i,irotmat))
           ENDDO
         ENDDO
-        SELECT CASE (SGsymb(id1:id1))
-        CASE ('P')
-! Proper rotation - leave the rotation matrix unchanged
-        CASE ('I')
+        IF (SGsymb(id1:id1) .EQ. 'I') THEN
 ! Improper rotation - negate the matrix
           DO j = 1, 3
             DO i = 1, 3
-              rotmat(i,j,isym) = -rotmat(i,j,isym)
+              rotmat(i,j,iSym) = -rotmat(i,j,iSym)
             ENDDO
           ENDDO
-        END SELECT
+        ENDIF
         DO I = 1, 3
           jd = id1 + 2 + i
           READ (SGsymb(jd:jd),1400) Num12th
- 1400     FORMAT (i1)
-          Tran(i,isym) = float(Num12th)/12.
-          IF (Num12th.EQ.5) Tran(i,isym) = 2.*Tran(i,isym)
+ 1400     FORMAT (I1)
+          Tran(i,isym) = FLOAT(Num12th)/12.
+          IF (Num12th .EQ. 5) Tran(i,iSym) = 2.0*Tran(i,iSym)
         ENDDO
-!	 write(76,*) ' '
-!	 write(76,*) ' Operator number   ',Isym
-!       do i=1,3
-!	   write(76,1500) (nint(rotmat(i,j,isym)),j=1,3),tran(i,isym)
-! 1500	   format(5x,3i4,f9.5)
-!	 end do
       ENDDO
-!
-!.. Now make the Jones faithful representation
+! Now make the Jones faithful representation
       nsymmin = isym
-!      write(76,*) ' Number of symmetry generators ',nsymmin
       DO js = 1, nsymmin
         DO i = 1, 3
           DO j = 1, 3
@@ -210,27 +156,21 @@
           symmin(4,j,js) = 0.
         ENDDO
         symmin(4,4,js) = 1.
-!	do i=1,4
-!	 write(76,3900) (nint(symmin(i,j,js)),j=1,3),symmin(i,4,js)
-! 3900	 format(10x,3i5,f10.5)
-!	end do
-        CALL M2S_SYMCON(symmin(1,1,js),stout,lstout)
-!	  write (76,4000) js,stout(:20)
+        CALL M2S_SYMCON(symmin(1,1,js),stout)
  4000   FORMAT (i5,5x,a)
         symline(js) = stout(:20)
       ENDDO
-!
+      CALL PDB_SymmRecords
+
       END SUBROUTINE DECODESGSYMBOL
-!*==M2S_SYMCON.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-!
-!
-!
-!
-      SUBROUTINE M2S_SYMCON(symtem,stout,lstout)
+      SUBROUTINE M2S_SYMCON(symtem, stout)
 ! Makes the Jones faithful representation from the 4 by 4 matrix
 !
+      IMPLICIT NONE
+
       CHARACTER*50 stem, stout, stoutt
       CHARACTER*3 strtran(12)
       REAL symtem(4,4)
@@ -238,23 +178,21 @@
       DATA lentran/0, 0, 3, 3, 3, 0, 3, 0, 3, 3, 3, 0/
       DATA strtran/'   ', '   ', '1/6', '1/4', '1/3', '   ', '1/2',     &
      &     '   ', '2/3', '3/4', '5/6', '   '/
-      INTEGER kk
-!
+      INTEGER kk, I, ipt, jpt, iTem, lstout
+
       lstout = 0
       DO i = 1, 3
-!
         ipt = 0
-!
-        item = 1 + nint(12.*symtem(i,4))
+        item = 1 + NINT(12.0*symtem(i,4))
         jpt = ipt + lentran(item)
         stem(ipt+1:jpt) = strtran(item)
         ipt = jpt
-        kk = nint(symtem(i,1))
-        IF (kk.EQ.-1) THEN
+        kk = NINT(symtem(i,1))
+        IF (kk .EQ. -1) THEN
           stem(ipt+1:ipt+2) = '-x'
           ipt = ipt + 2
-        ELSEIF (kk.EQ.1) THEN
-          IF (ipt.EQ.0) THEN
+        ELSEIF (kk .EQ. 1) THEN
+          IF (ipt .EQ. 0) THEN
             stem(ipt+1:ipt+1) = 'x'
             ipt = ipt + 1
           ELSE
@@ -262,14 +200,12 @@
             ipt = ipt + 2
           ENDIF
         ENDIF
-!
-!
-        kk = nint(symtem(i,2))
-        IF (kk.EQ.-1) THEN
+        kk = NINT(symtem(i,2))
+        IF (kk .EQ. -1) THEN
           stem(ipt+1:ipt+2) = '-y'
           ipt = ipt + 2
-        ELSEIF (kk.EQ.1) THEN
-          IF (ipt.EQ.0) THEN
+        ELSEIF (kk .EQ. 1) THEN
+          IF (ipt .EQ. 0) THEN
             stem(ipt+1:ipt+1) = 'y'
             ipt = ipt + 1
           ELSE
@@ -277,12 +213,11 @@
             ipt = ipt + 2
           ENDIF
         ENDIF
-!
-        kk = nint(symtem(i,3))
-        IF (kk.EQ.-1) THEN
+        kk = NINT(symtem(i,3))
+        IF (kk .EQ. -1) THEN
           stem(ipt+1:ipt+2) = '-z'
           ipt = ipt + 2
-        ELSEIF (kk.EQ.1) THEN
+        ELSEIF (kk .EQ. 1) THEN
           IF (ipt.EQ.0) THEN
             stem(ipt+1:ipt+1) = 'z'
             ipt = ipt + 1
@@ -295,10 +230,12 @@
         lstout = lstout + ipt
         lstout = lstout + 1
         stoutt(lstout:lstout) = ','
-!
       ENDDO
       lstout = lstout - 1
       stout = ' '
       stout(21-lstout:20) = stoutt(1:lstout)
-!
+
       END SUBROUTINE M2S_SYMCON
+!
+!*****************************************************************************
+!

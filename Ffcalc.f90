@@ -1,409 +1,1923 @@
-!*==FFCALC_001.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
-!CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC
+! This file contains the calculations of the squares of the structure factors.
+! Loops are performed over the atoms in the asymmetric unit
+! See get_logref.f90 for a description of the LOGREF conditions
 !
-      FUNCTION FFCALC_001(IR)
-      INCLUDE 'SGinc\FFCALCTOP.f90'
-      INCLUDE 'SGinc\FFCALC_001.f90'
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_001(IR)                  ! P 1
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+      REAL C3F, S3F, XCC, XSC, XCS, XSS, CCC, CSS, SCS, SSC, SCC, CSC, CCS, SSS
+
+      AFCAL = 0.0
+      BFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
+      DO N = 1, NATOM
+        C3F = COSQS(IL,3,N)*FOB(N,IR)
+        S3F = SINQS(IL,3,N)*FOB(N,IR)
+        XCC = COSQS(IK,2,N)*C3F
+        XSC = SINQS(IK,2,N)*C3F
+        XCS = COSQS(IK,2,N)*S3F
+        XSS = SINQS(IK,2,N)*S3F
+        CCC = COSQS(IH,1,N)*XCC
+        CSS = COSQS(IH,1,N)*XSS
+        SCS = SINQS(IH,1,N)*XCS
+        SSC = SINQS(IH,1,N)*XSC
+        SCC = SINQS(IH,1,N)*XCC
+        CSC = COSQS(IH,1,N)*XSC
+        CCS = COSQS(IH,1,N)*XCS
+        SSS = SINQS(IH,1,N)*XSS
+        AFCAL = AFCAL + CCC - (CSS+SCS+SSC)
+        BFCAL = BFCAL + SCC + CSC + CCS - SSS
+      ENDDO
+      FFCALC_001 = AFCAL*AFCAL + BFCAL*BFCAL
+
       END FUNCTION FFCALC_001
-!*==FFCALC_002.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-      FUNCTION FFCALC_002(IR)
-      INCLUDE 'SGinc\FFCALCTOP.f90'
-      INCLUDE 'SGinc\FFCALC_002.f90'
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_002(IR)                  ! P -1
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+      REAL C3F, S3F, CCC, CSS, SCS, SSC
+
+      AFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
+      DO N = 1, NATOM
+        C3F = COSQS(IL,3,N)*FOB(N,IR)
+        S3F = SINQS(IL,3,N)*FOB(N,IR)
+        CCC = COSQS(IH,1,N)*COSQS(IK,2,N)*C3F
+        CSS = COSQS(IH,1,N)*SINQS(IK,2,N)*S3F
+        SCS = SINQS(IH,1,N)*COSQS(IK,2,N)*S3F
+        SSC = SINQS(IH,1,N)*SINQS(IK,2,N)*C3F
+        AFCAL = AFCAL + CCC - (CSS+SCS+SSC)
+      ENDDO
+      FFCALC_002 = AFCAL*AFCAL
+
       END FUNCTION FFCALC_002
-!*==FFCALC_039.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-      FUNCTION FFCALC_039(IR)
-      INCLUDE 'SGinc\FFCALCTOP.f90'
-      INCLUDE 'SGinc\FFCALC_039.f90'
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_039(IR)                  ! P 1 21 1
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+      AFCAL = 0.0
+      BFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N) &
+                  *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+          BFCAL = BFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+        ENDDO
+      ELSE
+        DO N = 1, NATOM
+          AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N) &
+                  *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+          BFCAL = BFCAL + (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N) &
+                  *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+        ENDDO
+      ENDIF
+      FFCALC_039 = AFCAL*AFCAL + BFCAL*BFCAL
+
       END FUNCTION FFCALC_039
-!*==FFCALC_040.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-      FUNCTION FFCALC_040(IR)
-      INCLUDE 'SGinc\FFCALCTOP.f90'
-      INCLUDE 'SGinc\FFCALC_040.f90'
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_040(IR)                  ! C 1 2 1
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+      AFCAL = 0.0
+      BFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
+      DO N = 1, NATOM
+        AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)   &
+                *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+        BFCAL = BFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)   &
+                *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+      ENDDO
+      FFCALC_040 = AFCAL*AFCAL + BFCAL*BFCAL
+
       END FUNCTION FFCALC_040
-!*==FFCALC_044.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-      FUNCTION FFCALC_044(IR)
-      INCLUDE 'SGinc\FFCALCTOP.f90'
-      INCLUDE 'SGinc\FFCALC_044.f90'
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_044(IR)                  ! P 1 c 1
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+      AFCAL = 0.0
+      BFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+          BFCAL = BFCAL + (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+        ENDDO
+      ELSE
+        DO N = 1, NATOM
+          AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+          BFCAL = BFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+        ENDDO
+      ENDIF
+      FFCALC_044 = AFCAL*AFCAL + BFCAL*BFCAL
+
       END FUNCTION FFCALC_044
-!*==FFCALC_050.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-      FUNCTION FFCALC_050(IR)
-      INCLUDE 'SGinc\FFCALCTOP.f90'
-      INCLUDE 'SGinc\FFCALC_050.f90'
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_045(IR)                  ! P 1 n 1
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+      AFCAL = 0.0
+      BFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+          BFCAL = BFCAL + (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+        ENDDO
+      ELSE
+        DO N = 1, NATOM
+          AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+          BFCAL = BFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+        ENDDO
+      ENDIF
+      FFCALC_045 = AFCAL*AFCAL + BFCAL*BFCAL
+
+      END FUNCTION FFCALC_045
+!
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_046(IR)                  ! P 1 a 1
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+      AFCAL = 0.0
+      BFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+          BFCAL = BFCAL + (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+        ENDDO
+      ELSE
+        DO N = 1, NATOM
+          AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+          BFCAL = BFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+        ENDDO
+      ENDIF
+      FFCALC_046 = AFCAL*AFCAL + BFCAL*BFCAL
+
+      END FUNCTION FFCALC_046
+!
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_050(IR)                  ! C 1 c 1
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+      AFCAL = 0.0
+      BFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+          BFCAL = BFCAL + (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+        ENDDO
+      ELSE
+        DO N = 1, NATOM
+          AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+          BFCAL = BFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+        ENDDO
+      ENDIF
+      FFCALC_050 = AFCAL*AFCAL + BFCAL*BFCAL
+
       END FUNCTION FFCALC_050
-!*==FFCALC_052.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-      FUNCTION FFCALC_052(IR)
-      INCLUDE 'SGinc\FFCALCTOP.f90'
-      INCLUDE 'SGinc\FFCALC_052.f90'
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_052(IR)                  ! I 1 a 1
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+      AFCAL = 0.0
+      BFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+          BFCAL = BFCAL + (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+        ENDDO
+      ELSE
+        DO N = 1, NATOM
+          AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+          BFCAL = BFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+        ENDDO
+      ENDIF
+      FFCALC_052 = AFCAL*AFCAL + BFCAL*BFCAL
+
       END FUNCTION FFCALC_052
-!*==FFCALC_057.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-      FUNCTION FFCALC_057(IR)
-      INCLUDE 'SGinc\FFCALCTOP.f90'
-      INCLUDE 'SGinc\FFCALC_057.f90'
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_057(IR)                  ! P 1 21/m 1
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+      AFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+        ENDDO
+      ELSE
+        DO N = 1, NATOM
+          AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+        ENDDO
+      ENDIF
+      FFCALC_057 = AFCAL*AFCAL
+
       END FUNCTION FFCALC_057
-!*==FFCALC_058.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-      FUNCTION FFCALC_058(IR)
-      INCLUDE 'SGinc\FFCALCTOP.f90'
-      INCLUDE 'SGinc\FFCALC_058.f90'
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_058(IR)                  ! C 1 2/m 1
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+      AFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
+      DO N = 1, NATOM
+        AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)    &
+                *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+      ENDDO
+      FFCALC_058 = AFCAL*AFCAL
+
       END FUNCTION FFCALC_058
-!*==FFCALC_061.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-      FUNCTION FFCALC_061(IR)
-      INCLUDE 'SGinc\FFCALCTOP.f90'
-      INCLUDE 'SGinc\FFCALC_061.f90'
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_061(IR)                  ! P 1 2/c 1
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+      AFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
+      IF ( LOGREF(1,IR) ) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+        ENDDO
+      ELSE
+        DO N = 1, NATOM
+          AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+        ENDDO
+      ENDIF
+      FFCALC_061 = AFCAL*AFCAL
+
       END FUNCTION FFCALC_061
-!*==FFCALC_064.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-      FUNCTION FFCALC_064(IR)
-      INCLUDE 'SGinc\FFCALCTOP.f90'
-      INCLUDE 'SGinc\FFCALC_064.f90'
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_062(IR)                  ! P 1 2/n 1
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+      AFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
+      IF ( LOGREF(1,IR) ) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+        ENDDO
+      ELSE
+        DO N = 1, NATOM
+          AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+        ENDDO
+      ENDIF
+      FFCALC_062 = AFCAL*AFCAL
+
+      END FUNCTION FFCALC_062
+!
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_063(IR)                  ! P 1 2/a 1
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+      AFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
+      IF ( LOGREF(1,IR) ) THEN ! h is even
+        DO N = 1, NATOM
+          AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+        ENDDO
+      ELSE
+        DO N = 1, NATOM
+          AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+        ENDDO
+      ENDIF
+      FFCALC_063 = AFCAL*AFCAL
+
+      END FUNCTION FFCALC_063
+!
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_064(IR)                  ! P 1 21/c 1
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+      AFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+        ENDDO
+      ELSE
+        DO N = 1, NATOM
+          AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+        ENDDO
+      ENDIF
+      FFCALC_064 = AFCAL*AFCAL
+
       END FUNCTION FFCALC_064
-!*==FFCALC_065.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-      FUNCTION FFCALC_065(IR)
-      INCLUDE 'SGinc\FFCALCTOP.f90'
-      INCLUDE 'SGinc\FFCALC_065.f90'
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_065(IR)                  ! P 1 21/n 1
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+      AFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+        ENDDO
+      ELSE
+        DO N = 1, NATOM
+          AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+        ENDDO
+      ENDIF
+      FFCALC_065 = AFCAL*AFCAL
+
       END FUNCTION FFCALC_065
-!*==FFCALC_066.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-      FUNCTION FFCALC_066(IR)
-      INCLUDE 'SGinc\FFCALCTOP.f90'
-      INCLUDE 'SGinc\FFCALC_066.f90'
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_066(IR)                  ! P 1 21/a 1
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+      AFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+        ENDDO
+      ELSE
+        DO N = 1, NATOM
+          AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+        ENDDO
+      ENDIF
+      FFCALC_066 = AFCAL*AFCAL
+
       END FUNCTION FFCALC_066
-!*==FFCALC_067.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-      FUNCTION FFCALC_067(IR)
-      INCLUDE 'SGinc\FFCALCTOP.f90'
-      INCLUDE 'SGinc\FFCALC_067.f90'
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_067(IR)                  ! C 1 2/c 1
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+      AFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+        ENDDO
+      ELSE
+        DO N = 1, NATOM
+          AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+        ENDDO
+      ENDIF
+      FFCALC_067 = AFCAL*AFCAL
+
       END FUNCTION FFCALC_067
-!*==FFCALC_069.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-      FUNCTION FFCALC_069(IR)
-      INCLUDE 'SGinc\FFCALCTOP.f90'
-      INCLUDE 'SGinc\FFCALC_069.f90'
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_069(IR)                  ! I 1 2/a 1
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+      AFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IL,3,N)-SINQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*COSQS(IK,2,N)*FOB(N,IR)
+        ENDDO
+      ELSE
+        DO N = 1, NATOM
+          AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IL,3,N)+COSQS(IH,1,N)  &
+                  *SINQS(IL,3,N))*SINQS(IK,2,N)*FOB(N,IR)
+        ENDDO
+      ENDIF
+      FFCALC_069 = AFCAL*AFCAL
+
       END FUNCTION FFCALC_069
-!*==FFCALC_112.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-      FUNCTION FFCALC_112(IR)
-      INCLUDE 'SGinc\FFCALCTOP.f90'
-      INCLUDE 'SGinc\FFCALC_112.f90'
+      REAL FUNCTION FFCALC_081(IR)                  ! P 1 1 b
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+      AFCAL = 0.0
+      BFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IK,2,N)-SINQS(IH,1,N)  &
+                  *SINQS(IK,2,N))*COSQS(IL,3,N)*FOB(N,IR)
+          BFCAL = BFCAL + (SINQS(IH,1,N)*COSQS(IK,2,N)+COSQS(IH,1,N)  &
+                  *SINQS(IK,2,N))*COSQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSE
+        DO N = 1, NATOM
+          AFCAL = AFCAL - (SINQS(IH,1,N)*COSQS(IK,2,N)+COSQS(IH,1,N)  &
+                  *SINQS(IK,2,N))*SINQS(IL,3,N)*FOB(N,IR)
+          BFCAL = BFCAL + (COSQS(IH,1,N)*COSQS(IK,2,N)-SINQS(IH,1,N)  &
+                  *SINQS(IK,2,N))*SINQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ENDIF
+      FFCALC_081 = AFCAL*AFCAL + BFCAL*BFCAL
+
+      END FUNCTION FFCALC_081
+!
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_112(IR)                  ! P 21 21 2
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+      AFCAL = 0.0
+      BFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+          BFCAL = BFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSE
+        DO N = 1, NATOM
+          AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+          BFCAL = BFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ENDIF
+      FFCALC_112 = AFCAL*AFCAL + BFCAL*BFCAL
+
       END FUNCTION FFCALC_112
-!*==FFCALC_115.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-      FUNCTION FFCALC_115(IR)
-      INCLUDE 'SGinc\FFCALCTOP.f90'
-      INCLUDE 'SGinc\FFCALC_115.f90'
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_115(IR)                  ! P 21 21 21
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+      AFCAL = 0.0
+      BFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+          BFCAL = BFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(2,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+          BFCAL = BFCAL + SINQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(3,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL - SINQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+          BFCAL = BFCAL + COSQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(4,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+          BFCAL = BFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ENDIF
+      FFCALC_115 = AFCAL*AFCAL + BFCAL*BFCAL
+
       END FUNCTION FFCALC_115
-!*==FFCALC_116.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-      FUNCTION FFCALC_116(IR)
-      INCLUDE 'SGinc\FFCALCTOP.f90'
-      INCLUDE 'SGinc\FFCALC_116.f90'
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_116(IR)                  ! C 2 2 21
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+      AFCAL = 0.0
+      BFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+          BFCAL = BFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSE
+        DO N = 1, NATOM
+          AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+          BFCAL = BFCAL + SINQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ENDIF
+      FFCALC_116 = AFCAL*AFCAL + BFCAL*BFCAL
+
       END FUNCTION FFCALC_116
-!*==FFCALC_143.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-      FUNCTION FFCALC_143(IR)
-      INCLUDE 'SGinc\FFCALCTOP.f90'
-      INCLUDE 'SGinc\FFCALC_143.f90'
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_143(IR)                  ! P c a 21
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+      AFCAL = 0.0
+      BFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+          BFCAL = BFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(2,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL - SINQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+          BFCAL = BFCAL + SINQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(3,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+          BFCAL = BFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(4,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+          BFCAL = BFCAL + COSQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ENDIF
+      FFCALC_143 = AFCAL*AFCAL + BFCAL*BFCAL
+
       END FUNCTION FFCALC_143
-!*==FFCALC_164.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-      FUNCTION FFCALC_164(IR)
-      INCLUDE 'SGinc\FFCALCTOP.f90'
-      INCLUDE 'SGinc\FFCALC_164.f90'
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_164(IR)                  ! P n a 21
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+      AFCAL = 0.0
+      BFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+          BFCAL = BFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(2,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL - SINQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+          BFCAL = BFCAL + SINQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(3,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+          BFCAL = BFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(4,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+          BFCAL = BFCAL + COSQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ENDIF
+      FFCALC_164 = AFCAL*AFCAL + BFCAL*BFCAL
+
       END FUNCTION FFCALC_164
-!*==FFCALC_176.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-      FUNCTION FFCALC_176(IR)
-      INCLUDE 'SGinc\FFCALCTOP.f90'
-      INCLUDE 'SGinc\FFCALC_176.f90'
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_176(IR)                  ! C m c 21
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+      AFCAL = 0.0
+      BFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+          BFCAL = BFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSE
+        DO N = 1, NATOM
+          AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+          BFCAL = BFCAL + COSQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ENDIF
+      FFCALC_176 = AFCAL*AFCAL + BFCAL*BFCAL
+
       END FUNCTION FFCALC_176
-!*==FFCALC_212.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-      FUNCTION FFCALC_212(IR)
-      INCLUDE 'SGinc\FFCALCTOP.f90'
-      INCLUDE 'SGinc\FFCALC_212.f90'
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_212(IR)                  ! F d d 2
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+! Note the use here of a prefactor of '2' for logrefs of 1 and 3
+! to take into account the double weighting of these SF expression
+! as seen in Vol B
+!
+      AFCAL = 0.0
+      BFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + 2.*COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+          BFCAL = BFCAL + 2.*COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(2,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)  &
+                  -SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)          &
+                  -COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)          &
+                  -SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N))         &
+                  *FOB(N,IR)
+          BFCAL = BFCAL + (COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)  &
+                  -SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)          &
+                  +COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)          &
+                  +SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N))         &
+                  *FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(3,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL - 2.*SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+          BFCAL = BFCAL - 2.*SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(4,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + (COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)  &
+                  -SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)          &
+                  +COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)          &
+                  +SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N))         &
+                  *FOB(N,IR)
+          BFCAL = BFCAL + (COSQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)  &
+                  -SINQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)          &
+                  -COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)          &
+                  -SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N))         &
+                  *FOB(N,IR)
+        ENDDO
+      ENDIF
+      FFCALC_212 = AFCAL*AFCAL + BFCAL*BFCAL
+
       END FUNCTION FFCALC_212
-!*==FFCALC_266.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-      FUNCTION FFCALC_266(IR)
-      INCLUDE 'SGinc\FFCALCTOP.f90'
-      INCLUDE 'SGinc\FFCALC_266.f90'
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_266(IR)                  ! P c c n
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+      AFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(2,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(3,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(4,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL - SINQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ENDIF
+      FFCALC_266 = AFCAL*AFCAL
+
       END FUNCTION FFCALC_266
-!*==FFCALC_269.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-      FUNCTION FFCALC_269(IR)
-      INCLUDE 'SGinc\FFCALCTOP.f90'
-      INCLUDE 'SGinc\FFCALC_269.f90'
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_269(IR)                  ! P b c m
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+      AFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(2,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(3,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(4,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL - SINQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ENDIF
+      FFCALC_269 = AFCAL*AFCAL
+
       END FUNCTION FFCALC_269
-!*==FFCALC_284.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-      FUNCTION FFCALC_284(IR)
-      INCLUDE 'SGinc\FFCALCTOP.f90'
-      INCLUDE 'SGinc\FFCALC_284.f90'
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_284(IR)                  ! P b c n
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+      AFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(2,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(3,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL - SINQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(4,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ENDIF
+      FFCALC_284 = AFCAL*AFCAL
+
       END FUNCTION FFCALC_284
-!*==FFCALC_290.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-      FUNCTION FFCALC_290(IR)
-      INCLUDE 'SGinc\FFCALCTOP.f90'
-      INCLUDE 'SGinc\FFCALC_290.f90'
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_290(IR)                  ! P b c a
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+      AFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(2,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(3,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL - SINQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(4,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ENDIF
+      FFCALC_290 = AFCAL*AFCAL
+
       END FUNCTION FFCALC_290
-!*==FFCALC_292.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-      FUNCTION FFCALC_292(IR)
-      INCLUDE 'SGinc\FFCALCTOP.f90'
-      INCLUDE 'SGinc\FFCALC_292.f90'
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_292(IR)                  ! P n m a
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+      AFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(2,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL - SINQS(IH,1,N)*SINQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(3,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL - SINQS(IH,1,N)*COSQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSEIF (LOGREF(4,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ENDIF
+      FFCALC_292 = AFCAL*AFCAL
+
       END FUNCTION FFCALC_292
-!*==FFCALC_298.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-      FUNCTION FFCALC_298(IR)
-      INCLUDE 'SGinc\FFCALCTOP.f90'
-      INCLUDE 'SGinc\FFCALC_298.f90'
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_298(IR)                  ! C m c m
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+      AFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSE
+        DO N = 1, NATOM
+          AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ENDIF
+      FFCALC_298 = AFCAL*AFCAL
+
       END FUNCTION FFCALC_298
-!*==FFCALC_304.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-      FUNCTION FFCALC_304(IR)
-      INCLUDE 'SGinc\FFCALCTOP.f90'
-      INCLUDE 'SGinc\FFCALC_304.f90'
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_304(IR)                  ! C m c a
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+      AFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          AFCAL = AFCAL + COSQS(IH,1,N)*COSQS(IK,2,N)*COSQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ELSE
+        DO N = 1, NATOM
+          AFCAL = AFCAL - COSQS(IH,1,N)*SINQS(IK,2,N)*SINQS(IL,3,N)*FOB(N,IR)
+        ENDDO
+      ENDIF
+      FFCALC_304 = AFCAL*AFCAL
+
       END FUNCTION FFCALC_304
-!*==FFCALC_356.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-      FUNCTION FFCALC_356(IR)
-      INCLUDE 'SGinc\FFCALCTOP.f90'
-      INCLUDE 'SGinc\FFCALC_356.f90'
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_356(IR)                  ! I-4
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+      AFCAL = 0.0
+      BFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
+      DO N = 1, NATOM
+        term1 = COSQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,2,N)*COSQS(IK,1,N)
+        term2 = SINQS(IH,1,N)*SINQS(IK,2,N) - SINQS(IH,2,N)*SINQS(IK,1,N)
+        term3 = COSQS(IL,3,N)
+        term4 = (term1-term2)*term3
+        AFCAL = AFCAL + term4*fob(n,ir)
+        term1 = COSQS(IH,1,N)*COSQS(IK,2,N) - COSQS(IH,2,N)*COSQS(IK,1,N)
+        term2 = SINQS(IH,1,N)*SINQS(IK,2,N) + SINQS(IH,2,N)*SINQS(IK,1,N)
+        term3 = SINQS(IL,3,N)
+        term4 = (term1-term2)*term3
+        BFCAL = BFCAL + term4*fob(n,ir)
+      ENDDO
+      FFCALC_356 = AFCAL*AFCAL + BFCAL*BFCAL
+
       END FUNCTION FFCALC_356
-!*==FFCALC_365.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-      FUNCTION FFCALC_365(IR)
-      INCLUDE 'SGinc\FFCALCTOP.f90'
-      INCLUDE 'SGinc\FFCALC_365.f90'
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_360(IR)
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+! Structure factor calculations for space group P 4/n (origin choice 2, inversion at origin)
+      AFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
+      IF (LOGREF(1,IR)) THEN     ! h = 2n,   k = 2n
+        DO N = 1, NATOM
+          term1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
+          term2 = 4.0*COSQS(IL,3,N)
+          term3 = COSQS(IK,1,N)*COSQS(IH,2,N) + SINQS(IK,1,N)*SINQS(IH,2,N)
+          term5 = term2*term1 + term2*term3
+          AFCAL = AFCAL + term5*fob(N,iR)
+        ENDDO
+      ELSEIF (LOGREF(2,IR)) THEN ! h = 2n,   k = 2n+1
+        DO N = 1, NATOM
+          term1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)*SINQS(IK,2,N)
+          term2 = 4.0*SINQS(IL,3,N)
+          term3 = SINQS(IK,1,N)*COSQS(IH,2,N) - COSQS(IK,1,N)*SINQS(IH,2,N)
+          term5 = -term2*term1 - term2*term3
+          AFCAL = AFCAL + term5*fob(N,iR)
+        ENDDO
+      ELSEIF (LOGREF(3,IR)) THEN ! h = 2n+1, k = 2n
+        DO N = 1, NATOM
+          term1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)*SINQS(IK,2,N)
+          term2 = 4.0*SINQS(IL,3,N)
+          term3 = SINQS(IK,1,N)*COSQS(IH,2,N) - COSQS(IK,1,N)*SINQS(IH,2,N)
+          term5 = -term2*term1 + term2*term3
+          AFCAL = AFCAL + term5*fob(N,iR)
+        ENDDO
+      ELSEIF (LOGREF(4,IR)) THEN ! h = 2n+1, k = 2n+1
+        DO N = 1, NATOM
+          term1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
+          term2 = 4.0*COSQS(IL,3,N)
+          term3 = COSQS(IK,1,N)*COSQS(IH,2,N) + SINQS(IK,1,N)*SINQS(IH,2,N)
+          term5 = term2*term1 - term2*term3
+          AFCAL = AFCAL + term5*fob(N,iR)
+        ENDDO
+      ENDIF
+      FFCALC_360 = AFCAL*AFCAL
+
+      END FUNCTION FFCALC_360
+!
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_362(IR)
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+! Structure factor calculations for space group P 42/n (origin choice 2, inversion at origin)
+      AFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
+      IF (LOGREF(1,IR)) THEN ! h+k = 2n,   h+l = 2n,   k+l = 2n
+        DO N = 1, NATOM
+          term1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
+          term2 = COSQS(IL,3,N)
+          term3 = COSQS(IK,1,N)*COSQS(IH,2,N) + SINQS(IK,1,N)*SINQS(IH,2,N)
+          term5 = term2*term1 + term2*term3
+          AFCAL = AFCAL + 4.0*term5*fob(N,iR)
+        ENDDO
+      ELSEIF (LOGREF(2,IR)) THEN ! h+k = 2n,   h+l = 2n,   k+l = 2n+1
+        DO N = 1, NATOM
+          term1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
+          term2 = COSQS(IL,3,N)
+          term3 = SINQS(IK,1,N)*COSQS(IH,2,N) - COSQS(IK,1,N)*SINQS(IH,2,N)
+          term4 = SINQS(IL,3,N)
+          term5 = term2*term1 - term4*term3
+          AFCAL = AFCAL + 4.0*term5*fob(N,iR)
+        ENDDO
+      ELSEIF (LOGREF(3,IR)) THEN ! h+k = 2n,   h+l = 2n+1, k+l = 2n
+        DO N = 1, NATOM
+          term1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
+          term2 = COSQS(IL,3,N)
+          term3 = SINQS(IK,1,N)*COSQS(IH,2,N) - COSQS(IK,1,N)*SINQS(IH,2,N)
+          term4 = SINQS(IL,3,N)
+          term5 = term2*term1 + term4*term3
+          AFCAL = AFCAL + 4.0*term5*fob(N,iR)
+        ENDDO
+      ELSEIF (LOGREF(4,IR)) THEN ! h+k = 2n,   h+l = 2n+1, k+l = 2n+1
+        DO N = 1, NATOM
+          term1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
+          term2 = COSQS(IL,3,N)
+          term3 = COSQS(IK,1,N)*COSQS(IH,2,N) + SINQS(IK,1,N)*SINQS(IH,2,N)
+          term5 = term2*term1 - term2*term3
+          AFCAL = AFCAL + 4.0*term5*fob(N,iR)
+        ENDDO
+      ELSEIF (LOGREF(5,IR)) THEN ! h+k = 2n+1, h+l = 2n,   k+l = 2n
+        DO N = 1, NATOM
+          term1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)*SINQS(IK,2,N)
+          term2 = SINQS(IL,3,N)
+          term3 = COSQS(IK,1,N)*COSQS(IH,2,N) + SINQS(IK,1,N)*SINQS(IH,2,N)
+          term4 = COSQS(IL,3,N)
+          term5 = -term2*term1 + term4*term3
+          AFCAL = AFCAL + 4.0*term5*fob(N,iR)
+        ENDDO
+      ELSEIF (LOGREF(6,IR)) THEN ! h+k = 2n+1, h+l = 2n,   k+l = 2n+1
+        DO N = 1, NATOM
+          term1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)*SINQS(IK,2,N)
+          term2 = SINQS(IL,3,N)
+          term3 = SINQS(IK,1,N)*COSQS(IH,2,N) - COSQS(IK,1,N)*SINQS(IH,2,N)
+          term5 = -term2*term1 + term2*term3
+          AFCAL = AFCAL + 4.0*term5*fob(N,iR)
+        ENDDO
+      ELSEIF (LOGREF(7,IR)) THEN ! h+k = 2n+1, h+l = 2n+1, k+l = 2n
+        DO N = 1, NATOM
+          term1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)*SINQS(IK,2,N)
+          term2 = SINQS(IL,3,N)
+          term3 = SINQS(IK,1,N)*COSQS(IH,2,N) - COSQS(IK,1,N)*SINQS(IH,2,N)
+          term5 = -term2*term1 - term2*term3
+          AFCAL = AFCAL + 4.0*term5*fob(N,iR)
+        ENDDO
+      ELSEIF (LOGREF(8,IR)) THEN ! h+k = 2n+1, h+l = 2n+1, k+l = 2n+1
+        DO N = 1, NATOM
+          term1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)*SINQS(IK,2,N)
+          term2 = SINQS(IL,3,N)
+          term3 = COSQS(IK,1,N)*COSQS(IH,2,N) + SINQS(IK,1,N)*SINQS(IH,2,N)
+          term4 = COSQS(IL,3,N)
+          term5 = -term2*term1 - term4*term3
+          AFCAL = AFCAL + 4.0*term5*fob(N,iR)
+        ENDDO
+      ENDIF
+      FFCALC_362 = AFCAL*AFCAL
+
+      END FUNCTION FFCALC_362
+!
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_365(IR)
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+! Structure factor calculations for space group I 41/a (origin choice 2)
+      AFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          term1 = COSQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,2,N)*COSQS(IK,1,N)
+          term2 = SINQS(IH,1,N)*SINQS(IK,2,N) - SINQS(IH,2,N)*SINQS(IK,1,N)
+          term3 = COSQS(IL,3,N)
+          term4 = (term1-term2)*term3
+          AFCAL = AFCAL + term4*fob(n,ir)
+        ENDDO
+      ELSEIF (LOGREF(2,IR)) THEN
+        DO N = 1, NATOM
+          term1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)*SINQS(IK,2,N)
+          term2 = SINQS(IL,3,N)
+          term3 = COSQS(IH,2,N)*COSQS(IK,1,N) + SINQS(IH,2,N)*SINQS(IK,1,N)
+          term4 = COSQS(IL,3,N)
+          term5 = term1*term2 - term3*term4
+          AFCAL = AFCAL - term5*fob(n,ir)
+        ENDDO
+      ELSEIF (LOGREF(3,IR)) THEN
+        DO N = 1, NATOM
+          term1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
+          term2 = COSQS(IL,3,N)
+          term3 = SINQS(IH,2,N)*COSQS(IK,1,N) - COSQS(IH,2,N)*SINQS(IK,1,N)
+          term4 = SINQS(IL,3,N)
+          term5 = term1*term2 - term3*term4
+          AFCAL = AFCAL + term5*fob(n,ir)
+        ENDDO
+      ELSEIF (LOGREF(4,IR)) THEN
+        DO N = 1, NATOM
+          term1 = COSQS(IH,1,N)*SINQS(IK,2,N) - COSQS(IH,2,N)*SINQS(IK,1,N)
+          term2 = SINQS(IH,1,N)*COSQS(IK,2,N) + SINQS(IH,2,N)*COSQS(IK,1,N)
+          term3 = SINQS(IL,3,N)
+          term4 = (term1+term2)*term3
+          AFCAL = AFCAL - term4*fob(n,ir)
+        ENDDO
+      ELSEIF (LOGREF(5,IR)) THEN
+        DO N = 1, NATOM
+          term1 = COSQS(IH,1,N)*COSQS(IK,2,N) - COSQS(IH,2,N)*COSQS(IK,1,N)
+          term2 = SINQS(IH,1,N)*SINQS(IK,2,N) + SINQS(IH,2,N)*SINQS(IK,1,N)
+          term3 = COSQS(IL,3,N)
+          term4 = (term1-term2)*term3
+          AFCAL = AFCAL + term4*fob(n,ir)
+        ENDDO
+      ELSEIF (LOGREF(6,IR)) THEN
+        DO N = 1, NATOM
+          term1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)*SINQS(IK,2,N)
+          term2 = SINQS(IL,3,N)
+          term3 = COSQS(IH,2,N)*COSQS(IK,1,N) + SINQS(IH,2,N)*SINQS(IK,1,N)
+          term4 = COSQS(IL,3,N)
+          term5 = term1*term2 + term3*term4
+          AFCAL = AFCAL - term5*fob(n,ir)
+        ENDDO
+      ELSEIF (LOGREF(7,IR)) THEN
+        DO N = 1, NATOM
+          term1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
+          term2 = COSQS(IL,3,N)
+          term3 = SINQS(IH,2,N)*COSQS(IK,1,N) - COSQS(IH,2,N)*SINQS(IK,1,N)
+          term4 = SINQS(IL,3,N)
+          term5 = term1*term2 + term3*term4
+          AFCAL = AFCAL + term5*fob(n,ir)
+        ENDDO
+      ELSEIF (LOGREF(8,IR)) THEN
+        DO N = 1, NATOM
+          term1 = COSQS(IH,1,N)*SINQS(IK,2,N) + COSQS(IH,2,N)*SINQS(IK,1,N)
+          term2 = SINQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,2,N)*COSQS(IK,1,N)
+          term3 = SINQS(IL,3,N)
+          term4 = (term1+term2)*term3
+          AFCAL = AFCAL - term4*fob(n,ir)
+        ENDDO
+      ENDIF
+      FFCALC_365 = AFCAL*AFCAL
+
       END FUNCTION FFCALC_365
-!*==FFCALC_369.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-      FUNCTION FFCALC_369(IR)
-      INCLUDE 'SGinc\FFCALCTOP.f90'
-      INCLUDE 'SGinc\FFCALC_369.f90'
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_369(IR)                  ! P 41 21 2
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+      AFCAL = 0.0
+      BFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          term1 = COSQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,2,N)*COSQS(IK,1,N)
+          term2 = COSQS(IL,3,N)
+          term3 = 2.*term1*term2
+          AFCAL = AFCAL + term3*fob(n,ir)
+          term1 = SINQS(IH,1,N)*SINQS(IK,2,N) - SINQS(IH,2,N)*SINQS(IK,1,N)
+          term2 = SINQS(IL,3,N)
+          term3 = 2.*term1*term2
+          BFCAL = BFCAL - term3*fob(n,ir)
+        ENDDO
+      ELSEIF (LOGREF(2,IR)) THEN
+        DO N = 1, NATOM
+          term1 = SINQS(IH,1,N)*COSQS(IK,2,N) + SINQS(IH,2,N)*COSQS(IK,1,N)
+          term2 = COSQS(IH,1,N)*SINQS(IK,2,N) + COSQS(IH,2,N)*SINQS(IK,1,N)
+          term3 = COSQS(IL,3,N)
+          term4 = (term1-term2)*term3
+          term5 = COSQS(IH,1,N)*SINQS(IK,2,N) - COSQS(IH,2,N)*SINQS(IK,1,N)
+          term6 = SINQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,2,N)*COSQS(IK,1,N)
+          term7 = SINQS(IL,3,N)
+          term8 = (term5+term6)*term7
+          AFCAL = AFCAL + (term4-term8)*fob(n,ir)
+          term4 = (term1+term2)*term3
+          term8 = (term5-term6)*term7
+          BFCAL = BFCAL + (term4+term8)*fob(n,ir)
+        ENDDO
+      ELSEIF (LOGREF(3,IR)) THEN
+        DO N = 1, NATOM
+          term1 = SINQS(IH,1,N)*SINQS(IK,2,N) + SINQS(IH,2,N)*SINQS(IK,1,N)
+          term2 = COSQS(IL,3,N)
+          term3 = 2.*term1*term2
+          AFCAL = AFCAL - term3*fob(n,ir)
+          term1 = COSQS(IH,1,N)*COSQS(IK,2,N) - COSQS(IH,2,N)*COSQS(IK,1,N)
+          term2 = SINQS(IL,3,N)
+          term3 = 2.*term1*term2
+          BFCAL = BFCAL + term3*fob(n,ir)
+        ENDDO
+      ELSEIF (LOGREF(4,IR)) THEN
+        DO N = 1, NATOM
+          term1 = SINQS(IH,1,N)*COSQS(IK,2,N) + SINQS(IH,2,N)*COSQS(IK,1,N)
+          term2 = COSQS(IH,1,N)*SINQS(IK,2,N) + COSQS(IH,2,N)*SINQS(IK,1,N)
+          term3 = COSQS(IL,3,N)
+          term4 = (term1-term2)*term3
+          term5 = COSQS(IH,1,N)*SINQS(IK,2,N) - COSQS(IH,2,N)*SINQS(IK,1,N)
+          term6 = SINQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,2,N)*COSQS(IK,1,N)
+          term7 = SINQS(IL,3,N)
+          term8 = (term5+term6)*term7
+          AFCAL = AFCAL - (term4+term8)*fob(N,IR)
+          term4 = (term1+term2)*term3
+          term8 = (term5-term6)*term7
+          BFCAL = BFCAL + (term4-term8)*fob(N,IR)
+        ENDDO
+      ENDIF
+      FFCALC_369 = AFCAL*AFCAL + BFCAL*BFCAL
+
       END FUNCTION FFCALC_369
-!*==FFCALC_430.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-      FUNCTION FFCALC_430(IR)
-      INCLUDE 'SGinc\FFCALCTOP.f90'
-      INCLUDE 'SGinc\FFCALC_430.f90'
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_391(IR)                  ! P -4 21 c
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+      AFCAL = 0.0
+      BFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      IL = iHKL(3,IR)
+      IF (LOGREF(1,IR)) THEN
+        DO N = 1, NATOM
+          term1 = COSQS(IL,3,N)
+          term2 = COSQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,2,N)*COSQS(IK,1,N)
+          AFCAL = AFCAL + 4.0*term1*term2*fob(N,IR)
+          term1 = SINQS(IL,3,N)
+          term2 = SINQS(IH,1,N)*SINQS(IK,2,N) + SINQS(IH,2,N)*SINQS(IK,1,N)
+          BFCAL = BFCAL - 4.0*term1*term2*fob(N,IR)
+        ENDDO
+      ELSE
+        DO N = 1, NATOM
+          term1 = COSQS(IL,3,N)
+          term2 = SINQS(IH,2,N)*SINQS(IK,1,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
+          AFCAL = AFCAL + 4.0*term1*term2*fob(N,IR)
+          term1 = SINQS(IL,3,N)
+          term2 = COSQS(IH,1,N)*COSQS(IK,2,N) - COSQS(IH,2,N)*COSQS(IK,1,N)
+          BFCAL = BFCAL + 4.0*term1*term2*fob(N,IR)
+        ENDDO
+      ENDIF
+      FFCALC_391 = AFCAL*AFCAL + BFCAL*BFCAL
+
+      END FUNCTION FFCALC_391
+!
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_430(IR)                  ! P 3
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+      AFCAL = 0.0
+      BFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      II = -(IH+IK)
+      IL = iHKL(3,IR)
+      DO N = 1, NATOM
+        CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
+        CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)*SINQS(II,2,N)
+        CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)*SINQS(IH,2,N)
+        CHKI = CHKI1 + CHKI2 + CHKI3
+        SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)*SINQS(IK,2,N)
+        SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)*SINQS(II,2,N)
+        SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)*SINQS(IH,2,N)
+        SHKI = SHKI1 + SHKI2 + SHKI3
+        CLZ = COSQS(IL,3,N)
+        SLZ = SINQS(IL,3,N)
+        AFCAL = AFCAL + (CHKI*CLZ-SHKI*SLZ)*FOB(N,IR)
+        BFCAL = BFCAL + (CHKI*SLZ+SHKI*CLZ)*FOB(N,IR)
+      ENDDO
+      FFCALC_430 = AFCAL*AFCAL + BFCAL*BFCAL
+
       END FUNCTION FFCALC_430
-!*==FFCALC_431.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-      FUNCTION FFCALC_431(IR)
-      INCLUDE 'SGinc\FFCALCTOP.f90'
-      INCLUDE 'SGinc\FFCALC_431.f90'
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_431(IR)                  ! P 31
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+      AFCAL = 0.0
+      BFCAL = 0.0
+      RH = 6.283185307179*FLOAT(iHKL(1,IR))
+      RK = 6.283185307179*FLOAT(iHKL(2,IR))
+      RI = -(RH+RK)
+      RL = 6.283185307179*FLOAT(iHKL(3,IR))
+      VL = RL/3.
+      DO N = 1, NATOM
+        XV = X(1,N)
+        YV = X(2,N)
+        RLZV = RL*X(3,N)
+        ARG1 = RH*XV + RK*YV + RLZV
+        ARG2 = RK*XV + RI*YV + RLZV + VL
+        ARG3 = RI*XV + RH*YV + RLZV - VL
+        AFCAL = AFCAL + (COS(ARG1)+COS(ARG2)+COS(ARG3))*FOB(N,IR)
+        BFCAL = BFCAL + (SIN(ARG1)+SIN(ARG2)+SIN(ARG3))*FOB(N,IR)
+      ENDDO
+      FFCALC_431 = AFCAL*AFCAL + BFCAL*BFCAL
+
       END FUNCTION FFCALC_431
-!*==FFCALC_432.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-      FUNCTION FFCALC_432(IR)
-      INCLUDE 'SGinc\FFCALCTOP.f90'
-      INCLUDE 'SGinc\FFCALC_432.f90'
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_432(IR)                  ! P 32
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+      AFCAL = 0.0
+      BFCAL = 0.0
+      RH = 6.283185307179*FLOAT(iHKL(1,IR))
+      RK = 6.283185307179*FLOAT(iHKL(2,IR))
+      RI = -(RH+RK)
+      RL = 6.283185307179*FLOAT(iHKL(3,IR))
+      VL = RL/3.
+      DO N = 1, NATOM
+        XV = X(1,N)
+        YV = X(2,N)
+        RLZV = RL*X(3,N)
+        ARG1 = RH*XV + RK*YV + RLZV
+        ARG2 = RK*XV + RI*YV + RLZV - VL
+        ARG3 = RI*XV + RH*YV + RLZV + VL
+        AFCAL = AFCAL + (COS(ARG1)+COS(ARG2)+COS(ARG3))*FOB(N,IR)
+        BFCAL = BFCAL + (SIN(ARG1)+SIN(ARG2)+SIN(ARG3))*FOB(N,IR)
+      ENDDO
+      FFCALC_432 = AFCAL*AFCAL + BFCAL*BFCAL
+
       END FUNCTION FFCALC_432
-!*==FFCALC_433.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-      FUNCTION FFCALC_433(IR)
-      INCLUDE 'SGinc\FFCALCTOP.f90'
-      INCLUDE 'SGinc\FFCALC_433.f90'
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_433(IR)                  ! R 3, hexagonal axes
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+      AFCAL = 0.0
+      BFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      II = -(IH+IK)
+      IL = iHKL(3,IR)
+      DO N = 1, NATOM
+        CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
+        CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)*SINQS(II,2,N)
+        CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)*SINQS(IH,2,N)
+        CHKI = CHKI1 + CHKI2 + CHKI3
+        SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)*SINQS(IK,2,N)
+        SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)*SINQS(II,2,N)
+        SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)*SINQS(IH,2,N)
+        SHKI = SHKI1 + SHKI2 + SHKI3
+        CLZ = COSQS(IL,3,N)
+        SLZ = SINQS(IL,3,N)
+        AFCAL = AFCAL + (CHKI*CLZ-SHKI*SLZ)*FOB(N,IR)
+        BFCAL = BFCAL + (CHKI*SLZ+SHKI*CLZ)*FOB(N,IR)
+      ENDDO
+      FFCALC_433 = AFCAL*AFCAL + BFCAL*BFCAL
+
       END FUNCTION FFCALC_433
-!*==FFCALC_434.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-      FUNCTION FFCALC_434(IR)
-      INCLUDE 'SGinc\FFCALCTOP.f90'
-      INCLUDE 'SGinc\FFCALC_434.f90'
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_434(IR)                  ! P -3
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+      AFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      II = -(IH+IK)
+      IL = iHKL(3,IR)
+      DO N = 1, NATOM
+        CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
+        CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)*SINQS(II,2,N)
+        CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)*SINQS(IH,2,N)
+        CHKI = CHKI1 + CHKI2 + CHKI3
+        SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)*SINQS(IK,2,N)
+        SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)*SINQS(II,2,N)
+        SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)*SINQS(IH,2,N)
+        SHKI = SHKI1 + SHKI2 + SHKI3
+        CLZ = COSQS(IL,3,N)
+        SLZ = SINQS(IL,3,N)
+        AFCAL = AFCAL + (CHKI*CLZ-SHKI*SLZ)*FOB(N,IR)
+      ENDDO
+      FFCALC_434 = AFCAL*AFCAL
+
       END FUNCTION FFCALC_434
-!*==FFCALC_435.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-      FUNCTION FFCALC_435(IR)
-      INCLUDE 'SGinc\FFCALCTOP.f90'
-      INCLUDE 'SGinc\FFCALC_435.f90'
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_435(IR)                  ! R -3, hexagonal axes
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+      AFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      II = -(IH+IK)
+      IL = iHKL(3,IR)
+      DO N = 1, NATOM
+        CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
+        CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)*SINQS(II,2,N)
+        CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)*SINQS(IH,2,N)
+        CHKI = CHKI1 + CHKI2 + CHKI3
+        SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)*SINQS(IK,2,N)
+        SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)*SINQS(II,2,N)
+        SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)*SINQS(IH,2,N)
+        SHKI = SHKI1 + SHKI2 + SHKI3
+        CLZ = COSQS(IL,3,N)
+        SLZ = SINQS(IL,3,N)
+        AFCAL = AFCAL + (CHKI*CLZ-SHKI*SLZ)*FOB(N,IR)
+      ENDDO
+      FFCALC_435 = AFCAL*AFCAL
+
       END FUNCTION FFCALC_435
-!*==FFCALC_449.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-      FUNCTION FFCALC_449(IR)
-      INCLUDE 'SGinc\FFCALCTOP.f90'
-      INCLUDE 'SGinc\FFCALC_449.f90'
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_449(IR)
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+! Structure factor calculations for space group P-31m
+      AFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      II = -(IH+IK)
+      IL = iHKL(3,IR)
+      DO N = 1, NATOM
+        CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
+        CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)*SINQS(II,2,N)
+        CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)*SINQS(IH,2,N)
+        SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)*SINQS(IK,2,N)
+        SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)*SINQS(II,2,N)
+        SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)*SINQS(IH,2,N)
+        CHKI = CHKI1 + CHKI2 + CHKI3
+        SHKI = SHKI1 + SHKI2 + SHKI3
+        CKHI1 = COSQS(IK,1,N)*COSQS(IH,2,N) - SINQS(IK,1,N)*SINQS(IH,2,N)
+        CKHI2 = COSQS(IH,1,N)*COSQS(II,2,N) - SINQS(IH,1,N)*SINQS(II,2,N)
+        CKHI3 = COSQS(II,1,N)*COSQS(IK,2,N) - SINQS(II,1,N)*SINQS(IK,2,N)
+        SKHI1 = SINQS(IK,1,N)*COSQS(IH,2,N) + COSQS(IK,1,N)*SINQS(IH,2,N)
+        SKHI2 = SINQS(IH,1,N)*COSQS(II,2,N) + COSQS(IH,1,N)*SINQS(II,2,N)
+        SKHI3 = SINQS(II,1,N)*COSQS(IK,2,N) + COSQS(II,1,N)*SINQS(IK,2,N)
+        CKHI = CKHI1 + CKHI2 + CKHI3
+        SKHI = SKHI1 + SKHI2 + SKHI3
+        RPHCC = CHKI + CKHI
+        RPHSS = SHKI + SKHI
+        CLZ = COSQS(IL,3,N)
+        SLZ = SINQS(IL,3,N)
+        AFCAL = AFCAL + (RPHCC*CLZ-RPHSS*SLZ)*FOB(N,IR)
+      ENDDO
+      FFCALC_449 = AFCAL*AFCAL
+
       END FUNCTION FFCALC_449
-!*==FFCALC_451.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-      FUNCTION FFCALC_451(IR)
-      INCLUDE 'SGinc\FFCALCTOP.f90'
-      INCLUDE 'SGinc\FFCALC_451.f90'
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_451(IR)
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+! Structure factor calculations for space group P-3m1
+      AFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      II = -(IH+IK)
+      IL = iHKL(3,IR)
+      DO N = 1, NATOM
+        CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
+        CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)*SINQS(II,2,N)
+        CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)*SINQS(IH,2,N)
+        SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)*SINQS(IK,2,N)
+        SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)*SINQS(II,2,N)
+        SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)*SINQS(IH,2,N)
+        CHKI = CHKI1 + CHKI2 + CHKI3
+        SHKI = SHKI1 + SHKI2 + SHKI3
+        CKHI1 = COSQS(IK,1,N)*COSQS(IH,2,N) - SINQS(IK,1,N)*SINQS(IH,2,N)
+        CKHI2 = COSQS(IH,1,N)*COSQS(II,2,N) - SINQS(IH,1,N)*SINQS(II,2,N)
+        CKHI3 = COSQS(II,1,N)*COSQS(IK,2,N) - SINQS(II,1,N)*SINQS(IK,2,N)
+        SKHI1 = SINQS(IK,1,N)*COSQS(IH,2,N) + COSQS(IK,1,N)*SINQS(IH,2,N)
+        SKHI2 = SINQS(IH,1,N)*COSQS(II,2,N) + COSQS(IH,1,N)*SINQS(II,2,N)
+        SKHI3 = SINQS(II,1,N)*COSQS(IK,2,N) + COSQS(II,1,N)*SINQS(IK,2,N)
+        CKHI = CKHI1 + CKHI2 + CKHI3
+        SKHI = SKHI1 + SKHI2 + SKHI3
+        RPHCC = CHKI + CKHI
+        RMHSS = SHKI - SKHI
+        CLZ = COSQS(IL,3,N)
+        SLZ = SINQS(IL,3,N)
+        AFCAL = AFCAL + (RPHCC*CLZ-RMHSS*SLZ)*FOB(N,IR)
+      ENDDO
+      FFCALC_451 = AFCAL*AFCAL
+
       END FUNCTION FFCALC_451
-!*==FFCALC_462.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-      FUNCTION FFCALC_462(IR)
-      INCLUDE 'SGinc\FFCALCTOP.f90'
-      INCLUDE 'SGinc\FFCALC_462.f90'
+      REAL FUNCTION FFCALC_462(IR)                  ! P 6
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+      AFCAL = 0.0
+      BFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      II = -(IH+IK)
+      IL = iHKL(3,IR)
+      DO N = 1, NATOM
+        CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
+        CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)*SINQS(II,2,N)
+        CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)*SINQS(IH,2,N)
+        CHKI = CHKI1 + CHKI2 + CHKI3
+        CLZ = COSQS(IL,3,N)
+        SLZ = SINQS(IL,3,N)
+        AFCAL = AFCAL + (CHKI*CLZ)*FOB(N,IR)
+        BFCAL = BFCAL + (CHKI*SLZ)*FOB(N,IR)
+      ENDDO
+      FFCALC_462 = AFCAL*AFCAL + BFCAL*BFCAL
+
       END FUNCTION FFCALC_462
-!*==FFCALC_468.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-      FUNCTION FFCALC_468(IR)
-      INCLUDE 'SGinc\FFCALCTOP.f90'
-      INCLUDE 'SGinc\FFCALC_468.f90'
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_468(IR)                  ! P -6
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+      AFCAL = 0.0
+      BFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      II = -(IH+IK)
+      IL = iHKL(3,IR)
+      DO N = 1, NATOM
+        CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
+        CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)*SINQS(II,2,N)
+        CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)*SINQS(IH,2,N)
+        CHKI = CHKI1 + CHKI2 + CHKI3
+        SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)*SINQS(IK,2,N)
+        SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)*SINQS(II,2,N)
+        SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)*SINQS(IH,2,N)
+        SHKI = SHKI1 + SHKI2 + SHKI3
+        CLZ = COSQS(IL,3,N)
+        AFCAL = AFCAL + (CHKI*CLZ)*FOB(N,IR)
+        BFCAL = BFCAL + (SHKI*CLZ)*FOB(N,IR)
+      ENDDO
+      FFCALC_468 = AFCAL*AFCAL + BFCAL*BFCAL
+
       END FUNCTION FFCALC_468
-!*==FFCALC_469.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-      FUNCTION FFCALC_469(IR)
-      INCLUDE 'SGinc\FFCALCTOP.f90'
-      INCLUDE 'SGinc\FFCALC_469.f90'
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_469(IR)
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+! Structure factor calculations for space group P6/m
+      AFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      II = -(IH+IK)
+      IL = iHKL(3,IR)
+      DO N = 1, NATOM
+        CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
+        CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)*SINQS(II,2,N)
+        CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)*SINQS(IH,2,N)
+        CHKI = CHKI1 + CHKI2 + CHKI3
+        CLZ = COSQS(IL,3,N)
+        AFCAL = AFCAL + (CHKI*CLZ)*FOB(N,IR)
+      ENDDO
+      FFCALC_469 = AFCAL*AFCAL
+
       END FUNCTION FFCALC_469
-!*==FFCALC_471.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-      FUNCTION FFCALC_471(IR)
-      INCLUDE 'SGinc\FFCALCTOP.f90'
-      INCLUDE 'SGinc\FFCALC_471.f90'
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_471(IR)
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+! Structure factor calculations for space group P622
+      AFCAL = 0.0
+      BFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      II = -(IH+IK)
+      IL = iHKL(3,IR)
+      DO N = 1, NATOM
+        CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
+        CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)*SINQS(II,2,N)
+        CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)*SINQS(IH,2,N)
+        CHKI = CHKI1 + CHKI2 + CHKI3
+        CKHI1 = COSQS(IK,1,N)*COSQS(IH,2,N) - SINQS(IK,1,N)*SINQS(IH,2,N)
+        CKHI2 = COSQS(IH,1,N)*COSQS(II,2,N) - SINQS(IH,1,N)*SINQS(II,2,N)
+        CKHI3 = COSQS(II,1,N)*COSQS(IK,2,N) - SINQS(II,1,N)*SINQS(IK,2,N)
+        CKHI = CKHI1 + CKHI2 + CKHI3
+        RPHCC = CHKI + CKHI
+        RMHCC = CHKI - CKHI
+        CLZ = COSQS(IL,3,N)
+        SLZ = SINQS(IL,3,N)
+        AFCAL = AFCAL + (RPHCC*CLZ)*FOB(N,IR)
+        BFCAL = BFCAL + (RMHCC*SLZ)*FOB(N,IR)
+      ENDDO
+      FFCALC_471 = AFCAL*AFCAL + BFCAL*BFCAL
+
       END FUNCTION FFCALC_471
-!*==FFCALC_481.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-      FUNCTION FFCALC_481(IR)
-      INCLUDE 'SGinc\FFCALCTOP.f90'
-      INCLUDE 'SGinc\FFCALC_481.f90'
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_481(IR)
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+! Structure factor calculations for space group P-6m2
+      AFCAL = 0.0
+      BFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      II = -(IH+IK)
+      IL = iHKL(3,IR)
+      DO N = 1, NATOM
+        CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
+        CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)*SINQS(II,2,N)
+        CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)*SINQS(IH,2,N)
+        SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)*SINQS(IK,2,N)
+        SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)*SINQS(II,2,N)
+        SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)*SINQS(IH,2,N)
+        CHKI = CHKI1 + CHKI2 + CHKI3
+        SHKI = SHKI1 + SHKI2 + SHKI3
+        CKHI1 = COSQS(IK,1,N)*COSQS(IH,2,N) - SINQS(IK,1,N)*SINQS(IH,2,N)
+        CKHI2 = COSQS(IH,1,N)*COSQS(II,2,N) - SINQS(IH,1,N)*SINQS(II,2,N)
+        CKHI3 = COSQS(II,1,N)*COSQS(IK,2,N) - SINQS(II,1,N)*SINQS(IK,2,N)
+        SKHI1 = SINQS(IK,1,N)*COSQS(IH,2,N) + COSQS(IK,1,N)*SINQS(IH,2,N)
+        SKHI2 = SINQS(IH,1,N)*COSQS(II,2,N) + COSQS(IH,1,N)*SINQS(II,2,N)
+        SKHI3 = SINQS(II,1,N)*COSQS(IK,2,N) + COSQS(II,1,N)*SINQS(IK,2,N)
+        CKHI = CKHI1 + CKHI2 + CKHI3
+        SKHI = SKHI1 + SKHI2 + SKHI3
+        RPHCC = CHKI + CKHI
+        RMHSS = SHKI - SKHI
+        CLZ = COSQS(IL,3,N)
+        AFCAL = AFCAL + (RPHCC*CLZ)*FOB(N,IR)
+        BFCAL = BFCAL + (RMHSS*CLZ)*FOB(N,IR)
+      ENDDO
+      FFCALC_481 = AFCAL*AFCAL + BFCAL*BFCAL
+
       END FUNCTION FFCALC_481
-!*==FFCALC_483.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-      FUNCTION FFCALC_483(IR)
-      INCLUDE 'SGinc\FFCALCTOP.f90'
-      INCLUDE 'SGinc\FFCALC_483.f90'
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_483(IR)                  ! P -6 2 m
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+      AFCAL = 0.0
+      BFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      II = -(IH+IK)
+      IL = iHKL(3,IR)
+      DO N = 1, NATOM
+        CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
+        CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)*SINQS(II,2,N)
+        CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)*SINQS(IH,2,N)
+        SHKI1 = SINQS(IH,1,N)*COSQS(IK,2,N) + COSQS(IH,1,N)*SINQS(IK,2,N)
+        SHKI2 = SINQS(IK,1,N)*COSQS(II,2,N) + COSQS(IK,1,N)*SINQS(II,2,N)
+        SHKI3 = SINQS(II,1,N)*COSQS(IH,2,N) + COSQS(II,1,N)*SINQS(IH,2,N)
+        CHKI = CHKI1 + CHKI2 + CHKI3
+        SHKI = SHKI1 + SHKI2 + SHKI3
+        CKHI1 = COSQS(IK,1,N)*COSQS(IH,2,N) - SINQS(IK,1,N)*SINQS(IH,2,N)
+        CKHI2 = COSQS(IH,1,N)*COSQS(II,2,N) - SINQS(IH,1,N)*SINQS(II,2,N)
+        CKHI3 = COSQS(II,1,N)*COSQS(IK,2,N) - SINQS(II,1,N)*SINQS(IK,2,N)
+        SKHI1 = SINQS(IK,1,N)*COSQS(IH,2,N) + COSQS(IK,1,N)*SINQS(IH,2,N)
+        SKHI2 = SINQS(IH,1,N)*COSQS(II,2,N) + COSQS(IH,1,N)*SINQS(II,2,N)
+        SKHI3 = SINQS(II,1,N)*COSQS(IK,2,N) + COSQS(II,1,N)*SINQS(IK,2,N)
+        CKHI = CKHI1 + CKHI2 + CKHI3
+        SKHI = SKHI1 + SKHI2 + SKHI3
+        RPHCC = CHKI + CKHI
+        RPHSS = SHKI + SKHI
+        CLZ = COSQS(IL,3,N)
+        AFCAL = AFCAL + (RPHCC*CLZ)*FOB(N,IR)
+        BFCAL = BFCAL + (RPHSS*CLZ)*FOB(N,IR)
+      ENDDO
+      FFCALC_483 = AFCAL*AFCAL + BFCAL*BFCAL
+
       END FUNCTION FFCALC_483
-!*==FFCALC_485.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
-      FUNCTION FFCALC_485(IR)
-      INCLUDE 'SGinc\FFCALCTOP.f90'
-      INCLUDE 'SGinc\FFCALC_485.f90'
+!*****************************************************************************
+!
+      REAL FUNCTION FFCALC_485(IR)
+
+      INCLUDE 'SGinc\FFCALCTOP.inc'
+
+! Structure factor calculations for space group P6/mmm
+      AFCAL = 0.0
+      IH = iHKL(1,IR)
+      IK = iHKL(2,IR)
+      II = -(IH+IK)
+      IL = iHKL(3,IR)
+      DO N = 1, NATOM
+        CHKI1 = COSQS(IH,1,N)*COSQS(IK,2,N) - SINQS(IH,1,N)*SINQS(IK,2,N)
+        CHKI2 = COSQS(IK,1,N)*COSQS(II,2,N) - SINQS(IK,1,N)*SINQS(II,2,N)
+        CHKI3 = COSQS(II,1,N)*COSQS(IH,2,N) - SINQS(II,1,N)*SINQS(IH,2,N)
+        CHKI = CHKI1 + CHKI2 + CHKI3
+        CKHI1 = COSQS(IK,1,N)*COSQS(IH,2,N) - SINQS(IK,1,N)*SINQS(IH,2,N)
+        CKHI2 = COSQS(IH,1,N)*COSQS(II,2,N) - SINQS(IH,1,N)*SINQS(II,2,N)
+        CKHI3 = COSQS(II,1,N)*COSQS(IK,2,N) - SINQS(II,1,N)*SINQS(IK,2,N)
+        CKHI = CKHI1 + CKHI2 + CKHI3
+        RPHCC = CHKI + CKHI
+        CLZ = COSQS(IL,3,N)
+        AFCAL = AFCAL + (RPHCC*CLZ)*FOB(N,IR)
+      ENDDO
+      FFCALC_485 = AFCAL*AFCAL
+
       END FUNCTION FFCALC_485
-!*==FFCALC_DEFAULT.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
 !
+!*****************************************************************************
 !
-      FUNCTION FFCALC_DEFAULT(IR)
-!
-      INCLUDE 'SGinc\FFCALCTOP.f90'
-      COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8,&
-     &                VALMUB
+      REAL FUNCTION FFCALC_DEFAULT(IR)
+
+      USE REFVAR
+      USE ATMVAR
+
+      IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: iR
+
+      INTEGER         NATOM
+      REAL                   X
+      INTEGER                          KX
+      REAL                                        AMULT,      TF
+      INTEGER         KTF
+      REAL                      SITE
+      INTEGER                              KSITE,      ISGEN
+      REAL            SDX,        SDTF,      SDSITE
+      INTEGER                                             KOM17
+      COMMON /POSNS / NATOM, X(3,MaxAtm_3), KX(3,MaxAtm_3), AMULT(MaxAtm_3), TF(MaxAtm_3),  &
+                      KTF(MaxAtm_3), SITE(MaxAtm_3), KSITE(MaxAtm_3), ISGEN(3,MaxAtm_3),    &
+                      SDX(3,MaxAtm_3), SDTF(MaxAtm_3), SDSITE(MaxAtm_3), KOM17
+
+      REAL            FOB
+      COMMON /FCSTOR/ FOB(MaxAtm_3,MaxRef)
+
+      INTEGER         NOP, NCENT, NOPC, NLAT, NGEN
+      LOGICAL                                       CENTRC
+      INTEGER                                               KOM13
       COMMON /NSYM  / NOP, NCENT, NOPC, NLAT, NGEN, CENTRC, KOM13
-      LOGICAL CENTRC
-      COMMON /SYMDA / SYM(3,3,24), TRANS(3,24), ALAT(3,4), ORIGIN(3),   &
-     &                KOM26
-      COMMON /symsto/ sctrh(24,10000), rhsto(3,24,10000)
-      PARAMETER (NAC=256,NBC=100*NAC,FARCOS=256.)
-      COMMON /COSARS/ COSAR0(-NBC:NBC), COSAR1(-NBC:NBC),               &
-     &                COSAR2(-NBC:NBC)
-      COMMON /SINARS/ SINAR0(-NBC:NBC), SINAR1(-NBC:NBC),               &
-     &                SINAR2(-NBC:NBC)
-!
-!
-      AFCALC = 0.
-!
-!.. Firstly if we are centric then calculate only cosine terms
-!
+
+      REAL            sctrh,            rhsto
+      COMMON /symsto/ sctrh(24,MaxRef), rhsto(3,24,MaxRef)
+
+      INTEGER     NAC,       NBC
+      REAL                                  FARCOS
+      PARAMETER ( NAC = 256, NBC = 100*NAC, FARCOS = 256.0 )
+
+      REAL            COSAR0,           COSAR1,           COSAR2
+      COMMON /COSARS/ COSAR0(-NBC:NBC), COSAR1(-NBC:NBC), COSAR2(-NBC:NBC)
+
+      REAL            SINAR0,           SINAR1,           SINAR2
+      COMMON /SINARS/ SINAR0(-NBC:NBC), SINAR1(-NBC:NBC), SINAR2(-NBC:NBC)
+
+      REAL AFCALC, BFCALC, SUMA, SUMB, V, PV
+      INTEGER N, I, IV
+
+      AFCALC = 0.0
+! Firstly if we are centric then calculate only cosine terms
       IF (CENTRC) THEN
-        IF (LOG_HYDROGENS) THEN
-          DO N = 1, NATOM
-            SUM = 0.
+        DO N = 1, NATOM
+          SUMA = 0.0
 ! SUM OVER SYMMETRY EQUIVALENTS:
-            DO I = 1, NOPC
-!.. V is 2pi*(h*x+t)
-              V = (X(1,N)*RHSTO(1,I,IR)+X(2,N)*RHSTO(2,I,IR)+X(3,N)     &
-     &            *RHSTO(3,I,IR)+SCTRH(I,IR))*FARCOS
-              IV = V
-              PV = V - FLOAT(IV)
-              SUM = SUM + COSAR0(IV) + PV*(COSAR1(IV)+PV*COSAR2(IV))
-            ENDDO
-            AFCALC = AFCALC + SUM*FOB(N,IR)
+          DO I = 1, NOPC
+! V is 2pi*(h*x+t)
+!C RHSTO holds the reciprocal space vector (h,k,l) per symmetry operator per reflection
+!C (so in a way, it's the h,k,l that are transformed rather than the atomic co-ordinates)
+            V = (X(1,N)*RHSTO(1,I,IR)+X(2,N)*RHSTO(2,I,IR)+X(3,N)*RHSTO(3,I,IR)+SCTRH(I,IR))*FARCOS
+            IV = V
+            PV = V - FLOAT(IV)
+!C The COSARs are just a look-up table to speed up the goniometric calculations
+            SUMA = SUMA + COSAR0(IV) + PV*(COSAR1(IV)+PV*COSAR2(IV))
           ENDDO
-        ELSE
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            SUM = 0.
-!
-! SUM OVER SYMMETRY EQUIVALENTS:
-            DO I = 1, NOPC
-              V = (X(1,N)*RHSTO(1,I,IR)+X(2,N)*RHSTO(2,I,IR)+X(3,N)     &
-     &            *RHSTO(3,I,IR)+SCTRH(I,IR))*FARCOS
-              IV = V
-              PV = V - FLOAT(IV)
-              SUM = SUM + COSAR0(IV) + PV*(COSAR1(IV)+PV*COSAR2(IV))
-            ENDDO
-            AFCALC = AFCALC + SUM*FOB(N,IR)
-          ENDDO
-        ENDIF
+          AFCALC = AFCALC + SUMA*FOB(N,IR)
+        ENDDO
         FFCALC_DEFAULT = AFCALC*AFCALC
       ELSE
-!.. Deal with the non-centric case
-        BFCALC = 0.
-        IF (LOG_HYDROGENS) THEN
-          DO N = 1, NATOM
-            SUMA = 0.
-            SUMB = 0.
-!
+! Deal with the non-centric case
+        BFCALC = 0.0
+        DO N = 1, NATOM
+          SUMA = 0.0
+          SUMB = 0.0
 ! SUM OVER SYMMETRY EQUIVALENTS:
-            DO I = 1, NOPC
-!.. V is 2pi*(h*x+t)
-              V = (X(1,N)*RHSTO(1,I,IR)+X(2,N)*RHSTO(2,I,IR)+X(3,N)     &
-     &            *RHSTO(3,I,IR)+SCTRH(I,IR))*FARCOS
-              IV = V
-              PV = V - FLOAT(IV)
-              SUMA = SUMA + COSAR0(IV) + PV*(COSAR1(IV)+PV*COSAR2(IV))
-              SUMB = SUMB + SINAR0(IV) + PV*(SINAR1(IV)+PV*SINAR2(IV))
-            ENDDO
-            AFCALC = AFCALC + SUMA*FOB(N,IR)
-            BFCALC = BFCALC + SUMB*FOB(N,IR)
+          DO I = 1, NOPC
+! V is 2pi*(h*x+t)  2*pi*((R*x+t)*h) = 2*pi*(x*(h*R+t))
+            V = (X(1,N)*RHSTO(1,I,IR)+X(2,N)*RHSTO(2,I,IR)+X(3,N)*RHSTO(3,I,IR)+SCTRH(I,IR))*FARCOS
+            IV = V
+            PV = V - FLOAT(IV)
+            SUMA = SUMA + COSAR0(IV) + PV*(COSAR1(IV)+PV*COSAR2(IV))
+            SUMB = SUMB + SINAR0(IV) + PV*(SINAR1(IV)+PV*SINAR2(IV))
           ENDDO
-        ELSE
-          DO NS = 1, NSATOM
-            N = ISATOM(NS)
-            SUMA = 0.
-            SUMB = 0.
-!
-! SUM OVER SYMMETRY EQUIVALENTS:
-            DO I = 1, NOPC
-              V = (X(1,N)*RHSTO(1,I,IR)+X(2,N)*RHSTO(2,I,IR)+X(3,N)     &
-     &            *RHSTO(3,I,IR)+SCTRH(I,IR))*FARCOS
-              IV = V
-              PV = V - FLOAT(IV)
-              SUMA = SUMA + COSAR0(IV) + PV*(COSAR1(IV)+PV*COSAR2(IV))
-              SUMB = SUMB + SINAR0(IV) + PV*(SINAR1(IV)+PV*SINAR2(IV))
-            ENDDO
-            AFCALC = AFCALC + SUMA*FOB(N,IR)
-            BFCALC = BFCALC + SUMB*FOB(N,IR)
-          ENDDO
-        ENDIF
+          AFCALC = AFCALC + SUMA*FOB(N,IR)
+          BFCALC = BFCALC + SUMB*FOB(N,IR)
+        ENDDO
         FFCALC_DEFAULT = AFCALC*AFCALC + BFCALC*BFCALC
       ENDIF
-      RETURN
+
       END FUNCTION FFCALC_DEFAULT
-!*==CALCOSARX.f90  processed by SPAG 6.11Dc at 13:14 on 17 Sep 2001
+!
+!*****************************************************************************
 !
       SUBROUTINE CALCOSARX
-      PARAMETER (NAC=256,NBC=100*NAC,FARCOS=256.)
-      COMMON /COSARS/ COSAR0(-NBC:NBC), COSAR1(-NBC:NBC),               &
-     &                COSAR2(-NBC:NBC)
-      COMMON /SINARS/ SINAR0(-NBC:NBC), SINAR1(-NBC:NBC),               &
-     &                SINAR2(-NBC:NBC)
-!
-      TWOPI = 8.*ATAN(1.)
-      AMUL = TWOPI/FARCOS
+
+      IMPLICIT NONE
+
+      INTEGER     NAC,       NBC
+      REAL                                  FARCOS
+      PARAMETER ( NAC = 256, NBC = 100*NAC, FARCOS = 256.0 )
+
+      REAL            COSAR0,           COSAR1,           COSAR2
+      COMMON /COSARS/ COSAR0(-NBC:NBC), COSAR1(-NBC:NBC), COSAR2(-NBC:NBC)
+
+      REAL            SINAR0,           SINAR1,           SINAR2
+      COMMON /SINARS/ SINAR0(-NBC:NBC), SINAR1(-NBC:NBC), SINAR2(-NBC:NBC)
+
+      REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
+      COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
+
+      REAL    AMUL, X, XP, XM
+      INTEGER I
+
+      AMUL = TWOPI / FARCOS
       DO I = -NBC, NBC
-        X = AMUL*FLOAT(I)
-        XP = AMUL*FLOAT(I+1)
-        XM = AMUL*FLOAT(I-1)
+        X  = AMUL * FLOAT(I)
+        XP = AMUL * FLOAT(I+1)
+        XM = AMUL * FLOAT(I-1)
         COSAR0(I) = COS(X)
-        COSAR1(I) = 0.5*(COS(XP)-COS(XM))
-        COSAR2(I) = 0.5*(COS(XP)+COS(XM)-2.*COSAR0(I))
+        COSAR1(I) = 0.5 * (COS(XP) - COS(XM))
+        COSAR2(I) = 0.5 * (COS(XP) + COS(XM) - 2.0 * COSAR0(I))
         SINAR0(I) = SIN(X)
-        SINAR1(I) = 0.5*(SIN(XP)-SIN(XM))
-        SINAR2(I) = 0.5*(SIN(XP)+SIN(XM)-2.*SINAR0(I))
+        SINAR1(I) = 0.5 * (SIN(XP) - SIN(XM))
+        SINAR2(I) = 0.5 * (SIN(XP) + SIN(XM) - 2.0 * SINAR0(I))
       ENDDO
-!
+
       END SUBROUTINE CALCOSARX
+!
+!*****************************************************************************
+!
