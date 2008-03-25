@@ -41,3 +41,59 @@ macro Out_CIF_STR_Uiso(file)
                 " %11.5f" = (1.0/(8.0 * Pi * Pi)) * Get_From_String(Get(current_atom), beq);
              }
 }
+macro Out_X_Yobs_Ycalc_and_Difference_divide_by_SigmaYobs(file)
+{
+	xdd_out file load out_record out_fmt out_eqn
+	{
+	" %11.5f " = X;
+	" %11.5f " = Yobs;
+	" %11.5f " = Ycalc;
+	" %11.5f\n" = (Yobs-Ycalc)/SigmaYobs;
+	}
+}
+'******************************************************************************
+
+macro Out_Profile(file)
+{
+xdd_out file load out_record out_fmt out_eqn
+{
+" %11.5f " = X;
+" %11.5f " = Yobs;
+" %11.5f " = Ycalc;
+" %11.5f\n" = SigmaYobs;
+}
+}
+
+'******************************************************************************
+
+' Output a file with a series of points at the reflection positions
+macro Out_Tick(file)
+{
+phase_out file load out_record out_fmt out_eqn
+{
+" %11.5f -200\n" = 2 Rad Th;
+}
+}
+
+'******************************************************************************
+
+' Output a file suitable for CIF submission
+macro Out_PowderDataBlock(file)
+{
+out file
+Out_String("loop_")
+Out_String("\n_pd_meas_2theta_scan")
+Out_String("\n_pd_proc_intensity_total")
+Out_String("\n_pd_calc_intensity_total")
+Out_String("\n_pd_proc_ls_weight")
+Out_String("\n")
+xdd_out file append load out_record out_fmt out_eqn
+{
+" %11.5f " = X;
+" %11.5f " = Yobs;
+" %11.5f " = Ycalc;
+" %11.5f\n" = 1./(SigmaYobs*SigmaYobs);
+}
+}
+
+'******************************************************************************

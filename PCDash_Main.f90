@@ -1,125 +1,206 @@
 !
 !*****************************************************************************
 !
-      PROGRAM PCDruid_Main
+      PROGRAM PCDash_Main
 
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
+      USE DFLIB
+      USE ZMVAR
 
       IMPLICIT NONE
 
-      TYPE(WIN_STYLE)   :: MAIN_WINDOW
+      INTEGER, EXTERNAL :: Read_One_zm, DiffractionFileOpen
+      LOGICAL, EXTERNAL :: FnPatternOK
+      INTEGER IWID, IWIDTHS(10)
+      CHARACTER(MaxPathLength) ArgString, tDirName, tFileName
+      CHARACTER(7) StrFileExtension ! maximum = 7 = .zmatrix
+      INTEGER ExtLen, iFrg, iDummy
+      INTEGER       tNumZMatrices
+      CHARACTER(80) tZmatrices(10)
+      INTEGER       tNextzmNum
 
-      INCLUDE 'GLBVAR.INC'
-      INCLUDE 'lattice.inc'
-      INCLUDE 'DialogPosCmn.inc'
-      INCLUDE 'STATLOG.INC'
+! The following variables are there to allow the dialogue fields in the
+! window dealing with Z-matrices to be handled by DO...ENDDO loops.
+! The field identifiers assigned by Winteracter are not necessarily consecutive, 
+! but these mappings are.
 
-      INTEGER           :: IWIDTHS(10)
-      INTEGER           :: IWID
+      INTEGER        IDFZMFile,                                                &
+                     IDBZMDelete,                    IDBZMBrowse,              &
+                     IDBZMView,                      IDBZMEdit,                &
+                     IDFZMpars,                      IDFZMLabel,               &
+                     first_zm_in_win
+      COMMON /IDFZM/ IDFZMFile(1:maxfrginterface),                                      &
+                     IDBZMDelete(1:maxfrginterface), IDBZMBrowse(1:maxfrginterface),    &
+                     IDBZMView(1:maxfrginterface),   IDBZMEdit(1:maxfrginterface),      &
+                     IDFZMpars(1:maxfrginterface),   IDFZMLabel(1:maxfrginterface),     &
+                     first_zm_in_win
+      DATA IDFZMFile   / IDF_zmFile1,   IDF_zmFile2,   IDF_zmFile3,   IDF_zmFile4   /
+      DATA IDBZMDelete / IDB_zmDelete1, IDB_zmDelete2, IDB_zmDelete3, IDB_zmDelete4 /
+      DATA IDBZMBrowse / IDB_zmBrowse1, IDB_zmBrowse2, IDB_zmBrowse3, IDB_zmBrowse4 /
+      DATA IDBZMView   / IDB_zmView1,   IDB_zmView2,   IDB_zmView3,   IDB_zmView4   /
+      DATA IDBzmEdit   / IDB_zmEdit1,   IDB_zmEdit2,   IDB_zmEdit3,   IDB_zmEdit4   /
+      DATA IDFZMpars   / IDF_ZM_pars1,  IDF_ZM_pars2,  IDF_ZM_pars3,  IDF_ZM_pars4  /
+      DATA IDFZMLabel  / IDF_LABEL1,    IDF_LABEL2,    IDF_LABEL3,    IDF_LABEL4    /
+
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+      CHARACTER(MaxPathLength) BatchLogName
+      COMMON /BATLOG/ BatchLogName
+
+      in_batch = .FALSE.
+      BatchLogName = ''
 
       CALL WInitialise(' ')
-      CALL Init_StdOut()
-!   Initialise Winteracter
-      XBSWidth  = WInfoScreen(1)
-      XBSHeight = WInfoScreen(2)
-! Try to redirect stdout - change working directory if unsuccessful
 
-!   Set up root window options
-!
-!     - System menu
-!     - Minimise button
-!     - Maximise button
-!     - Status bar
-!
-      MAIN_WINDOW%FLAGS  = SysMenuOn + MinButton + MaxButton + StatusBar
-! Place window on the screen with a fractional size determined from the screen size
-      MAIN_WINDOW%WIDTH  = 0.8*XBSWidth
-      MAIN_WINDOW%HEIGHT = 0.375*XBSHeight
-      MAIN_WINDOW%X      = 0.1*XBSWidth
-      MAIN_WINDOW%Y      = 0.06*FLOAT(XBSHeight)+262 !0.4*XBSHeight
-! Set druid_header menu id and window title
-      MAIN_WINDOW%MENUID = IDR_MENU1
-      MAIN_WINDOW%TITLE  = "DASH"
+      IF (NARGS() .GT. 1) THEN
+        CALL GetArg(1, ArgString)
+        CALL StrUpperCase(ArgString)
+        IF ( ArgString .EQ. "MERGE" ) THEN
+          in_batch = .TRUE.
+          CALL RunMerge
+          STOP
+        ELSE
+          ExtLen = 7
+          CALL FileGetExtension(ArgString, StrFileExtension, ExtLen)
+          CALL StrUpperCase(StrFileExtension)
+          IF (StrFileExtension .EQ. 'DBF   ') THEN
+            in_batch = .TRUE.
+            BatchLogName = TRIM(ArgString)//'.log'
+            CALL ClearBatchLogFile()
+          ENDIF
+        ENDIF
+      ENDIF
+      first_zm_in_win = 1
+! Initialise Winteracter
+
+      CALL InitialiseDASHDialogState
+
+      CALL GetInstallationDirectory
+! Check if there are any command line arguments
+! Try to redirect stdout - change working directory if unsuccessful
+      IF (NARGS() .EQ. 0) CALL Init_StdOut
+      IF ( .NOT. in_batch ) THEN
 ! Open root window
-      CALL WindowOpen(MAIN_WINDOW,128)
+        CALL WindowOpen(FLAGS = SysMenuOn + MinButton + MaxButton + StatusBar, X = WInfoScreen(1)/10, &
+                        Y = (WInfoScreen(2)/100) + 365, WIDTH = (WInfoScreen(1)*4)/5, &
+                        HEIGHT = (WInfoScreen(2)*3)/8, MENUID = IDR_MENU1, &
+                        TITLE = "DASH", NCOL256=128)
 ! Load and display the toolbar
-      CALL WMenuToolbar(ID_TOOLBAR1)
-      CALL WCursorShape(CurCrossHair)
+        CALL WMenuToolbar(ID_TOOLBAR1)
+        CALL WCursorShape(CurCrossHair)
 ! Disable the menu buttons
-      CALL SetModeMenuState(1,-1,-1)
+        CALL SetModeMenuState(1,-1)
 ! Setup array of widths for status bar
-      IWIDTHS(1) = 3800
-      DO IWID = 2, 7
-        IWIDTHS(IWID) = 800
-      END DO
-      IWIDTHS(8)= 1500 
-!      OPEN (UNIT=76,FILE='D:\cvsDASH\dash\Debug\output.log')
+        IWIDTHS(1) = 6200
+        DO IWID = 2, 4
+          IWIDTHS(IWID) = 800
+        ENDDO
+        IWIDTHS(5)= 1500 
 ! Split status bar into more than one part
-      CALL WindowStatusBarParts(8,IWIDTHS)
-    !  CALL IDebugLevel(DbgMsgBox)
-      CALL WMessageEnable(PushButton, Enabled)
-! Load all Winteracter dialogues into memory
-      CALL PolyFitter_UploadDialogues()
+        CALL WindowStatusBarParts(5, IWIDTHS)
+      !  CALL IDebugLevel(DbgMsgBox)
+        CALL WMessageEnable(PushButton, Enabled)
+        CALL WMessageEnable(FieldChanged, Enabled)
+      ENDIF
+
+      CALL CheckLicence
+
 ! Initialise space group information
-      CALL PolyFitterInitialise()
-      CALL InitialiseVariables
-      CALL Check_License()
-      CALL WMessageEnable(FieldChanged, Enabled)
-      CALL WMessageEnable(TabChanged, Enabled)
+      CALL PolyFitterInitialise
+      CALL InitialiseVariables(in_batch)
+
+      IF ( .NOT. IN_BATCH ) THEN
+        CALL WMessageEnable(TabChanged, Enabled)
+        CALL WMessageEnable(MouseMove, Enabled)
+      ENDIF
+
+      CALL IOsDirChange(StartUpDirectory)
+
 ! Main message loop
+      IF (NARGS() .GT. 1) THEN
+        CALL GetArg(1,ArgString) 
+! Parse directory and go there
+        CALL SplitPath(ArgString, tDirName, tFileName)
+        CALL IOsDirChange(tDirName)
+! Parse directory and go there
+        ExtLen = 7
+        CALL FileGetExtension(ArgString, StrFileExtension, ExtLen)
+        CALL StrUpperCase(StrFileExtension)
+        SELECT CASE (StrFileExtension)
+          CASE ('DASH   ')
+            CALL PrjFileOpen(ArgString)
+          CASE ('DBF   ')
+            CALL BatchMode(ArgString)
+          CASE ('ZMATRIX')
+            iFrg = 1
+            frag_file(iFrg) = ArgString
+            iDummy = Read_One_ZM(iFrg)
+            IF (iDummy .EQ. 0) THEN ! successful read
+              nFrag = 1
+            ELSE 
+              CALL FileErrorPopup(frag_file(iFrg), iDummy)
+            ENDIF ! If the read on the Z-matrix was ok
+            CALL ShowWizardWindowZmatrices
+          CASE ('SDI    ')
+            CALL SDIFileOpen(ArgString)
+            CALL ShowWizardWindowZmatrices
+          CASE ('PDB    ', 'MOL    ', 'MOL2   ', 'ML2    ', 'MDL    ', 'RES    ', 'XYZ    ', 'CSSR   ', 'CIF    ')
+            CALL ViewStructure(ArgString, .TRUE.)
+            CALL SelectDASHDialog(IDD_SAW_Page1)
+            iFrg = 1
+            CALL zmConvert(ArgString, tNumZMatrices, tZmatrices)
+            IF (tNumZMatrices .EQ. 0) GOTO 999
+            tNextzmNum  = 1
+   10       CONTINUE
+            frag_file(iFrg) = tDirName(1:LEN_TRIM(tDirName))//tZmatrices(tNextzmNum)
+            iDummy = Read_One_ZM(iFrg)
+            IF (iDummy .EQ. 0) THEN ! successful read
+              iFrg = iFrg + 1
+              IF (iFrg .EQ. maxfrg+1) THEN
+! If no free slot found, exit
+                CALL InfoMessage('File contained more Z-matrices than available slots.')
+                GOTO 999
+              ENDIF
+            ELSE
+              CALL FileErrorPopup(frag_file(iFrg), iDummy)
+! Slot still free, so iFrg still OK.
+            ENDIF
+! More Z-matrices to read?
+            tNextzmNum = tNextzmNum + 1
+            IF (tNextzmNum .LE. tNumZMatrices) GOTO 10
+  999       CONTINUE
+            nFrag = iFrg - 1
+            CALL ShowWizardWindowZmatrices
+          CASE ('RAW    ', 'CPI    ', 'DAT    ', 'TXT    ', 'MDI    ', 'POD    ', &
+                'RD     ', 'SD     ', 'UDF    ', 'UXD    ', 'XYE    ', 'X01    ', 'ASC    ')
+            iDummy = DiffractionFileOpen(ArgString)
+            CALL SelectDASHDialog(IDD_PW_Page3)
+            CALL WDialogFieldStateLogical(IDNEXT,FnPatternOK())
+            CALL WDialogFieldStateLogical(IDB_Bin, FnPatternOK())
+            CALL WizardWindowShow(IDD_PW_Page3)
+          CASE DEFAULT
+            CALL ErrorMessage('Unrecognised file format.')
+            CALL StartWizard
+        END SELECT
+      ELSE
 ! Go through the PolyFitter wizard
-! Comment this next line out to remove the wizard
-      CALL StartWizard()
+        CALL StartWizard
+      ENDIF
       DO WHILE (.TRUE.)
         CALL GetEvent
-      END DO
+      ENDDO
 
-      END PROGRAM PCDruid_Main
-!
-!*****************************************************************************
-!
-      SUBROUTINE SelectMode(TheMode)
-!
-! This subroutine selects "peak fitting" / "Pawley refinement" / "structure solution" mode,
-! ensuring that exactly one mode is active at all times and
-! updating the current mode in the menu and in the toolbar.
-!
-      USE WINTERACTER
-      USE DRUID_HEADER
-      USE VARIABLES
-      
-      IMPLICIT NONE
-
-      INTEGER, INTENT (IN   ) :: TheMode
-
-      INCLUDE 'GLBVAR.INC'
-
-! Update the status bar
-      SELECT CASE (TheMode)
-        CASE (ID_Peak_Fitting_Mode)
-          STATBARSTR(8)='Peak fitting mode'
-        CASE (ID_Pawley_Refinement_Mode)
-          STATBARSTR(8)='Pawley refinement mode'
-        CASE (ID_Structure_Solution_Mode)
-          STATBARSTR(8)='Structure solution mode'
-      END SELECT
-      CALL WindowOutStatusBar(8,STATBARSTR(8))
-! Update the menu
-      CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOff)
-      IDCurrent_Cursor_mode = TheMode
-      IF (IDCurrent_Cursor_mode .EQ. ID_Default_Mode) IDCurrent_Cursor_mode = ID_Peak_Fitting_Mode
-      CALL WMenuSetState(IDCurrent_Cursor_mode,ItemChecked,WintOn)
-! Update the toolbar
-      
-      END SUBROUTINE SelectMode
+      END PROGRAM PCDash_Main
 !
 !*****************************************************************************
 !
       SUBROUTINE ProcessMenu
 !
-!   This subroutine processes the menu selections
+! This subroutine processes the menu selections
+! This includes the toolbar
 !
       USE WINTERACTER
       USE DRUID_HEADER
@@ -128,206 +209,271 @@
       IMPLICIT NONE
 
       INCLUDE 'GLBVAR.INC'
-      INCLUDE 'statlog.inc'
 
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
-                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
-
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD
       COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
-                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD,   &
-                       XGGMIN,    XGGMAX,    YGGMIN,    YGGMAX
-      INTEGER IPMIN,IPMAX,IPMINOLD,IPMAXOLD
-      COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD
 
-!C>> JCC data to indicate whether we are coming out of peak-fitting mode
-!U      LOGICAL FromPeakFit
-      LOGICAL Confirm ! Function
+      INTEGER          IPMIN, IPMAX, iStart, iStop, nPoints
+      COMMON /PROFIPM/ IPMIN, IPMAX, iStart, iStop, nPoints
+
+      LOGICAL, EXTERNAL :: Confirm
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
+      INTEGER, EXTERNAL :: DiffractionFileBrowse
       REAL xpgdif, ypgdif
-      INTEGER ISTAT
-      INTEGER DiffractionFileBrowse ! Function
+      INTEGER ISTAT, tInt1, tInt2
 
-!
-!   Branch depending on chosen menu item
-!
- 10   CALL WCursorShape(CurCrossHair)
-      STATBARSTR(8)=' '
-      CALL WindowOutStatusBar(8,STATBARSTR(8))
+! Branch depending on chosen menu item
+
       SELECT CASE (EventInfo%VALUE1)
-        CASE (ID_import_dpj_file)
-          CALL SDIFileBrowse
+        CASE (IDB_Open)
+          CALL PrjFileBrowse
         CASE (ID_import_xye_file)
           ISTAT = DiffractionFileBrowse()
+        CASE (ID_import_dpj_file)
+          CALL SDIFileBrowse
         CASE (ID_Remove_Background)
-          CALL Background_Fit
+          CALL PushActiveWindowID
+          CALL LoadDASHDialog(IDD_Background_Fit)
+! Initialise the background
+          CALL DASHWDialogGetInteger(IDF_NumOfIterations, tInt2)
+          CALL DASHWDialogGetInteger(IDF_WindowWidth, tInt1)
+          CALL CalculateBackground(tInt1, tInt2, &
+                                   DASHWDialogGetCheckBoxLogical(IDF_UseMCYN), &
+                                   .FALSE., 5)
+          CALL Profile_Plot
+          CALL WDialogShow(-1, -1, 0, Modeless)
+          CALL PopActiveWindowID
         CASE (ID_FILE_PRINT)
-          CALL Profile_Plot(-IPTYPE)
+          IPTYPE = -IPTYPE
+          CALL Profile_Plot
+          IPTYPE = -IPTYPE
+        CASE (ID_SaveXYE)
+          CALL SaveXYE
         CASE (ID_FILE_EXIT)
           CALL WExit
         CASE (ID_Plot_Options)
           CALL PushActiveWindowID
-          CALL WDialogSelect(IDD_Plot_Option_Dialog)
-          CALL WDialogShow(-1,-1,0,Modeless)
+          CALL SelectDASHDialog(IDD_Plot_Option_Dialog)
+          CALL WDialogShow(-1, -1, 0, Modeless)
+          CALL PopActiveWindowID
+        CASE (ID_Configuration)
+          CALL PushActiveWindowID
+          CALL SelectDASHDialog(IDD_Configuration)
+          CALL WDialogShow(-1, -1, 0, Modeless)
           CALL PopActiveWindowID
         CASE (ID_Peak_Fitting_Mode)
           CALL SelectMode(ID_Peak_Fitting_Mode)
         CASE (ID_Pawley_Refinement_Mode)
-          IF (NumPawleyRef .EQ. 0) THEN
-            IF (.NOT. Confirm('Lattice constants may not have been refined'//CHAR(13)//&
-                              'Do you wish to continue?')) RETURN
-          END IF
-          CALL SelectMode(ID_Pawley_Refinement_Mode)
-          CALL Quick_Pawley()
+          CALL ShowPawleyFitWindow
         CASE (ID_Structure_Solution_Mode)
-          CALL SA_Main()
+          CALL ShowWizardWindowZmatrices
+        CASE (IDB_AnalyseSolutions)
+          CALL SelectMode(IDB_AnalyseSolutions)
+          CALL SelectDASHDialog(IDD_Polyfitter_Wizard_01)
+          CALL WDialogPutRadioButton(IDF_PW_Option4)
+          CALL WizardWindowShow(IDD_SAW_Page5)
+        CASE (ID_FitPeaks)
+          CALL FitPeaks
+        CASE (ID_ClearPeakFitRanges)
+          IF (Confirm('Do you wish to delete all peak fit ranges?')) CALL Clear_PeakFitRanges
+        CASE (ID_Delabc)
+          CALL Clear_UnitCell_WithConfirmation
         CASE (ID_get_crystal_symmetry)
           CALL PushActiveWindowID
-          CALL WDialogSelect(IDD_Structural_Information)
-          CALL WDialogShow(-1,-1,0,Modeless)
-          CALL WDialogSetTab(IDF_Structural_Information_tab,IDD_Crystal_Symmetry)
+          CALL SelectDASHDialog(IDD_Structural_Information)
+          CALL WDialogShow(-1, -1, 0, Modeless)
+          CALL WDialogSetTab(IDF_Structural_Information_tab, IDD_Crystal_Symmetry)
           CALL PopActiveWindowID
         CASE (ID_get_data_properties)
           CALL PushActiveWindowID
-          CALL WDialogSelect(IDD_Structural_Information)
-          CALL WDialogShow(-1,-1,0,Modeless)
-          CALL WDialogSetTab(IDF_Structural_Information_tab,IDD_Data_Properties)
+          CALL SelectDASHDialog(IDD_Structural_Information)
+          CALL WDialogShow(-1, -1, 0, Modeless)
+          CALL WDialogSetTab(IDF_Structural_Information_tab, IDD_Data_Properties)
           CALL PopActiveWindowID
         CASE (ID_get_peak_positions)
           CALL PushActiveWindowID
-          CALL WDialogSelect(IDD_Structural_Information)
-          CALL WDialogShow(-1,-1,0,Modeless)
-          CALL WDialogSetTab(IDF_Structural_Information_tab,IDD_Peak_Positions)
+          CALL SelectDASHDialog(IDD_Structural_Information)
+          CALL WDialogShow(-1, -1, 0, Modeless)
+          CALL WDialogSetTab(IDF_Structural_Information_tab, IDD_Peak_Positions)
           CALL PopActiveWindowID
         CASE (ID_get_peak_widths)
           CALL PushActiveWindowID
-          CALL WDialogSelect(IDD_Structural_Information)
-          CALL WDialogShow(-1,-1,0,Modeless)
-          CALL WDialogSetTab(IDF_Structural_Information_tab,IDD_Peak_Widths)
+          CALL SelectDASHDialog(IDD_Structural_Information)
+          CALL WDialogShow(-1, -1, 0, Modeless)
+          CALL WDialogSetTab(IDF_Structural_Information_tab, IDD_Peak_Widths)
+          CALL PopActiveWindowID
+        CASE (IDM_ViewPawley)
+          CALL PushActiveWindowID
+          CALL SelectDASHDialog(IDD_Structural_Information)
+          CALL WDialogShow(-1, -1, 0, Modeless)
+          CALL WDialogSetTab(IDF_Structural_Information_tab, IDD_ViewPawley)
           CALL PopActiveWindowID
         CASE (ID_Left)
 ! We're going to move the graph to the left if we can
-          xpgdif=xpgmax-xpgmin
-          xpgmin=MAX(xpmin,xpgmin-0.25*xpgdif)
-          xpgmax=xpgmin+xpgdif
-          CALL Get_IPMaxMin() 
-          CALL Profile_Plot(IPTYPE)
+          xpgdif = xpgmax - xpgmin
+          xpgmin = MAX(XPMIN, xpgmin-0.25*xpgdif)
+          xpgmax = xpgmin + xpgdif
+          CALL Get_IPMaxMin 
+          CALL Profile_Plot
         CASE (ID_Right)
 ! We're going to move the graph to the right if we can
-          xpgdif=xpgmax-xpgmin
-          xpgmax=MIN(xpmax,xpgmax+0.25*xpgdif)
-          xpgmin=xpgmax-xpgdif
-          CALL Get_IPMaxMin() 
-          CALL Profile_Plot(IPTYPE)
+          xpgdif = xpgmax - xpgmin
+          xpgmax = MIN(XPMAX, xpgmax+0.25*xpgdif)
+          xpgmin = xpgmax - xpgdif
+          CALL Get_IPMaxMin 
+          CALL Profile_Plot
         CASE (ID_Down)
 ! We're going to move the graph down if we can
-          ypgdif=ypgmax-ypgmin
-          ypgmin=max(ypmin,ypgmin-0.25*ypgdif)
-          ypgmax=ypgmin+ypgdif
-          CALL Get_IPMaxMin() 
-          CALL Profile_Plot(IPTYPE)
+          ypgdif = ypgmax - ypgmin
+          ypgmin = MAX(YPMIN, ypgmin-0.25*ypgdif)
+          ypgmax = ypgmin + ypgdif
+          CALL Get_IPMaxMin 
+          CALL Profile_Plot
         CASE (ID_Up)
 ! We're going to move the graph up if we can
-          ypgdif=ypgmax-ypgmin
-          ypgmax=min(ypmax,ypgmax+0.25*ypgdif)
-          ypgmin=ypgmax-ypgdif
-          CALL Get_IPMaxMin() 
-          CALL Profile_Plot(IPTYPE)
+          ypgdif = ypgmax - ypgmin
+          ypgmax = MIN(YPMAX, ypgmax+0.25*ypgdif)
+          ypgmin = ypgmax - ypgdif
+          CALL Get_IPMaxMin
+          CALL Profile_Plot
         CASE (ID_Home)
 ! Back to full profile range
-          xpgmin=xpmin
-          xpgmax=xpmax
-          ypgmin=ypmin
-          ypgmax=ypmax
-          CALL Get_IPMaxMin() 
-          CALL Profile_Plot(IPTYPE)        
+          xpgmin = XPMIN
+          xpgmax = XPMAX
+          ypgmin = YPMIN
+          ypgmax = YPMAX
+          CALL Get_IPMaxMin 
+          CALL Profile_Plot 
         CASE (ID_PolyFitter_Help)
-          CALL LaunchHelp()
-        CASE (ID_Tutorial_1, ID_Tutorial_2, ID_Tutorial_3, ID_Tutorial_4, ID_Tutorial_5)
+          CALL LaunchHelp
+        CASE (ID_Tutorial_1, ID_Tutorial_2, ID_Tutorial_3, ID_Tutorial_4, ID_Tutorial_5, ID_Tutorial_6)
           CALL LaunchTutorial(EventInfo%VALUE1)
         CASE (ID_help_about_Polyfitter)
-          CALL About()
+          CALL About
         CASE(ID_Start_Wizard)
-          CALL StartWizard()
+          CALL StartWizard
       END SELECT
 
       END SUBROUTINE ProcessMenu
 !
 !*****************************************************************************
 !
-      SUBROUTINE LaunchHelp()
+      SUBROUTINE SaveXYE
 
       USE WINTERACTER
-      USE DRUID_HEADER
       USE VARIABLES
 
-      CALL WHelpFile(INSTDIR(1:LEN_TRIM(INSTDIR))//DIRSPACER//'Documentation'//DIRSPACER//'manual'//DIRSPACER//'dash.html')
+      IMPLICIT NONE
+
+      INCLUDE 'PARAMS.INC'
+      INCLUDE 'GLBVAR.INC'
+
+      INTEGER          NBIN, LBIN
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS), AVGESD
+
+      LOGICAL, EXTERNAL :: FnWavelengthOK, Get_WriteWavelength2XYEFile
+      CHARACTER(MaxPathLength) :: tFileName
+      CHARACTER(LEN=45) :: FILTER
+      INTEGER iFlags, hFile, I
+      
+      iFlags = SaveDialog + AppendExt + PromptOn
+      FILTER = 'Powder diffraction files (*.xye)|*.xye|'
+      tFileName = ''
+      CALL WSelectFile(FILTER,iFlags,tFileName,'Save powder diffraction file')
+      IF ((WInfoDialog(4) .EQ. CommonOK) .AND. (LEN_TRIM(tFileName) .NE. 0)) THEN
+        hFile = 10
+        OPEN(UNIT=hFile,FILE=tFileName,ERR=999)
+        IF ( FnWavelengthOK() .AND. Get_WriteWavelength2XYEFile() ) WRITE(hFile,'(F9.5)',ERR=999) ALambda
+        DO I = 1, NBIN
+!          WRITE(hFile,'(F6.3,X,F11.3,X,F12.5)',ERR=999) XBIN(I), YOBIN(I), EBIN(I)
+          WRITE(hFile,'(F10.5,X,F11.3,X,F12.5)',ERR=999) XBIN(I), YOBIN(I), EBIN(I)
+        ENDDO
+        CLOSE(hFile)
+      ENDIF
+      RETURN
+  999 CALL ErrorMessage('Error writing .xye file.')
+      CLOSE(hFile)
+
+      END SUBROUTINE SaveXYE
+!
+!*****************************************************************************
+!
+      SUBROUTINE LaunchHelp
+
+      USE WINTERACTER
+      USE VARIABLES
+      use kernel32
+      use dfwinty
+ 
+      IMPLICIT NONE
+
+      CHARACTER(MaxPathLength) WorkingDir
+      CHARACTER(MaxPathLength) ManualDir
+
+      INTEGER d
+
+      CALL IOsDirName(WorkingDir)
+
+      ManualDir = TRIM(InstallationDirectory)//&
+                  'Documentation'//DIRSPACER//&
+                  'manual'//DIRSPACER//'portable_html'
+
+      CALL IOsDirChange(TRIM(ManualDir))      
+
+     
+      d=WinExec('cmd /c "TOC.html" 'C,SW_HIDE)
+
+      CALL IOsDirChange(TRIM(WorkingDir))
 
       END SUBROUTINE LaunchHelp
 !
 !*****************************************************************************
 !
-      SUBROUTINE About()
+      SUBROUTINE About
 !
-!   This subroutine processes About selection
-!
-      USE WINTERACTER
-      USE DRUID_HEADER
-
-      IMPLICIT NONE
-
-      CHARACTER(LEN=512)  :: CABOUT
-!
-!   Set about message
-!
-      CABOUT = 'DASH: A structure solution package for X-ray powder '//CHAR(13)//&
-               'diffraction, developed and distributed in collaboration'//CHAR(13)//&
-               'between the ISIS Facility of the Rutherford Appleton'//CHAR(13)//&
-               'Laboratory and the Cambridge Crystallographic Data Centre.'//CHAR(13)//&
-               'Access to this software product is permitted only under the'//CHAR(13)//&
-               'terms and conditions of a valid software licence, obtainable'//CHAR(13)//&
-               'from the Cambridge Crystallographic Data Centre.'//CHAR(13)//&
-               CHAR(13)//&
-               'Copyright February 2001'
-      CALL WMessageBox(OkOnly,InformationIcon,CommonOk,CABOUT,'About DASH')
-
-      END SUBROUTINE About
-!
-!*****************************************************************************
-!
-      SUBROUTINE Redraw()
-!
-!   This subroutine redraws the window
+!   This subroutine shows the About... dialogue
 !
       USE WINTERACTER
       USE VARIABLES
 
       IMPLICIT NONE
 
-      INCLUDE 'GLBVAR.INC'
+      CHARACTER(LEN=712) :: CABOUT
+      INTEGER tLen
 
-!      INTEGER ICurPlotMode
-!
-!   Update window
-!
-!      ICurPlotMode = InfoGrScreen(PlotModeReq)
-      CALL IGrPlotMode('N')
-      IF (PLOTT) CALL Profile_Plot(IPTYPE)
-      IF (DoSaRedraw) CALL sa_output_gr()
+      CABOUT = 'DASH: A structure solution package for X-ray powder '//CHAR(13)//&
+               'diffraction, developed and distributed in collaboration'//CHAR(13)//&
+               'between the Council for the Central Laboratory of the Research '//CHAR(13)//&
+               'Councils (CCLRC) at the ISIS Facility of the Rutherford Appleton '//CHAR(13)//&
+               'Laboratory and CCDC Software Ltd. (CCDC).'//CHAR(13)//&
+               CHAR(13)//&
+               'Access to this software product is permitted only under the'//CHAR(13)//&
+               'terms and conditions of a valid software licence, obtainable'//CHAR(13)//&
+               'from the CCDC Software Ltd.'//CHAR(13)//&
+               CHAR(13)//&
+               'Reference:'//CHAR(13)//&
+               'W.I.F. David, K. Shankland, J. van de Streek, E. Pidcock,'//CHAR(13)//&
+               'W.D.S. Motherwell & J.C. Cole (2006). J. Appl. Cryst. 39, 910-915.'//CHAR(13)//&
+               CHAR(13)//&
+               ProgramVersion
+      tLen = LEN_TRIM(CABOUT)
+!DEC$ IF DEFINED (ONTBUG)
+      CABOUT = CABOUT(1:tLen)//' (Debug version)'
+!DEC$ ELSE
+      CABOUT = CABOUT(1:tLen)//' Release'
+!DEC$ ENDIF
+      tLen = LEN_TRIM(CABOUT)
+      CABOUT = CABOUT(1:tLen)//CHAR(13)//CHAR(13)//&
+               'Copyright CCDC and CCLRC, February 2008'//CHAR(13)//CHAR(13)//&
+               'Licence file:'//CHAR(13)
+      CALL WMessageBox(OkOnly, InformationIcon, CommonOk, TRIM(CABOUT)//TRIM(PathToLicenseFile), 'About DASH')
 
-!       SELECT CASE (ICurPlotMode)
-!           CASE (PlotNormal)
-!                 CALL IGrPlotMode('N')
-!           CASE (PlotOr)
-!                 CALL IGrPlotMode('O')
-!           CASE (PlotAnd)
-!                 CALL IGrPlotMode('A')
-!           CASE (PlotEor)
-!                 CALL IGrPlotMode('E')
-!       END SELECT                        
-
-      END SUBROUTINE Redraw
+      END SUBROUTINE About
 !
 !*****************************************************************************
 !
@@ -335,126 +481,102 @@
 !
 !   This subroutine processes the close requests
 !
-      USE WINTERACTER
-      USE VARIABLES
-
       IMPLICIT NONE
 
-      LOGICAL Confirm ! Function
+      LOGICAL, EXTERNAL :: Confirm
 
-      IF (Confirm('Do you want to exit DASH?')) CALL DoExit()
+      IF (Confirm('Do you want to exit DASH?')) THEN
+        CALL WriteConfigurationFile
+        CALL DoExit
+      ENDIF
 
       END SUBROUTINE WExit
 !
 !*****************************************************************************
 !
-      SUBROUTINE DoExit()
-
-      USE WINTERACTER
-      USE VARIABLES
+      SUBROUTINE DoExit
 
       IMPLICIT NONE
 
       INTEGER ISTAT
 
-      CALL SaveConfigurationFile
-      CLOSE(UNIT=12,STATUS='DELETE',IOSTAT=ISTAT)
-      CLOSE(UNIT=6,STATUS='DELETE',IOSTAT=ISTAT)
+      CLOSE(UNIT=12, STATUS='DELETE', IOSTAT=ISTAT)
+      CLOSE(UNIT=6, STATUS='DELETE', IOSTAT=ISTAT)  ! dash.out
       CALL DeleteTempFiles
-      CALL WindowClose()
+      CALL WindowClose
       STOP
 
       END SUBROUTINE DoExit
 !
 !*****************************************************************************
 !
-      SUBROUTINE ToggleMenus(OnOff)
-! JvdS This routine emulates 'modal' by greying out all menus, buttons etc.
-! It is necessary when a window pops up that should still be able to communicate
-! to the main window.
-! JvdS I checked all references to 'ToggleMenus', the argument OnOff is always
-! JvdS either 0 or 1
-! JvdS It's better to use some sort of a stack mechanism, popping and pushing
-! the state of all windows.
-! As it is, the routine is not a real 'toggle': a toggle doesn't need an argument
-! because it simply flips between two states. This introduces bugs: the series
-!
-! CALL ToggleMenus(Off)
-! CALL ToggleMenus(Off)
-! CALL ToggleMenus(On)
-!
-! does not restore the original state of the program.
-
-      USE WINTERACTER
-      USE VARIABLES
-      USE DRUID_HEADER
-
-      IMPLICIT NONE
-
-      INTEGER OnOff
-      INTEGER  PeakOn, PawleyOn, SolutionOn
-      SAVE PeakOn, PawleyOn, SolutionOn
-      DATA PeakOn / 1 /
-      DATA PawleyOn / 0 /
-      DATA SolutionOn / 0 /
-      INTEGER OnOrOff
-
-! WintOn and WintOff are Winteracter constants
-
-      RETURN
-
-      IF (OnOff .EQ. 1) THEN
-        OnOrOff = WintOn
-      ELSE
-        OnOrOff = WintOff
-      ENDIF
-      CALL WMenuSetState(ID_Import_dpj_file,ItemEnabled,OnOrOff)
-!      CALL WMenuSetState(ID_get_data_properties,ItemEnabled,OnOrOff)
-!      CALL WMenuSetState(ID_get_peak_positions,ItemEnabled,OnOrOff)
-!      CALL WMenuSetState(ID_get_crystal_symmetry,ItemEnabled,OnOrOff)
-!      CALL WMenuSetState(ID_get_peak_widths,ItemEnabled,OnOrOff)
-!      CALL WMenuSetState(ID_plot_options,ItemEnabled,OnOrOff)
-      CALL WMenuSetState(ID_PolyFitter_Help,ItemEnabled,OnOrOff)
-!      CALL WMenuSetState(ID_Polyfitter_Tips,ItemEnabled,OnOrOff)
-      CALL WMenuSetState(ID_help_about_Polyfitter,ItemEnabled,OnOrOff)
-      CALL WMenuSetState(ID_import_xye_file,ItemEnabled,OnOrOff)
-!      CALL WMenuSetState(ID_import_pro_file,ItemEnabled,OnOrOff)
-      IF (OnOff .EQ. 1) THEN
-        CALL SetModeMenuState(PeakOn,PawleyOn,SolutionOn)
-      ELSE
-        PeakOn     = WMenuGetState(ID_Peak_Fitting_Mode,ItemEnabled)
-        PawleyOn   = WMenuGetState(ID_Pawley_Refinement_Mode,ItemEnabled)
-        SolutionOn = WMenuGetState(ID_Structure_Solution_Mode,ItemEnabled)
-        CALL SetModeMenuState(-1,-1,-1)
-      ENDIF
-
-      END SUBROUTINE ToggleMenus
-!
-!*****************************************************************************
-!
       SUBROUTINE DeleteTempFiles
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE DICVAR
 
 ! Remove redundant files 
       CALL IDebugLevel(DbgSilent)
-      CALL IOsDeleteFile('polyf.tic')
-      CALL IOsDeleteFile('polyf.ccl')
-      CALL IOsDeleteFile('polyf.lis')
-      CALL IOsDeleteFile('polyf.hkl')
-      CALL IOsDeleteFile('polyp.tic')
-      CALL IOsDeleteFile('polyp.hkl')
-      CALL IOsDeleteFile('polyp.ccl')
-      CALL IOsDeleteFile('polyp.ccn')
-      CALL IOsDeleteFile('polyp.pik')
-      CALL IOsDeleteFile('polyp.hcv')
-      CALL IOsDeleteFile('polyp.dat')
+      CALL IOsDeleteFile('polyf.*')
+      CALL IOsDeleteFile('polyp.*')
       CALL IOsDeleteFile('polys.ccl')
       CALL IOsDeleteFile('polys.lis')
-      CALL IDebugLevel(DbgMsgBox)
+      CALL IOsDeleteFile('polyo.ccl')
+      CALL IOsDeleteFile('polyo.lis')
+!      CALL IOsDeleteFile('SA_best.pdb')
+      CALL IOsDeleteFile(DV_FileName)
+      CALL IOsDeleteFile('DASHDV.*')
+      CALL IOSDeleteFile('MakeZmatrix.log')
+      CALL IOSDeleteFile('SA_PARAMS.TXT')
+      CALL IOSDeleteFile('Overlap_Temp.pdb')
+      CALL IOSDeleteFile('Overlap_Temp.cif')
+      CALL IOSDeleteFile('Rebuild_temp*.zmatrix')
+      CALL IOSDeleteFile('*.glob')
+      CALL IOSDeleteFile('Rebuild_temp.mol2')
+      CALL IOSDeleteFile('DASH_tmp*.pdb')
+      CALL IOSDeleteFile('DASH_tmp*.cif')
 
       END SUBROUTINE DeleteTempFiles
 !
 !*****************************************************************************
 !
+
+      SUBROUTINE RunMerge
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+      USE DFLIB
+      USE ZMVAR
+
+      IMPLICIT NONE
+
+      INTEGER iLen
+      CHARACTER(MaxPathLength) tDirName, tFileName
+
+      CALL IOsDirName(tDirName)          
+          
+      IF ( NARGS() .EQ. 2 ) THEN 
+
+        CALL WSelectDir(DirChange,tDirName,"Select Input Directory")
+        IF (WInfoDialog(4).NE.IDOK) RETURN
+      ELSE
+        CALL GetArg(2, tDirName)
+      ENDIF
+
+      tFileName = ""
+      IF ( NARGS() .GT. 3 ) THEN
+        CALL GetArg(3, tFileName)
+      ELSE
+        iLen = LEN_TRIM(tDirName)
+        IF ( tDirName(iLen:iLen) .NE. "\" ) &
+          tDirName = tDirName(1:iLen)//"\"
+
+        tFileName = tDirName(1:LEN_TRIM(tDirName))//"output.dash"
+        CALL WSelectFile("*.dash",SaveDialog + NonExPath + DirChange + AppendExt,tFileName,"Selct Output File" )
+        IF (WInfoDialog(4) .NE. IDOK ) RETURN          
+      ENDIF
+
+      CALL MergeDASHFiles(tDirName, tFileName);
+
+      END SUBROUTINE

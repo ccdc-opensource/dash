@@ -1,15 +1,17 @@
-!*==DICVOL91.f90  processed by SPAG 6.11Dc at 15:36 on 20 Sep 2001
+!
+!*****************************************************************************
+!
 !
 !       ======================================================================
 !     ==========================================================================
 !
-!     DDDDDDD   IIII   CCCCCC   VV    VV   OOOOOO   LL         999999        11
-!     DD    DD   II   CC    CC  VV    VV  OO    OO  LL        99    99     1111
-!     DD    DD   II   CC        VV    VV  OO    OO  LL        99    99   111 11
-!     DD    DD   II   CC        VV    VV  OO    OO  LL         9999999       11
-!     DD    DD   II   CC         VV  VV   OO    OO  LL              99       11
-!     DD    DD   II   CC    CC    VVVV    OO    OO  LL    LL  99    99       11
-!     DDDDDDD   IIII   CCCCCC      VV      OOOOOO   LLLLLLLL   999999       1111
+!     DDDDDDD   IIII   CCCCCC   VV    VV   OOOOOO   LL         999999       11
+!     DD    DD   II   CC    CC  VV    VV  OO    OO  LL        99    99    1111
+!     DD    DD   II   CC        VV    VV  OO    OO  LL        99    99      11
+!     DD    DD   II   CC        VV    VV  OO    OO  LL         9999999      11
+!     DD    DD   II   CC         VV  VV   OO    OO  LL              99      11
+!     DD    DD   II   CC    CC    VVVV    OO    OO  LL    LL  99    99      11
+!     DDDDDDD   IIII   CCCCCC      VV      OOOOOO   LLLLLLLL   999999     111111
 !
 !     ==========================================================================
 !       ======================================================================
@@ -57,10 +59,7 @@
 !
 !          N               NUMBER OF LINES USED.
 !          ITYPE           SPACING DATA TYPE.
-!                      =1  THETA BRAGG IN DEGREES.
 !                      =2  2-THETA ANGLE IN DEGREES.
-!                      =3  D-SPACING IN ANGSTROMS.
-!                      =4  Q SPECIFIED IN Q-UNITS AS E+04/D**2.
 !          JC          =0  CUBIC SYSTEM IS NOT TESTED.
 !                      =1  CUBIC SYSTEM IS TESTED.
 !          JT          =0  TETRAGONAL SYSTEM IS NOT TESTED.
@@ -134,18 +133,18 @@
 !  REFERENCES:
 !     1.-  LOUER, D. AND LOUER, M., METHODE D'ESSAIS ET ERREURS POUR
 !          L'INDEXATION AUTOMATIQUE DES DIAGRAMMES DE POUDRE,
-!	   J. APPL. CRYST. 5, 271-275 (1972).
+!          J. APPL. CRYST. 5, 271-275 (1972).
 !     2.-  LOUER, D. AND VARGAS, R., INDEXATION AUTOMATIQUE DES
 !          DIAGRAMMES DE POUDRE PAR DICHOTOMIES SUCCESSIVES,
-!	   J. APPL. CRYST. 15, 542-545 (1982).
+!          J. APPL. CRYST. 15, 542-545 (1982).
 !     3.-  BOULTIF, A. AND LOUER, D., INDEXING OF POWDER DIFFRACTION
-!	   PATTERNS FOR LOW SYMMETRY LATTICES BY THE SUCCESSIVE
-!	   DICHOTOMY METHOD, J. APPL. CRYST. 24, 987-993 (1991).
+!          PATTERNS FOR LOW SYMMETRY LATTICES BY THE SUCCESSIVE
+!          DICHOTOMY METHOD, J. APPL. CRYST. 24, 987-993 (1991).
 !     4.-  DE WOLFF, P.M., A SIMPLIFIED CRITERION FOR THE RELIABILITY
-!	   OF A POWDER PATTERN INDEXING, J. APPL. CRYST. 5, 108-113 (1968).
+!          OF A POWDER PATTERN INDEXING, J. APPL. CRYST. 5, 108-113 (1968).
 !     5.-  SMITH, G. S. AND SNYDER, R. L., F(N): A CRITERION FOR RATING
-!	   POWDER DIFFRACTION PATTERNS AND EVALUATING THE RELIABILITY
-!	   OF POWDER-PATTERN INDEXING, J. APPL. CRYST. 12, 60-65 (1979).
+!          POWDER DIFFRACTION PATTERNS AND EVALUATING THE RELIABILITY
+!          OF POWDER-PATTERN INDEXING, J. APPL. CRYST. 12, 60-65 (1979).
 !     6.-  MIGHELL, A.D., HUBBARD, C.R. AND STALIK, J.K., NBS*AIDS80:
 !          A FORTRAN PROGRAM FOR CRYSTALLOGRAPHIC DATA EVALUATION.
 !          NAT. BUR. STAND. (U.S.) TECH. NOTE 1141 (1981). (NBS*AIDS83
@@ -175,13 +174,13 @@
 !      CONVENTIONAL UNIT CELL (E.G. CDF-SRCH/JCPDS).
 !
 !     NOTE - CASE OF TRIGONAL SYMMETRY WITH RHOMBOEDRAL LATTICE:
-!	    THE PATTERN IS INDEXED WITH AN HEXAGONAL LATTICE, HAVING
-!	    A UNIT CELL VOLUME THREE TIMES GREATER. OWING TO THE
-!	    STRATEGY BASED ON THE PATITION OF VOLUME SPACE (SHELLS OF
-!	    400 A**3) YOU CAN MISS THE SOLUTION IF, BY ACCIDENT, A
-!	    SMALLER (PSEUDO) SOLUTION IS FOUND IN AN OTHER SYMMETRY.
-!	    IF YOU SUSPECT SUCH A CASE, RUN DICVOL91 WITH THE HEXAGONAL
-!	    CASE ONLY (JC=0, JT=0, JH=1, JO=0, JM=0, JTR=0).
+!         THE PATTERN IS INDEXED WITH AN HEXAGONAL LATTICE, HAVING
+!         A UNIT CELL VOLUME THREE TIMES GREATER. OWING TO THE
+!         STRATEGY BASED ON THE PARTITION OF VOLUME SPACE (SHELLS OF
+!         400 A**3) YOU CAN MISS THE SOLUTION IF, BY ACCIDENT, A
+!         SMALLER (PSEUDO) SOLUTION IS FOUND IN AN OTHER SYMMETRY.
+!         IF YOU SUSPECT SUCH A CASE, RUN DICVOL91 WITH THE HEXAGONAL
+!         CASE ONLY (JC=0, JT=0, JH=1, JO=0, JM=0, JTR=0).
 !
 !  RECOMMENDATIONS
 !   ---------------
@@ -276,40 +275,41 @@
 !
 ! global variables : lowercase
 !
-      SUBROUTINE DICVOL91(Jc, Jt, Jh, Jo, Jm, Jtr, Volmin, Volmax)
+      SUBROUTINE DICVOL91(Jc, Jt, Jh, Jo, Jm, Jtr, Volmin, Volmax, Poimol, Dens, Delden)
 
       USE DICVAR
 
       IMPLICIT NONE
 
-      INTEGER, INTENT (IN   ) :: Jc, Jt, Jh, Jo, Jm, Jtr
+      LOGICAL, INTENT (IN   ) :: Jc, Jt, Jh, Jo, Jm, Jtr
       REAL,    INTENT (INOUT) :: Volmin, Volmax
+      REAL,    INTENT (IN   ) :: Poimol, Dens, Delden
 !
 ! Local variables
 !
       REAL, INTRINSIC :: AMAX1, AMIN1
       REAL :: Amaxi, Angulo, Avog, Bmaxi, Cmaxi,   &
-     &        Delden, Dens, Di, Difvol, Dos, Dosinv, Epsili, Epsqi, Pasvol, Pasvol1,       &
-     &        Petiamaxi, Peticmax, Peticmaxi, Poimol, Pr, Q11, Qi, Thi, Vmax, Vmin, Vmoi, &
+     &        Di, Difvol, Epsili, Epsqi, Pasvol, Pasvol1,       &
+     &        Petiamaxi, Peticmax, Peticmaxi, Pr, Q11, Qi, Thi, Vmax, Vmin, Vmoi, &
      &        Vn, Voinf, Volmaxc, Vosup, Vplu, Vsupm, Vunitm, Vunitp, Vv, Wave, X, Zb, Zz
       INTEGER :: I, Ichoix, Jfl, Klv, Kvol, Kz1, Kz2, Kzt, Na, Nac, Nb, Nc, Nr, Nvol
       INTEGER, INTRINSIC :: NINT
-!
+
 !     Reading of the data
-      ir = 10
-      OPEN(ir,FILE='DICVOL.IN',ERR=1900)
       iw = 117
-      OPEN(iw,FILE='DICVOL.OUT',ERR=1900)
+      DICVOL_Error = 0 ! Success
+      DICVOL_NumOfSolutions = 0 ! Initialise number of solutions to 0 for all crystal systems
+      OPEN(iw,FILE=DV_FileName,ERR=1900)
 99001 FORMAT (A)
-      READ (ir,*,ERR=1900) Wave, Poimol, Dens, Delden
-      IF ( amax.EQ.0.0 ) amax = 20.0
-      IF ( Bmax.EQ.0.0 ) Bmax = 20.0
-      IF ( Cmax.EQ.0.0 ) Cmax = 20.0
-      IF ( Volmax.EQ.0.0 ) Volmax = 1500.0
-      wave2 = Wave / 2.0
+      IF ( amax.EQ.0.0 ) amax = 30.0
+      IF ( Bmax.EQ.0.0 ) Bmax = 30.0
+      IF ( Cmax.EQ.0.0 ) Cmax = 30.0
+      IF ( Volmax.EQ.0.0 ) Volmax = 3000.0
+! wave2 has been set to wavelength / 2
+      Wave = wave2 * 2.0
       pas = 0.4
       IF ( fom .EQ. 0.0 ) fom = 5.0
-!     preparation and writing out of the data
+! preparation and writing out of the data
  100  bb = 0.0
       cc = 0.0
       beta = 0.0
@@ -317,25 +317,25 @@
       nini = n
       WRITE (iw,99003)
 99003 FORMAT (/36X,'INPUT DATA')
-      dth = 0.
+      dth = 0.0
       WRITE (iw,99005)
 99005 FORMAT (12X,'EXPERIMENTAL',35X,'EXPERIMENTAL'/14X,'2-THETA',42X,'ERROR'/)
       WRITE (iw,99034) (d(I),epsil(I),I=1,n)
 99034 FORMAT (11X,F10.3,36X,F10.3)
-      Dos = 1.0
-      Dosinv = 0.5
+! Convert the 2 theta values to d-spacings
       DO I = 1, n
-        th(I) = Dos*d(I)
-        Angulo = pirad*Dosinv*d(I)
+        th(I) = d(I)
+        Angulo = pirad*0.5*d(I)
         d(I) = wave2/SIN(Angulo)
-        dth = dth + Dos*epsil(I)
-        epsil(I) = d(I)*epsil(I)*pirad*Dosinv/TAN(Angulo)
+        d(I) = d(I)
+        dth = dth + epsil(I)
+        epsil(I) = d(I)*epsil(I)*pirad*0.5/TAN(Angulo)
       ENDDO
-      Vn = .6/(1./n-.0052)*d(n)**3
+      Vn = 0.6/(1.0/n-.0052)*d(n)**3
  200  DO I = 1, n
         Pr = d(I)*d(I)
         q(I) = 1./Pr
-        epsq(I) = 2.*epsil(I)/(Pr*d(I))
+        epsq(I) = 2.0*epsil(I)/(Pr*d(I))
       ENDDO
       dth = dth/n
  300  Nr = NINT(d(1)/d(2))
@@ -361,7 +361,8 @@
           n = n - 1
           IF ( n.EQ.0 ) THEN
             WRITE (iw,*) ' EXPERIMENTAL ERROR TOO LARGE !'
-            GOTO 2000
+            DICVOL_Error = cDIVCOLExpErrTooLarge
+            GOTO 999
           ENDIF
           GOTO 300
         ENDIF
@@ -370,7 +371,7 @@
         kq(I) = coeff*q(I)
         kepsq(I) = coeff*epsq(I)
       ENDDO
-      IF ( Jm.NE.0 ) THEN
+      IF ( Jm ) THEN
         IF ( Bemin.EQ.0.0 ) Bemin = 90.
         IF ( Bemax.EQ.0.0 ) Bemax = 125.
         WRITE (iw,99009) amax, Bmax, Volmin, Cmax, Bemin, Volmax, Bemax
@@ -380,7 +381,7 @@
      &          'C MAXIMUM    =',F8.2,' A',5X,'|',5X,'|',32X,'|'/4X,'|',4X,'BETA MINIMUM =',F8.2,' Deg.',2X,'|',5X,&
      &          '|',2X,'VOLUME MAXIMUM =',F8.2,' A**3 |'/4X,'|',4X,'BETA MAXIMUM =',F8.2,' Deg.',2X,'|',5X,'|',32X,&
      &          '|'/4X,'|',33X,'|',5X,'|',32X,'|'/4X,35('-'),5X,34('-')//)
-      ELSEIF ( (Jc+Jt+Jh+Jo).EQ.0 ) THEN
+      ELSEIF ( .NOT. (Jc .OR. Jt .OR. Jh .OR. Jo) ) THEN
         WRITE (iw,99010) Volmin, Volmax
 99010   FORMAT (//21X,42('*')//22X,9('-'),'---  VOLUME LIMITS  ---',8('-')/22X,'|',38X,'|'/22X,'|',38X,'|'/22X,'|',&
      &          3X,' VOLUME MINIMUM =',F8.2,' A**3',5X,'|'/22X,'|',38X,'|'/22X,'|',3X,' VOLUME MAXIMUM =',F8.2,    &
@@ -448,7 +449,7 @@
         rap = Poimol/Avog
         Vunitp = rap/(Dens-Delden)
         Vunitm = rap/(Dens+Delden)
-        IF ( Jc.EQ.0 ) GOTO 1200
+        IF ( .NOT. Jc ) GOTO 1200
 !        WRITE (iw,99030)
 !99030 FORMAT (/3X,'SEARCH OF CUBIC SOLUTION(S)'/3X,27('*')//)
 !        WRITE (iw,99020)
@@ -464,6 +465,7 @@
 !99028 FORMAT (/2X,'VOLUME DOMAIN BEING SCANNED :'/2X,27('=')/15X,'LOWER BOUND = ',F7.2,' A**3',5X,                 &
 !     &        'HIGHER BOUND = ',F7.2,' A**3'/)
             CALL CUBIQU(Na)
+            IF (DICVOL_Error .NE. 0) GOTO 999
             Difvol = ABS(Vv-v)
             IF ( Difvol.GT.1E-12 ) GOTO 1200
 !            WRITE (iw,99021)
@@ -479,7 +481,7 @@
         Pasvol = 400.
         Nvol = (Volmaxc-Volmin)/Pasvol
         Nvol = Nvol + 1
-        IF ( Jc.NE.0 ) THEN
+        IF ( Jc ) THEN
 !          WRITE (iw,99030)
 !99030 FORMAT (/3X,'SEARCH OF CUBIC SOLUTION(S)'/3X,27('*')//)
           vinf = Volmin
@@ -490,6 +492,7 @@
 !          WRITE (iw,99020)
 !99020 FORMAT (8X,'CUBIC SYSTEM')
           CALL CUBIQU(Na)
+          IF (DICVOL_Error .NE. 0) GOTO 999
           Difvol = ABS(Vv-v)
           IF ( Difvol.LE.1E-12 ) THEN
 !            WRITE (iw,99021)
@@ -501,7 +504,9 @@
           Vv = v
           Volmaxc = AMIN1(Volmaxc,v)
         ENDIF
-        IF ( Jt.NE.0 .OR. Jh.NE.0 .OR. Jo.NE.0 ) THEN
+! When we are here, cubic has finished
+        CALL DICVOL_FinishedCrystalSystem(cCubic)
+        IF ( Jt .OR. Jh .OR. Jo ) THEN
 !          WRITE (iw,99031)
 !99031 FORMAT (//3X,'SEARCH OF TETRAGONAL AND/OR HEXAGONAL AND/OR ORTHORHOMBIC SOLUTION(S)'/3X,69('*')/)
           DO Kvol = 1, Nvol
@@ -512,34 +517,37 @@
 !            WRITE (iw,99028) vinf, vsup
 !99028 FORMAT (/2X,'VOLUME DOMAIN BEING SCANNED :'/2X,27('=')/15X,'LOWER BOUND = ',F7.2,' A**3',5X,                 &
 !     &        'HIGHER BOUND = ',F7.2,' A**3'/)
-            IF ( Jt.NE.0 ) THEN
+            IF ( Jt ) THEN
 !              WRITE (iw,99022)
 !99022 FORMAT (8X,'TETRAGONAL SYSTEM')
               Ichoix = -1
               CALL TETHEX(Nc,Ichoix)
+              IF (DICVOL_Error .NE. 0) GOTO 999
               Difvol = ABS(Vv-v)
               IF ( Difvol.LE.1E-12 ) THEN
 !                WRITE (iw,99021)
 !99021 FORMAT (/,36X,'NO SOLUTION'/)
               ENDIF
             ENDIF
-            IF ( Jh.NE.0 ) THEN
+            IF ( Jh ) THEN
               Vv = v
 !              WRITE (iw,99023)
 !99023 FORMAT (8X,'HEXAGONAL SYSTEM')
               Ichoix = 1
               CALL TETHEX(Nc,Ichoix)
+              IF (DICVOL_Error .NE. 0) GOTO 999
               Difvol = ABS(Vv-v)
               IF ( Difvol.LE.1E-12 ) THEN
 !                WRITE (iw,99021)
 !99021 FORMAT (/,36X,'NO SOLUTION'/)
               ENDIF
             ENDIF
-            IF ( Jo.NE.0 ) THEN
+            IF ( Jo ) THEN
               Vv = v
 !              WRITE (iw,99024)
 !99024 FORMAT (8X,'ORTHORHOMBIC SYSTEM')
               CALL ORTHOR(Na,Nb,Nc)
+              IF (DICVOL_Error .NE. 0) GOTO 999
               Difvol = ABS(Vv-v)
               IF ( Difvol.GT.1E-12 ) GOTO 320
 !              WRITE (iw,99021)
@@ -552,11 +560,13 @@
           Vv = v
           Volmaxc = AMIN1(Volmaxc,v)
         ENDIF
-        IF ( Jm.EQ.0 ) GOTO 600
+! When we are here, Tetragonal, Hexagonal and Orthorhombic have finished
+        CALL DICVOL_FinishedCrystalSystem(cTetragonal+cHexagonal+cOrthorhombic)
+        IF ( .NOT. Jm ) GOTO 600
 !        WRITE (iw,99032)
 !99032 FORMAT (//3X,'SEARCH OF MONOCLINIC SOLUTION(S)'/3X,32('*')/)
 !        WRITE (iw,99027)
-!99027 FORMAT (8X,'MONOCLINIC SYSTEM'/8X,17('-'))
+!99027 FORMAT (8X,'MONOCLINIC SYSTEM')
         Bemin = Bemin*pirad
         Bemax = Bemax*pirad
         Petiamaxi = amax
@@ -602,6 +612,7 @@
 !99028 FORMAT (/2X,'VOLUME DOMAIN BEING SCANNED :'/2X,27('=')/15X,'LOWER BOUND = ',F7.2,' A**3',5X,                 &
 !     &        'HIGHER BOUND = ',F7.2,' A**3'/)
           CALL MONOC1(Na,Nb,Nc)
+          IF (DICVOL_Error .NE. 0) GOTO 999
           Difvol = ABS(Vv-v)
           IF ( Difvol.GT.1E-12 ) GOTO 500
 !          WRITE (iw,99021)
@@ -626,7 +637,10 @@
  500  CONTINUE
 !      WRITE (iw,99029)
 !99029 FORMAT (/2X,'END OF SEARCH FOR MONOCLINIC SOLUTIONS'/2X,38('*'))
- 600  IF ( Jtr.EQ.0 ) GOTO 2000
+ 600  CONTINUE
+! When we are here, Monoclinic has finished
+      CALL DICVOL_FinishedCrystalSystem(cMonoclinic)
+      IF ( .NOT. Jtr ) GOTO 999
 !      WRITE (iw,99033)
 !99033 FORMAT (//3X,'SEARCH OF TRICLINIC SOLUTION(S)'/3X,31('*')/)
 !      WRITE (iw,99037)
@@ -667,6 +681,7 @@
 !99028 FORMAT (/2X,'VOLUME DOMAIN BEING SCANNED :'/2X,27('=')/15X,'LOWER BOUND = ',F7.2,' A**3',5X,                 &
 !     &        'HIGHER BOUND = ',F7.2,' A**3'/)
         CALL TRICLINI1(Vmin,Vmax)
+        IF (DICVOL_Error .NE. 0) GOTO 999
         Difvol = ABS(v-Vv)
         IF ( Difvol.GT.1E-12 ) GOTO 1000
 !        WRITE (iw,99021)
@@ -694,15 +709,16 @@
  1000 CONTINUE
 !      WRITE (iw,99038)
 !99038 FORMAT (//2X,'END OF SEARCH FOR TRICLINIC SOLUTIONS'/2X,37('*'))
-      GOTO 2000
+      GOTO 999
  1100 CONTINUE
 !      WRITE (iw,99025)
 !99025 FORMAT (/2X,'END OF SEARCH FOR CUBIC SOLUTION(S)'/2X,35('*'))
       Vv = v
       Volmaxc = AMIN1(Volmaxc,v)
- 1200 IF ( Jt.NE.0 .OR. Jh.NE.0 .OR. Jo.NE.0 ) THEN
+ 1200 CALL DICVOL_FinishedCrystalSystem(cCubic)
+      IF ( Jt .OR. Jh .OR. Jo ) THEN
 !        WRITE (iw,99031)
-!99031 FORMAT (//3X,'SEARCH OF TETRAGONAL AND/OR HEXAGONAL AND/OR ORTHORHOMBIC SOLUTION(S)'/3X,69('*')/)
+!99031 FORMAT (3X,'TETRAGONAL AND/OR HEXAGONAL AND/OR ORTHORHOMBIC SYSTEM')
         DO kz = 1, 50
           vinf = kz*Vunitm
           vsup = kz*Vunitp
@@ -714,47 +730,42 @@
 !            WRITE (iw,99028) vinf, vsup
 !99028 FORMAT (/2X,'VOLUME DOMAIN BEING SCANNED :'/2X,27('=')/15X,'LOWER BOUND = ',F7.2,' A**3',5X,                 &
 !     &        'HIGHER BOUND = ',F7.2,' A**3'/)
-            IF ( Jt.NE.0 ) THEN
+            IF ( Jt ) THEN
               Vv = v
 !              WRITE (iw,99022)
 !99022 FORMAT (8X,'TETRAGONAL SYSTEM')
               Ichoix = -1
               CALL TETHEX(Nc,Ichoix)
+              IF (DICVOL_Error .NE. 0) GOTO 999
               Difvol = ABS(Vv-v)
               IF ( Difvol.LE.1E-12 ) THEN
 !                WRITE (iw,99021)
 !99021 FORMAT (/,36X,'NO SOLUTION'/)
-!                TetragonalSolutionFound = .FALSE.
-              ELSE
-!                TetragonalSolutionFound = .TRUE.
               ENDIF
             ENDIF
-            IF ( Jh.NE.0 ) THEN
+            IF ( Jh ) THEN
               Vv = v
 !              WRITE (iw,99023)
 !99023 FORMAT (8X,'HEXAGONAL SYSTEM')
               Ichoix = 1
               CALL TETHEX(Nc,Ichoix)
+              IF (DICVOL_Error .NE. 0) GOTO 999
               Difvol = ABS(Vv-v)
               IF ( Difvol.LE.1E-12 ) THEN
 !                WRITE (iw,99021)
 !99021 FORMAT (/,36X,'NO SOLUTION'/)
-!                HexagonalSolutionFound = .FALSE.
-              ELSE
-!                HexagonalSolutionFound = .TRUE.
               ENDIF
             ENDIF
-            IF ( Jo.NE.0 ) THEN
+            IF ( Jo ) THEN
               Vv = v
 !              WRITE (iw,99024)
 !99024 FORMAT (8X,'ORTHORHOMBIC SYSTEM')
               CALL ORTHOR(Na,Nb,Nc)
+              IF (DICVOL_Error .NE. 0) GOTO 999
               Difvol = ABS(Vv-v)
               IF ( Difvol.GT.1E-12 ) THEN
-!                OrthorhombicSolutionFound = .TRUE.
                 GOTO 1250
               ELSE
-!                OrthorhombicSolutionFound = .FALSE.
 !                WRITE (iw,99021)
 !99021 FORMAT (/,36X,'NO SOLUTION'/)
               ENDIF
@@ -765,11 +776,12 @@
 !        WRITE (iw,99026)
 !99026 FORMAT (//2X,'END OF SEARCH FOR TETRAGONAL AND/OR HEXAGONAL AND/OR ORTHORHOMBIC SOLUTION(S)'/2X,77('*'))
       ENDIF
-      IF ( Jm.EQ.0 ) GOTO 1500
+      CALL DICVOL_FinishedCrystalSystem(cTetragonal+cHexagonal+cOrthorhombic)
+      IF ( .NOT. Jm ) GOTO 1500
 !      WRITE (iw,99032)
 !99032 FORMAT (//3X,'SEARCH OF MONOCLINIC SOLUTION(S)'/3X,32('*')/)
 !      WRITE (iw,99027)
-!99027 FORMAT (8X,'MONOCLINIC SYSTEM'/8X,17('-'))
+!99027 FORMAT (8X,'MONOCLINIC SYSTEM')
       Bemin = Bemin*pirad
       Bemax = Bemax*pirad
       Petiamaxi = amax
@@ -816,6 +828,7 @@
 !99028 FORMAT (/2X,'VOLUME DOMAIN BEING SCANNED :'/2X,27('=')/15X,'LOWER BOUND = ',F7.2,' A**3',5X,                 &
 !     &        'HIGHER BOUND = ',F7.2,' A**3'/)
             CALL MONOC1(Na,Nb,Nc)
+            IF (DICVOL_Error .NE. 0) GOTO 999
             Difvol = ABS(Vv-v)
             IF ( Difvol.GT.1E-12 ) GOTO 1400
 !            WRITE (iw,99021)
@@ -840,7 +853,8 @@
  1400 CONTINUE
 !      WRITE (iw,99029)
 !99029 FORMAT (/2X,'END OF SEARCH FOR MONOCLINIC SOLUTIONS'/2X,38('*'))
- 1500 IF ( Jtr.EQ.0 ) GOTO 2000
+ 1500 CALL DICVOL_FinishedCrystalSystem(cMonoclinic)
+      IF ( .NOT. Jtr ) GOTO 999
 !      WRITE (iw,99033)
 !99033 FORMAT (//3X,'SEARCH OF TRICLINIC SOLUTION(S)'/3X,31('*')/)
 !      WRITE (iw,99037)
@@ -872,6 +886,7 @@
 !99037 FORMAT (8X,'TRICLINIC SYSTEM')
             IF ( Kz1.EQ.0 ) Kz1 = kz
             CALL TRICLINI1(Vmin,Vmax)
+            IF (DICVOL_Error .NE. 0) GOTO 999
             Difvol = ABS(Vv-v)
             IF ( Difvol.GT.1E-12 ) GOTO 1800
 !            WRITE (iw,99021)
@@ -889,24 +904,20 @@
  1800 CONTINUE
 !      WRITE (iw,99038)
 !99038 FORMAT (//2X,'END OF SEARCH FOR TRICLINIC SOLUTIONS'/2X,37('*'))
-      GOTO 2000
- 1900 CALL ErrorMessage('Error accessing input / output file')
-      CLOSE (IR)
+      GOTO 999
+ 1900 CALL ErrorMessage('Error opening output file')
       CLOSE (IW)
+      DICVOL_Error = cDICVOL_ErrorOnWrite
       RETURN
- 2000 WRITE (iw,99019)
-99019 FORMAT (/14X,'DICVOL91 : USEFUL REFERENCES'/14X,'--------'/16X,                                              &
-     &        '* LOUER, D. & LOUER, M. (1972). J. APPL. CRYST. 5, 271-275.'/16X,                                   &
-     &        '* BOULTIF, A. & LOUER, D. (1991). J. APPL. CRYST. 24, 987-993.')
-!99020 FORMAT (8X,'CUBIC SYSTEM')
+!U99020 FORMAT (8X,'CUBIC SYSTEM')
 !99021 FORMAT (/,36X,'NO SOLUTION'/)
-!99022 FORMAT (8X,'TETRAGONAL SYSTEM')
-!99023 FORMAT (8X,'HEXAGONAL SYSTEM')
-!99024 FORMAT (8X,'ORTHORHOMBIC SYSTEM')
+!U99022 FORMAT (8X,'TETRAGONAL SYSTEM')
+!U99023 FORMAT (8X,'HEXAGONAL SYSTEM')
+!U99024 FORMAT (8X,'ORTHORHOMBIC SYSTEM')
 !99025 FORMAT (/2X,'END OF SEARCH FOR CUBIC SOLUTION(S)')
 !99026 FORMAT (//2X,'END OF SEARCH FOR TETRAGONAL AND/OR HEXAGONAL AND/OR ORTHORHOMBIC SOLUTION(S)'/2X,77('*'))
-!99027 FORMAT (8X,'MONOCLINIC SYSTEM'/8X,17('-'))
-!99028 FORMAT (/2X,'VOLUME DOMAIN BEING SCANNED :'/2X,27('=')/15X,'LOWER BOUND = ',F7.2,' A**3',5X,                 &
+!U99027 FORMAT (8X,'MONOCLINIC SYSTEM')
+!99028 FORMAT (/2X,'VOLUME DOMAIN BEING SCANNED :'/2X,27('=')/15X,'LOWER BOUND = ',F7.2,' A**3',5X,  &
 !     &        'HIGHER BOUND = ',F7.2,' A**3'/)
 !99029 FORMAT (/2X,'END OF SEARCH FOR MONOCLINIC SOLUTIONS')
 !99030 FORMAT (/3X,'SEARCH OF CUBIC SOLUTION(S)'/3X,27('*')//)
@@ -918,8 +929,17 @@
 99036 FORMAT (/,3X,'EXTENSION OF THE SEARCH OF MONOCLINIC SOLUTION(S)'/3X,                                         &
      &        'WITHIN THE LIMITS ON LINEAR PARAMETERS :'/14X,'A MAX =',F8.3,6X,'B MAX =',F8.3,6X,'C MAX =',F8.3,6X,&
      &        F8.3)
-!99037 FORMAT (8X,'TRICLINIC SYSTEM')
+!U99037 FORMAT (8X,'TRICLINIC SYSTEM')
 !99038 FORMAT (//2X,'END OF SEARCH FOR TRICLINIC SOLUTIONS')
-      CLOSE(IR)
+  999 WRITE (iw,"(/14X,'DICVOL : Useful References'/14X,'------'/16X,                     &
+     &            '1 D. Louër & M. Louër      (1972). J. Appl. Cryst.  5, 271-275.'/16X,  &
+     &            '2 A. Boultif & D. Louër    (1991). J. Appl. Cryst. 24, 987-993.'/16X,  &
+     &            '3 D. Louër & R. Vargas     (1982). J. Appl. Cryst. 15, 542-545.'/16X,  &
+     &            '4 P.M. de Wolff            (1968). J. Appl. Cryst.  5, 108-113.'/16X,  &
+     &            '5 G.S. Smith & R.L. Snyder (1979). J. Appl. Cryst. 12,  60- 65.')")
       CLOSE(IW)
+
       END SUBROUTINE DICVOL91
+!
+!*****************************************************************************
+!

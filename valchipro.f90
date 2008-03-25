@@ -1,63 +1,85 @@
+!
+!*****************************************************************************
+!
       SUBROUTINE VALCHIPRO(chivalpro)
 !
-      USE WINTERACTER
-      USE DRUID_HEADER
+! Must be called after VALCHI, because it needs the BICALC to have been set up.
 !
+      USE REFVAR
+      
+      IMPLICIT NONE
+
+      REAL, INTENT (  OUT) :: chivalpro
 
       INCLUDE 'PARAMS.INC'
-	  COMMON /FCSPEC/ NLGREF,IREFH(3,MFCSPE),LOGREF(8,MFCSPE)
-!     COMMON /FCSPEC/NPHSPC,TREFH(3,10000),PHSPEC(5,10000)
-      COMMON /FCSTOR/MAXK,FOB(150,MFCSTO)
 
-      COMMON /SAREFLNS/AIOBS(MSAREF),AICALC(MSAREF)
+      REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
+                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD
+      COMMON /PROFRAN/ XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
+                       XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
+                       XPGMINOLD, XPGMAXOLD, YPGMINOLD, YPGMAXOLD
 
-      COMMON /CHISTOP/ NOBS,NFIT,IFIT(MCHSTP),CHIOBS,&
-      WT(MCHSTP),XOBS(MCHSTP),YOBS(MCHSTP),YCAL(MCHSTP),ESD(MCHSTP)
-	  common /chibest/ ycalbest(MCHSTP)
-      COMMON /FPINF/PIK(0:50,MFPINF),KMINST(MFPINF),KMAXST(MFPINF)
-      COMMON /FPINF1/ KREFT(MFPINF),KNIPT(50,MFPINF),PIKVAL(50,MFPINF)
+      INTEGER          NFITA, IFITA
+      REAL                                 WTSA
+      COMMON /CHISTOP/ NFITA, IFITA(MOBS), WTSA(MOBS)
 
+      INTEGER          NBIN, LBIN
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS), AVGESD
+
+      REAL            CummChiSqd
+      COMMON /CMN007/ CummChiSqd(MOBS)
+
+      INTEGER         KNIPT
+      REAL                            PIKVAL
+      COMMON /FPINF1/ KNIPT(MaxKTem,MOBS), PIKVAL(MaxKTem,MOBS)
+
+      INTEGER         KREFT
+      COMMON /FPINF2/ KREFT(MOBS)
+
+      REAL    SUM1, SUM2, YCALC, RESCL, CVP, LastValue
+      INTEGER II, I, K, KK
+      REAL    tScale
+
+! VALCHIPRO, which calculates the profile chi-squared, is always
+! called after VALCHI. VALCHI already fills BICALC.
+      SUM1 = 0.0
+      SUM2 = 0.0
+      CummChiSqd = -1.0
+      DO II = 1, NFITA
+        I = IFITA(II)
+        YCALC = 0.0
+        DO K = 1, KREFT(I)
+          KK = KNIPT(K,I)
+          YCALC = YCALC + BICALC(KK) * PIKVAL(K,I)
+        ENDDO
+        YCBIN(I) = YCALC
+        SUM1 = SUM1 + YCALC
+        SUM2 = SUM2 + YOBIN(I)
+      ENDDO
+      RESCL = SUM2 / SUM1
+      CVP = 0.0
+      DO II = 1, NFITA
+        I = IFITA(II)
+        YCBIN(I) = RESCL * YCBIN(I)
+        CVP = CVP + WTSA(I) * (YOBIN(I) - YCBIN(I))**2
+        CummChiSqd(I) = CVP
+      ENDDO
+      CHIVALPRO = CVP/FLOAT(NFITA-2)
+      tScale = ypmax / CVP
+      LastValue = 0.0
+      DO i = 1, NBIN
+        IF (CummChiSqd(i) .LT. 0.0) THEN
+          CummChiSqd(i) = LastValue
+        ELSE
+! Rescale cumulative profile chi-squared
+          CummChiSqd(i) = CummChiSqd(i) * tScale
+          LastValue = CummChiSqd(i)
+        ENDIF
+      ENDDO
+
+      END SUBROUTINE VALCHIPRO
 !
-      include 'statlog.inc'
+!*****************************************************************************
 !
-      include 'AllFFCalc.inc'
-!
-      SUM1=0.
-      SUM2=0.
-      DO II=1,NFIT
-        I=IFIT(II)
-        YCALC=0.
-        DO K=1,KREFT(I)
-          KK=KNIPT(K,I)
-          YCALC=YCALC+AICALC(KK)*PIKVAL(K,I)
-        END DO
-!!        DO K=KMINST(I),KMAXST(I)
-!!          KD=K-KMINST(I)
-!!          YCALC=YCALC+AICALC(K)*PIK(KD,I)
-!!        END DO
-!        WY=WT(I)*YCALC
-!        SUM1=SUM1+WY*YCALC
-!        SUM2=SUM2+WY*YOBS(I)
-        YCAL(I)=YCALC
-        SUM1=SUM1+YCALC
-        SUM2=SUM2+YOBS(I)
-      END DO
-      RESCL=SUM2/SUM1
-      CVP=0.
-      DO II=1,NFIT
-        I=IFIT(II)
-        CVP=CVP+WT(I)*(YOBS(I)-RESCL*YCAL(I))**2
-        ycalbest(i)=rescl*ycal(i)
-      END DO
-!
-!
-!      CHIVALPRO=CHIOBS!-SUM2*SUM2/SUM1
-!
-      CHIVALPRO = CVP/FLOAT(NFIT-2)
-!
-!
-!. Now output the new chi-squared
-      CALL WDialogSelect(IDD_Profile_Status)
-      CALL WDialogPutReal(IDF_profile_chisq,chivalpro,'(f15.2)')
-!
-      END

@@ -1,502 +1,347 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE SubtractBackground(nbruckwin,mbruckiter,UseMC,UseSpline)
-
-      USE WINTERACTER
-      USE DRUID_HEADER
-      USE VARIABLES
-
-!      IMPLICIT NONE
-
-      INTEGER, INTENT (IN   ) :: nbruckwin, mbruckiter
-      LOGICAL, INTENT (IN   ) :: UseMc, UseSpline
-
-      INCLUDE 'PARAMS.INC'
-      INCLUDE 'GLBVAR.INC'
-      INCLUDE 'Lattice.inc'
-      INCLUDE 'statlog.inc'
-
-      COMMON /PROFOBS/ NOBS,XOBS(MOBS),YOBS(MOBS),YCAL(MOBS),YBAK(MOBS),EOBS(MOBS)
-      COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
-      COMMON /PROFRAN/ XPMIN,XPMAX,YPMIN,YPMAX,XPGMIN,XPGMAX,&
-        YPGMIN,YPGMAX,XPGMINOLD,XPGMAXOLD,YPGMINOLD,YPGMAXOLD, &
-        XGGMIN,XGGMAX,YGGMIN,YGGMAX
-      COMMON /PROFIPM/ IPMIN,IPMAX,IPMINOLD,IPMAXOLD
-
-      INTEGER CurrentRange 
-      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),IPF_Lo(MAX_NPFR),IPF_Hi(MAX_NPFR), &
-        NumPeakFitRange,CurrentRange,IPF_Range(MAX_NPFR),NumInPFR(MAX_NPFR), &
-        XPF_Pos(MAX_NPPR,MAX_NPFR),YPF_Pos(MAX_NPPR,MAX_NPFR), &
-        IPF_RPt(MAX_NPFR),XPeakFit(MAX_FITPT),YPeakFit(MAX_FITPT)
-
-      COMMON /TICCOMM/ NUMOBSTIC,XOBSTIC(MOBSTIC),YOBSTIC(MOBSTIC),&
-        itypot(mobstic),iordot(mobstic),uobstic(20,mobstic),zobstic(20,mobstic)
-      COMMON /PROFTIC/ NTIC,IH(3,MTIC),ARGK(MTIC),DSTAR(MTIC)
-
-! Calculate the background
-      CALL CalculateBackground(nbruckwin,mbruckiter,UseMC,UseSpline)
-! Subtract the background
-      IOBS = 0
-      YPMIN = YOBS(1) - YBBIN(1)
-      YPMAX = YPMIN
-      DO I = 1, NBIN
-        DO J = 1, LBIN
-          IOBS = IOBS + 1
-          YOBS(IOBS) = YOBS(IOBS) - YBBIN(I)
-          YPMIN = MIN(YOBS(IOBS),YPMIN)
-          YPMAX = MAX(YOBS(IOBS),YPMAX)
-        END DO
-        YOBIN(I) = YOBIN(I) - YBBIN(I)
-        YBBIN(I) = 0.0
-      END DO
-      XPGMIN = XPMIN
-      XPGMAX = XPMAX                       
-      YPGMIN = YPMIN
-      YPGMAX = YPMAX
-      CALL UPLOAD_RANGE()
-      XPGMINOLD = XPMIN
-      XPGMAXOLD = XPMAX
-      YPGMINOLD = YPMIN
-      YPGMAXOLD = YPMAX
-      IPMIN = 1
-      IPMAX = NBIN
-      IPMINOLD = IPMIN
-      IPMAXOLD = IPMAX
-      QUIT = .TRUE. 
-      BACKREF = .FALSE.
-
-      END SUBROUTINE SubtractBackground
+! This unit contains subroutines for the manipulation of vectors and lattices.
 !
 !*****************************************************************************
 !
-      SUBROUTINE Background_Fit
-
-      USE WINTERACTER
-      USE DRUID_HEADER
-      USE VARIABLES
-
-      INCLUDE 'PARAMS.INC'
-      INCLUDE 'GLBVAR.INC'
-      INCLUDE 'Lattice.inc'
-      INCLUDE 'statlog.inc'
-
-      COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
-
-      INTEGER I, IBpass
-      LOGICAL QUIT
-
-! Remember current dialogue window
-      CALL PushActiveWindowID
-! Grey out all other menus
-      CALL ToggleMenus(0)
-! The reason behind this greying out seems to be that the next dialogue
-! window cannot be made modal because it needs to draw the calculated background 
-! to the main screen. And the user should be able to zoom in on parts of the graph
-! to decide whether or not to accept the background.
-      CALL WDialogSelect(ID_Background_Fit)
-! Initialise the background
-      CALL WDialogGetInteger(IDF_Background_Pass,IBpass)
-      CALL CalculateBackground(IBpass,20,.TRUE.,.TRUE.)
-      CALL Profile_Plot(IPTYPE)
-      CALL WDialogShow(-1,-1,0,Modeless)
-      QUIT = .FALSE.
-      DO WHILE(.NOT. QUIT)
-        CALL GetEvent
-        IF (EventType .EQ. PushButton) THEN
-! Process it
-          SELECT CASE (EventInfo%VALUE1)
-            CASE (IDF_Background_Apply)
-              CALL WDialogGetInteger(IDF_Background_Pass,IBpass)
-              CALL CalculateBackground(IBpass,20,.TRUE.,.TRUE.)
-              CALL Profile_Plot(IPTYPE)
-            CASE (IDF_Background_Accept)
-              CALL WDialogGetInteger(IDF_Background_Pass,IBpass)
-              CALL SubtractBackground(IBpass,20,.TRUE.,.TRUE.)
-              QUIT = .TRUE.
-            CASE (IDCANCEL)
-! If user Cancels, assume no knowledge on background
-              DO I = 1, NBIN
-                YBBIN(I) = 0.0
-              END DO
-              QUIT = .TRUE.
-          END SELECT
-        END IF
-      END DO
-      CALL WDialogSelect(ID_Background_Fit)
-      CALL WDialogHide()
-      CALL Profile_Plot(IPTYPE)
-      CALL ToggleMenus(1)
-      CALL PopActiveWindowID
-
-      END SUBROUTINE Background_Fit
+      SUBROUTINE LatticeCellParameters2Lattice(a, b, c, tAlpha, tBeta, tGamma, TheLattice)
 !
-!*****************************************************************************
+! Calculates right-handed lattice from cell parameters, c along z, b in yz plane
 !
-      SUBROUTINE CalculateBackground(nbruckwin,mbruckiter,UseMC,UseSpline)
-
-      USE WINTERACTER
-
+! The left-most subscript must vary most rapidly
+!
+! Corresponding subroutine in CCSL: ORTHG()
+! See also ORTHO()
       IMPLICIT NONE
 
-      INTEGER, INTENT (IN   ) :: nbruckwin, mbruckiter
-      LOGICAL, INTENT (IN   ) :: UseMc, UseSpline
+      REAL, INTENT (IN   ) :: a, b, c, tAlpha, tBeta, tGamma
+      REAL, INTENT (  OUT) :: TheLattice(1:3,1:3)
 
-      INCLUDE 'PARAMS.INC'
-      INTEGER  NBIN, LBIN
-      REAL     XBIN, YOBIN, YCBIN, YBBIN, EBIN
-      COMMON /PROFBIN/ NBIN,LBIN,XBIN(MOBS),YOBIN(MOBS),YCBIN(MOBS),YBBIN(MOBS),EBIN(MOBS)
+      REAL, EXTERNAL :: Degrees2Radians
+      LOGICAL, EXTERNAL :: ValidCellAxisLength
+      REAL    cSTAR(1:3)
+      REAL    alpha, beta, gamma ! to resolve call by value / call by reference conflict
 
-      INTEGER MAXSSPL
-      PARAMETER (MAXSSPL=5000)
-      REAL,    DIMENSION(MAXSSPL)         :: xkt
-      INTEGER, DIMENSION(MAXSSPL)         :: ikt
-      INTEGER, DIMENSION(MAXSSPL)         :: ipartem
-      REAL,    DIMENSION(MOBS)            :: es
-      REAL,    DIMENSION(-200:MOBS+200)   :: ys
-      INTEGER, DIMENSION(MOBS)            :: jft
-      REAL                                tRandomNumber
-      INTEGER I, II, IIII, I1, I2, KK, jf1, jf0, jfp1, jfn, n0, ndiv
-      INTEGER iter, IILO, IIHI, nsep, ninsep, ngood
-      INTEGER knotem, npartem
-      INTRINSIC MOD
-      REAL rat, stem
-!
-!  This subroutine determines the background using a smoothing
-!  procedure published by Sergio Brueckner in J. Appl. Cryst. (2000) 33, 977-979
-!  Modified by WIFD to smooth residual noise using SplineSmooth 
-!  and raise background to correct value using a Monte Carlo sampling procedure)
-!
-      CALL WCursorShape(CurHourGlass)
-      DO I = -nbruckwin, 0
-        ys(I) = yobin(1)
-      END DO
-      DO I = 1, NBIN
-        ys(I) = yobin(I)
-      END DO
-      DO I = 1, nbruckwin
-        ii = NBIN + I
-        ys(ii) = yobin(NBIN)
-      END DO
-      IIII = 0
-      DO iter = 1, mbruckiter
-! Loop over data points
-        DO I = 1, NBIN
-          iilo = I - nbruckwin
-          iihi = I + nbruckwin
-          ybbin(I) = 0.0
-! Loop over window around current data point
-          DO II = iilo, iihi
-            ybbin(I) = ybbin(I) + ys(II)
-          END DO
-          ybbin(I) = (ybbin(I)-ys(I))/FLOAT(2 * nbruckwin)
-        END DO
-! Use a Monte Carlo algorithm to find the correct height of the background
-        IF (UseMC) THEN
-          DO I = 1, NBIN
-! rat = ratio?
-            rat = (ybbin(I)-ys(I))/ebin(I)
-            stem = 1.0 / (1.0 + EXP(MIN(20.0,-rat)))  
-            CALL RANDOM_NUMBER(tRandomNumber)
-            IF (tRandomNumber .LT. stem) ybbin(I) = ys(I)
-            ys(I) = ybbin(I)
-          END DO
-        ELSE
-          DO I = 1, NBIN
-            ys(I) = ybbin(I)
-          END DO
-        ENDIF
-      END DO
-!.. Now we should do some spline smoothing to remove the noise 
-      IF (UseSpline) THEN
-        nsep    =  5
-        ninsep  = 10
-        ngood   =  0
-        knotem  =  0  
-        npartem =  0
-        DO i = 1, NBIN
-          IF (ybbin(i) .EQ. yobin(i)) THEN
-            es(i) = 1.E6 * ebin(i)
-          ELSE
-            es(i) = ebin(i)
-            IF (MOD(ngood,nsep) .EQ. 0) THEN
-              IF (MOD(knotem,ninsep) .EQ. 0) THEN
-                npartem = npartem + 1
-                ipartem(npartem) = knotem + 1
-              END IF
-              knotem = knotem + 1
-              ikt(knotem) = i
-              xkt(knotem) = xbin(i)
-            END IF
-            ngood = ngood + 1
-          END IF
-        END DO
-        ikt(knotem) = NBIN
-        ipartem(npartem) = knotem
-        jft(1) = 1
-        jft(NBIN) = knotem - 1
-        DO kk = 1, knotem-1
-          i1 = ikt(kk)
-          i2 = ikt(kk+1) - 1
-          DO i = i1, i2
-            jft(i) = kk
-          END DO
-        END DO
-        DO i = 1, npartem-1
-          jf1 = ipartem(i)
-          jf0 = jf1-1
-          jfp1 = ipartem(i+1)
-          jfn = 1 + jfp1 - ipartem(i)
-          n0 = ikt(jf1)
-          ndiv = 1 + ikt(jfp1) - n0
-          CALL SplineSmooth(xbin(n0),ys(n0),es(n0),ndiv,jf0,jft(n0),xkt(jf1),jfn,ybbin(n0))
-        END DO
+      IF (.NOT. ValidCellAxisLength(a)) THEN
+        CALL ErrorMessage('Invalid length of a axis')
+        RETURN
       ENDIF
-      CALL WCursorShape(CurArrow)
+      IF (.NOT. ValidCellAxisLength(b)) THEN
+        CALL ErrorMessage('Invalid length of b axis')
+        RETURN
+      ENDIF
+      IF (.NOT. ValidCellAxisLength(c)) THEN
+        CALL ErrorMessage('Invalid length of c axis')
+        RETURN
+      ENDIF
+      alpha = Degrees2Radians(tAlpha)
+      beta  = Degrees2Radians(tBeta)
+      gamma = Degrees2Radians(tGamma)
+! c-axis
+      TheLattice(1,3) = 0.0
+      TheLattice(2,3) = 0.0
+      TheLattice(3,3) = c
+! b-axis
+      TheLattice(1,2) = 0.0
+      TheLattice(2,2) = b * SIN(alpha)
+      TheLattice(3,2) = b * COS(alpha)
+! a-axis
+      TheLattice(3,1) = a * COS(beta)
+! Maybe an odd way to do this, but it works:
+! the projection of a on the "b*c*" plane equals the projection of a on the yz plane:
+! (ba)b* + (ca)c* = (ay)y + (az)z
+! Multiplying from the right by y* yields:
+! (ba)(b*y) + (ca)(c*y) = ay
+! Note that y = y* and z = z*
+! Since b* = y/|b|, b*y = 1/|b|:
+! a(cos(gamma)) + (ca)(c*y) = ay
+! We know ca and y and can calculate c*, leaving the unknown ay
+      cSTAR = TheLattice(:,3)
+      CALL VectorOrthogonalise(cSTAR,TheLattice(:,2))
+      CALL VectorSetLength(cSTAR,1.0/c)
+      TheLattice(2,1) = (c*a*COS(beta)) * cSTAR(2)   +   a * COS(gamma)
+      TheLattice(1,1) = SQRT(a**2-TheLattice(2,1)**2-TheLattice(3,1)**2)
 
-      END SUBROUTINE CalculateBackground
+      END SUBROUTINE LatticeCellParameters2Lattice
 !
 !*****************************************************************************
 !
-      SUBROUTINE SplineSmooth(x,y,e,NDAT,jf0,jfs,xkk,nkn,smo)
+      SUBROUTINE LatticeCellParameters2Lattice_2(a, b, c, tAlpha, tBeta, tGamma, TheLattice)
 
-      REAL    x(NDAT),y(NDAT),e(NDAT)
-      INTEGER NDAT
-      INTEGER jfs(NDAT)
-      REAL    xkk(nkn)
-      REAL    smo(NDAT)
+! Same as FRAC2PDB()
 
-      REAL*8  xdel(nkn),u(nkn,nkn)
-      REAL*8  bvec(nkn),hess(nkn,nkn),covar(nkn,nkn)
-
-      REAL*8  xdd
-      REAL*8  a(NDAT),b(NDAT),c(NDAT),d(NDAT)
-
-      REAL*8  deri(nkn),ans(nkn)
-      REAL*8  w
-      REAL*8  qj, qj1
-      REAL*8  TempResult
-
-      DO J = 1, nkn-1
-        xdel(J) = DBLE(xkk(J+1)-xkk(J))
-      END DO
-      CALL SplVal(xdel,u,nkn)
-      nd1 = ndat-1
-      nk1 = nkn-1
-      DO j = 1, nkn
-        bvec(j) = 0.0 
-        DO k = 1, nkn
-          hess(j,k) = 0.0 
-        END DO
-      END DO
-      DO i = 1, ndat
-        j0 = MIN(nkn-1,jfs(i)-jf0)
-        j1 = j0 + 1
-        w = DBLE(e(i))**-2
-!       b(i)=(dble(x(i))-xkk(j0))/xdel(j0)
-        b(i) = ( DBLE( x(i)-xkk(j0) ) )/xdel(j0)
-        a(i) = 1.0-b(i)
-        ab = -a(i)*b(i)/6.0
-        xdd = xdel(j0)**2
-        c(i) = ab*(1.0 + a(i))*xdd
-        d(i) = ab*(1.0 + b(i))*xdd
-        DO j = 1, nkn
-          deri(j) = 0.0
-        END DO
-        deri(j0) = a(i)
-        deri(j1) = b(i)
-        DO j = 1, nkn
-          deri(j) = deri(j)+c(i)*u(j0,j)+d(i)*u(j1,j)
-        END DO
-        DO j = 1, nkn
-          bvec(j) = bvec(j)+w*DBLE(y(i))*deri(j)
-          DO k = 1, nkn
-            hess(j,k) = hess(j,k)+w*deri(j)*deri(k)
-          END DO
-        END DO
-      END DO
-      CALL DGMINV(hess,covar,nkn)
-      DO I = 1, nkn
-        ans(i) = 0.0
-        DO j = 1, nkn
-          ans(i) = ans(i) + covar(i,j) * bvec(j)
-        END DO
-      END DO
-      DO I = 1, ndat
-        j0 = jfs(i) - jf0
-        j1 = j0 + 1
-        qj  = 0.0
-        qj1 = 0.0
-        DO k = 1, nkn
-          qj  = qj  + u(j0,k)*ans(k)
-          qj1 = qj1 + u(j1,k)*ans(k)
-        END DO
-! JvdS Was:
-!O        smo(i) = SNGL(a(i)*ans(j0)+b(i)*ans(j1)+c(i)*qj+d(i)*qj1)
-! This caused an underflow error
-        TempResult = a(i)*ans(j0)+b(i)*ans(j1)+c(i)*qj+d(i)*qj1
-        IF (ABS(TempResult) .LT. 0.000001) TempResult = 0.0
-        smo(i) = SNGL(TempResult)
-      END DO
 !
-      END SUBROUTINE SplineSmooth
+! To be used when writing out mol2 files only
 !
-!*****************************************************************************
+! mol2 files contain an unresolved ambiguity: atom co-ordinates are given wrt. the 
+! the orthogonal axes, but the unit cell is given as a, b, c, alpha, beta, gamma.
+! It is not specified how the unit cell is to be constructed from the unit cell parameters.
+! Mercury turns out to choose: a along x. Everywhere else in DASH, we have used c along z
 !
-      SUBROUTINE SplVal(XDEL,U,M)
-
-      INTEGER M
-      REAL*8  xdel(m)
-      REAL*8  u(m,m)
-
-      REAL*8  A(m,m),b(m,m),c(m,m)
-      INTEGER I, J
-
-! Initialise all entries of A, b and c to 0.0
-      DO J = 1, m
-        DO I = 1, m
-          A(I,J) = 0.0
-          b(I,J) = 0.0
-          c(I,J) = 0.0
-        END DO
-      END DO
-      A(1,1) = 1.0
-      A(m,m) = 1.0
-      DO I = 2, m-1
-!        Im1 = I - 1
-!        Ip1 = I + 1
-        A(I,I-1) = xdel(I-1) / 6.0
-        A(I,I+1) = xdel(I  ) / 6.0
-        A(I,I  ) = 2.0 * (A(I,I-1)+A(I,I+1))
-        c(I,I-1) = 1.0 / xdel(I-1)
-        c(I,I+1) = 1.0 / xdel(I)
-        c(I,I)   = -(c(I,I-1)+c(I,I+1))
-      END DO
-! Invert matrix A. Answer is in b
-      CALL DGMINV(A,b,m)
-! Multiply matrix b by matrix c. Result is in u
-      CALL MultiplyMatrices(b,c,u,m,m,m)
-
-      END SUBROUTINE SplVal
+! Calculates right-handed lattice from cell parameters, a along x, b in xy plane
 !
-!*****************************************************************************
-!
-! LEVEL 3      SUBROUTINE DGMINV(A,B,N)
-      SUBROUTINE DGMINV(A,B,N)
-!
-! *** GMINV by JCM from SID 11 Oct 88 ***
-!
-!X
-!C 12C
-!H Inverts matrix A into matrix B.
-!A On entry A is a square NxN real matrix
-!A On exit  B is its inverse
-!D Based on SID
-!
-      IMPLICIT REAL*8 (A-H,O-Z)
-      INTEGER         II(500),IL(500),IG(500)
-      REAL*8          A(N,N),B(N,N)
-      INTEGER         I, J
-
-! Initialise b with values from a
-      DO I = 1, N
-        DO J = 1, N
-          B(I,J) = A(I,J)
-        ENDDO
-      ENDDO
-      D = 1.0
-      IS = N - 1
-      DO K = 1, N
-        IL(K) = 0
-        IG(K) = K
-      ENDDO
-      DO 150 K = 1, N
-        R = 0.0
-        DO 40 I = 1, N
-          IF (IL(I) .NE. 0) GOTO 40
-          W = B(I,K)
-          X = ABS(W)
-          IF (R .GT. X) GOTO 40
-          R  = X
-          P  = W
-          KF = I
-   40   CONTINUE
-        II(K) = KF
-        IL(KF) = KF
-        D = D * P
-        IF (D .EQ. 0.0) D = 1.0E-6
-        DO 80 I = 1, N
-          IF (I .EQ. KF) THEN
-            B(I,K) = 1.0/P
-          ELSE
-            B(I,K) = -B(I,K)/P
-          ENDIF
-   80   CONTINUE
-        DO 140 J = 1, N
-          IF (J .EQ. K) GOTO 140
-          W = B(KF,J)
-          IF (W .EQ. 0.0) GOTO 140
-          DO 130 I = 1, N
-            IF (I .EQ. KF) THEN
-              B(I,J) = W/P
-            ELSE
-              B(I,J) = B(I,J)+W*B(I,K)
-            ENDIF
-  130     CONTINUE
-  140   CONTINUE
-  150 CONTINUE
-      DO 190 K = 1, IS
-        KF = II(K)
-        KL = IL(KF)
-        KG = IG(K)
-        IF(KF .EQ. KG) GOTO 190
-        DO 170 I = 1, N
-          R = B(I,KF)
-          B(I,KF) = B(I,KG)
-  170     B(I,KG) = R
-        DO 180 J = 1, N
-          R = B(K,J)
-          B(K,J) = B(KL,J)
-  180     B(KL,J) = R
-        IL(KF) = K
-        IL(KG) = KL
-        IG(KL) = IG(K)
-        IG(K) = KF
-        D = -D
-  190 CONTINUE
-      RETURN
-
-      END SUBROUTINE DGMINV
-!
-!*****************************************************************************
-!
-      SUBROUTINE MultiplyMatrices(A,B,C,Dim1,Dim2,Dim3)
-!
-! This subroutine multiplies two matrices A and B
-!
-! INPUT  : A, B = the matrices to be multiplied
-!          Dim1, Dim2, Dim3 : Dimensions of the matrices.
-!          A is a Dim1 x Dim2 matrix
-!          B is a Dim2 x Dim3 matrix
-!
-! OUTPUT : C = A x B
+! The left-most subscript must vary most rapidly
 !
       IMPLICIT NONE
 
-      INTEGER Dim1, Dim2, Dim3
-      REAL*8  A(Dim1,Dim2), B(Dim2,Dim3), C(Dim1,Dim3)
-      INTEGER I, J, K
+      REAL, INTENT (IN   ) :: a, b, c, tAlpha, tBeta, tGamma
+      REAL, INTENT (  OUT) :: TheLattice(1:3,1:3)
 
-      DO I = 1, Dim1
-        DO J = 1, Dim3
-          C(I,J) = 0.0
-          DO K = 1, Dim2
-            C(I,J) =  C(I,J) + A(I,K)*B(K,J)
-          ENDDO
-        ENDDO
+      REAL, EXTERNAL :: Degrees2Radians
+      LOGICAL, EXTERNAL :: ValidCellAxisLength
+      REAL    aSTAR(1:3)
+      REAL    alpha, beta, gamma ! to resolve call by value / call by reference conflict
+
+      IF (.NOT. ValidCellAxisLength(a)) THEN
+        CALL ErrorMessage('Invalid length of a axis')
+        RETURN
+      ENDIF
+      IF (.NOT. ValidCellAxisLength(b)) THEN
+        CALL ErrorMessage('Invalid length of b axis')
+        RETURN
+      ENDIF
+      IF (.NOT. ValidCellAxisLength(c)) THEN
+        CALL ErrorMessage('Invalid length of c axis')
+        RETURN
+      ENDIF
+      alpha = Degrees2Radians(tAlpha)
+      beta  = Degrees2Radians(tBeta)
+      gamma = Degrees2Radians(tGamma)
+! a-axis
+      TheLattice(1,1) = a
+      TheLattice(2,1) = 0.0
+      TheLattice(3,1) = 0.0
+! b-axis
+      TheLattice(1,2) = b * COS(gamma)
+      TheLattice(2,2) = b * SIN(gamma)
+      TheLattice(3,2) = 0.0
+! c-axis
+      TheLattice(1,3) = c * COS(beta)
+! Maybe an odd way to do this, but it works:
+! the projection of c on the "a*b*" plane equals the projection of c on the xy plane:
+! (ac)a* + (bc)b* = (cx)x + (cy)y
+! Multiplying from the right by y* yields:
+! (ac)(a*y) + (bc)(b*y) = cy
+! Note that y = y* and z = z*
+! Since b* = y/|b|, b*y = 1/|b|:
+! (ac)(a*y) + c(cos(alpha)) = cy
+! We know ac and y and can calculate a*, leaving the unknown cy
+      aSTAR = TheLattice(:,1)
+      CALL VectorOrthogonalise(aSTAR,TheLattice(:,2))
+      CALL VectorSetLength(aSTAR,1.0/a)
+      TheLattice(2,3) = (a*c*COS(beta)) * aSTAR(2)   +   c * COS(alpha)
+      TheLattice(3,3) = SQRT(c**2-TheLattice(1,3)**2-TheLattice(2,3)**2)
+
+      END SUBROUTINE LatticeCellParameters2Lattice_2
+!
+!*****************************************************************************
+!
+      SUBROUTINE VectorNormalise(TheVector)
+!
+! Normalises a vector to 1
+!
+      IMPLICIT NONE
+
+      REAL, INTENT (INOUT) :: TheVector(1:3)
+
+      LOGICAL, EXTERNAL ::  VectorIsNullVector
+      REAL, EXTERNAL ::     VectorGetLength
+
+      IF (VectorIsNullVector(TheVector)) RETURN
+      TheVector = TheVector / VectorGetLength(TheVector)
+
+      END SUBROUTINE VectorNormalise
+!
+!*****************************************************************************
+!
+      SUBROUTINE VectorOrthogonalise(TheVector1, TheVector2)
+!
+! Orthogonalises Vector1 to Vector2
+!
+      IMPLICIT NONE
+
+      REAL, INTENT (INOUT) :: TheVector1(1:3)
+      REAL, INTENT (IN   ) :: TheVector2(1:3)
+
+      LOGICAL, EXTERNAL :: VectorIsNullVector
+      REAL, EXTERNAL :: VectorGetLength
+      REAL    tVector(1:3)
+      REAL    Coefficient
+      REAL    OriginalLength
+
+      IF (VectorIsNullVector(TheVector1) .OR. VectorIsNullVector(TheVector2)) RETURN
+      OriginalLength = VectorGetLength(TheVector1)
+      tVector = TheVector2
+      CALL VectorNormalise(tVector)
+      Coefficient = DOT_PRODUCT(TheVector1, tVector)
+      TheVector1 = TheVector1 - Coefficient * tVector
+      CALL VectorSetLength(TheVector1, OriginalLength)
+
+      END SUBROUTINE VectorOrthogonalise
+!
+!*****************************************************************************
+!
+      REAL FUNCTION VectorGetLength(TheVector)
+!
+! Guess
+!
+      IMPLICIT NONE
+
+      REAL, INTENT (IN   ) :: TheVector(1:3)
+
+      VectorGetLength = SQRT(DOT_PRODUCT(TheVector,TheVector))
+
+      END FUNCTION VectorGetLength
+!
+!*****************************************************************************
+!
+      LOGICAL FUNCTION VectorIsNullVector(TheVector)
+!
+! Guess
+!
+      IMPLICIT NONE
+
+      REAL, INTENT (IN   ) :: TheVector(1:3)
+
+      REAL, EXTERNAL ::     VectorGetLength
+      LOGICAL, EXTERNAL ::  NearlyEqual
+
+      VectorIsNullVector = NearlyEqual(VectorGetLength(TheVector),0.0)
+
+      END FUNCTION VectorIsNullVector
+!
+!*****************************************************************************
+!
+      SUBROUTINE VectorSetLength(TheVector, TheLength)
+!
+! Guess
+!
+      IMPLICIT NONE
+
+      REAL, INTENT (INOUT) :: TheVector(1:3)
+      REAL, INTENT (IN   ) :: TheLength
+
+      CALL VectorNormalise(TheVector)
+      TheVector = TheVector * TheLength
+
+      END SUBROUTINE VectorSetLength
+!
+!*****************************************************************************
+!
+      SUBROUTINE VectorCrossProduct(Vector1, Vector2, ResultVector);
+
+      IMPLICIT NONE
+
+      REAL, INTENT (IN   ) :: Vector1(1:3), Vector2(1:3)
+      REAL, INTENT (  OUT) :: ResultVector(1:3)
+
+      ResultVector(1) = Vector1(2) * Vector2(3) - Vector1(3) * Vector2(2)
+      ResultVector(2) = Vector1(3) * Vector2(1) - Vector1(1) * Vector2(3)
+      ResultVector(3) = Vector1(1) * Vector2(2) - Vector1(2) * Vector2(1)
+
+      END SUBROUTINE VectorCrossProduct
+!
+!*****************************************************************************
+!
+      SUBROUTINE Vector2Quaternion(Vector, Q)
+
+      IMPLICIT NONE
+
+      REAL, INTENT (IN   ) :: Vector(1:3)
+      REAL, INTENT (  OUT) :: Q(0:3)
+
+      REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
+      COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
+
+      REAL tVector(1:3)
+      REAL Length, Alpha, Beta
+      INTEGER iAxis
+
+      tVector = Vector  ! to resolve call by value / call by reference conflict
+      ! Normalise the axis
+      Length = SQRT(tVector(1)**2 + tVector(2)**2 + tVector(3)**2)
+      DO iAxis = 1, 3
+        tVector(iAxis) = tVector(iAxis) / Length
+        IF (tVector(iAxis) .GT.  0.99999) tVector(iAxis) =  0.99999
+        IF (tVector(iAxis) .LT. -0.99999) tVector(iAxis) = -0.99999
       ENDDO
+! Calculate the orientation of the axis
+! Note: Alpha and Beta in radians
+      Beta  = ACOS(tVector(3))
+      IF (ABS(tVector(3)) .GT. 0.99998) THEN
+! The axis coincides with the z-axis, so alpha becomes undefined: set alpha to 0.0
+        Alpha = 0.0
+! I turns out that we can get problems with rounding errors here
+      ELSE IF ((-tVector(2)/SIN(Beta)) .GT.  0.99999) THEN
+        Alpha = 0.0
+      ELSE IF ((-tVector(2)/SIN(Beta)) .LT. -0.99999) THEN
+        Alpha = PI
+      ELSE
+        Alpha = ACOS(-tVector(2)/SIN(Beta))
+        IF ((ASIN((tVector(1)))/SIN(Beta)) .LT. 0.0) Alpha = TWOPI - Alpha
+      ENDIF
+! It's an axis, so Gamma can be set to 0.0
+      Q(0) = COS(0.5*Beta) * COS(0.5*Alpha)
+      Q(1) = SIN(0.5*Beta) * COS(0.5*Alpha)
+      Q(2) = SIN(0.5*Beta) * SIN(0.5*Alpha)
+      Q(3) = COS(0.5*Beta) * SIN(0.5*Alpha)
 
-      END SUBROUTINE MultiplyMatrices
+      END SUBROUTINE Vector2Quaternion
+!
+!*****************************************************************************
+!
+      SUBROUTINE PremultiplyVectorByMatrix(Matrix, Vector, Ret)
+
+      IMPLICIT NONE
+
+      REAL, INTENT (IN   ) :: Matrix(1:3, 1:3)
+      REAL, INTENT (IN   ) :: Vector(1:3)
+      REAL, INTENT (  OUT) :: Ret(1:3)
+
+      Ret(1) = Matrix(1,1)*Vector(1) + Matrix(1,2)*Vector(2) + Matrix(1,3)*Vector(3)
+      Ret(2) = Matrix(2,1)*Vector(1) + Matrix(2,2)*Vector(2) + Matrix(2,3)*Vector(3)
+      Ret(3) = Matrix(3,1)*Vector(1) + Matrix(3,2)*Vector(2) + Matrix(3,3)*Vector(3)
+
+      END SUBROUTINE PremultiplyVectorByMatrix
+!
+!*****************************************************************************
+!
+      SUBROUTINE QuaternionMultiply(Q1, Q2, Ret)
+
+! quaternion A times quaternion B:
+!
+! {A0*1 + A1*i + A2*j + A3*k} * {B0*1 + B1*i + B2*j + B3*k} =
+!   (A0*B0 - A1*B1 - A2*B2 - A3*B3)*1 +
+!   (A0*B1 + A1*B0 + A2*B3 - A3*B2)*i +
+!   (A0*B2 - A1*B3 + A2*B0 + A3*B1)*j +
+!   (A0*B3 + A1*B2 - A2*B1 + A3*B0)*k
+
+      IMPLICIT NONE
+
+      REAL, INTENT (IN   ) :: Q1(0:3), Q2(0:3)
+      REAL, INTENT (  OUT) :: Ret(0:3)
+
+      Ret(0) = Q1(0)*Q2(0) - Q1(1)*Q2(1) - Q1(2)*Q2(2) - Q1(3)*Q2(3)
+      Ret(1) = Q1(0)*Q2(1) + Q1(1)*Q2(0) + Q1(2)*Q2(3) - Q1(3)*Q2(2)
+      Ret(2) = Q1(0)*Q2(2) - Q1(1)*Q2(3) + Q1(2)*Q2(0) + Q1(3)*Q2(1)
+      Ret(3) = Q1(0)*Q2(3) + Q1(1)*Q2(2) - Q1(2)*Q2(1) + Q1(3)*Q2(0)
+
+      END SUBROUTINE QuaternionMultiply
+!
+!*****************************************************************************
+!
+      SUBROUTINE QuaternionInverse(Q)
+
+      IMPLICIT NONE
+
+      REAL, INTENT (INOUT) :: Q(0:3)
+
+      Q(1) = -Q(1)
+      Q(2) = -Q(2)
+      Q(3) = -Q(3)
+
+      END SUBROUTINE QuaternionInverse
 !
 !*****************************************************************************
 !

@@ -1,24 +1,34 @@
-!*==AFFPAR.f90  processed by SPAG 6.11Dc at 15:36 on 20 Sep 2001
+!
+!*****************************************************************************
+!
 !     ------------------------------------------------------------------
 !     |       A F F I N E M E N T   D E S   P A R A M E T R E S        |
 !     ------------------------------------------------------------------
       SUBROUTINE AFFPAR(Ind,Nrind,Vap)
-      USE DICVAR
-      IMPLICIT NONE
 !
-!*** Start of declarations rewritten by SPAG
+! This is where we jump to whenever a solution is found. Ind is the crystal system:
+! 1 = Cubic
+! 2 = Tetragonal
+! 3 = Hexagonal
+! 4 = Orthorhombic
+! 5 = Monoclinic
+! 6 = Triclinic
+!
+      USE DICVAR
+      USE WINTERACTER
+
+      IMPLICIT NONE
 !
 ! Dummy arguments
 !
-      INTEGER :: Ind, Nrind
-      REAL :: Vap
-      INTENT (IN) Nrind, Vap
+      INTEGER, INTENT (IN   ) :: Ind, Nrind
+      REAL,    INTENT (IN   ) :: Vap
 !
 ! Local variables
 !
       REAL, DIMENSION(7,7) :: A
       REAL :: Ae, Ae2, Be, Be2, Bidon1, Bidon2, Calq, Ce, Ce2, Coa, Cob, Cog, Cosa, Cosb,     &
-     &        Cosg, Dcal, Deltaq, Deltav, Detav, Detav1, Diag, Difd, Difq, Difq1, Dift, Dtet, Dtheta, &
+     &        Cosg, Dcal, Deltaq,Diag, Difd, Difq, Difq1, Dift, Dtet, Dtheta, &
      &        Findex, Fitest, Fvar, Fwtest, Parh, Parhk, Park, Parkl, Parl, Ph, Ph2, Pk, Pk2, Pl,    &
      &        Pl2, Qnaf, Qnc, R, Raizda, Rindep, Sia, Sib, Sig, Svol, Tcal, Vol, Xt1, Xt2
       REAL, DIMENSION(6,6) :: B
@@ -28,18 +38,24 @@
      &           Ktestwolff, L, L1, L2, Ll, Llave, M, M1, Mrj, Mxl, Ncaf, Nh, Nk, Nl, Nraies
       INTEGER, DIMENSION(50) :: Jh, Jk, Jl
       REAL, DIMENSION(50) :: Poids, Ssc, Ssq
-!
-!*** End of declarations rewritten by SPAG
-!
+      INTEGER ir
+
       Ncaf = 1
       DO I = 1, 6
         Dir(I) = 0.0
       ENDDO
       jcount = jcount + 1
+! The following stopped DICVOL from generating more than 30 solutions
       IF ( jcount.GT.30 ) THEN
         WRITE (iw,99023) n, fom
+99023 FORMAT (10X,'W A R N I N G   :'/6X,'THE NUMBER OF SOLUTIONS FOUND,WITH M(',I2,') .GT.',F5.2,                 &
+     &        ', IS GREATER THAN 30.'/29X,'THE CALCULATION HAS BEEN STOPPED.'/29X,                                 &
+     &        'PLEASE, CHECK YOUR INPUT DATA !')
+        DICVOL_Error = cDICVOL_TooManySolutions
         RETURN
       ENDIF
+! Misnomer...
+      CALL DICVOL_FinishedCrystalSystem(LSHIFT(1,Ind-1))
       DO I = 1, 3
         Error(I) = 0.0001
         Error(I+3) = .001
@@ -57,8 +73,10 @@
       Bidon1 = 1.001
       Bidon2 = 1000./1001.
       Bebe = pirad*beta
-      IF ( Ind.EQ.5 ) aa = aa/SIN(Bebe)
-      IF ( Ind.EQ.5 ) cc = cc/SIN(Bebe)
+      IF ( Ind.EQ.5 ) THEN
+        aa = aa/SIN(Bebe)
+        cc = cc/SIN(Bebe)
+      ENDIF
       par(1) = aa
       par(2) = bb
       par(3) = cc
@@ -185,7 +203,7 @@
       DO I = 2, Nrind
         L = I - 1
         DO J = 1, L
-          A(I,J) = 0.
+          A(I,J) = 0.0
         ENDDO
       ENDDO
       A(1,1) = 1.0/SQRT(A(1,1))
@@ -299,13 +317,12 @@
       nposs = -1
       Qnc = q(n) + epsq(n)
       SELECT CASE (Ind)
-      CASE (1:4)
-      CASE (6)
-        Cosa = COS(pirad*par(4))
-        Cosb = COS(pirad*par(5))
-        Cosg = COS(pirad*par(6))
-      CASE DEFAULT
-        Cosb = COS(pirad*par(4))
+        CASE (6) ! Triclinic
+          Cosa = COS(pirad*par(4))
+          Cosb = COS(pirad*par(5))
+          Cosg = COS(pirad*par(6))
+        CASE (5) ! Monoclinic
+          Cosb = COS(pirad*par(4))
       END SELECT
       M1 = 0
       K1 = 0
@@ -317,8 +334,10 @@
           irj(ir,8) = 0
         ENDDO
       ENDIF
-      IF ( Ind.EQ.1 ) nposs = 0
-      IF ( Ind.EQ.1 ) M1 = 1
+      IF ( Ind.EQ.1 ) THEN ! Cubic
+        nposs = 0
+        M1 = 1
+      ENDIF 
       DO M = M1, mh2
         IF ( Ind.EQ.6 .AND. M.NE.0 ) K1 = -mk2
         IF ( Ind.LT.4 ) K2 = M
@@ -328,8 +347,10 @@
           IF ( Ind.EQ.6 .AND. (M.NE.0 .OR. K.NE.0) ) L1 = -ml2
           DO Mxl = L1, L2
             SELECT CASE (Ind)
+            CASE (1)
+              Calq = (M*M+K*K+Mxl*Mxl)*Ae2
             CASE (2)
-              Calq = (M*M+K*K)*Ae2 + Mxl*Mxl*Be2
+              Calq = (M*M+K*K    )*Ae2 + Mxl*Mxl*Be2
             CASE (3)
               Calq = (M*M+K*K+M*K)*Ae2 + Mxl*Mxl*Be2
             CASE (4)
@@ -339,8 +360,6 @@
             CASE (6)
               Calq = M*M*Ae2 + K*K*Be2 + Mxl*Mxl*Ce2 + 2.*M*K*Ae*Be*Cosg + 2.*K*Mxl*Be*Ce*Cosa +                   &
      &               2.*M*Mxl*Ae*Ce*Cosb
-            CASE DEFAULT
-              Calq = (M*M+K*K+Mxl*Mxl)*Ae2
             END SELECT
             IF ( Calq.LE.Qnc ) THEN
               nposs = nposs + 1
@@ -425,6 +444,8 @@
         Pk2 = Pk*Pk
         Pl2 = Pl*Pl
         SELECT CASE (Ind)
+        CASE (1)
+          Calq = (Ph2+Pk2+Pl2)*Ae2
         CASE (2)
           Calq = (Ph2+Pk2)*Ae2 + Pl2*Be2
         CASE (3)
@@ -435,8 +456,6 @@
           Calq = Ph2*Ae2 + Pk2*Be2 + Pl2*Ce2 + 2.*Ph*Pl*Ae*Ce*Cosb
         CASE (6)
           Calq = Ph2*Ae2 + Pk2*Be2 + Pl2*Ce2 + 2.*Ph*Pk*Ae*Be*Cosg + 2.*Pk*Pl*Be*Ce*Cosa + 2.*Ph*Pl*Ae*Ce*Cosb
-        CASE DEFAULT
-          Calq = (Ph2+Pk2+Pl2)*Ae2
         END SELECT
         Difq1 = ABS(q(I)-Calq)
         Dcal = SQRT(Calq)
@@ -464,7 +483,7 @@
         ENDIF
       ENDDO
 !
-!     I M P R E S S I O N   D E S   R E S U L T A T S
+!     Output of the results
 !
       Ktestwolff = 1
       Kclef = 1
@@ -475,49 +494,58 @@
         Ae2 = Ae*Ae
         Be2 = Be*Be
         Ce2 = Ce*Ce
-!
         SELECT CASE (Ind)
-        CASE (1,2,3,4)
-        CASE (6)
-          Cosa = COS(pirad*par(4))
-          Cosb = COS(pirad*par(5))
-          Cosg = COS(pirad*par(6))
-        CASE DEFAULT
-          Cosb = COS(pirad*par(4))
+          CASE (5)
+            Cosb = COS(pirad*par(4))
+          CASE (6)
+            Cosa = COS(pirad*par(4))
+            Cosb = COS(pirad*par(5))
+            Cosg = COS(pirad*par(6))
         END SELECT
       ENDIF
-!
       SELECT CASE (Ind)
       CASE (2)
         Vol = Dir(1)**2*Dir(2)
-        Deltav = Vol*(2.*Ecart(1)/Dir(1)+Ecart(2)/Dir(2))
-        IF ( Ktestwolff.EQ.0 ) WRITE (iw,99002) Dir(1), Dir(2), Vol
-99002   FORMAT (//20X,'T E T R A G O N A L   S Y S T E M  '//6X,'DIRECT PARAMETERS :',4X,'A=',F9.5,2X,'C=',F9.5,4X,&
+        IF ( Ktestwolff.EQ.0 ) THEN
+          WRITE (iw,99002) Dir(1), Dir(2), Vol
+99002     FORMAT (//20X,'T E T R A G O N A L   S Y S T E M  '//6X,'DIRECT PARAMETERS :',4X,'A=',F9.5,2X,'C=',F9.5,4X,&
      &          'VOLUME=',F9.2)
+          CALL AddDICVOLSolution(6,Dir(1),Dir(1),Dir(2),90.0,90.0,90.0,Vol)
+          DICVOL_NumOfSolutions(Ind) = DICVOL_NumOfSolutions(Ind) + 1
+        ENDIF
         IF ( Ktestwolff.EQ.0 .AND. Kclef.EQ.1 ) WRITE (iw,99003) Ecart(1), Ecart(2)
 99003   FORMAT (6X,'STANDARD DEVIATIONS :',4X,F9.5,4X,F9.5,11X,F9.2)
       CASE (3)
         Vol = Dir(1)**2*Dir(2)*SQRT(3.)/2.
-        Deltav = Vol*(2.*Ecart(1)/Dir(1)+Ecart(2)/Dir(2))
-        IF ( Ktestwolff.EQ.0 ) WRITE (iw,99004) Dir(1), Dir(2), Vol
-99004   FORMAT (//20X,'H E X A G O N A L    S Y S T E M '//6X,'DIRECT PARAMETERS :',4X,'A=',F9.5,2X,'C=',F9.5,4X,  &
+        IF ( Ktestwolff.EQ.0 ) THEN
+          WRITE (iw,99004) Dir(1), Dir(2), Vol
+99004     FORMAT (//20X,'H E X A G O N A L    S Y S T E M '//6X,'DIRECT PARAMETERS :',4X,'A=',F9.5,2X,'C=',F9.5,4X,  &
      &          'VOLUME=',F9.2)
+          CALL AddDICVOLSolution(9,Dir(1),Dir(1),Dir(2),90.0,90.0,120.0,Vol)
+          DICVOL_NumOfSolutions(Ind) = DICVOL_NumOfSolutions(Ind) + 1
+        ENDIF
         IF ( Ktestwolff.EQ.0 .AND. Kclef.EQ.1 ) WRITE (iw,99005) Ecart(1), Ecart(2)
 99005   FORMAT (6X,'STANDARD DEVIATIONS :',4X,F9.5,4X,F9.5,11X,F9.2)
       CASE (4)
         Vol = Dir(1)*Dir(2)*Dir(3)
-        Deltav = (Ecart(1)/Dir(1)+Ecart(2)/Dir(2)+Ecart(3)/Dir(3))*Vol
-        IF ( Ktestwolff.EQ.0 ) WRITE (iw,99006) (Dir(I),I=1,3), Vol
-99006   FORMAT (//20X,'O R T H O R H O M B I C    S Y S T E M '//2X,'DIRECT PARAMETERS :',4X,'A=',F9.5,2X,'B=',    &
+        IF ( Ktestwolff.EQ.0 ) THEN
+          WRITE (iw,99006) (Dir(I),I=1,3), Vol
+99006     FORMAT (//20X,'O R T H O R H O M B I C    S Y S T E M '//2X,'DIRECT PARAMETERS :',4X,'A=',F9.5,2X,'B=',    &
      &          F9.5,2X,'C=',F9.5,3X,'VOLUME=',F8.2)
+          CALL AddDICVOLSolution(5,Dir(1),Dir(2),Dir(3),90.0,90.0,90.0,Vol)
+          DICVOL_NumOfSolutions(Ind) = DICVOL_NumOfSolutions(Ind) + 1
+        ENDIF
         IF ( Ktestwolff.EQ.0 .AND. Kclef.EQ.1 ) WRITE (iw,99007) (Ecart(I),I=1,3)
 99007   FORMAT (2X,'STANDARD DEVIATIONS :',4X,3(F9.5,4X),6X,F8.2)
       CASE (5)
         Vol = Dir(1)*Dir(2)*Dir(3)*SIN(Dir(4)*pirad)
-        Deltav = (Ecart(1)/Dir(1)+Ecart(2)/Dir(2)+Ecart(3)/Dir(3)+Ecart(4)*pirad/ABS(TAN(Dir(4)*pirad)))*Vol
-        IF ( Ktestwolff.EQ.0 ) WRITE (iw,99008) (Dir(I),I=1,4), Vol
-99008   FORMAT (//20X,'M O N O C L I N I C    S Y S T E M '//1X,'DIRECT PARAMETERS :',1X,'A=',F7.4,' B=',F7.4,     &
+        IF ( Ktestwolff.EQ.0 ) THEN
+          WRITE (iw,99008) (Dir(I),I=1,4), Vol
+99008     FORMAT (//20X,'M O N O C L I N I C    S Y S T E M '//1X,'DIRECT PARAMETERS :',1X,'A=',F7.4,' B=',F7.4,     &
      &          ' C=',F7.4,1X,'BETA=',F7.3,1X,'VOLUME=',F7.2)
+          CALL AddDICVOLSolution(3,Dir(1),Dir(2),Dir(3),90.0,Dir(4),90.0,Vol)
+          DICVOL_NumOfSolutions(Ind) = DICVOL_NumOfSolutions(Ind) + 1
+        ENDIF
         IF ( Ktestwolff.EQ.0 .AND. Kclef.EQ.1 ) WRITE (iw,99009) (Ecart(I),I=1,4)
 99009   FORMAT (1X,'STANDARD DEVIATIONS :',1X,F7.4,3X,F7.4,3X,F7.4,6X,F7.3/)
       CASE (6)
@@ -529,21 +557,23 @@
         Sig = SIN(Dir(6)*pirad)
         Svol = SQRT(1.-Coa*Coa-Cob*Cob-Cog*Cog+2.*Coa*Cob*Cog)
         Vol = Dir(1)*Dir(2)*Dir(3)*Svol
-        Detav = Ecart(1)/Dir(1) + Ecart(2)/Dir(2) + Ecart(3)/Dir(3)
-        Detav1 = pirad*(ABS(Sia*Coa-Sia*Cob*Cog)*Ecart(4)+ABS(Sib*Cob-Sib*Coa*Cog)*Ecart(5)                        &
-     &           +ABS(Sig*Cog-Sig*Coa*Cob)*Ecart(6))/Svol/Svol
-        Deltav = Vol*(Detav+Detav1)
-        IF ( Ktestwolff.EQ.0 ) WRITE (iw,99010) (Dir(I),I=1,6), Vol
-99010   FORMAT (//20X,'T R I C L I N I C    S Y S T E M '//1X,'DIRECT PARAMETERS AND THEIR STANDARD DEVIATIONS :'/1&
+        IF ( Ktestwolff.EQ.0 ) THEN
+          WRITE (iw,99010) (Dir(I),I=1,6), Vol
+99010     FORMAT (//20X,'T R I C L I N I C    S Y S T E M '//1X,'DIRECT PARAMETERS AND THEIR STANDARD DEVIATIONS :'/1&
      &          X,'A=',F7.4,' B=',F7.4,' C=',F7.4,2X,'ALP=',F7.3,1X,'BET=',F7.3,' GAM=',F7.3,1X,'VOL=',F7.2)
+          CALL AddDICVOLSolution(1,Dir(1),Dir(2),Dir(3),Dir(4),Dir(5),Dir(6),Vol)
+          DICVOL_NumOfSolutions(Ind) = DICVOL_NumOfSolutions(Ind) + 1
+        ENDIF
         IF ( Ktestwolff.EQ.0 .AND. Kclef.EQ.1 ) WRITE (iw,99011) (Ecart(I),I=1,6)
 99011   FORMAT (3X,F7.4,3X,F7.4,3X,F7.4,6X,F7.3,5X,F7.3,5X,F7.3,6X,F5.2/)
-      CASE DEFAULT
+      CASE (1)
         Vol = Dir(1)**3
-        Deltav = 3.*Ecart(1)/Dir(1)*Vol
-        IF ( Ktestwolff.EQ.0 ) WRITE (iw,99012) Dir(1), Vol
-!
-99012   FORMAT (//20X,' C U B I C    S Y S T E M '//6X,'DIRECT PARAMETERS :',4X,'A=',F9.5,4X,'VOLUME=',F9.2)
+        IF ( Ktestwolff.EQ.0 ) THEN
+          WRITE (iw,99012) Dir(1), Vol
+99012     FORMAT (//20X,' C U B I C    S Y S T E M '//6X,'DIRECT PARAMETERS :',4X,'A=',F9.5,4X,'VOLUME=',F9.2)
+          CALL AddDICVOLSolution(10,Dir(1),Dir(1),Dir(1),90.0,90.0,90.0,Vol)
+          DICVOL_NumOfSolutions(Ind) = DICVOL_NumOfSolutions(Ind) + 1
+        ENDIF
         IF ( Ktestwolff.EQ.0 .AND. Kclef.EQ.1 ) WRITE (iw,99013) Ecart(1)
 99013   FORMAT (6X,'STANDARD DEVIATIONS :',4X,F9.5,11X,F9.2)
       END SELECT
@@ -553,8 +583,7 @@
 99014     FORMAT (/6X,'NUMBER OF MOLECULES IN THE UNIT CELL :  ',7X,'Z=',I3/)
         ENDIF
         WRITE (iw,99015)
-99015   FORMAT (/3X,'H',3X,'K',3X,'L',4X,'DOBS',5X,'DCAL',3X,'DOBS-DCAL',2X,'QOBS',2X,'QCAL',2X,'2TH.OBS',2X,      &
-     &          '2TH.CAL',1X,'DIF.2TH.'/)
+99015   FORMAT (/3X,'H',4X,'K',4X,'L',4X,'DOBS',5X,'DCAL',3X,'DOBS-DCAL',2X,'2TH.OBS',2X,'2TH.CAL',1X,'DIF.2TH.'/)
       ENDIF
       Dtheta = 0.
       Deltaq = 0.
@@ -593,12 +622,11 @@
           Dift = th(I) - Tcal
           IF ( Ktestwolff.NE.1 ) THEN
             IF ( Key.EQ.1 ) THEN
-              WRITE (iw,99016) ih(I,J,8), ik(I,J,8), il(I,J,8), d(I), Dcal, Difd, q(I), Calq, th(I),      &
-     &                         Tcal, Dift
-99016         FORMAT (1X,I3,2I4,2(F9.5),F9.5,F8.5,F7.5,F8.3,F8.3,F7.3)
+              WRITE (iw,99016) ih(I,J,8), ik(I,J,8), il(I,J,8), d(I), Dcal, Difd, th(I), Tcal, Dift
+99016         FORMAT (1X,I3,1X,I4,1X,I4,F9.5,F9.5,1X, F9.5,1X,F8.3,1X,F8.3,1X,F7.3)
             ELSE
-              WRITE (iw,99017) ih(I,J,8), ik(I,J,8), il(I,J,8), Dcal, Difd, Calq, Tcal, Dift
-99017         FORMAT (1X,I3,2I4,10X,F8.5,F9.5,5X,F10.5,8X,F8.3,F7.3)
+              WRITE (iw,99017) ih(I,J,8), ik(I,J,8), il(I,J,8),       Dcal, Difd,        Tcal, Dift
+99017         FORMAT (1X,I3,1X,I4,1X,I4,9X,1X,F8.5,1X,F9.5,1X,8X,  1X,F8.3,1X,F7.3)
             ENDIF
           ENDIF
           IF ( Difq1.LT.Difq ) THEN
@@ -610,7 +638,7 @@
         Deltaq = Difq + Deltaq
         Dtheta = Dtet + Dtheta
       ENDDO
-!     F I G U R E S   D E   M E R I T E
+! Figures of merit
       Deltaq = Deltaq/nini
       Dtheta = Dtheta/nini
       fwolff = q(n)/(2.*nposs*Deltaq)
@@ -627,14 +655,14 @@
 99020   FORMAT (//10X,'* FIGURES OF MERIT'/17X,'1.- M(',I3,') =',F7.1,25X,'(REF. 4)'/17X,'2.- F(',I3,') =',F7.1,   &
      &          '(',F6.4,',',I4,')',12X,'(REF. 5)'/)
         IF ( Llave.EQ.2 ) GOTO 600
-!TEST N. 2 : FIGURES DE MERITE (A ENLEVER ?)
+! TEST N. 2 : FIGURES DE MERITE (A ENLEVER ?)
         R = 2.*dth*nposs
-!                  DTH= ERREUR SUR 2THETA
+! DTH= ERREUR SUR 2THETA
         Fwtest = TAN(th(n)/2.)/R
         Fitest = 2.*nini/R
         IF ( Fwtest.LE.fwolff .AND. Fitest.LE.Findex ) GOTO 600
         WRITE (iw,99021)
-99021   FORMAT (/10X,'WARNING !'/14X,'THE NEXT SOLUTION IS SAME THAN THE LATER SOLUTION BUT IT IS NOT REFINED.'///)
+99021   FORMAT (/10X,'WARNING !'/14X,'THE NEXT SOLUTION IS THE SAME AS THE LAST SOLUTION BUT IT IS NOT REFINED.'///)
       ELSEIF ( fwolff.GT.fom ) THEN
         Ktestwolff = 0
         GOTO 400
@@ -668,47 +696,47 @@
       ENDDO
       Ktestwolff = 0
       GOTO 400
-!
  600  v = Vol
+      CALL AddDICVOL_M(fwolff)
+      CALL AddDICVOL_F(Findex)
       WRITE (iw,99022) v, nini, fwolff, nini, Findex, Dtheta, nposs
-99022 FORMAT (2x,'=====>  CELL VOLUME = ',f7.1,' A**3     M(',i2,')=',f6.1,'  F(',i2,')=',f6.1,'(',f6.4,',',i3,')')
-99023 FORMAT (10X,'W A R N I N G   :'/6X,'THE NUMBER OF SOLUTIONS FOUND,WITH M(',I2,') .GT.',F5.2,                 &
-     &        ', IS GREATER THAN 30.'/29X,'THE CALCULATION HAS BEEN STOPPED.'/29X,                                 &
-     &        'PLEASE, CHECK YOUR INPUT DATA !')
+99022 FORMAT (2x,'=====>  CELL VOLUME = ',F7.1,' A**3     M(',I2,')=',F6.1,'  F(',I2,')=',F6.1,'(',F6.4,',',I3,')')
+
 99999 END SUBROUTINE AFFPAR
-!*==PASAJE.f90  processed by SPAG 6.11Dc at 15:36 on 20 Sep 2001
-      SUBROUTINE PASAJE(Ind)
-      USE DICVAR
-      IMPLICIT NONE
 !
-!*** Start of declarations rewritten by SPAG
+!*****************************************************************************
+!
+      SUBROUTINE PASAJE(Ind)
+
+      USE DICVAR
+
+      IMPLICIT NONE
 !
 ! Dummy arguments
 !
-      INTEGER :: Ind
-      INTENT (IN) Ind
+      INTEGER, INTENT (IN   ) :: Ind
 !
 ! Local variables
 !
       REAL :: Cosa, Cosb, Cosg, Sina, Sinb, Sing, Svol, Vol
-!
-!*** End of declarations rewritten by SPAG
-!
+
       rec(1) = 1./par(1)
       SELECT CASE (Ind)
-      CASE (1)
-      CASE (3)
+      CASE (1) ! Cubic
+      CASE (2) ! Tetragonal
+        rec(2) = 1./par(2)
+      CASE (3) ! Hexagonal
         rec(1) = 2./par(1)/SQRT(3.)
         rec(2) = 1./par(2)
-      CASE (4)
+      CASE (4) ! Orthorhombic
         rec(2) = 1./par(2)
         rec(3) = 1./par(3)
-      CASE (5)
+      CASE (5) ! Monoclinic
         rec(1) = rec(1)/SIN(par(4)*Pirad)
         rec(2) = 1./par(2)
         rec(3) = 1./par(3)/SIN(par(4)*Pirad)
         rec(4) = 180. - par(4)
-      CASE (6)
+      CASE (6) ! Triclinic
         Cosa = COS(par(4)*Pirad)
         Cosb = COS(par(5)*Pirad)
         Cosg = COS(par(6)*Pirad)
@@ -723,7 +751,9 @@
         rec(4) = Pideg*ACOS((Cosb*Cosg-Cosa)/Sinb/Sing)
         rec(5) = Pideg*ACOS((Cosa*Cosg-Cosb)/Sina/Sing)
         rec(6) = Pideg*ACOS((Cosa*Cosb-Cosg)/Sina/Sinb)
-      CASE DEFAULT
-        rec(2) = 1./par(2)
       END SELECT
+
       END SUBROUTINE PASAJE
+!
+!*****************************************************************************
+!

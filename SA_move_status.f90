@@ -7,9 +7,15 @@
       USE DRUID_HEADER
 
       INTEGER, INTENT (IN   ) :: ntotmov, movenow
+
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
       INTEGER ipcol
 
-      CALL WDialogSelect(IDD_SA_Action1)
+      IF ( in_batch ) &
+        RETURN
+      CALL SelectDASHDialog(IDD_SA_Action1)
       ipcol = InfoGrScreen(ColourReq)
       CALL IGrSelect(3,IDF_SAMove_picture)
       ruler = ntotmov

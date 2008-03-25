@@ -1,0 +1,19 @@
+@<TRIPOS>MOLECULE
+83267-ICSD
+    3    0     3
+SMALL
+NO_CHARGES
+****
+Generated from the CSD
+
+@<TRIPOS>ATOM
+     1 Zr1     -0.0027    4.5827    4.5772 Zr        3 RES3   0.0000
+     2 W1       1.4546    6.0346    7.7053 W         1 RES1   0.0000
+     3 W2       0.9233   -0.9233    3.6566 W         2 RES2   0.0000
+@<TRIPOS>SUBSTRUCTURE
+     1 RES1        1 GROUP             0 ****  ****    0 
+     2 RES2        1 GROUP             0 ****  ****    0 
+     3 RES3        1 GROUP             0 ****  ****    0 
+@<TRIPOS>CRYSIN
+    9.1599    9.1599    9.1599   90.0000   90.0000   90.0000   198     1
+

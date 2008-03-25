@@ -1,9 +1,11 @@
-!*==TRIHKL.f90  processed by SPAG 6.11Dc at 15:36 on 20 Sep 2001
-      SUBROUTINE TRIHKL(Kamoi,Kbmoi,Kcmoi,Kdmoi,Kemoi,Kfmoi,Kaplu,Kbplu,Kcplu,Kdplu,Keplu,Kfplu)
-      USE DICVAR
-      IMPLICIT NONE
 !
-!*** Start of declarations rewritten by SPAG
+!*****************************************************************************
+!
+      SUBROUTINE TRIHKL(Kamoi,Kbmoi,Kcmoi,Kdmoi,Kemoi,Kfmoi,Kaplu,Kbplu,Kcplu,Kdplu,Keplu,Kfplu)
+
+      USE DICVAR
+
+      IMPLICIT NONE
 !
 ! Dummy arguments
 !
@@ -14,9 +16,7 @@
 !
       INTEGER :: I, Jj, Jjb, K, Kqqm, Kqqp, M, Mcarhm, Mcarhp, Mcarkm, Mcarkp, Mcarlm, Mcarlp, Mco1m,&
      &           Mco1p, Mco2m, Mco2p, Mco3m, Mco3p, Mdk, Mdk2, Mdl, Mdl2, Mxl
-!
-!*** End of declarations rewritten by SPAG
-!
+
       mt = 0
       DO I = 1, n
         irj(I,1) = 0
@@ -156,13 +156,16 @@
           ENDIF
         ENDDO
       ENDDO
+
 99999 END SUBROUTINE TRIHKL
-!*==TRIHKLB.f90  processed by SPAG 6.11Dc at 15:36 on 20 Sep 2001
-      SUBROUTINE TRIHKLB(Kamoi,Kbmoi,Kcmoi,Kdmoi,Kemoi,Kfmoi,Kaplu,Kbplu,Kcplu,Kdplu,Keplu,Kfplu)
-      USE DICVAR
-      IMPLICIT NONE
 !
-!*** Start of declarations rewritten by SPAG
+!*****************************************************************************
+!
+      SUBROUTINE TRIHKLB(Kamoi,Kbmoi,Kcmoi,Kdmoi,Kemoi,Kfmoi,Kaplu,Kbplu,Kcplu,Kdplu,Keplu,Kfplu)
+
+      USE DICVAR
+
+      IMPLICIT NONE
 !
 ! Dummy arguments
 !
@@ -173,9 +176,7 @@
 !
       INTEGER :: I, Jj, K, Kqqm, Kqqp, M, Mcarhm, Mcarhp, Mcarkm, Mcarkp, Mcarlm, Mcarlp, Mco1m,      &
      &           Mco1p, Mco2m, Mco2p, Mco3m, Mco3p, Mdk, Mdk2, Mdl, Mdl2, Mxl
-!
-!*** End of declarations rewritten by SPAG
-!
+
       nt = 0
       DO I = 1, n
         irj(I,1) = 0
@@ -304,13 +305,16 @@
           ENDIF
         ENDDO
       ENDDO
+
 99999 END SUBROUTINE TRIHKLB
-!*==TRIHKL1.f90  processed by SPAG 6.11Dc at 15:36 on 20 Sep 2001
-      SUBROUTINE TRIHKL1(Kamoi,Kbmoi,Kcmoi,Kdmoi,Kemoi,Kfmoi,Kaplu,Kbplu,Kcplu,Kdplu,Keplu,Kfplu,K1)
-      USE DICVAR
-      IMPLICIT NONE
 !
-!*** Start of declarations rewritten by SPAG
+!*****************************************************************************
+!
+      SUBROUTINE TRIHKL1(Kamoi,Kbmoi,Kcmoi,Kdmoi,Kemoi,Kfmoi,Kaplu,Kbplu,Kcplu,Kdplu,Keplu,Kfplu,K1)
+
+      USE DICVAR
+
+      IMPLICIT NONE
 !
 ! Dummy arguments
 !
@@ -322,9 +326,7 @@
 !
       INTEGER :: I, J, Jj, K, Kj, Kk, Kqqm, Kqqp, M, Mcarhm, Mcarhp, Mcarkm, Mcarkp, Mcarlm, Mcarlp,&
      &           Mco1m, Mco1p, Mco2m, Mco2p, Mco3m, Mco3p, Mxl
-!
-!*** End of declarations rewritten by SPAG
-!
+
       nt = 0
       Kk = K1 - 1
       DO I = 1, n
@@ -378,12 +380,17 @@
           GOTO 99999
         ENDIF
       ENDDO
-99999 END SUBROUTINE TRIHKL1
-!*==VOLUME.f90  processed by SPAG 6.11Dc at 15:36 on 20 Sep 2001
-      SUBROUTINE VOLUME(Amoi,Bmoi,Cmoi,Dmoi,Emoi,Fmoi,Aplu,Bplu,Cplu,Dplu,Eplu,Fplu)
-      USE DICVAR
-      IMPLICIT NONE
 
+99999 END SUBROUTINE TRIHKL1
+!
+!*****************************************************************************
+!
+      SUBROUTINE VOLUME(Amoi,Bmoi,Cmoi,Dmoi,Emoi,Fmoi,Aplu,Bplu,Cplu,Dplu,Eplu,Fplu)
+
+      USE DICVAR
+
+      IMPLICIT NONE
+!
 ! Dummy arguments
 !
       REAL :: Amoi, Aplu, Bmoi, Bplu, Cmoi, Cplu, Dmoi, Dplu, Emoi, Eplu, Fmoi, Fplu
@@ -394,7 +401,7 @@
       REAL, INTRINSIC :: AMAX1, AMIN1
       REAL :: Ed1, Ed2, Ed3, Ed4, Ef1, Ef2, Ef3, Ef4, Emoir, Eplur, Fd1, Fd2, Fd3, Fd4, Fm1, Fm2,  &
      &        Fm3, Fm4, Fm5, Fm6, Fm7, Fm8, Fp1, Fp2, Fp3, Fp4, Fp5, Fp6, Fp7, Fp8, O, P1, Q1,    &
-     &        Vmoi, Vplu, Vtestm, Vtestp, Vvr, X, Y, Z
+     &        Vmoi, Vplu, Vtestm, Vtestp, X, Y, Z
       REAL :: FX1, FX2
 
       FX1(X,Y,O,P1,Q1) = .25*(4.*O*P1*Q1-O*X*X-P1*Y*Y+X*X*Y*Y/4./Q1)
@@ -411,7 +418,6 @@
           Vmoi = AMAX1(6.25E-8,Vmoi)
           Vtestp = 1/Vmoi
           Vtestm = 1/Vplu
-          Vvr = AMAX1(ABS(SQRT(vr2)-SQRT(Vtestp)),ABS(SQRT(vr2)-SQRT(Vtestm)))
           vmoii = SQRT(Vmoi)
           IF ( Vtestm.GT.vmax2 ) THEN
             ly = -1
@@ -470,7 +476,6 @@
           Vmoi = AMAX1(6.25E-8,Vmoi)
           Vtestp = 1/Vmoi
           Vtestm = 1/Vplu
-          Vvr = AMAX1(ABS(SQRT(vr2)-SQRT(Vtestp)),ABS(SQRT(vr2)-SQRT(Vtestm)))
           vmoii = SQRT(Vmoi)
           IF ( Vtestm.GT.vmax2 ) THEN
             ly = -1
@@ -481,9 +486,10 @@
           ENDIF
         ENDIF
       ENDIF
+
       END SUBROUTINE VOLUME
-!*==RELSPE.f90  processed by SPAG 6.11Dc at 15:36 on 20 Sep 2001
 !
+!*****************************************************************************
 !
       SUBROUTINE RELSPE
 
@@ -546,4 +552,8 @@
           IF ( J1.GE.3 ) GOTO 40
  100    ENDDO
       ENDDO
+
       END SUBROUTINE RELSPE
+!
+!*****************************************************************************
+!

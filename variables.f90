@@ -3,12 +3,12 @@
 !
 ! JvdS The following global variables seem to be needed:
 !
-! - start of profile (to indicate range)
-! - end  of profile
 ! - filename (this is now done partially by 'FNAME', which is also used as a dummy)
 
 ! NoData is regularly set to .FALSE. but is it ever set to .TRUE.?
-
+!
+! The declarations have now been rewritten in a format SPAG can understand
+!
       MODULE VARIABLES
 
       USE WINTERACTER
@@ -16,78 +16,120 @@
 !   Shared variables for any routine with 'USE VARIABLES'
 !
       IMPLICIT NONE
-!
-      LOGICAL                       :: SAVEF = .FALSE. ! File needs saving
 
-      INTEGER, PARAMETER :: MaxPathLength =  255
-      LOGICAL                       :: PLOTT = .FALSE. ! Graphic plotted?
-      CHARACTER(LEN=MaxPathLength)  :: FNAME = ' '     ! Current filename
-! Added these in for portability reasons       
-      CHARACTER(LEN=MaxPathLength)  :: INSTDIR =     'C:\Program Files\DASH' ! Default installation directory
-      CHARACTER(LEN=21)             :: SPACEGROUPS = 'SpaceGroupSymbols.dat' ! Table name
-      CHARACTER                     :: DIRSPACER   = '\' ! Windows spacer
-      CHARACTER(LEN=8)              :: CONFIG      = 'Dash.cfg'
-! External binaries
-      CHARACTER(LEN=MaxPathLength)  :: VIEWEXE     = 'C:\Program Files\DASH\mercury.exe'
-      CHARACTER(LEN=MaxPathLength)  :: CONVEXE     = 'C:\Program Files\DASH\zmconv.exe'
-      CHARACTER(LEN=20)             :: VIEWARG     = ''
+      INTEGER MaxPathLength
+      PARAMETER (MaxPathLength = 255)
 
-      LOGICAL ViewOn
-      LOGICAL ConvOn       ! Set if external z-matix conversion program available
-      LOGICAL ViewAct
-      LOGICAL AutoUpdate
+      CHARACTER(MaxPathLength) ::  FNAME
+      DATA FNAME / ' ' /     ! Current filename
+
+      CHARACTER(MaxPathLength) ::  InstallationDirectory
+      CHARACTER(MaxPathLength) ::  StartUpDirectory
+      CHARACTER(MaxPathLength) ::  AllUsersProfileDirectory
+      CHARACTER(MaxPathLength) ::  AppDataDirectory
+      CHARACTER(MaxPathLength) ::  PathToLicenseFile
+
+      CHARACTER                ::  DIRSPACER
+      DATA DIRSPACER / '\' / ! Windows spacer
+
+      CHARACTER(MaxPathLength) :: VIEWEXE
+      CHARACTER(20)            :: VIEWARG
+      CHARACTER(MaxPathLength) :: MOGULEXE
+      CHARACTER(MaxPathLength) :: DICVOLEXE
+      INTEGER                  :: DICVOL_ver
+      INTEGER, PARAMETER       :: DICVOL_internal = 0, DICVOL04 = 4, DICVOL06 = 6
+      CHARACTER(MaxPathLength) :: McMailleEXE
+      INTEGER                  :: iMcMailleNgridOpt
+
+      LOGICAL UseMogul
+      DATA UseMogul / .TRUE. /
+! Set to false when Mogul not used for Modal Torsion Angle Ranges.
+! Stops the user constantly being reminded that there isn't a path
+! to a Mogul exe specified
+
+      CHARACTER(8) :: ProgramVersion
+      DATA ProgramVersion / 'DASH 3.1' /
 
 ! File information; Names of files used by DASH For I/O
-      CHARACTER*80 :: DashTicFile
-      CHARACTER*80 :: DashHcvFile
-      CHARACTER*80 :: DashPikFile
-      CHARACTER*80 :: DashRawFile
-      CHARACTER*80 :: DashDslFile
-
-      LOGICAL TicExists
-      LOGICAL HcvExists
-      LOGICAL PikExists
-      LOGICAL RawExists
-      LOGICAL DslExists
+      CHARACTER(MaxPathLength)  DashTicFile
+      CHARACTER(MaxPathLength)  DashHcvFile
+      CHARACTER(MaxPathLength)  DashPikFile
+      CHARACTER(MaxPathLength)  DashRawFile
+      CHARACTER(MaxPathLength)  DashDslFile
 
 ! New license information structure    
       TYPE License_Info
-        INTEGER  :: Day
-        INTEGER  :: Month
-        INTEGER  :: Year
-        INTEGER  :: DateCode
-        INTEGER  :: SerialNumber
-        INTEGER  :: LicenseType
-        INTEGER  :: Valid
+        CHARACTER(80) KeyStr
+        INTEGER   ExpiryDate
+        INTEGER   DaysLeft
+        INTEGER   SerialNumber
+        INTEGER   LicenceType
+        INTEGER   Valid
       END TYPE
-      INTEGER NodeKey,DemoKey,SiteKey
+      INTEGER NodeKey, DemoKey, SiteKey
       PARAMETER (NodeKey = 1)
       PARAMETER (DemoKey = 2)
       PARAMETER (SiteKey = 3)
 
-      INTEGER           :: EventType
-      TYPE(WIN_MESSAGE) :: EventInfo
+      INTEGER            EventType
+      TYPE(WIN_MESSAGE)  EventInfo
 ! These global variables hold the last event reported by Winteracter
 
       LOGICAL NoData
-! .TRUE. when a powder diffraction pattern has been read in
-
-      INTEGER OriginalNOBS ! Original number of data points read in for the raw powder pattern
-      INTEGER EndNOBS
-! When truncating the powder pattern at the start, DASH stores the data points that were removed
-! _after_ the original pattern. EndNOBS points to the original end of the pattern.
-! OriginalNOBS is never changed, so the point between EndNOBS and Original NOBS are
-! data points that were reomved from the start of the pattern.
+      DATA NoData / .TRUE. /
+! .FALSE. when a powder diffraction pattern has been read in
 
       LOGICAL UseConfigFile
 ! This is the first item read from the configuration file (if present).
 ! If set to .FALSE., the rest of the configuration file will be skipped.
       
-      LOGICAL SavePDB, SaveCSSR, SaveCCL, SaveRES
-! Flags to decide which molecular model files are written out when a best solution is found
+      REAL SA_SimplexDampingFactor
+! Damping factor for the local minimisation during / after a simulated annealing run
 
-      LOGICAL AutoLocalMinimisation
-! When set, each run in a multi run ends with a local minimisation
+      REAL        DASHDefaultMaxResolution
+      PARAMETER ( DASHDefaultMaxResolution = 1.75 )
+      REAL DefaultMaxResolution
+! The maximum resolution cut-off, in Angstrom, for this powder pattern.
+! This is equal to DASHDefaultMaxResolution for new patterns, and equal to whatever was used
+! for patterns from a .sdi file. 
+
+      REAL SXMaxResolution 
+! The maximum resolution cut-off, in Angstrom, for Single Crystal data.
+! The reason this must be held in a variable is that we have too many dialogue windows to keep in memory,
+! and the dialogue window displaying this variable must therefore be swapped in and out of memory.
+
+      INTEGER iRietveldMethodOpt
+! The chosen Rietveld refinement method, "Rigid-body", "TOPAS"......
+! The reason this must be held in a variable is that we have too many dialogue windows to keep in memory,
+! and the dialogue window displaying this variable must therefore be swapped in and out of memory.
+
+      LOGICAL lRebin
+      INTEGER iBinWidth
+! Whether or not to re-bin and with what bin-width
+! The reason these must be held in variables is that we have too many dialogue windows to keep in memory,
+! and the dialogue window displaying these variables must therefore be swapped in and out of memory.
+
+      INTEGER RR_SA_Sol
+! The SA solution that will be used for Rietveld refinement. Crystal structures read in from an external
+! file are stored in RR_SA_Sol = 1
+
+      LOGICAL PastPawley
+! The code used to calculate the tickmarks does so by emulating a Rietveld refinement.
+! As a Rietveld Refinement needs scatterers, a single carbon atom is provided in the 
+! CCSL input file. This is read by the CCSL code and sets the number of atoms to 1, overriding
+! all Z-matrices.
+! Therefore, calculating the tickmarks destroys the Z-matrices.
+! Due to the way Winteracter and DASH work, the tickmarks are re-calculated every time
+! a user switches between tabs in the 'View' dialogue.
+! The variable 'PastPawley' is there to indicate that the Pawley refinement has finished and that
+! no changes to any of the variables involved in calculating the tickmarks
+! (wavelength, zeropoint and unit cell parameters) is expected any more.
+! This variable is then tested before calculating the tickmarks.
+
+      LOGICAL NoWavelengthInXYE
+! Set to .TRUE. whenever an .xye file is loaded that doesn't contain the wavelength
+! When the wavelength is set, this variable is tested and the wavelength is
+! written to the file.
 
       END MODULE VARIABLES
 !

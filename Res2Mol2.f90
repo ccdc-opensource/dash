@@ -1,288 +1,346 @@
+! @@ The validity of tLattice is never checked !!!
 !
 !*****************************************************************************
 !
-      SUBROUTINE Res2Mol2(TheFileName)
+      INTEGER FUNCTION CSSR2Mol2(TheFileName)
 !
-! This subroutine tries to read a SHELX .res file and tries to convert it to a Sybyl .mol2 file.
+! This subroutine tries to read a .cssr file and tries to convert it to a Sybyl .mol2 file.
 ! The .mol2 file stuff was taken from 'cad2mol2.f' by Jos Lommerse.
-! Bonds are calculated from the distances between 2 atoms.
+! All variables are read in directly to the global variables in SAMVAR, ready for
+! Sam's routines to calculate bond types.
+!
+! RETURNS : 0 for failure
+!           1 for success
+!
+! A .cssr file is fixed format.
+!
+!                                         3.988   3.988   9.769
+!                       90.000  90.000  60.000    SPGR =  1 P 1         OPT = 1
+!   6   0 Created by Cerius2
+!     0 halite_3    : halite_3                                
+!   1 Na1     0.00000   0.00000   0.00000    0   0   0   0   0   0   0   0   0.000
+!   2 Na2     0.66667   0.66667   0.33333    0   0   0   0   0   0   0   0   0.000
+!   3 Cl3     0.00000   0.00000   0.50000    0   0   0   0   0   0   0   0   0.000
+!   4 Cl4     0.66667   0.66667   0.83333    0   0   0   0   0   0   0   0   0.000
+!   5 Na5     0.33333   0.33333   0.66667    0   0   0   0   0   0   0   0   0.000
+!   6 Cl6     0.33333   0.33333   0.16667    0   0   0   0   0   0   0   0   0.000
 !
       USE VARIABLES
+      USE SAMVAR
+      USE ZMVAR
 
       IMPLICIT NONE
 
-      CHARACTER*MaxPathLength, INTENT (IN   ) :: TheFileName
+      CHARACTER*(*), INTENT (IN   ) :: TheFileName
 
-      INTEGER maxatom, maxbond, maxdimer, maxelm, maxatom_sup, maxbond_sup
-      PARAMETER (maxatom=100,maxbond=100,maxdimer=100,maxelm=108, maxatom_sup=1000,maxbond_sup=1000)
+      INCLUDE 'Lattice.inc'
 
-      CHARACTER*2  attype(maxatom)
-      CHARACTER*6  atom(maxatom)
-      CHARACTER*4  sybatom(maxatom)
-      CHARACTER*80 mol2file,title,nix
-      CHARACTER*120 word(40),line
-      INTEGER      i,j,natom,nbond, bat(maxbond,2), nwords
-      REAL         x(maxatom,3),atomno(maxatom),  vdwr(maxatom),bndr(maxatom)
-      LOGICAL      IMPTPUN,IMPTOUT
+      LOGICAL, EXTERNAL :: ChrIsLetter
+      INTEGER, EXTERNAL :: WriteMol2, ElmSymbol2CSD
+      CHARACTER*2  AtmElement(MAXATM_2)
+      INTEGER      i
+      REAL         Coordinates(3,MAXATM_2)
+      INTEGER      InputFile
+      REAL         a, b, c, alpha, beta, gamma
+      INTEGER      INORM
+      REAL         tLattice(1:3,1:3)
+      CHARACTER*50 tString
+      INTEGER*4    SERIAL
+      CHARACTER*4  NAME(MAXATM_2)
+      LOGICAL      IsFractional
+      REAL         tCellPar(1:6)
 
-      natom = 0
-      nbond = 0
-      OPEN(unit=2,file=TheFileName,form='formatted',status='old',err=998)
-      mol2file = 'Temp.mol2'
-      OPEN(unit=3,file=mol2file,form='formatted',err=997)
-
-      if (IMPTPUN) then
-         read(2,'(A80)') nix
-         read(2,'(A80)') title
-      elseif (IMPTOUT) then
-         read(2,'(A120)') line
-         CALL line_to_words(line,word,nwords)
-         do while ((word(2).NE.'X') .AND. (word(3).NE.'Y') .AND. (word(4).NE.'Z'))
-            read(2,'(A120)') line
-            CALL line_to_words(line,word,nwords)
-         enddo
-         read(2,'(A120)') line
-      endif
-      natom = 0
-      read(2,'(A120)') line
-      CALL line_to_words(line,word,nwords)
-      do while ((word(1)(1:3).NE.'Es:') .AND. (word(1)(1:3).NE.'---'))
-         natom = natom + 1
-         read(word(1),'(A)') atom(natom)
-         read(word(2),*) atomno(natom)
-         read(word(3),*) x(natom,1)
-         read(word(4),*) x(natom,2)
-         read(word(5),*) x(natom,3)
-         read(2,'(A120)') line
-         CALL line_to_words(line,word,nwords)
-      enddo
-      close(2)
-
-      IF (natom .EQ. 0) THEN
+! Initialise to 'failure'
+      CSSR2Mol2 = 0
+      natcry = 0
+      InputFile = 10
+      OPEN(UNIT=InputFile,file=TheFileName,form='formatted',status='old',err=999)
+! Initialise cell parameters to invalid values
+! If no valid values are read, then the atomic co-ordinates must be orthogonal
+      a = 0.0
+      b = 0.0
+      c = 0.0
+      alpha = 0.0
+      beta  = 0.0
+      gamma = 0.0
+! Record # 1 : unit cell lengths
+      READ(InputFile,'(38X,3F8.3)',ERR=999,END=999) a, b, c
+! Record # 2 : unit cell angles
+   10 READ(InputFile,'(21X,3F8.3)',ERR=999,END=999) alpha, beta, gamma
+! Record # 3 : number of atoms and co-ordinate system.
+! INORM = 0   =>   fractional co-ordinates
+! INORM = 1   =>   orthogonal co-ordinates
+   20 READ(InputFile,'(2I4)',ERR=999,END=999) natcry, INORM
+      IF (natcry .EQ. 0) THEN
         CALL ErrorMessage('No Atoms found.')
         RETURN
       ENDIF
-      CALL ass_type(natom,atomno,attype,vdwr,bndr)
-      CALL make_bond(natom,x,bndr,nbond,bat)
-      CALL sybylatom(natom,attype,sybatom,nbond,bat)
-      write(3,"('@<TRIPOS>MOLECULE')")
-      write(3,'(A)') 'Temporary file'
-      write(3,220) natom,nbond
-      write(3,"('SMALL')")
-      write(3,"('NO_CHARGES')")
-      write(3,"(A80)") title
-      write(3,"('@<TRIPOS>ATOM')")
-      do i=1,natom
-         write(3,270) i,atom(i),(x(i,j),j=1,3),sybatom(i),1,1
-      enddo
-      write(3,"('@<TRIPOS>BOND')")
-      do i=1,nbond
-        write(3,'(4(I3,X))') i,bat(i,1),bat(i,2),1
-      enddo
-      close(3)
-  220 FORMAT(2(I5,X),'    1     0     0')
-  270 FORMAT(I3,X,A2,X,3(F10.4,X),A4,X,I1,X,'<',I1,'> 0.0')
-  997 stop 'Error opening mol2file'
-  998 stop 'Error opening readfile' 
+      IsFractional = (INORM .EQ. 0)
+      IF (IsFractional) CALL LatticeCellParameters2Lattice(a, b, c, alpha, beta, gamma, tLattice)
+! Record # 4 : second title, just skip.
+      READ(InputFile,'(A50)',ERR=30,END=999) tString ! On error, just continue
+   30 CONTINUE
+      DO I = 1, natcry
+        READ(InputFile,'(I4,1X,A4,2X,F9.5,1X,F9.5,1X,F9.5)',ERR=999,END=999) SERIAL, NAME(I), &
+                                                            Coordinates(1,I), Coordinates(2,I), Coordinates(3,I)
+      ENDDO
+      CLOSE(InputFile)
+! The variable X holds the atomic fractional co-ordinates, the mol2 file
+! needs orthogonal co-ordinates => convert
+      IF (IsFractional) THEN
+        DO I = 1, natcry
+          CALL PremultiplyVectorByMatrix(tLattice, Coordinates(1,I), axyzo(1,I))
+        ENDDO
+      ELSE
+        DO I = 1, natcry
+          axyzo(1,I) = Coordinates(1,I)
+          axyzo(2,I) = Coordinates(2,I)
+          axyzo(3,I) = Coordinates(3,I)
+        ENDDO
+      ENDIF
+! The variable NAME now holds 'Cl6 ' etc. for every atom. 
+! We must extract the element from that
+      DO I = 1, natcry
+        atomlabel(I)(1:4) = NAME(I)(1:4)
+        atomlabel(I)(5:5) = ' '
+        AtmElement(I) = NAME(I)(1:2)
+        IF (.NOT. ChrIsLetter(AtmElement(I)(2:2))) AtmElement(I)(2:2) = ' '
+        CALL StrUpperCase(AtmElement(I))
+      ENDDO
+! Given the element, assign the CSD element (fill aelem(1:MAXATM))
+      DO I = 1, natcry
+        aelem(I) = ElmSymbol2CSD(AtmElement(I))
+      ENDDO
+      CALL SAMABO
+      DO i = 1, natcry
+        izmbid(i,0) = i
+        izmoid(i,0) = i
+      ENDDO
+      !C For Rietveld Refinement, we will need the unit cell parameters. WriteMol2() takes
+      !C these from the global variables CellPar. Therefore, these must temporarily be replaced
+      !C with the unit cell parameters from the .cssr file.
+      tCellPar = CellPar
+      CellPar(1) = a
+      CellPar(2) = b
+      CellPar(3) = c
+      CellPar(4) = alpha
+      CellPar(5) = beta
+      CellPar(6) = gamma
+      CSSR2Mol2 = WriteMol2(TheFileName(1:LEN_TRIM(TheFileName)-4)//'mol2',.TRUE.,0)
+      CellPar = tCellPar
+      RETURN
+  999 CALL ErrorMessage('Error reading input file.')
 
-      END SUBROUTINE Res2Mol2
+      END FUNCTION CSSR2Mol2
 !
 !*****************************************************************************
 !
-      SUBROUTINE sybylatom(natom,attype,sybatom,nbond,bat)
+      INTEGER FUNCTION WriteMol2(TheFileName, IncludeUnitCell, iFrg)
+!
+! Takes number of atoms    from natcry    in SAMVAR
+! Takes atomic coordinates from axyzo     in SAMVAR  (orthogonal)
+! Takes element types      from aelem     in SAMVAR  (CSD style)
+! Takes atom labels        from atomlabel in SAMVAR
+! Takes bonds              from bond      in SAMVAR
+! Takes bond types         from btype     in SAMVAR
+! Takes unit cell from global variables in DASH
+! Sets space group to P1
+! and writes out a .mol2 file
+! Takes the order of the atoms from izmbid(:,iFrg)
+!
+! mol2 files contain an unresolved ambiguity: atom co-ordinates are given wrt. the 
+! the orthogonal axes, but the unit cell is given as a, b, c, alpha, beta, gamma.
+! It is not specified how the unit cell is to be constructed wrt. the orthogonal axes
+! from the unit cell parameters.
+! Mercury turns out to choose: a along x. Everywhere else in DASH, we have used c along z
+!
+! RETURNS 0 for failure
+!         1 for success
 
-      PARAMETER(maxatom=100,maxbond=100)
+      USE SAMVAR
+      USE ATMVAR
+      USE ZMVAR
 
-      CHARACTER*1  number, getal
-      CHARACTER*2  attype(maxatom)
-      CHARACTER*4  sybatom(maxatom)
-      INTEGER      i, j, neighbour, bat(maxbond,2)
+      IMPLICIT NONE
 
-      DO i = 1, natom
-        SELECT CASE (attype(i)(1:2))
-          CASE ('O ')
-            neighbour = 0
-            DO j = 1, nbond
-              IF ((bat(j,1).EQ.i) .OR. (bat(j,2).EQ.i)) THEN
-              neighbour = neighbour + 1
-              ENDIF
-            ENDDO
-            WRITE(number,'(I1)') neighbour+1
-            READ(number,'(A1)') getal
-            sybatom(i)=attype(i)(1:1)//'.'//getal
-          CASE ('N ')
-            neighbour = 0
-            DO j = 1, nbond
-              IF ((bat(j,1).EQ.i) .OR. (bat(j,2).EQ.i)) THEN
-                neighbour = neighbour + 1
-              ENDIF
-            ENDDO
-            WRITE(number,'(I1)') neighbour
-            READ(number,'(A1)') getal
-            sybatom(i)=attype(i)(1:1)//'.'//getal
-          CASE ('C ')
-            neighbour = 0
-            DO j = 1, nbond
-              IF ((bat(j,1).EQ.i) .OR. (bat(j,2).EQ.i)) THEN
-                neighbour = neighbour + 1
-              ENDIF
-            ENDDO
-            WRITE(number,'(I1)') neighbour-1
-            READ(number,'(A1)') getal
-            sybatom(i)=attype(i)(1:1)//'.'//getal
+      CHARACTER*(*), INTENT (IN   ) :: TheFileName
+      LOGICAL,       INTENT (IN   ) :: IncludeUnitCell
+      INTEGER,       INTENT (IN   ) :: iFrg
+
+      INCLUDE 'Lattice.inc'
+
+      LOGICAL, EXTERNAL :: FnUnitCellOK
+      CHARACTER*1, EXTERNAL :: ChrLowerCase, ChrUpperCase
+      CHARACTER*4 sybatom(1:MAXATM_2)
+      CHARACTER*2 BondStr(0:9)
+      CHARACTER*2 HybridisationStr
+      INTEGER      ii, I, J, Ilen, OutputFile
+      LOGICAL      tIncludeUnitCell
+      REAL         tLattice(1:3,1:3), tRecLattice(1:3,1:3), tLattice_2(1:3,1:3)
+      REAL         NEWaxyzo(1:3, 1:MAXATM_2)
+
+!    The CSD bond types are:  1 = single  2= double  3=triple  4=quadruple
+!                             5 = aromatic      6 = polymeric single
+!                             7 = delocalised   9 = pi-bond
+!
+!   Sam's                            mol2
+!     1       (single)                1
+!     2       (double)                2
+!     3       (triple)                3
+!     4       (quadruple)             un
+!     5       (aromatic)              ar
+!     6       (polymeric)             un
+!     7       (delocalised double)    un
+!     9       (pi)                    un
+
+      tIncludeUnitCell = IncludeUnitCell
+      IF (.NOT. FnUnitCellOK()) tIncludeUnitCell = .FALSE.
+      BondStr(0) = 'un'   ! unspecified
+      BondStr(1) = ' 1'
+      BondStr(2) = ' 2'
+      BondStr(3) = ' 3'
+      BondStr(4) = 'un'
+      BondStr(5) = 'ar'
+      BondStr(6) = 'un'
+      BondStr(7) = 'un'
+      BondStr(8) = 'un'
+      BondStr(9) = 'un'
+! Initialise to failure
+      WriteMol2 = 0
+      DO I = 1, natcry
+        sybatom(I) = '    '
+        SELECT CASE (aelem(I))
+          CASE (1, 56, 64) ! C, N, O
+            SELECT CASE (hybr(I))
+              CASE (1)
+                HybridisationStr = '1 '
+              CASE (2)
+                HybridisationStr = '2 '
+              CASE (3)
+                HybridisationStr = '3 '
+              CASE (4)
+                HybridisationStr = 'ar'
+              CASE DEFAULT
+                HybridisationStr = '0 '
+            END SELECT
+            sybatom(I) = ElementStr(aelem(I))(1:1)//'.'//HybridisationStr
           CASE DEFAULT
-            sybatom(i)=attype(i)
+            sybatom(I)(1:1) = ChrUpperCase(ElementStr(aelem(I))(1:1))
+            sybatom(I)(2:2) = ChrLowerCase(ElementStr(aelem(I))(2:2))
         END SELECT
       ENDDO
-      RETURN
-
-      END SUBROUTINE sybylatom
-!
-!*****************************************************************************
-!
-      SUBROUTINE line_to_words(line,word,nwords)
-!!-- This subroutine maps the input string into the array words and
-!!-- returns the number of words
-!!-- As delimiters spaces only are allowed
-
-      CHARACTER*120 line,word(40)
-      INTEGER, INTENT (  OUT) :: nwords
-      CHARACTER letter
-
-      DO I = 1, 40 
-        word(I) = ' '
-      ENDDO
-      nwords = 0
-      ip = 1
-      DO I = 1, 120
-        letter = line(I:I)
-        IF (letter .NE. ' ') THEN
-          IF (ip .EQ. 1) nwords = nwords + 1
-          word(nwords)(ip:ip) = letter
-          ip = ip + 1
-        ELSE
-          ip = 1
-        ENDIF
-      ENDDO
-      RETURN
-
-      END SUBROUTINE line_to_words
-!
-!*****************************************************************************
-!
-      SUBROUTINE ass_type(natom,atomno,attype,vdwr,bndr)
-
-      PARAMETER(maxatom=100,maxelm=108)
-  
-      REAL         rvdw(maxelm),rsd(maxelm)
-      INTEGER      atnr(maxelm)
-      CHARACTER*2  el(maxelm)
-
-! Van der Waals radii
-! Methylgroup (Me) added (element 108)
-! For H (element no. 2) rvdw=1.10 Angstrom (in stead of 1.20)
-      DATA rvdw/1.70,1.10,2.00,1.72,2.00,2.00,1.88,1.85,2.00,1.66,2.00, &
-           2.00,2.00,2.00,2.00,1.85,2.00,1.58,2.00,2.00,1.75,2.00,2.00, &
-           2.00,2.00,1.40,1.20,2.00,2.00,2.00,2.00,1.47,2.00,2.00,2.00, &
-           1.87,2.00,2.00,1.40,2.00,1.55,2.00,1.98,1.93,2.00,2.75,2.02, &
-           2.00,1.82,2.00,2.00,2.00,1.73,2.00,2.00,1.55,2.27,2.00,2.00, &
-           1.54,1.63,2.00,2.00,1.52,2.00,1.80,2.00,2.02,1.63,2.00,2.00, &
-           2.00,1.72,2.00,2.00,2.00,2.00,2.00,2.00,2.00,1.80,2.00,2.00, &
-           1.90,2.10,2.00,2.17,2.00,2.00,2.00,2.00,2.06,2.00,2.00,1.96, &
-           2.00,1.86,2.00,2.00,2.00,2.16,2.00,2.00,2.00,1.39,2.00,2.00, &
-           2.00/
-
-! Elements (plus other CSD 'element' definitions What's 'Zz'??)
-      DATA el/'C ','H ','Ac','Ag','Al','Am','Ar','As','At','Au','B ',   &
-           'Ba','Be','Bi','Bk','Br','Ca','Cd','Ce','Cf','Cl','Cm','Co', &
-           'Cr','Cs','Cu','D ','Dy','Er','Es','Eu','F ','Fe','Fm','Fr', &
-           'Ga','Gd','Ge','He','Hf','Hg','Ho','I ','In','Ir','K ','Kr', &
-           'La','Li','Lu','Lw','Md','Mg','Mn','Mo','N ','Na','Nb','Nd', &
-           'Ne','Ni','No','Np','O ','Os','P ','Pa','Pb','Pd','Pm','Po', &
-           'Pr','Pt','Pu','Ra','Rb','Re','Rh','Rn','Ru','S ','Sb','Sc', &
-           'Se','Si','Sm','Sn','Sr','Ta','Tb','Tc','Te','Th','Ti','Tl', &
-           'Tm','U ','V ','W ','X ','Xe','Y ','Yb','Z ','Zn','Zr','Zz', &
-           'Me'/
-! Elements (plus other CSD 'element' definitions What's 'Zz'??)
-      DATA atnr/6,1,89,47,13,95,18,33,85,79,5,                          &
-           56,4,83,97,35,20,48,58,98,17,96,27,                          &
-           24,55,29,0,66,68,99,63,9,26,100,87,                          &
-           31,64,32,2,72,80,67,53,49,77,19,36,                          &
-           57,3,71,0,101,12,25,42,7,11,41,60,                           &
-           10,28,102,93,8,76,15,91,82,46,61,84,                         &
-           59,78,94,88,37,75,45,86,44,16,51,21,                         &
-           34,14,62,50,38,73,65,43,52,90,22,81,                         &
-           69,92,23,74,0,54,39,70,0,30,40,0,                            &
-           0/
-
-! Bonding radii
-      DATA rsd/0.68,0.23,1.88,1.59,1.35,1.51,1.61,1.21,0.00,1.50,0.83,  &
-           1.34,0.35,1.54,0.00,1.21,0.99,1.69,1.83,0.00,0.99,0.00,1.33, &
-           1.35,1.67,1.52,0.23,1.75,1.73,0.00,1.99,0.64,1.34,0.00,0.00, &
-           1.22,1.79,1.17,0.00,1.57,1.70,1.74,1.40,1.63,1.32,1.33,0.00, &
-           1.87,0.68,1.72,0.00,0.00,1.10,1.35,1.47,0.68,0.97,1.48,1.81, &
-           0.00,1.50,0.00,1.55,0.68,1.37,1.05,1.61,1.54,1.50,1.80,1.68, &
-           1.82,1.50,1.53,1.90,1.47,1.35,1.45,0.00,1.40,1.02,1.46,1.44, &
-           1.22,1.20,1.80,1.46,1.12,1.43,1.76,1.35,1.47,1.79,1.47,1.55, &
-           1.72,1.58,1.33,1.37,0.00,1.62,1.78,1.94,0.00,1.45,1.56,0.00, &
-           0.68/
-
-      CHARACTER*2 attype(maxatom)
-      INTEGER     atomnr,natom,i,j
-      REAL        atomno(maxatom),vdwr(maxatom),bndr(maxatom)
-      LOGICAL     FOUND
-
-      DO I = 1, natom
-        atomnr = INT(atomno(I))
-        FOUND = .FALSE.
-        DO J = 1, maxelm
-          IF (atnr(J) .EQ. atomnr) THEN
-             attype(I) = el(J)
-             vdwr(I) = rvdw(J)
-             bndr(I) = rsd(J)
-             FOUND = .TRUE.
-          ENDIF
+      Ilen = LEN_TRIM(TheFileName)
+      OutputFile = 3
+      OPEN(UNIT=OutputFile,file=TheFileName(1:Ilen),form='formatted',ERR=999)
+      WRITE(OutputFile,"('@<TRIPOS>MOLECULE')",ERR=999)
+      WRITE(OutputFile,'(A)',ERR=999) 'Temporary file created by DASH'
+      WRITE(OutputFile,"(2(I5,1X),'    1     0     0')",ERR=999) natcry, nbocry
+      WRITE(OutputFile,"('SMALL')",ERR=999)
+      WRITE(OutputFile,"('NO_CHARGES')",ERR=999)
+      WRITE(OutputFile,"('@<TRIPOS>ATOM')",ERR=999)
+      IF (tIncludeUnitCell) THEN
+        CALL LatticeCellParameters2Lattice(CellPar(1), CellPar(2), CellPar(3), &
+                                           CellPar(4), CellPar(5), CellPar(6), tLattice)
+! tLattice now holds the matrix for fractional to c-along-z orthogonal
+        CALL InverseMatrix(tLattice, tRecLattice, 3)
+! tRecLattice now holds the matrix for c-along-z orthogonal to fractional
+        CALL LatticeCellParameters2Lattice_2(CellPar(1), CellPar(2), CellPar(3), &
+                                             CellPar(4), CellPar(5), CellPar(6), tLattice_2)
+! tLattice_2 now holds the matrix for fractional to a-along-x orthogonal
+        CALL MultiplyMatrices(tLattice_2, tRecLattice, tLattice, 3, 3, 3)
+! tLattice now holds the matrix for c-along-z orthogonal to a-along-x orthogonal
+! axyzo now holds the orthogonal co-ordinates if c is along z  
+        DO I = 1, natcry
+          CALL PremultiplyVectorByMatrix(tLattice, axyzo(1,I), NEWaxyzo(1,I))
         ENDDO
-        IF (.NOT. FOUND) THEN
-          CALL DebugErrorMessage('Atomnumber not found')
+! NEWaxyzo now holds the orthogonal co-ordinates if a is along x
+      ELSE
+        DO I = 1, natcry
+          NEWaxyzo(1,I) = axyzo(1,I)
+          NEWaxyzo(2,I) = axyzo(2,I)
+          NEWaxyzo(3,I) = axyzo(3,I)
+        ENDDO
+      ENDIF
+      DO I = 1, natcry
+        WRITE(OutputFile,270,ERR=999) I,atomlabel(izmbid(I,iFrg)),(NEWaxyzo(j,izmbid(I,iFrg)),j=1,3),sybatom(izmbid(I,iFrg))
+  270   FORMAT(I3,1X,A5,1X,3(F10.4,1X),A4,' 1 <1> 0.0')
+      ENDDO
+      WRITE(OutputFile,"('@<TRIPOS>BOND')",ERR=999)
+      DO i = 1, nbocry
+        WRITE(OutputFile,'(3(I3,1X),A2)',ERR=999) i,izmoid(bond(i,1),iFrg),izmoid(bond(i,2),iFrg),BondStr(btype(I))
+      ENDDO
+! Write out unit cell. First six numbers: a, b, c, alpha, beta, gamma
+! Next two integers: space group followed by axis setting
+! For this purpose, we set the space group to P1
+!C@<TRIPOS>CRYSIN
+!C   11.3720   10.2720    7.3590  108.7500   71.0700   96.1600     2     1
+      IF (tIncludeUnitCell) THEN
+        WRITE(OutputFile,"('@<TRIPOS>CRYSIN')",ERR=999)
+        WRITE(OutputFile,'(6(F8.4,1X),"   1    1")',ERR=999) (CellPar(ii),ii=1,6)
+      ENDIF
+      CLOSE(OutputFile)
+      WriteMol2 = 1
+      RETURN
+  999 CALL ErrorMessage('Error writing mol2 file.')
+      CLOSE(OutputFile)
+
+      END FUNCTION WriteMol2
+!
+!*****************************************************************************
+!
+      INTEGER FUNCTION ElmSymbol2CSD(TheElementSymbol)
+! This function takes an element symbol (e.g. 'Ag') and converts it to the corresponding CSD element number
+
+      USE ATMVAR
+
+      IMPLICIT NONE
+
+      CHARACTER*2, INTENT (IN   ) :: TheElementSymbol
+
+      CHARACTER*1, EXTERNAL :: ChrLowerCase, ChrUpperCase
+      INTEGER I
+      CHARACTER*2 tElem
+
+      tElem(1:1) = ChrUpperCase(TheElementSymbol(1:1))
+      tElem(2:2) = ChrLowerCase(TheElementSymbol(2:2))
+      IF (tElem(1:1) .EQ. ' ') tElem(1:1) = tElem(2:2)
+      DO I = 1, MaxElm
+        IF (tElem .EQ. ElementStr(I)) THEN
+          ElmSymbol2CSD = I
           RETURN
         ENDIF
       ENDDO
-      RETURN
+      CALL WarningMessage('Unknown element '//TheElementSymbol(1:2)//'.'//CHAR(13)//&
+                          'Element has been set to Dummy.')
+      ElmSymbol2CSD = MaxElm
 
-      END SUBROUTINE ass_type
+      END FUNCTION ElmSymbol2CSD
 !
 !*****************************************************************************
 !
-      SUBROUTINE make_bond(natom,x,bndr,nbond,bat)
+      INTEGER FUNCTION ElmNumber2CSD(TheElementNumber)
+! This function takes an element number (e.g. 6 for carbon) and converts it to the corresponding CSD element number
 
-      PARAMETER (maxatom=100,maxbond=100)
+      USE ATMVAR
 
-      INTEGER natom
-      REAL    x(1:maxatom,1:3), bndr(1:maxatom)
-      INTEGER nbond, bat(1:maxbond,1:2) 
+      IMPLICIT NONE
 
-      REAL    dist, tol
+      INTEGER, INTENT (IN   ) :: TheElementNumber
 
-      tol = 0.5
-      nbond = 0
-      DO I = 1, natom-1
-        DO J = I+1, natom
-          dist = 0.0
-          DO K = 1, 3
-            dist = dist + (x(I,K)-x(J,K))**2
-          ENDDO
-          dist = SQRT(dist)
-          IF (dist .LT. (bndr(I)+bndr(J)+tol)) THEN
-            nbond = nbond + 1
-            bat(nbond,1) = I
-            bat(nbond,2) = J
-          ENDIF
-        ENDDO
+      CHARACTER*(20), EXTERNAL :: Integer2String
+      INTEGER I
+
+      DO I = 1, MaxElm
+        IF (TheElementNumber .EQ. atnr(I)) THEN
+          ElmNumber2CSD = I
+          RETURN
+        ENDIF
       ENDDO
-      RETURN
+      CALL WarningMessage('Unknown element '//Integer2String(TheElementNumber)//'.'//CHAR(13)//&
+                          'Element has been set to Dummy.')
+      ElmNumber2CSD = MaxElm
 
-      END SUBROUTINE make_bond
+      END FUNCTION ElmNumber2CSD
 !
 !*****************************************************************************
 !

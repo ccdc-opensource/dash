@@ -1,9 +1,13 @@
-!*==TRICLINI1.f90  processed by SPAG 6.11Dc at 15:36 on 20 Sep 2001
+!
+!*****************************************************************************
+!
 !     --------------------------------------------------
 !     | 	      T R I C L I N I C	1	       |
 !     --------------------------------------------------
       SUBROUTINE TRICLINI1(Vmin,Vmax)
+
       USE DICVAR
+
       IMPLICIT NONE
 !
 ! Dummy arguments
@@ -1087,6 +1091,7 @@
         cmin = AMAX1(cmin,fmin*fmin/amax/zco)
         ASSIGN 200 TO Ias
  250    CALL TRICLINI2
+        IF (DICVOL_Error .NE. 0) RETURN
         IF ( Jrt.GE.jrd ) THEN
           IF ( jrd.NE.0 ) THEN
             IF ( ndich(8).EQ.0 ) THEN
@@ -1100,6 +1105,7 @@
               jjdd = 1
               iidd = 1
               CALL TRICLINI2
+              IF (DICVOL_Error .NE. 0) RETURN
             ENDIF
           ENDIF
           IF ( ndich(8).NE.0 ) GOTO 99999
@@ -1108,4 +1114,8 @@
           GOTO Ias
         ENDIF
       ENDDO
+
 99999 END SUBROUTINE TRICLINI1
+!
+!*****************************************************************************
+!

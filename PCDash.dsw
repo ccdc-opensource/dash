@@ -3,7 +3,7 @@ Microsoft Developer Studio Workspace File, Format Version 6.00
 
 ###############################################################################
 
-Project: "Encode"=.\Encode\Encode.dsp - Package Owner=<4>
+Project: "Encoder"=.\Encoder\Encoder.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
@@ -27,7 +27,7 @@ Package=<4>
 
 ###############################################################################
 
-Project: "Polarisation"=.\Polarisation\Polarisation.dsp - Package Owner=<4>
+Project: "wEncoder"=.\wEncoder\wEncoder.dsp - Package Owner=<4>
 
 Package=<5>
 {{{
