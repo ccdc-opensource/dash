@@ -88,9 +88,18 @@
       CHARACTER*80 tString, tString1, tString2
       CHARACTER*2  LATT
       INTEGER NumOfAtmPerElm(1:MaxElm)
-      CHARACTER*72 DASHRemarkStr
+      CHARACTER*80 DASHRemarkStr
       REAL TOUISO
 
+      IF (in_batch) THEN
+        ! log SA paramters in easily parsing format (delims: ,=)
+        WRITE (DASHRemarkStr,105,ERR=999) T, FOPT, CHIPROBEST, ntotmov
+        CALL InfoMessage(TRIM(DASHRemarkStr))
+  105   FORMAT ('T=',F8.2,', chi**2=',F7.2,', profile chi**2=',F7.2,', total moves=',I8)
+        tFileName = OutputFilesBaseName(1:OFBN_Len)//'_'//TRIM(Integer2String(iSeed1))//SA_RunNumberStr
+      ELSE
+        tFileName = OutputFilesBaseName(1:OFBN_Len)//'_'//SA_RunNumberStr
+      ENDIF
       IF (T .GT. 999.9) THEN
         TemperatureStr = 'T=******'
       ELSE
@@ -98,12 +107,6 @@
       ENDIF
       WRITE (DASHRemarkStr,100,ERR=999) TemperatureStr, FOPT, CHIPROBEST, ntotmov
   100 FORMAT (A8,', chi**2=',F7.2,' and profile chi**2=',F7.2,' after ',I8,' moves')
-      tFileName = OutputFilesBaseName(1:OFBN_Len)//'_'//SA_RunNumberStr
-      IF (in_batch) THEN
-        tFileName = OutputFilesBaseName(1:OFBN_Len)//'_'//TRIM(Integer2String(iSeed1))//SA_RunNumberStr
-      ELSE
-        tFileName = OutputFilesBaseName(1:OFBN_Len)//'_'//SA_RunNumberStr
-      ENDIF
 ! Just in case the user decides to change this in the options menu just while we are in this routine:
 ! make local copies of the variables that determine which files to save.
       tSavePDB  = SavePDB()
