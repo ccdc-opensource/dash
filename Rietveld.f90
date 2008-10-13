@@ -1753,7 +1753,7 @@
       INTEGER, EXTERNAL :: XtalFileOpen, XtalFileBrowse 
       LOGICAL, EXTERNAL :: FnUnitCellOK, SDIFileOpen
       CHARACTER(MaxPathLength) SDIFile, XtalFile
-      INTEGER iStat, IV, iOpt
+      INTEGER iStat, IV, iOpt, IErrCode
 
       CALL PushActiveWindowID
       CALL SelectDASHDialog(IDD_SAW_Page6)
@@ -1836,7 +1836,7 @@
               CALL SDIFileBrowse
             CASE (IDB_SDI_file_Open)
               CALL DASHWDialogGetString(IDF_SDI_File_Name, SDIFile)
-              CALL SDIFileOpen(SDIFile)
+              IErrCode = SDIFileOpen(SDIFile)
             CASE (IDB_xtal_file_Browse)
               iStat = XtalFileBrowse()
               CALL WDialogFieldStateLogical(IDNEXT, (iStat .EQ. 0))

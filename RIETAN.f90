@@ -3,6 +3,7 @@
 !
       INTEGER FUNCTION Launch_RIETAN(input_file_name)
 
+      USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
       USE TAVAR
@@ -15,7 +16,7 @@
       INTEGER, EXTERNAL :: SetOptions, CheckRIETANExe
       CHARACTER*20, EXTERNAL :: Integer2String
 
-      INTEGER nCycle, opt
+      INTEGER nCycle, opt, IErrCode
       CHARACTER(MaxPathLength) tScriptName
       CHARACTER(1) tOptStr
 
@@ -32,7 +33,7 @@
       CALL SetRefineParameters(input_file_name, opt)
       IF ( CheckRIETANExe(RIETANEXE, tScriptName) .NE. 0 ) RETURN
       ! Launch RIETAN vis script and wait for it to return
-      CALL InfoError(1) ! Clear errors
+      IErrCode = InfoError(1) ! Clear errors
 !        CALL IOSCommand('cmd.exe /k start /b '//TRIM(tScriptName)//' '// &
       CALL IOSCommand('"'//TRIM(tScriptName)//'" "'//TRIM(RIETANEXE)//'" '// &
                       '"'//TRIM(input_file_name)//'" '//tOptStr, ProcBlocked)
@@ -257,7 +258,7 @@
  
       CHARACTER*(*), PARAMETER :: ctPMark = ' #@DASH@MARK@P '
       INTEGER, PARAMETER :: chFileW = 116, chFileR = 117, ciPMarkLen = LEN(ctPMark)
-      INTEGER p, flag, nCycle, kLen, iNBT
+      INTEGER p, flag, nCycle, kLen, iNBT, IErrCode
       REAL tk, finc
       CHARACTER (40) tKeyWord
       CHARACTER (80) tLine, tLine2
@@ -365,7 +366,7 @@
 !      CALL IOSCommand('CMD.exe /C copy /Y "'//TRIM(TheFileName)//'.tmp" '// &
 !                      '"'//TRIM(TheFileName)//'"', ProcSilent+ProcBlocked)
 !      CALL IOsDeleteFile(TRIM(TheFileName))
-      CALL InfoError(1)
+      IErrCode = InfoError(1)
       CALL IOsRenameFile(TRIM(TheFileName)//'.tmp', TRIM(TheFileName))
       IF ( InfoError(1) .NE. 0 ) GOTO 996
       SetRefineParameters = 0
@@ -1067,7 +1068,7 @@
       CHARACTER*120 tLine
       CHARACTER*1 w
       LOGICAL exists
-      INTEGER ExtLength, iBaseLen, a1, a2, a3, n
+      INTEGER ExtLength, iBaseLen, a1, a2, a3, n, IErrCode
       REAL value, std
 
       ! Initialise to failure
@@ -1141,7 +1142,7 @@
       END DO
       CLOSE(chFileInsW)
       CLOSE(chFileInsR, STATUS='delete')
-      CALL InfoError(1)
+      IErrCode = InfoError(1)
       CALL IOsRenameFile(TRIM(TheFileName)//'.tmp', TRIM(TheFileName))
       IF ( InfoError(1) .NE. 0 ) GOTO 996
       CopyRIETANRestraints = 0
