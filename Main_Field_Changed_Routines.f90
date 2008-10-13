@@ -89,7 +89,7 @@
 
       LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical, SetRRMethodRadioState
       LOGICAL tLogical
-      INTEGER IFLAGS, IFTYPE, iOpt
+      INTEGER IFLAGS, IFTYPE, iOpt, IErrCode
       CHARACTER*MaxPathLength tFileName
       CHARACTER*75  FILTER
 
@@ -125,7 +125,7 @@
               ENDIF
               CALL SelectDASHDialog(IDD_SAW_Page6)
               IF ( SetRRMethodRadioState() ) CALL WDialogPutRadioButton(IDF_RADIO1)
-              CALL InfoError(1) ! Clear errors
+              IErrCode = InfoError(1) ! Clear errors
               CALL SelectDASHDialog(IDD_SAW_Page6a)
 ! As loaded by WizardWindowShow, select IDD_SAW_Page6a may fail
               IF ( InfoError(1) .EQ. 0 ) THEN

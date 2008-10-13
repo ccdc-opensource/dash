@@ -12,11 +12,12 @@
       CHARACTER(MaxPathLength) tString
       CHARACTER(MaxPathLength) tFile
       INTEGER*4 tProcess, tSize
-
+      INTEGER IDummy
 ! Determine the directory where DASH.exe resides and store it in "InstallationDirectory"
       tSize = MaxPathLength
       tProcess = 0 ! this program
-      CALL GetModuleFileName(tProcess, tString, LOC(tSize))
+      IDummy = GetModuleFileName(tProcess, tString, LOC(tSize))
+      
 ! tString should now contain the full path to DASH.exe irrespective of the way
 ! DASH has been invoked.
       CALL SplitPath(tString, InstallationDirectory, tFile)
