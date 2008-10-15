@@ -150,6 +150,8 @@
 		<File RelativePath=".\PCDruid_resource.RC">
 			<FileConfiguration Name="release_build|Win32">
 				<Tool Name="VFCustomBuildTool" CommandLine="rc PCDruid_resource.RC" Outputs="PCDruid_resource.res" AdditionalDependencies=""/></FileConfiguration>
+			<FileConfiguration Name="Debug|Win32">
+				<Tool Name="VFCustomBuildTool" CommandLine="rc PCDruid_resource.RC" Outputs="PCDruid_resource.RES"/></FileConfiguration>
 			<FileConfiguration Name="Release|Win32">
 				<Tool Name="VFCustomBuildTool" CommandLine="rc PCDruid_resource.RC" Outputs="PCDruid_resource.res" AdditionalDependencies=""/></FileConfiguration></File>
 		<File RelativePath=".\res\PolyFitterWizard.bmp"/>
