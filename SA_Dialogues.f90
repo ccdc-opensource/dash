@@ -1485,7 +1485,8 @@
 
       REAL             prevx,       prevlb,       prevub
       LOGICAL                                                   LimsChanged
-      COMMON /pvalues/ prevx(mvar), prevlb(mvar), prevub(mvar), LimsChanged
+      INTEGER                                                                prevflag
+      COMMON /pvalues/ prevx(mvar), prevlb(mvar), prevub(mvar), LimsChanged, prevflag(mvar)
 
       INTEGER                ModalFlag,       RowNumber, iRadio
       REAL                                                       iX, iUB, iLB  
@@ -1508,13 +1509,14 @@
 ! Disable modal button for everything but torsion angles, angles and bonds
 ! This allows angles and bonds to be searched in Mogul too.
 !O        IF (ModalFlag(i) .EQ. 0) CALL WGridStateCell(IDF_parameter_grid_modal, 5, i, DialogReadOnly)
-         IF ((kzmpar2(i) .LT. 3) .OR. (kzmpar2(i) .GT. 5)) THEN
+         IF ((kzmpar2(i) .LT. 3) .OR. (kzmpar2(i) .GT. 5) .OR. iCheck .EQ. Checked) THEN
            CALL WGridStateCell(IDF_parameter_grid_modal, 5, i, DialogReadOnly)
          ELSE
            CALL WGridStateCell(IDF_parameter_grid_modal, 5, i, Enabled)
          ENDIF
          IF (kzmpar2(i) .EQ. 3) THEN !torsion angle
-           CALL WGridColourRow(IDF_parameter_grid_modal, I, WIN_RGB(256, 256, 256), WIN_RGB(256, 256, 256))
+           !CALL WGridColourRow(IDF_parameter_grid_modal, I, WIN_RGB(256, 256, 256), WIN_RGB(256, 256, 256))
+           CALL RefreshTorsionRow(i, .TRUE.)
          ENDIF
       ENDDO
       LimsChanged = .FALSE.
@@ -1549,7 +1551,8 @@
 
       REAL             prevx,       prevlb,       prevub
       LOGICAL                                                   LimsChanged
-      COMMON /pvalues/ prevx(mvar), prevlb(mvar), prevub(mvar), LimsChanged
+      INTEGER                                                                prevflag
+      COMMON /pvalues/ prevx(mvar), prevlb(mvar), prevub(mvar), LimsChanged, prevflag(mvar)
 
       INTEGER         nvar, ns, nt, iseed1, iseed2
       COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
@@ -1567,7 +1570,7 @@
       REAL    xtem
       INTEGER IFCOl, IFRow, ICHK
       INTEGER I
-      INTEGER iRow, iStatus
+      INTEGER iRow, iStatus, iMinHits
       INTEGER iFrg
       INTEGER kk, iOption, jFrg
       INTEGER UndoModalFlag
@@ -1612,6 +1615,15 @@
               CALL ShowWithWizardWindowSASettings
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizardPastPawley
+            CASE (IDF_SetupMDB)
+              CALL CheckMogulUse
+              IF (.NOT.UseMogul) THEN
+                CALL WarningMessage('Mogul must be installed and made available '// &
+                                    'using Configuration dialogue')
+              ELSE
+                CALL DASHWDialogGetInteger(IDF_MDBMinHit, iMinHits)
+                CALL SetupMDB(iMinHits)
+              ENDIF
             CASE (IDB_Relabel)
               CALL DASHWDialogGetMenu(IDF_MENU1, iOption)
               ! Update memory
@@ -1700,9 +1712,13 @@
                     prevx(IFRow) = xtem
                   ENDIF
                 CASE (4) ! fix or vary
+                  ! Checkbox, no bother by the move-cell messages, i.e. different to/from
+                  IF (EventInfo%X .NE. EventInfo%Y) GOTO 300
                   CALL DASHWGridGetCellCheckBox(IDF_parameter_grid_modal, IFCol, IFRow, ICHK)
                   IF (ICHK .EQ. Checked) THEN
                     CALL DASHWGridGetCellReal(IDF_parameter_grid_modal,1,IFRow,xtem)
+                    prevflag(IFRow) = ModalFlag(IFRow)
+                    IF (ModalFlag(IFRow) .EQ. 4) ModalFlag(IFRow) = 1
                     lb(IFRow) = xtem-1.0E-5
                     ub(IFRow) = xtem+1.0E-5
                     CALL WGridStateCell(IDF_parameter_grid_modal, 1, IFRow, DialogReadOnly)
@@ -1710,6 +1726,7 @@
                     CALL WGridStateCell(IDF_parameter_grid_modal, 3, IFRow, DialogReadOnly)
                     CALL WGridStateCell(IDF_parameter_grid_modal, 5, IFRow, Disabled)
                   ELSE
+                    ModalFlag(IFRow) = prevflag(IFRow) 
                     lb(IFRow) = prevlb(IFRow)
                     ub(IFRow) = prevub(IFRow)
                     CALL WGridStateCell(IDF_parameter_grid_modal, 1, IFRow, Enabled)
@@ -1719,9 +1736,9 @@
                       CALL WGridStateCell(IDF_parameter_grid_modal, 5, IFRow, Enabled)
                     ENDIF
                   ENDIF
-                  CALL WGridPutCellReal(IDF_parameter_grid_modal, 2, IFRow, lb(IFRow), '(F12.5)')
-                  CALL WGridPutCellReal(IDF_parameter_grid_modal, 3, IFRow, ub(IFRow), '(F12.5)')
+                  CALL RefreshTorsionRow(IFRow, .TRUE.)
                   LimsChanged = .TRUE.
+ 300              CONTINUE
               END SELECT ! IFCol
           END SELECT ! EventInfo%Value1 Field Changed Options
       END SELECT  ! EventType
@@ -1736,7 +1753,7 @@
             UndoModalFlag = ModalFlag(iFRow)
           ENDIF
           IF (UseMogul) THEN
-            CALL WriteMogulMol2(iFRow) !Call Mogul
+            CALL WriteMogulMol2(iFRow, .TRUE., .FALSE., 0) !Call Mogul
           ENDIF
           IF (kzmpar2(IFrow) .EQ. 3) THEN ! Modal Torsion Angle so show dialog
             CALL ShowBiModalDialog(IFRow, xtem, UndoModalFlag)
@@ -1748,6 +1765,121 @@
       CALL PopActiveWindowID
 
       END SUBROUTINE DealWithWizardWindowParameterBounds      
+!
+!*****************************************************************************
+!
+      SUBROUTINE SetupMDB(iMinHits)
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE ZMVAR
+
+      IMPLICIT NONE
+
+      INCLUDE 'PARAMS.INC'
+
+      INTEGER,  INTENT (IN   ) :: iMinHits
+
+      REAL            X_init,       x_unique,       lb,       ub
+      COMMON /values/ X_init(MVAR), x_unique(MVAR), lb(MVAR), ub(MVAR)
+
+      REAL             prevx,       prevlb,       prevub
+      LOGICAL                                                   LimsChanged
+      INTEGER                                                                prevflag
+      COMMON /pvalues/ prevx(mvar), prevlb(mvar), prevub(mvar), LimsChanged, prevflag(mvar)
+
+      INTEGER         nvar, ns, nt, iseed1, iseed2
+      COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
+
+      INTEGER                ModalFlag,       RowNumber, iRadio
+      REAL                                                       iX, iUB, iLB  
+      COMMON /ModalTorsions/ ModalFlag(MVAR), RowNumber, iRadio, iX, iUB, iLB
+
+      CHARACTER*20, EXTERNAL :: Integer2String
+      INTEGER iRow, OrigModalFlag, n, iStatus
+      
+      n = 0
+      CALL PushActiveWindowID
+      CALL SelectDASHDialog(IDD_SA_Modal_input2)
+      DO iRow = 1, NVAR
+        IF (kzmpar2(iRow) .NE. 3) CYCLE
+        CALL DASHWGridGetCellCheckBox(IDF_parameter_grid_modal, 4, iRow, iStatus)
+        IF (iStatus .EQ. Checked) CYCLE
+        ! save and reset ModalFlag, as used as an indicator for profile loading
+        OrigModalFlag = ModalFlag(iRow)
+        ModalFlag(iRow) = 1 
+        CALL WriteMogulMol2(iRow, .FALSE., .TRUE., iMinHits) !Call Mogul
+        IF (ModalFlag(iRow) .EQ. 4 ) THEN ! Mogul profile
+          lb(iRow) = -180.0
+          ub(iRow) =  180.0
+          prevlb(iRow) = lb(iRow)
+          prevub(iRow) = ub(iRow)
+          LimsChanged = .TRUE.
+          n = n + 1
+        ELSE IF (OrigModalFlag .NE. 4) THEN
+          ModalFlag(iRow) = OrigModalFlag
+        ENDIF
+        CALL RefreshTorsionRow(iRow, .FALSE.)
+      ENDDO
+      IF (n .GT. 1) THEN 
+        CALL InfoMessage(TRIM(Integer2String(n))//' torsion angles are set up'// &
+                         ' for Mogul distribution bias(MDB)')
+      ELSE IF (n .EQ. 1) THEN 
+        CALL InfoMessage('1 torsion angle is set up'// &
+                         ' for Mogul distribution bias(MDB)')
+      ELSE
+        CALL WarningMessage('No torsion angle set up'// &
+                         ' for Mogul distribution bias(MDB)')
+      ENDIF
+      CALL PopActiveWindowID
+
+      END SUBROUTINE SetupMDB
+!
+!*****************************************************************************
+!
+      SUBROUTINE RefreshTorsionRow(IFRow, keepStat)
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      INCLUDE 'PARAMS.INC'
+
+      INTEGER,  INTENT (IN   ) :: IFRow
+      LOGICAL,  INTENT (IN   ) :: keepStat
+
+      REAL            X_init,       x_unique,       lb,       ub
+      COMMON /values/ X_init(MVAR), x_unique(MVAR), lb(MVAR), ub(MVAR)
+
+      INTEGER                ModalFlag,       RowNumber, iRadio
+      REAL                                                       iX, iUB, iLB  
+      COMMON /ModalTorsions/ ModalFlag(MVAR), RowNumber, iRadio, iX, iUB, iLB
+
+      CALL PushActiveWindowID
+      CALL SelectDASHDialog(IDD_SA_Modal_input2)
+      IF (ModalFlag(IFRow) .EQ. 4) THEN
+        ! Mogul profile
+        CALL WGridStateCell(IDF_parameter_grid_modal, 2, IFRow, DialogReadOnly)
+        CALL WGridStateCell(IDF_parameter_grid_modal, 3, IFRow, DialogReadOnly)
+        CALL WGridColourRow(IDF_parameter_grid_modal, IFrow, WIN_RGB(0, 0, 255), WIN_RGB(256, 256, 256))  
+      ELSE
+        IF (.NOT. keepStat) THEN
+          CALL WGridStateCell(IDF_parameter_grid_modal, 2, IFRow, Enabled)
+          CALL WGridStateCell(IDF_parameter_grid_modal, 3, IFRow, Enabled)
+        ENDIF
+        IF (ModalFlag(IFRow) .LE. 1) THEN
+          CALL WGridColourRow(IDF_parameter_grid_modal, IFrow, WIN_RGB(256, 256, 256), WIN_RGB(256, 256, 256))  
+        ELSE
+          CALL WGridColourRow(IDF_parameter_grid_modal, IFrow, WIN_RGB(255, 0, 0), WIN_RGB(256, 256, 256))  
+        ENDIF
+      ENDIF
+      CALL WGridPutCellReal(IDF_parameter_grid_modal, 2, IFRow, lb(IFRow), '(F12.5)')
+      CALL WGridPutCellReal(IDF_parameter_grid_modal, 3, IFRow, ub(IFRow), '(F12.5)')
+      CALL PopActiveWindowID
+
+      END SUBROUTINE RefreshTorsionRow
+
 !
 !*****************************************************************************
 !
@@ -2094,7 +2226,8 @@
 
       REAL             prevx,       prevlb,       prevub
       LOGICAL                                                   LimsChanged
-      COMMON /pvalues/ prevx(mvar), prevlb(mvar), prevub(mvar), LimsChanged
+      INTEGER                                                                prevflag
+      COMMON /pvalues/ prevx(mvar), prevlb(mvar), prevub(mvar), LimsChanged, prevflag(mvar)
 
       REAL, DIMENSION (3,2) :: TempBounds
       COMMON /TriModalBounds/  TempBounds
@@ -2213,7 +2346,8 @@
 
       REAL             prevx,       prevlb,       prevub
       LOGICAL                                                   LimsChanged
-      COMMON /pvalues/ prevx(mvar), prevlb(mvar), prevub(mvar), LimsChanged
+      INTEGER                                                                prevflag
+      COMMON /pvalues/ prevx(mvar), prevlb(mvar), prevub(mvar), LimsChanged, prevflag(mvar)
 
       REAL, DIMENSION (3,2) :: TempBounds
       COMMON /TriModalBounds/  TempBounds
@@ -2361,8 +2495,6 @@
               CALL DASHWDialogGetReal(IDF_ModalUpper, ub(RowNumber))
 !             Check that x is in bounds
               CALL WDialogHide
-              CALL SelectDASHDialog(IDD_SA_Modal_Input2)
-              CALL WGridColourRow(IDF_parameter_grid_modal, RowNumber, WIN_RGB(255, 0, 0), WIN_RGB(256, 256, 256))  
               LimsChanged = .TRUE.
 !           Return bounds to previous values
             CASE (IDCANCEL)
@@ -2378,8 +2510,6 @@
               X_init(RowNumber) = iX
               ModalFlag(RowNumber) = 1 
               CALL WDialogHide
-              CALL SelectDASHDialog(IDD_SA_Modal_Input2)
-              CALL WGridColourRow(IDF_parameter_grid_modal, RowNumber, WIN_RGB(256, 256, 256), WIN_RGB(256, 256, 256))                                              
           END SELECT
           IF  (.NOT. UseMogul) THEN
             CALL SelectDASHDialog(IDD_ModalDialog)
@@ -2389,8 +2519,7 @@
           prevlb(RowNumber) = LB(RowNumber)
           CALL SelectDASHDialog(IDD_SA_Modal_Input2)
           CALL WGridPutCellReal(IDF_parameter_grid_modal, 1, RowNumber, X_init(RowNumber))
-          CALL WGridPutCellReal(IDF_parameter_grid_modal, 2, RowNumber, LB(RowNumber))
-          CALL WGridPutCellReal(IDF_parameter_grid_modal, 3, RowNumber, UB(RowNumber)) 
+          CALL RefreshTorsionRow(RowNumber, .FALSE.)
           CALL WGridPutCellCheckBox(IDF_parameter_grid_modal,5, RowNumber, UnChecked)                          
       END SELECT
       CALL PopActiveWindowID

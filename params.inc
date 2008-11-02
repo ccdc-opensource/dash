@@ -101,3 +101,7 @@
       INTEGER     MaxNumT
       PARAMETER	( MaxNumT = 50)
 ! Maximum number of Temperatures for parallel tempering
+
+      INTEGER     MaxMogulBin
+      PARAMETER ( MaxMogulBin = 20)
+! Maximum number of bins for MDB

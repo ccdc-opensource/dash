@@ -36,6 +36,8 @@
 
       IF ( ModalFlag(iPar) .LT. 2 ) &
         RETURN
+      IF ( ModalFlag(iPar) .EQ. 4 ) &
+        RETURN
       ratios(1, iPar) = 1.0
       ratios(2, iPar) = 1.0
       ratios(3, iPar) = 1.0
