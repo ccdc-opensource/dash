@@ -1395,17 +1395,23 @@
         CALL ErrorMessage('Invalid wavelength')
         RETURN
       ENDIF
-      IF ( NoWavelengthInXYE .AND. Get_WriteWavelength2XYEFile() ) THEN
-        IF (Confirm('For ease of use, DASH now interprets a single number on the first line of an .xye file as a wavelength.'//CHAR(13)// &
-                    'The file you are using does not contain a wavelength yet.'//CHAR(13)// &
-                    'Would you like to write the wavelength you have just entered to the file'//CHAR(13)// &
-                    FNAME(1:LEN_TRIM(FNAME))//' ?')) THEN
-          tFileHandle = 10
-          OPEN(UNIT=tFileHandle,FILE=FNAME(1:LEN_TRIM(FNAME)),ERR=999)
-          WRITE(tFileHandle,'(F9.5)',ERR=999) TheWaveLength
-          DO I = 1, BackupNOBS
-            WRITE(tFileHandle,'(F6.3,X,F11.3,X,F12.5)',ERR=999) BackupXOBS(I), BackupYOBS(I), BackupEOBS(I)
-          ENDDO
+! Unlike DF, there is no left-to-right and/or short-circuit evaluation in Intel Fortran (IF10):
+! the second term is still evaluated even when the first one is false(even replaced by constant .FALSE.).
+! Split the two terms into nesting IF...THEN...ENDIF
+!      IF ( NoWavelengthInXYE .AND. Get_WriteWavelength2XYEFile() ) THEN
+      IF ( NoWavelengthInXYE ) THEN
+        IF ( Get_WriteWavelength2XYEFile() ) THEN
+          IF (Confirm('For ease of use, DASH now interprets a single number on the first line of an .xye file as a wavelength.'//CHAR(13)// &
+                      'The file you are using does not contain a wavelength yet.'//CHAR(13)// &
+                      'Would you like to write the wavelength you have just entered to the file'//CHAR(13)// &
+                      FNAME(1:LEN_TRIM(FNAME))//' ?')) THEN
+            tFileHandle = 10
+            OPEN(UNIT=tFileHandle,FILE=FNAME(1:LEN_TRIM(FNAME)),ERR=999)
+            WRITE(tFileHandle,'(F9.5)',ERR=999) TheWaveLength
+            DO I = 1, BackupNOBS
+              WRITE(tFileHandle,'(F6.3,X,F11.3,X,F12.5)',ERR=999) BackupXOBS(I), BackupYOBS(I), BackupEOBS(I)
+            ENDDO
+          ENDIF
         ENDIF
       ENDIF
       GOTO 10
