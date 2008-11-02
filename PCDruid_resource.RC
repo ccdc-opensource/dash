@@ -8,7 +8,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 13/Oct/2008 19:01:54
+// Modified : 30/Oct/2008 17:07:14
 //
 ///////////////////////////////////////////////////
 //
@@ -727,6 +727,8 @@
 #define IDD_PW_Page8c                     166
 #define IDF_GSAS_Import_ins              1570
 #define ID_Tutorial_6                   40026
+#define IDF_SetupMDB                     1580
+#define IDF_MDBMinHit                    1579
 
 ///////////////////////////////////////////////////
 //
@@ -2806,12 +2808,16 @@ BEGIN
     CONTROL "Simulated annealing parameter bounds",IDF_SA2_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   90,    7,  122,    8
     CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  150,   40,   14
     CONTROL "",IDF_PW_Logo1,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   10,   15,   70,  140,WS_EX_DLGMODALFRAME
-    CONTROL "Randomise inital values",IDF_RandomInitVal,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  111,  129,  100,   14
-    CONTROL "Re-&label",IDB_Relabel,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  241,  142,   42,   14
-    CONTROL "/",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  283,  144,   10,    8
-    CONTROL "&View",IDB_View,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  293,  142,   40,   14
-    CONTROL "Z-matrices",IDF_GROUP1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  232,  128,  156,   36
-    CONTROL "",IDF_MENU1,"COMBOBOX",WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_GROUP | WS_TABSTOP | CBS_DROPDOWNLIST | CBS_HASSTRINGS,  338,  142,   40,   50
+    CONTROL "Randomise inital values",IDF_RandomInitVal,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  236,  122,   92,   12
+    CONTROL "Re-&label",IDB_Relabel,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  242,  147,   42,   12
+    CONTROL "/",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  284,  149,   10,    8
+    CONTROL "&View",IDB_View,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  294,  147,   40,   12
+    CONTROL "Z-matrices",IDF_GROUP1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  234,  139,  148,   25
+    CONTROL "",IDF_MENU1,"COMBOBOX",WS_CHILD | WS_VISIBLE | WS_VSCROLL | WS_GROUP | WS_TABSTOP | CBS_DROPDOWNLIST | CBS_HASSTRINGS,  340,  145,   40,   50
+    CONTROL "Mogul distribution bias(MDB)",IDF_GROUP2,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,   90,  122,  130,   26
+    CONTROL "&Set MDB",IDF_SetupMDB,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  174,  132,   40,   12
+    CONTROL "10",IDF_MDBMinHit,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  128,  132,   35,   12
+    CONTROL "Min. hits:",IDF_LABEL3,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   99,  133,   28,    8
 END
 
 IDD_SA_Modal_input2 RCDATA
@@ -2823,6 +2829,7 @@ BEGIN
 "Debug message \n"
 " \n"
 "[Ranges] \n"
+" 1579               1      2147483647 \n"
 "[Grids] \n"
 " 1363     5     99   162 \n"
 "  100 \n"

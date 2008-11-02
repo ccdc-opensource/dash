@@ -90,7 +90,7 @@
       REAL             PAWLEYCHISQ, RWPOBS, RWPEXP
       COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP
 
-      REAL, EXTERNAL :: EXPREP, RANMAR_2, GetMaxwellRandomNumber
+      REAL, EXTERNAL :: EXPREP, RANMAR_2, GetMaxwellRandomNumber, GetMDBRandomTorsion
       LOGICAL, EXTERNAL :: IsEventWaiting, Get_AutoAlign
       LOGICAL, EXTERNAL :: CheckTerm, OutOfBounds
       INTEGER NumTrialsPar(MVAR), NumParPerTrial, iParNum
@@ -282,6 +282,14 @@
               NumTrialsPar(H) = NumTrialsPar(H) + 1
               TotNumTrials = TotNumTrials + 1
 ! Generate XP, the trial value of X. Note use of VM to choose XP.
+              IF (ModalFlag(H) .EQ. 4) THEN ! MDB
+                ! Keep in range: calling, eg. LocalMinimise() may break this
+                XP(H) = MOD(XP(H), 360.0)
+                IF (XP(H) .LT. -180.0) XP(H) = XP(H) + 360.0
+                IF (XP(H) .GT. +180.0) XP(H) = XP(H) - 360.0
+                XP(H) = GetMDBRandomTorsion(RANMAR_2(), XP(H), VM(H), H) 
+                GOTO 555
+              ENDIF
               DX = GetMaxwellRandomNumber() * VM(H)
               XP(H) = XP(H) + DX
 ! If modal ranges defined for torsions use random number to
@@ -363,6 +371,7 @@
                   ENDIF
                   XP(H) = xtem
               END SELECT
+ 555          CONTINUE
               IF (kzmpar2(H) .EQ. 7) CurrParsInclPO = .TRUE.
             ENDDO
 ! Evaluate the function with the trial point XP and return as FP.

@@ -38,7 +38,7 @@
       REAL                                                                          iX, iUB, iLB  
       COMMON /ModalTorsions/ ModalFlag(mvar), RowNumber, iRadio, iX, iUB, iLB
 
-      LOGICAL, EXTERNAL :: SDIFileLoad
+      LOGICAL, EXTERNAL :: SDIFileLoad, ParseDistribution
       INTEGER, EXTERNAL :: Read_One_zm
 
       CHARACTER*255 line, keyword, tString
@@ -235,6 +235,13 @@
                       IF ( InfoError(1) .NE. 0 ) GOTO 999
                       CALL INextReal(line, UB(i)) ! Upper bound
                       IF ( InfoError(1) .NE. 0 ) GOTO 999
+                    CASE ('MDB','MOGU') ! Distribution
+                      ModalFlag(i) = 4
+                      CALL INextReal(line, LB(i)) ! Lower bound
+                      IF ( InfoError(1) .NE. 0 ) GOTO 999
+                      CALL INextReal(line, UB(i)) ! Upper bound
+                      IF ( InfoError(1) .NE. 0 ) GOTO 999
+                      IF (.NOT. ParseDistribution(line, i)) GOTO 999
                     CASE DEFAULT
                       GOTO 999 ! Error
                   END SELECT
@@ -368,13 +375,17 @@
       REAL                                                                          iX, iUB, iLB  
       COMMON /ModalTorsions/ ModalFlag(mvar), RowNumber, iRadio, iX, iUB, iLB
 
+      INTEGER NumMogulBins(MVAR), MogulBins(MaxMogulBin, MVAR)
+      REAL MogulDistributions(-180:180, MVAR)
+      COMMON /MDB/ NumMogulBins, MogulBins, MogulDistributions
 
       LOGICAL , EXTERNAL :: Get_SavePRO, SavePDB
       LOGICAL , EXTERNAL :: SaveCSSR, SaveCCL, SaveCIF, SaveRes
       LOGICAL , EXTERNAL :: Get_SaveParamAtEnd
       LOGICAL , EXTERNAL :: Get_OutputChi2vsMoves
+      CHARACTER*20, EXTERNAL :: Integer2String
 
-      INTEGER iHandle, i, iFrg
+      INTEGER iHandle, i, j, iFrg
       REAL    tReal
       INTEGER tInt
       INTEGER ExtLength
@@ -522,6 +533,10 @@
             WRITE(iHandle,'(F10.5,X,A,X,F10.5,X,F10.5)',ERR=999) X_init(i), 'BIMODAL', LB(i), UB(i)
           CASE ( 3 ) ! Trimodal torsion
             WRITE(iHandle,'(F10.5,X,A,X,F10.5,X,F10.5)',ERR=999) X_init(i), 'TRIMODAL', LB(i), UB(i)
+          CASE ( 4 ) ! Mogul distribution torsion
+            WRITE(iHandle,'(F10.5,X,A,X,F10.5,X,F10.5$)',ERR=999) X_init(i), 'MDB', LB(i), UB(i)
+            WRITE(iHandle,'(X,I2,200(X,A))',ERR=999) NumMogulBins(i), &
+                 (TRIM(Integer2String(MogulBins(j, i))), j=1,NumMogulBins(i))
         END SELECT
       ENDDO
 !C  0.0000 LBUB 0.000 1.000

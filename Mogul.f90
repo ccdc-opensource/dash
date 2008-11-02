@@ -25,7 +25,7 @@
       
 !***********************************************************************      
       
-      SUBROUTINE WriteMogulMol2(iFRow)
+      SUBROUTINE WriteMogulMol2(iFRow, showGUI, isMDBRun, iMDBMinHits)
 
 ! Writes Mol2 file for MOGUL.  
 ! Calls GetAtomLineNumbers   
@@ -36,15 +36,23 @@
 
       IMPLICIT NONE
 
-      INTEGER, INTENT (IN   ) :: iFRow
+      INTEGER, INTENT (IN   ) :: iFRow, iMDBMinHits
+      LOGICAL, INTENT (IN   ) :: showGUI, isMDBRun
 
+      INTEGER            MDBMinHits
+      LOGICAL                        inMDBRun, showMogulGUI 
+      COMMON /MOGUL_CTRL/MDBMinHits, inMDBRun, showMogulGUI 
+ 
       INTEGER, EXTERNAL :: WriteMol2
       INTEGER I,K
       CHARACTER(MaxPathLength) MogulMol2
       INTEGER tLength, BondNr
       INTEGER iFrg, DoF
 
-
+      showMogulGUI = showGUI
+      inMDBRun = isMDBRun
+      MDBMinHits = iMDBMinHits
+ 
 !     Given the number of the parameter want to know which zmatrix, fragment it belongs to.
       iFrg = 0
       DO i = 1, maxDOF
@@ -165,6 +173,10 @@
       CHARACTER(MaxPathLength), INTENT(IN   ) :: MogulMol2
       INTEGER, INTENT (IN   ) :: iFRow
 
+      INTEGER            MDBMinHits
+      LOGICAL                        inMDBRun, showMogulGUI 
+      COMMON /MOGUL_CTRL/MDBMinHits, inMDBRun, showMogulGUI 
+   
       INTEGER I
       CHARACTER(MaxPathLength) CurrentDirectory, Script_file, MogulOutputFile
       INTEGER tLength, olength
@@ -196,7 +208,7 @@
 32        FORMAT(('BOND '), 2(I3, 1X))
       END SELECT
 
-      WRITE(240,40)
+      IF (showMogulGUI) WRITE(240,40)
 40    FORMAT(('MOGUL GUI OPEN'))
       
       CLOSE (240)
@@ -270,6 +282,12 @@
       CHARACTER(MaxPathLength), INTENT(IN   ) ::  MogulOutputFile
       INTEGER, INTENT (IN   ) :: iFRow
 
+      INTEGER            MDBMinHits
+      LOGICAL                        inMDBRun, showMogulGUI 
+      COMMON /MOGUL_CTRL/MDBMinHits, inMDBRun, showMogulGUI 
+
+      LOGICAL, External :: ProcessDistribution
+
       INTEGER nlin, I
       CHARACTER*255 line
       CHARACTER*12 Distribution
@@ -316,6 +334,14 @@
       DO I = 1,NumberOfBins
         TotalSum = TotalSum + TC(I) ! number of hits in histogram
       ENDDO
+
+      IF (inMDBRun) THEN
+        IF (TotalSum .LT. MDBMinHits) GOTO 888
+        IF (MinAngle .NE. 0 .OR. MaxAngle .NE. 180) GOTO 990
+        IF (.NOT. ProcessDistribution(NumberofBins, TC, IFRow)) GOTO 995
+        ModalFlag(IFRow) = 4
+        RETURN
+      ENDIF
 
       IF (TotalSum .LT. 30) THEN
         MogulText = 'No recommendation - not enough data'
@@ -430,6 +456,10 @@
       RETURN
 
 999   CALL ErrorMessage("DASH could not read Mogul Output File.")
+      GOTO 888
+995   CALL ErrorMessage("Failed processing Mogul profile.")
+      GOTO 888
+990   CALL ErrorMessage("Mogul profile must fill the range of 0-180 degrees.")
 888   ModalFlag(IFRow) = 1 ! Will not default to modal ranges in dialog
 
       END SUBROUTINE ProcessMogulOutput
@@ -470,4 +500,3 @@
 
       END SUBROUTINE MaximumValue
 
-!*********************************************************************************
