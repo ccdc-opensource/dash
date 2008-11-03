@@ -730,9 +730,9 @@
                       KTF(MaxAtm_3), SITE(MaxAtm_3), KSITE(MaxAtm_3), ISGEN(3,MaxAtm_3),    &
                       SDX(3,MaxAtm_3), SDTF(MaxAtm_3), SDSITE(MaxAtm_3), KOM17
 
-      REAL, EXTERNAL         :: UnitCellVolume
+      REAL, EXTERNAL         :: UnitCellVolume, WavelengthOf
       CHARACTER*1, EXTERNAL  :: ChrLowerCase
-      INTEGER I, tLen, iRadSelection
+      INTEGER I, tLen !, iRadSelection
       CHARACTER*80              tString
 
 ! Initialise to failure
@@ -777,31 +777,38 @@
       WRITE (hFileCIF,'("_cell_formula_units_Z  ?")',ERR=999)
       SELECT CASE (JRadOption)
         CASE (1) ! X-ray lab data
-          CALL PushActiveWindowID
-          CALL SelectDASHDialog(IDD_Data_Properties)
-          CALL DASHWDialogGetMenu(IDF_Wavelength_Menu,iRadSelection)
-          CALL PopActiveWindowID
-          SELECT CASE (iRadSelection)
-! Winteracter menu:
-!     1 = <...>
-!     2 = Cu      <==  DEFAULT
-!     3 = Mo
-!     4 = Co
-!     5 = Cr
-!     6 = Fe
-            CASE (1)
-              tString = 'Xx'
-            CASE (2)
-              tString = 'Cu'
-            CASE (3)
-              tString = 'Mo'
-            CASE (4)
-              tString = 'Co'
-            CASE (5)
-              tString = 'Cr'
-            CASE (6)
-              tString = 'Fe'
-          END SELECT
+! Access GUI can be expensive, especially in batch mode, should avoid.
+!          CALL PushActiveWindowID
+!          CALL SelectDASHDialog(IDD_Data_Properties)
+!          CALL DASHWDialogGetMenu(IDF_Wavelength_Menu,iRadSelection)
+!          CALL PopActiveWindowID
+!          SELECT CASE (iRadSelection)
+!! Winteracter menu:
+!!     1 = <...>
+!!     2 = Cu      <==  DEFAULT
+!!     3 = Mo
+!!     4 = Co
+!!     5 = Cr
+!!     6 = Fe
+!            CASE (1)
+!              tString = 'Xx'
+!            CASE (2)
+!              tString = 'Cu'
+!            CASE (3)
+!              tString = 'Mo'
+!            CASE (4)
+!              tString = 'Co'
+!            CASE (5)
+!              tString = 'Cr'
+!            CASE (6)
+!              tString = 'Fe'
+!          END SELECT
+          tString = 'Xx'
+          IF (ABS(ALambda - WavelengthOf('Cu')) .LT. 0.0003) tString = 'Cu'
+          IF (ABS(ALambda - WavelengthOf('Mo')) .LT. 0.0003) tString = 'Mo'
+          IF (ABS(ALambda - WavelengthOf('Co')) .LT. 0.0003) tString = 'Co'
+          IF (ABS(ALambda - WavelengthOf('Cr')) .LT. 0.0003) tString = 'Cr'
+          IF (ABS(ALambda - WavelengthOf('Fe')) .LT. 0.0003) tString = 'Fe'
           tString = "'"//tString(1:2)//" K\a'"
         CASE (2) ! X-ray synchrotron data
           tString = 'synchrotron'
