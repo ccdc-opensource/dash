@@ -1,7 +1,9 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE LocalMinimise(Auto)
+! For Auto, if set TestOnlyForAuto, the prof chi or F will be returned, 
+! but global CHIPROBEST, FOPT and XOPT are not changed.
+      REAL FUNCTION LocalMinimise(Auto, TestOnlyForAuto)
 
       USE WINTERACTER
       USE DRUID_HEADER
@@ -12,7 +14,7 @@
 
       IMPLICIT NONE
 
-      LOGICAL, INTENT (IN   ) :: Auto
+      LOGICAL, INTENT (IN   ) :: Auto, TestOnlyForAuto
 
       INCLUDE 'PARAMS.INC'
 
@@ -65,12 +67,15 @@
       INTEGER                                                                    HydrogenTreatment
       COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign, HydrogenTreatment
 
+      LOGICAL           Is_SX
+      COMMON  / SXCOM / Is_SX
+
       LOGICAL, EXTERNAL :: Confirm
       REAL, EXTERNAL :: SA_FCN
       CHARACTER*80 chistr
       INTEGER I, II, III, N
-      LOGICAL tAccept, tLOG_HYDROGENS
-      REAL    FTEM
+      LOGICAL tAccept, tLOG_HYDROGENS, tUpdate
+      REAL    FTEM, ChiProTem
       REAL    DFTEM
       LOGICAL DesorbHydrogens
       REAL    XSIM(MVAR), DXSIM(MVAR)
@@ -78,6 +83,7 @@
       LOGICAL         in_batch
       COMMON /BATEXE/ in_batch
 
+      LocalMinimise = HUGE(1.0)
       IF (Auto .AND. (.NOT. AutoMinimise)) RETURN
  
       IF ( .NOT. IN_BATCH ) &
@@ -103,54 +109,64 @@
       CALL SA_SIMOPT(XSIM,DXSIM,N,FTEM)
       IF (Auto) THEN
         tAccept = .TRUE.
+        tUpdate = .NOT. TestOnlyForAuto
       ELSE
         chistr = 'Chi-squared = 0000.00'
         WRITE(chistr(15:21),'(F7.2)') FTEM
         tAccept = Confirm(CHISTR//CHAR(13)//'Press Yes to proceed with Simplex results.')
+        tUpdate = tAccept
       ENDIF
       LOG_HYDROGENS = tLOG_HYDROGENS
       IF (DesorbHydrogens) CALL create_fob(.TRUE.)
       IF (tAccept) THEN
         IF (.NOT. Auto) WasMinimised = .TRUE.
-        DO II = 1, N
-          I = IP(II)
-          XOPT(I) = XSIM(II)
-          x_unique(I) = XSIM(II)
-        ENDDO
-        FOPT = FTEM
         DO II = 1, NATOM
           DO III = 1, 3
             XAtmCoords(III,II,Curr_SA_Run) = XATO(III,II)
           ENDDO
         ENDDO
-        CALL valchipro(CHIPROBEST)
-        NewOptimumFound = .TRUE.
-        IF ( .NOT. IN_BATCH ) THEN
-          CALL SelectDASHDialog(IDD_SA_Action1)
-          CALL WDialogPutReal(IDF_min_chisq, FOPT, '(F8.2)')
-          CALL WDialogPutReal(IDF_profile_chisq2, CHIPROBEST, '(F8.2)')
-          CALL SelectDASHDialog(IDD_Summary)
-          CALL WGridPutCellReal(IDF_SA_Summary, 4, Curr_SA_Run, CHIPROBEST, '(F7.2)')
-          CALL WGridPutCellReal(IDF_SA_Summary, 5, Curr_SA_Run, FOPT, '(F7.2)')
-  !U      CALL SelectDASHDialog(IDD_Parameter_Status)
-  !U      DO i = 1, nvar
-  !U        CALL WGridPutCellReal(IDF_CPL_grid,1,i,xopt(i),'(F12.5)')
-  !U        DO icol = 2, 7
-  !U          CALL WGridClearCell(IDF_CPL_grid,icol,i)
-  !U        ENDDO
-  !U      ENDDO
+        CALL valchipro(ChiProTem)
+        IF (tUpdate) THEN
+          DO II = 1, N
+            I = IP(II)
+            XOPT(I) = XSIM(II)
+            x_unique(I) = XSIM(II)
+          ENDDO
+          FOPT = FTEM
+          CHIPROBEST = ChiProTem
+          NewOptimumFound = .TRUE.
+          IF ( .NOT. IN_BATCH ) THEN
+            CALL SelectDASHDialog(IDD_SA_Action1)
+            CALL WDialogPutReal(IDF_min_chisq, FOPT, '(F8.2)')
+            CALL WDialogPutReal(IDF_profile_chisq2, CHIPROBEST, '(F8.2)')
+            CALL SelectDASHDialog(IDD_Summary)
+            CALL WGridPutCellReal(IDF_SA_Summary, 4, Curr_SA_Run, CHIPROBEST, '(F7.2)')
+            CALL WGridPutCellReal(IDF_SA_Summary, 5, Curr_SA_Run, FOPT, '(F7.2)')
+    !U      CALL SelectDASHDialog(IDD_Parameter_Status)
+    !U      DO i = 1, nvar
+    !U        CALL WGridPutCellReal(IDF_CPL_grid,1,i,xopt(i),'(F12.5)')
+    !U        DO icol = 2, 7
+    !U          CALL WGridClearCell(IDF_CPL_grid,icol,i)
+    !U        ENDDO
+    !U      ENDDO
+          ENDIF
         ENDIF
-      ELSE
-        IF (PrefParExists) THEN
-          CALL PO_PRECFC(x_unique(iPrfPar))
-          CALL FCN(x_unique,DFTEM,0)
-        ENDIF
+      ENDIF
+      IF ((.NOT. (tAccept .AND. tUpdate)) .AND. PrefParExists) THEN
+        CALL PO_PRECFC(x_unique(iPrfPar))
+        CALL FCN(x_unique,DFTEM,0)
       ENDIF
 
       IF ( .NOT. IN_BATCH ) &
         CALL WCursorShape(CurCrossHair)
 
-      END SUBROUTINE LocalMinimise
+      IF (Is_SX) THEN
+        LocalMinimise = FTEM
+      ELSE
+        LocalMinimise = ChiProTem
+      ENDIF
+
+      END FUNCTION LocalMinimise
 !
 !*****************************************************************************
 !
@@ -227,7 +243,11 @@
       INTEGER IR(MVAR+1) ! Maximum index I could find: N+1. Maximum value for N should be MVAR
                          ! IR seems to hold a sorted list of pointers into C
       EXTERNAL SA_FCN
+      
+      INTEGER iPass
 
+      iPass = 0
+   10 CONTINUE
       CALL VCOPY(X,V,N)
       CHIMIN = SA_FCN(N,V)
       ZERO = 0.0
@@ -251,6 +271,8 @@
       ENDIF
   999 CALL VCOPY(V,X,N)
       TheChiSqd = CHI
+      iPass = iPass + 1
+      IF (iPass .LT. 3) GOTO 10 ! Repeat 3 times
 
       END SUBROUTINE SA_SIMOPT
 !

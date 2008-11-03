@@ -50,7 +50,7 @@
                 iMyExit = 5
               ENDIF
             CASE (IDF_SA_Simplex_Button) ! 'Local minimisation'
-              CALL LocalMinimise(.FALSE.)
+              CALL LocalMinimise(.FALSE., .FALSE.)
             CASE (IDB_Summary)           ! 'Solutions'
               CALL WDialogFieldState(IDB_Summary,Disabled)
               CALL SelectDASHDialog(IDD_Summary)
