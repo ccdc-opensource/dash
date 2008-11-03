@@ -41,43 +41,40 @@
       LOGICAL, EXTERNAL :: SDIFileLoad, ParseDistribution
       INTEGER, EXTERNAL :: Read_One_zm
 
+      INTEGER, PARAMETER :: hFile = 63
       CHARACTER*255 line, keyword, tString
-      INTEGER iTem, hFile, nl, I, iLen, iFrg, iDummy, iP
+      INTEGER iTem, I, iLen, iFrg, iDummy, iP
       REAL    rTem
       REAL    MaxMoves1
       INTEGER MaxMoves2
       LOGICAL tSdiIn, tZmIn
 
       in_batch = .TRUE.
-      hFile = 63
       iFrg = 0
       tSdiIn = .FALSE.
       tZmIn  = .FALSE.
       OPEN (UNIT=hFile, FILE=ArgString, STATUS='OLD', ERR=998)
 ! Loop over all records
       DO WHILE ( .TRUE. )
- 10     READ(hFile, '(A)', END=100, ERR=998) line
-        nl = LEN_TRIM(line)
-        IF ( nl .EQ. 0 ) GOTO 10 ! Blank line
+        READ(hFile, '(A)', END=100, ERR=998) line
         iP = VERIFY(line, ' '//CHAR(9)) ! Locate first non space/tab char
-        IF ( iP .EQ. 0 ) GOTO 10 ! White spaces only
-        line = line(iP:) ! Remove leading white spaces
-        nl = nl - iP + 1 ! Update string length
-        IF ( line(1:1) .EQ. "#" ) GOTO 10 ! It's a comment
+        IF ( iP .EQ. 0 ) CYCLE ! White spaces only
+        line = line(iP:) ! Skip leading white spaces
+        IF ( line(1:1) .EQ. "#" ) CYCLE ! It's a comment
+        iDummy = InfoError(1) ! reset the errors
         CALL INextString(line, keyword)
         CALL IUpperCase(keyword)
-        SELECT CASE(keyword(1:LEN_TRIM(keyword)))
+        IF (InfoError(1) .NE. 0) GOTO 999
+        iP = VERIFY(line, ' '//CHAR(9)) ! Locate first non space/tab char
+        IF ( iP .EQ. 0 ) GOTO 999 ! All keywords MUST followed by at least one value
+        line = line(iP:) ! Skip leading white spaces
+        SELECT CASE(keyword)
           CASE ('SDI') ! The .sdi file, containing wavelength, pattern, space group etc. etc.
-            I = InfoError(1) ! reset the errors
-            IF (InfoError(1) .NE. 0) GOTO 999
-            IF ( .NOT. SDIFileLoad(line(:nl))) GOTO 999
+            IF ( .NOT. SDIFileLoad(line)) GOTO 999
             tSdiIn = .TRUE.
           CASE ('OUT') ! The output file, must have extension .dash
-            I = InfoError(1) ! reset the errors
-            IF (InfoError(1) .NE. 0) GOTO 999
-            PrjFileName = line(:nl)
+            PrjFileName = line
           CASE ('SAVE')
-            I = InfoError(1) ! reset the errors
             CALL INextString(line, tString)
             IF (InfoError(1) .NE. 0) GOTO 999
 
@@ -101,90 +98,72 @@
             ENDIF
 
           CASE ('T0') ! T0, the starting temperature for the SA
-            I = InfoError(1) ! reset the errors
             CALL INextReal(line, rTem)
             IF (InfoError(1) .NE. 0) GOTO 999
             T0 = rTem
           CASE ('COOL') ! The cooling rate for the SA
-            I = InfoError(1) ! reset the errors
             CALL INextReal(line, rTem)
             IF (InfoError(1) .NE. 0) GOTO 999
             RT = rTem
           CASE ('N1') ! N1/NS in the SA
-            I = InfoError(1) ! reset the errors
             CALL INextInteger(line, iTem)
             IF (InfoError(1) .NE. 0) GOTO 999
             NS = iTem
           CASE ('N2') ! N2/NT in the SA
-            I = InfoError(1) ! reset the errors
             CALL INextInteger(line, iTem)
             IF (InfoError(1) .NE. 0) GOTO 999
             NT = iTem
           CASE ('SEED1') ! Random generator seed 1
-            I = InfoError(1) ! reset the errors
             CALL INextInteger(line, iTem)
             IF (InfoError(1) .NE. 0) GOTO 999
             iseed1 = iTem
           CASE ('SEED2') ! Random generator seed 2
-            I = InfoError(1) ! reset the errors
             CALL INextInteger(line, iTem)
             IF (InfoError(1) .NE. 0) GOTO 999
             iseed2 = iTem
           CASE ('NRUNS') ! Termination criterion: number of SA runs
-            I = InfoError(1) ! reset the errors
             CALL INextInteger(line, iTem)
             IF (InfoError(1) .NE. 0) GOTO 999
             MaxRuns = iTem
           CASE ('MAXMOVES') ! Maximum number of moves, stored as e.g. 3.0 7 meaning 3.0E7
-            I = InfoError(1) ! reset the errors
             CALL INextReal(line, MaxMoves1)
             IF (InfoError(1) .NE. 0) &
               GOTO 999
-            I = InfoError(1) ! reset the errors
             CALL INextInteger(line, MaxMoves2)
             IF (InfoError(1) .NE. 0) &
               GOTO 999
             CALL RealInt2NMoves(MaxMoves1, MaxMoves2, MaxMoves)
           CASE ('MULTIPLIER') ! Termination criterion: profile chi-sqrd multiplier
-            I = InfoError(1) ! reset the errors
             CALL INextReal(line, rTem)
             IF (InfoError(1) .NE. 0) GOTO 999
             ChiMult = rTem
           CASE ('USECCOM') ! Use crystallographic centre of mass
-            I = InfoError(1) ! reset the errors
             CALL INextString(line, tString)
             IF (InfoError(1) .NE. 0) GOTO 999
             UseCCoM = (tString(1:LEN_TRIM(tString) ) .EQ. "TRUE")
           CASE ('AUTOALIGN') ! Auto align
-            I = InfoError(1) ! reset the errors
             CALL INextString(line, tString)
             IF (InfoError(1) .NE. 0) GOTO 999
             LAlign = (tString(1:LEN_TRIM(tString)) .EQ. "TRUE")
           CASE ('HYDROGEN') ! Hydrogen treatment
-            I = InfoError(1) ! reset the errors
             CALL INextInteger(line, iTem)
             IF (InfoError(1) .NE. 0) GOTO 999
             CALL Set_HydrogenTreatment(iTem)
           CASE ('AUTOMIN') ! Auto local minimise
-            I = InfoError(1) ! reset the errors
             CALL INextString(line, tString)
             IF (InfoError(1) .NE. 0) GOTO 999
-            AutoMinimise = (tString(1:LEN_TRIM(tString)) .EQ. "TRUE")
+            AutoMinimise = (TRIM(tString) .EQ. "TRUE")
           CASE ('MINIMISEHYDR') ! Use Hydrogens for auto local minimise
-            I = InfoError(1) ! reset the errors
             CALL INextString(line, tString)
             IF (InfoError(1) .NE. 0) GOTO 999
-            UseHAutoMin = (tString(1:LEN_TRIM(tString)) .EQ. "TRUE")
+            UseHAutoMin = (TRIM(tString) .EQ. "TRUE")
           CASE ('RANDOMISE') ! Randomise initial SA-parameter values
-            I = InfoError(1) ! reset the errors
             CALL INextString(line, tString)
             IF (InfoError(1) .NE. 0) GOTO 999
-            iLen = LEN_TRIM(tString)
-            RandomInitVal = (tString(1:iLen) .EQ. "TRUE")
+            RandomInitVal = (TRIM(tString) .EQ. "TRUE")
           CASE ('ZMATRIX')
-            I = InfoError(1) ! reset the errors
             iFrg = iFrg + 1
-            frag_file(iFrg) = line(:nl)
+            frag_file(iFrg) = line
             iDummy = Read_One_Zm(iFrg)
             IF (iDummy .NE. 0) THEN
              CALL FileErrorPopup(frag_file(iFrg), iDummy)
@@ -192,7 +171,6 @@
             ENDIF
             tZmIn = .TRUE.
           CASE ('PO_DIR')
-            I = InfoError(1) ! reset the errors
             CALL INextInteger(line, PO_Direction(1))
             IF (InfoError(1) .NE. 0) GOTO 999
             CALL INextInteger(line, PO_Direction(2))
@@ -206,49 +184,50 @@
             I = InfoError(1) ! reset the errors
             CALL INextInteger(line, iTem)
             IF (InfoError(1) .NE. 0) GOTO 999
-            DO I = 1, iTem
+            I = 0
+            DO WHILE (I .LT. iTem)
               READ(hFile, '(A)', END=100, ERR=998) line
-              nl = LEN_TRIM(line)  ! Since we only read iTem lines, this would crash
-              IF ( nl .NE. 0 ) THEN ! Blank line
-                IF ( line(1:1) .NE. "#" ) THEN ! It's a comment
-                  CALL IUpperCase(line(:nl))
-                  iDummy = InfoError(1) ! reset the errors
-                  CALL INextReal(line, X_init(i)) ! This is the initial value
+              iP = VERIFY(line, ' '//CHAR(9)) ! Locate first non space/tab char
+              IF ( iP .EQ. 0 ) CYCLE ! White spaces only
+              line = line(iP:) ! Skip leading white spaces
+              IF ( line(1:1) .EQ. "#" ) CYCLE ! It's a comment
+              I = I + 1
+              iDummy = InfoError(1) ! reset the errors
+              CALL INextReal(line, X_init(i)) ! This is the initial value
+              IF ( InfoError(1) .NE. 0 ) GOTO 999
+              CALL INextString(line, tString)
+              CALL IUpperCase(tString)
+              IF ( InfoError(1) .NE. 0 ) GOTO 999
+              SELECT CASE(TRIM(tString))
+                CASE ('LBUB') ! Lower Bound/Upper Bound pair
+                  CALL INextReal(line, LB(i)) ! Lower bound
                   IF ( InfoError(1) .NE. 0 ) GOTO 999
-                  CALL INextString(line, tString)
+                  CALL INextReal(line, UB(i)) ! Upper bound
                   IF ( InfoError(1) .NE. 0 ) GOTO 999
-                  SELECT CASE(tString(1:LEN_TRIM(tString)))
-                    CASE ('LBUB') ! Lower Bound/Upper Bound pair
-                      CALL INextReal(line, LB(i)) ! Lower bound
-                      IF ( InfoError(1) .NE. 0 ) GOTO 999
-                      CALL INextReal(line, UB(i)) ! Upper bound
-                      IF ( InfoError(1) .NE. 0 ) GOTO 999
-                    CASE ('FIXED') ! Fixed
-                    CASE ('BIMODAL') ! Bimodal
-                      ModalFlag(i) = 2
-                      CALL INextReal(line, LB(i)) ! Lower bound
-                      IF ( InfoError(1) .NE. 0 ) GOTO 999
-                      CALL INextReal(line, UB(i)) ! Upper bound
-                      IF ( InfoError(1) .NE. 0 ) GOTO 999
-                    CASE ('TRIMODAL') ! Trimodal
-                      ModalFlag(i) = 3
-                      CALL INextReal(line, LB(i)) ! Lower bound
-                      IF ( InfoError(1) .NE. 0 ) GOTO 999
-                      CALL INextReal(line, UB(i)) ! Upper bound
-                      IF ( InfoError(1) .NE. 0 ) GOTO 999
-                    CASE ('MDB','MOGU') ! Distribution
-                      ModalFlag(i) = 4
-                      CALL INextReal(line, LB(i)) ! Lower bound
-                      IF ( InfoError(1) .NE. 0 ) GOTO 999
-                      CALL INextReal(line, UB(i)) ! Upper bound
-                      IF ( InfoError(1) .NE. 0 ) GOTO 999
-                      IF (.NOT. ParseDistribution(line, i)) GOTO 999
-                    CASE DEFAULT
-                      GOTO 999 ! Error
-                  END SELECT
-                  CALL ParseRawInput(I)
-                ENDIF
-              ENDIF
+                CASE ('FIXED') ! Fixed
+                CASE ('BIMODAL') ! Bimodal
+                  ModalFlag(i) = 2
+                  CALL INextReal(line, LB(i)) ! Lower bound
+                  IF ( InfoError(1) .NE. 0 ) GOTO 999
+                  CALL INextReal(line, UB(i)) ! Upper bound
+                  IF ( InfoError(1) .NE. 0 ) GOTO 999
+                CASE ('TRIMODAL') ! Trimodal
+                  ModalFlag(i) = 3
+                  CALL INextReal(line, LB(i)) ! Lower bound
+                  IF ( InfoError(1) .NE. 0 ) GOTO 999
+                  CALL INextReal(line, UB(i)) ! Upper bound
+                  IF ( InfoError(1) .NE. 0 ) GOTO 999
+                CASE ('MDB','MOGU') ! Distribution
+                  CALL INextReal(line, LB(i)) ! Lower bound
+                  IF ( InfoError(1) .NE. 0 ) GOTO 999
+                  CALL INextReal(line, UB(i)) ! Upper bound
+                  IF ( InfoError(1) .NE. 0 ) GOTO 999
+                  IF (.NOT. ParseDistribution(line, i)) GOTO 999
+                  ModalFlag(i) = 4
+                CASE DEFAULT
+                  GOTO 999 ! Error
+              END SELECT
+              CALL ParseRawInput(I)
             ENDDO
           CASE DEFAULT
             CALL InfoMessage('Ignore the line begin with unknown keyword: '//TRIM(keyword))
@@ -269,7 +248,7 @@
       GOTO 990
   998 CALL ErrorMessage('Problem occurred while open or read '//TRIM(ArgString))
       GOTO 990
-  999 CALL ErrorMessage('Problem occurred while processing line begin with: '//TRIM(keyword))
+  999 CALL ErrorMessage('Problem occurred while processing '//TRIM(keyword)//' record(s)')
   990 CLOSE(hFile)
       CALL DoExit
 
