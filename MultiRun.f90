@@ -222,14 +222,19 @@
       INTEGER         nvar, ns, nt, iseed1, iseed2
       COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
 
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+      CHARACTER*20, EXTERNAL :: GetSeed1SuffixString
       LOGICAL, EXTERNAL :: Get_SaveParamAtEnd
       INTEGER hFile, iSol, J
-      CHARACTER(MaxPathLength) tFileName
+      CHARACTER*20 tString
 
       IF (.NOT. Get_SaveParamAtEnd()) RETURN
       hFile = 10
-      tFileName = OutputFilesBaseName(1:OFBN_Len)//'.tbl'
-      OPEN(UNIT=hFile,FILE=tFileName(1:OFBN_Len+4),ERR=999)
+      tString = ''
+      IF (in_batch) tString = GetSeed1SuffixString()
+      OPEN(UNIT=hFile,FILE=OutputFilesBaseName(1:OFBN_Len)//TRIM(tString)//'.tbl',ERR=999)
       DO iSol = 1, NumOf_SA_Runs
         WRITE(hFile,'(100(F9.4,1X))',ERR=999) (BestValuesDoF(J,iSol2Run(iSol)),J=1,nvar)
       ENDDO

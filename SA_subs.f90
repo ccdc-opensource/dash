@@ -1062,3 +1062,18 @@
 !
 !*****************************************************************************
 !
+      CHARACTER*20 FUNCTION GetSeed1SuffixString
+
+      IMPLICIT NONE
+
+      INTEGER         nvar, NS, NT, iSeed1, iSeed2
+      COMMON /sapars/ nvar, NS, NT, iSeed1, iSeed2
+
+      CHARACTER*20, EXTERNAL :: Integer2String
+
+      GetSeed1SuffixString = '_'//Integer2String(iSeed1)
+      RETURN
+      END FUNCTION GetSeed1SuffixString
+!
+!*****************************************************************************
+!

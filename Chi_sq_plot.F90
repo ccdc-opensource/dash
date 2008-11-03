@@ -543,14 +543,19 @@
       INTEGER         nmpert, bmIHANDLE
       COMMON /sagdat/ nmpert, bmIHANDLE
 
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+      CHARACTER*20, EXTERNAL :: GetSeed1SuffixString
       LOGICAL, EXTERNAL :: Get_OutputChi2vsMoves
       INTEGER hFile, I, J
-      CHARACTER(MaxPathLength) tFileName
+      CHARACTER*20 tString
 
       IF (.NOT. Get_OutputChi2vsMoves()) RETURN
       hFile = 10
-      tFileName = OutputFilesBaseName(1:OFBN_Len)//'.chi'
-      OPEN(UNIT=hFile,FILE=tFileName(1:OFBN_Len+4),ERR=999)
+      tString = ''
+      IF (in_batch) tString = GetSeed1SuffixString()
+      OPEN(UNIT=hFile,FILE=OutputFilesBaseName(1:OFBN_Len)//TRIM(tString)//'.chi',ERR=999)
       DO I = 1, MaxIterationSoFar
         WRITE(hFile,'(I10,999(1X,F9.2))',ERR=999) I*nmpert,(chi_sqd(I,J),J=1,NumOf_SA_Runs) ! NumOf_SA_Runs = last completed SA run
       ENDDO

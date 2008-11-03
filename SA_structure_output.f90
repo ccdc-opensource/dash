@@ -64,15 +64,12 @@
       REAL            f2cpdb
       COMMON /pdbcat/ f2cpdb(1:3,1:3)
 
-      INTEGER         nvar, NS, NT, iSeed1, iSeed2
-      COMMON /sapars/ nvar, NS, NT, iSeed1, iSeed2
-
       LOGICAL         in_batch
       COMMON /BATEXE/ in_batch
 
       INTEGER, EXTERNAL :: WritePDBCommon, WriteCIFCommon
       REAL, EXTERNAL :: UnitCellVolume
-      CHARACTER*20, EXTERNAL :: Integer2String
+      CHARACTER*20, EXTERNAL :: GetSeed1SuffixString
       CHARACTER*1, EXTERNAL :: ChrLowerCase
       LOGICAL, EXTERNAL :: SavePDB, SaveCSSR, SaveCCL, SaveCIF, SaveRES
       REAL qvals(4), qnrm
@@ -96,7 +93,7 @@
         WRITE (DASHRemarkStr,105,ERR=999) T, FOPT, CHIPROBEST, ntotmov
         CALL InfoMessage(TRIM(DASHRemarkStr))
   105   FORMAT ('T=',F8.2,', chi**2=',F7.2,', profile chi**2=',F7.2,', total moves=',I8)
-        tFileName = OutputFilesBaseName(1:OFBN_Len)//'_'//TRIM(Integer2String(iSeed1))//SA_RunNumberStr
+        tFileName = OutputFilesBaseName(1:OFBN_Len)//TRIM(GetSeed1SuffixString())//SA_RunNumberStr
       ELSE
         tFileName = OutputFilesBaseName(1:OFBN_Len)//'_'//SA_RunNumberStr
       ENDIF
