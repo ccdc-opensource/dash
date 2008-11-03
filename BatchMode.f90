@@ -216,6 +216,7 @@
                   CALL INextReal(line, X_init(i)) ! This is the initial value
                   IF ( InfoError(1) .NE. 0 ) GOTO 999
                   CALL INextString(line, tString)
+                  IF ( InfoError(1) .NE. 0 ) GOTO 999
                   SELECT CASE(tString(1:LEN_TRIM(tString)))
                     CASE ('LBUB') ! Lower Bound/Upper Bound pair
                       CALL INextReal(line, LB(i)) ! Lower bound
