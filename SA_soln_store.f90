@@ -31,18 +31,24 @@
       REAL                                                           ChiMult
       COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+      CHARACTER*20, EXTERNAL :: GetSeed1SuffixString
       LOGICAL, EXTERNAL :: Get_SavePRO
       INTEGER I
       INTEGER    hFile
+      CHARACTER*20 tString
 
       IF (.NOT. Get_SavePRO()) RETURN
 
       hFile = 61
-      OPEN(UNIT=hFile,FILE=OutputFilesBaseName(1:OFBN_Len)//'_'//SA_RunNumberStr//'.pro',status='unknown',ERR=999)
-      DO I = 1, NBIN
-        WRITE(hFile,12,ERR=999) XBIN(I), CHAR(9), YOBIN(I), CHAR(9), YCBIN(I), CHAR(9), EBIN(I)
-   12   FORMAT(F12.4,3(A,F12.4))
-      ENDDO
+      tString = ''
+      IF (in_batch) tString = GetSeed1SuffixString()
+      OPEN(UNIT=hFile,FILE=OutputFilesBaseName(1:OFBN_Len)//TRIM(tString)// &
+           SA_RunNumberStr//'.pro',status='unknown',ERR=999)
+      WRITE(hFile,'((F12.4,3("'//CHAR(9)//'",F12.4)))',ERR=999) &
+           (XBIN(I), YOBIN(I), YCBIN(I), EBIN(I), I=1, NBIN)
 ! to overwrite:
       CLOSE(hFile)
       RETURN
