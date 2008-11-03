@@ -533,27 +533,28 @@
       CALL ChiSqPlot_UpdateIterAndChiProBest(Curr_SA_Iteration)
 !  Check termination criteria.
 !  Terminate SA if appropriate.
-      IF (CheckTerm(NTOTMOV) .OR. (iMyExit .NE. 0)) THEN
+!      IF ((iMyExit .NE. 0) .OR. CheckTerm(NTOTMOV, AutoMinimise .AND. MOD(Curr_SA_Iteration,5) .EQ. 0)) THEN
+      IF (iMyExit .EQ. 0) THEN
+        IF (.NOT. CheckTerm(NTOTMOV, AutoMinimise .AND. MOD(Curr_SA_Iteration,5) .EQ. 0)) &
+          GOTO 100 ! Next iteration
+      ENDIF
 ! End of a run in a multi-run. This is the place for a final local minimisation
-        NumOf_SA_Runs = Curr_SA_Run
+      NumOf_SA_Runs = Curr_SA_Run
 ! Get AutoLocalMinimisation from the Configuration Window
-        IF ((iMyExit .NE. 5) .AND. AutoMinimise) THEN
-          CALL LocalMinimise(.TRUE.)
-          CALL ChiSqPlot_UpdateIterAndChiProBest(Curr_SA_Iteration)
-        ENDIF
-        CALL ChiSqPlot_EndOfSARun
+      IF ((iMyExit .NE. 5) .AND. AutoMinimise) THEN
+        CALL LocalMinimise(.TRUE., .FALSE.)
+        CALL ChiSqPlot_UpdateIterAndChiProBest(Curr_SA_Iteration)
+      ENDIF
+      CALL ChiSqPlot_EndOfSARun
 ! ep  Saves calculated and observed diffraction patterns in .pro file 
-        CALL Sa_soln_store
+      CALL Sa_soln_store
 ! Align structure.  Will get to this point whether autominimise enabled or not.
-        IF (Get_AutoAlign()) CALL Align
+      IF (Get_AutoAlign()) CALL Align
 ! Store optimum crystal structure        
-        CALL Log_SARun_Entry
-        CALL SA_STRUCTURE_OUTPUT(T, XOPT, ntotmov)
-        IF ((Curr_SA_Run .LT. MaxRuns) .AND. (iMyExit .NE. 3) .AND. (iMyExit .NE. 5)) THEN
-          GOTO 1 ! Next run
-        ENDIF
-      ELSE
-        GOTO 100 ! Next iteration
+      CALL Log_SARun_Entry
+      CALL SA_STRUCTURE_OUTPUT(T, XOPT, ntotmov)
+      IF ((Curr_SA_Run .LT. MaxRuns) .AND. (iMyExit .NE. 3) .AND. (iMyExit .NE. 5)) THEN
+        GOTO 1 ! Next run
       ENDIF
 
       END SUBROUTINE SimulatedAnnealing
@@ -930,11 +931,12 @@
 !
 !*****************************************************************************
 !
-      LOGICAL FUNCTION CheckTerm(Nmoves)
+      LOGICAL FUNCTION CheckTerm(Nmoves, TestLocalMin)
 
       IMPLICIT NONE
 
       INTEGER, INTENT (IN   ) :: Nmoves
+      LOGICAL, INTENT (IN   ) :: TestLocalMin
 
       INCLUDE 'PARAMS.INC'
 
@@ -954,14 +956,28 @@
       REAL             CHIPROBEST
       COMMON /PLTSTO2/ CHIPROBEST
 
+      REAL, EXTERNAL :: LocalMinimise
       REAL Best_CHI
+
+      CheckTerm = .TRUE.
 
       IF (Is_SX) THEN
         Best_CHI = FOPT
       ELSE
         Best_CHI = CHIPROBEST
       ENDIF
-      CheckTerm = ((Nmoves .GT. MaxMoves) .OR. (Best_CHI .LT. (ChiMult*PAWLEYCHISQ)))
+      IF (Nmoves .GT. MaxMoves) &
+        RETURN
+      IF (Best_CHI .LT. (ChiMult*PAWLEYCHISQ)) &
+        RETURN
+      IF (TestLocalMin) THEN
+        IF (Best_CHI .LT. (3*ChiMult*PAWLEYCHISQ)) THEN
+          IF (LocalMinimise(.TRUE., .TRUE.) .LT. (ChiMult*PAWLEYCHISQ)) &
+            RETURN
+        ENDIF
+      ENDIF
+
+      CheckTerm =  .FALSE.
 
       END FUNCTION CheckTerm
 !
