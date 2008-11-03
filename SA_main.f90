@@ -397,7 +397,7 @@
 
       USE WINTERACTER
 
-      INCLUDE 'iosdef.for'
+      INCLUDE 'for_iosdef.for'
 
       INTEGER       ErrorStatus
       CHARACTER*(*) FileName
