@@ -11,6 +11,7 @@
       USE ZMVAR
       USE SOLVAR
       USE RRVAR
+      USE PRJVAR
 
       IMPLICIT NONE
 
@@ -93,6 +94,8 @@
       REAL, EXTERNAL :: EXPREP, RANMAR_2, GetMaxwellRandomNumber, GetMDBRandomTorsion
       LOGICAL, EXTERNAL :: IsEventWaiting, Get_AutoAlign
       LOGICAL, EXTERNAL :: CheckTerm, OutOfBounds
+      CHARACTER*20, EXTERNAL :: GetSeed1SuffixString
+      CHARACTER(MaxPathLength) tTmpSaveName
       INTEGER NumTrialsPar(MVAR), NumParPerTrial, iParNum
       INTEGER NACP(MVAR)
       LOGICAL MAKET0
@@ -117,6 +120,7 @@
       REAL InitialProChiSqrd
       REAL ProgressIndicator ! 0.0 = just begun, 1.0 = best profile chi-sqrd <= Pawley chi-sqrd
 
+      tTmpSaveName = TRIM(OutputFilesBaseName)//TRIM(GetSeed1SuffixString())//'Tmp.dash'
       WasMinimised = .FALSE.
       NumParPerTrial = 1
       TotNumTrials = 0
@@ -554,8 +558,12 @@
       CALL Log_SARun_Entry
       CALL SA_STRUCTURE_OUTPUT(T, XOPT, ntotmov)
       IF ((Curr_SA_Run .LT. MaxRuns) .AND. (iMyExit .NE. 3) .AND. (iMyExit .NE. 5)) THEN
+! Temp save project
+        CALL PrjReadWrite(tTmpSaveName, cWrite)
         GOTO 1 ! Next run
       ENDIF
+! Delete temp saved project
+      CALL IosDeleteFile(tTmpSaveName)
 
       END SUBROUTINE SimulatedAnnealing
 !
