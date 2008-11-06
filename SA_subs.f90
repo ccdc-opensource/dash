@@ -110,7 +110,7 @@
       INTEGER III, IH, KK, iFrg
       INTEGER Last_NUP, Last_NDOWN
       CHARACTER*3 CNruns,CMruns
-      LOGICAL PrevRejected, CurrParsInclPO, PrevParsInclPO
+      LOGICAL PrevRejected, CurrParsInclPO, PrevParsInclPO, tReadyForSimplexTest
       INTEGER TotNumTrials
       CHARACTER*3 RowLabelStr
       REAL XP(MVAR)
@@ -268,6 +268,7 @@
       FPSUM0 = 0.0
       FPSUM1 = 0.0
       FPSUM2 = 0.0
+      tReadyForSimplexTest = .FALSE.
 ! Update the SA status window
       CALL SA_OUTPUT(T,FOPT,FPAV,FPSD,dxvav,xvsig,flav,nvar,Last_NUP,Last_NDOWN,ntotmov)
       CALL sa_move_status(nmpert,0)
@@ -423,6 +424,7 @@
                   ENDDO
                 ENDDO
                 NewOptimumFound = .TRUE.
+                tReadyForSimplexTest = .TRUE.
                 CALL valchipro(CHIPROBEST)
                 ProgressIndicator = 1.0 -( (CHIPROBEST - (ChiMult*PAWLEYCHISQ)) / (InitialProChiSqrd - (ChiMult*PAWLEYCHISQ)))
                 FOPT = FP
@@ -539,7 +541,7 @@
 !  Terminate SA if appropriate.
 !      IF ((iMyExit .NE. 0) .OR. CheckTerm(NTOTMOV, AutoMinimise .AND. MOD(Curr_SA_Iteration,5) .EQ. 0)) THEN
       IF (iMyExit .EQ. 0) THEN
-        IF (.NOT. CheckTerm(NTOTMOV, AutoMinimise .AND. MOD(Curr_SA_Iteration,5) .EQ. 0)) &
+        IF (.NOT. CheckTerm(NTOTMOV, AutoMinimise .AND. tReadyForSimplexTest)) &
           GOTO 100 ! Next iteration
       ENDIF
 ! End of a run in a multi-run. This is the place for a final local minimisation
