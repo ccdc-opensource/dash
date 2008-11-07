@@ -365,11 +365,12 @@
       LOGICAL , EXTERNAL :: Get_OutputChi2vsMoves
       CHARACTER*20, EXTERNAL :: Integer2String
 
-      INTEGER iHandle, i, j, iFrg
+      INTEGER iHandle, i, j, iFrg, kk
       REAL    tReal
       INTEGER tInt
       INTEGER ExtLength
       CHARACTER*255 tDirName, tFileName, tExtension
+      CHARACTER*36 parlabel(mvar)
 
       CALL DownLoadSAOPT
       iHandle = 10
@@ -494,6 +495,7 @@
         WRITE(iHandle,'(A)',ERR=999) '#Preferred Orientation DIRection'
         WRITE(iHandle,'(A,3(X,I3))',ERR=999) 'PO_DIR', (PO_Direction(i),i=1,3)
       ENDIF
+      kk = 0
       DO iFrg = 1, nfrag
         IF ( TruncateSDIFileName ) THEN
           ExtLength = 7
@@ -502,10 +504,15 @@
         ELSE
           WRITE(iHandle,'(A)',ERR=999) "ZMATRIX "//frag_file(iFrg)(1:LEN_TRIM(frag_file(iFrg)))
         ENDIF
+        DO i = 1, izmpar(iFrg)
+          kk = kk + 1
+          parlabel(kk) = czmpar(i, iFrg)
+        ENDDO
       ENDDO
 !C Need limits for all parameters. Since these are by index, we need to write all of them out
       WRITE(iHandle,'(A,X,I3)',ERR=999) 'LIMITS', nvar
       DO i = 1, nvar
+        WRITE(iHandle,'(2A)',ERR=999) '# ', TRIM(parlabel(i))
         SELECT CASE ( ModalFlag(i) )
           CASE ( 0, 1 ) ! Not a torsion/ a unimodal torsion
             WRITE(iHandle,'(F10.5,X,A,X,F10.5,X,F10.5)',ERR=999) X_init(i), 'LBUB', LB(i), UB(i)
