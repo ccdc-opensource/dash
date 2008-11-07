@@ -260,6 +260,30 @@
 !
 !*****************************************************************************
 !
+      LOGICAL FUNCTION InWizard()
+
+      USE WINTERACTER
+
+      IMPLICIT NONE
+
+      INTEGER         CurrentWizardWindow
+      COMMON /Wizard/ CurrentWizardWindow
+
+      IF (CurrentWizardWindow .GT. 0) THEN
+        CALL PushActiveWindowID
+        CALL SelectDASHDialog(CurrentWizardWindow)
+        CALL WDialogShow(-1,-1)
+        CALL PopActiveWindowID
+        InWizard = .TRUE.
+      ELSE
+        InWizard = .FALSE.
+      ENDIF
+      RETURN
+
+      END FUNCTION InWizard
+!
+!*****************************************************************************
+!
       SUBROUTINE DealWithMainWizardWindow
 
       USE DRUID_HEADER
@@ -2161,7 +2185,7 @@
       WRITE(hFile, '(A)' ,ERR=997) '!    2-Theta    Intensity'
       DO I = 1, NTPeak
         iOrd = iOrdTem(i)
-        WRITE(hFile,'(F12.5,X,F12.2))',ERR=997) AllPkPosVal(iOrd), AllPkAreaVal(iOrd)
+        WRITE(hFile,'(F12.5,X,F12.2)',ERR=997) AllPkPosVal(iOrd), AllPkAreaVal(iOrd)
       ENDDO
       CLOSE(hFile)
       IF (LEN_TRIM(McMailleEXE) .EQ. 0) GOTO 998
