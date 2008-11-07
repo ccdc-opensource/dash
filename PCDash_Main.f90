@@ -68,7 +68,7 @@
           CALL StrUpperCase(StrFileExtension)
           IF (StrFileExtension .EQ. 'DBF   ') THEN
             in_batch = .TRUE.
-            BatchLogName = TRIM(ArgString)//'.log'
+            CALL IOsFullPathname(TRIM(ArgString)//'.log',BatchLogName) 
             CALL ClearBatchLogFile()
           ENDIF
         ENDIF
