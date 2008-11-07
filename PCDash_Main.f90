@@ -202,6 +202,9 @@
 ! This subroutine processes the menu selections
 ! This includes the toolbar
 !
+! As wizard uses modeless dialogs, to prevent interruption to it, the actions
+! for item which may bring up wizard are ignored until current wizard closed.
+!
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
@@ -220,7 +223,7 @@
       INTEGER          IPMIN, IPMAX, iStart, iStop, nPoints
       COMMON /PROFIPM/ IPMIN, IPMAX, iStart, iStop, nPoints
 
-      LOGICAL, EXTERNAL :: Confirm
+      LOGICAL, EXTERNAL :: Confirm, InWizard
       LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
       INTEGER, EXTERNAL :: DiffractionFileBrowse
       REAL xpgdif, ypgdif
@@ -230,11 +233,14 @@
 
       SELECT CASE (EventInfo%VALUE1)
         CASE (IDB_Open)
-          CALL PrjFileBrowse
+          IF (.NOT. InWizard()) &
+            CALL PrjFileBrowse
         CASE (ID_import_xye_file)
-          ISTAT = DiffractionFileBrowse()
+          IF (.NOT. InWizard()) &
+            ISTAT = DiffractionFileBrowse()
         CASE (ID_import_dpj_file)
-          CALL SDIFileBrowse
+          IF (.NOT. InWizard()) &
+            CALL SDIFileBrowse
         CASE (ID_Remove_Background)
           CALL PushActiveWindowID
           CALL LoadDASHDialog(IDD_Background_Fit)
@@ -268,14 +274,18 @@
         CASE (ID_Peak_Fitting_Mode)
           CALL SelectMode(ID_Peak_Fitting_Mode)
         CASE (ID_Pawley_Refinement_Mode)
-          CALL ShowPawleyFitWindow
+          IF (.NOT. InWizard()) &
+            CALL ShowPawleyFitWindow
         CASE (ID_Structure_Solution_Mode)
-          CALL ShowWizardWindowZmatrices
+          IF (.NOT. InWizard()) &
+            CALL ShowWizardWindowZmatrices
         CASE (IDB_AnalyseSolutions)
-          CALL SelectMode(IDB_AnalyseSolutions)
-          CALL SelectDASHDialog(IDD_Polyfitter_Wizard_01)
-          CALL WDialogPutRadioButton(IDF_PW_Option4)
-          CALL WizardWindowShow(IDD_SAW_Page5)
+          IF (.NOT. InWizard()) THEN
+            CALL SelectMode(IDB_AnalyseSolutions)
+            CALL SelectDASHDialog(IDD_Polyfitter_Wizard_01)
+            CALL WDialogPutRadioButton(IDF_PW_Option4)
+            CALL WizardWindowShow(IDD_SAW_Page5)
+          ENDIF
         CASE (ID_FitPeaks)
           CALL FitPeaks
         CASE (ID_ClearPeakFitRanges)
