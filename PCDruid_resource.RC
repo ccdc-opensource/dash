@@ -8,7 +8,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 30/Oct/2008 17:07:14
+// Modified : 07/Nov/2008 16:54:34
 //
 ///////////////////////////////////////////////////
 //
@@ -727,6 +727,10 @@
 #define IDD_PW_Page8c                     166
 #define IDF_GSAS_Import_ins              1570
 #define ID_Tutorial_6                   40026
+#define IDD_SA_ByDbfFile                  168
+#define IDF_GROUP                        1577
+#define IDF_FileName                     1578
+#define IDD_SA_method                     169
 #define IDF_SetupMDB                     1580
 #define IDF_MDBMinHit                    1579
 
@@ -3717,6 +3721,54 @@ BEGIN
 " 1140 1 \n"
 " 1129 0 \n"
 " 1130 0 \n"
+"[Ranges] \n"
+"[Formats] \n"
+,0
+END
+
+IDD_SA_ByDbfFile DIALOG 0, 0,  375,  170
+STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | DS_3DLOOK | DS_MODALFRAME
+FONT    8, "MS Sans Serif"
+CAPTION "DASH Wizard : Simulated Annealing Using Batch File"
+BEGIN
+    CONTROL "",IDF_PW_Logo1,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   10,   15,   70,  140,WS_EX_DLGMODALFRAME
+    CONTROL "",IDF_FileName,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_AUTOHSCROLL,  122,   72,  202,   11
+    CONTROL "...",IDBBROWSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  332,   72,   16,   11
+    CONTROL "< &Back",IDBACK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  100,  150,   40,   14
+    CONTROL "&Solve >",IDNEXT,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  140,  150,   40,   14
+    CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  150,   40,   14
+    CONTROL "Choose a DASH batch file (.dbf). Press the Solve button to start a SA task in GUI mode using the settings loaded from this file.",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  100,   20,  258,   28
+    CONTROL "DBF file",IDF_GROUP,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  100,   55,  258,   40
+END
+
+IDD_SA_ByDbfFile RCDATA
+BEGIN
+"[Ranges] \n"
+"[Lengths] \n"
+" 1578   255 \n"
+"[Formats] \n"
+,0
+END
+
+IDD_SA_method DIALOG 0, 0,  375,  170
+STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | DS_3DLOOK | DS_MODALFRAME
+FONT    8, "MS Sans Serif"
+CAPTION "DASH Wizard : Simulated Annealing"
+BEGIN
+    CONTROL "",IDF_PW_Logo1,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   10,   15,   70,  140,WS_EX_DLGMODALFRAME
+    CONTROL "< &Back",IDBACK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  100,  150,   40,   14
+    CONTROL "&Next >",IDNEXT,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  140,  150,   40,   14
+    CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  150,   40,   14
+    CONTROL "Set up new SA runs",IDF_RADIO1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  146,   59,  140,   14
+    CONTROL "Load settings from an batch file",IDF_RADIO2,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  146,   72,  140,   14
+    CONTROL "Options for simulated annealing",IDF_GROUP1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  122,   35,  188,   70
+END
+
+IDD_SA_method RCDATA
+BEGIN
+"[Checks] \n"
+" 1140 1 \n"
+" 1129 0 \n"
 "[Ranges] \n"
 "[Formats] \n"
 ,0

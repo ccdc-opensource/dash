@@ -1,4 +1,4 @@
-! Winteracter resource identifiers. Created : 30/Oct/2008 17:07:14
+! Winteracter resource identifiers. Created : 07/Nov/2008 16:54:34
 !
       MODULE Druid_Header
       IMPLICIT NONE
@@ -708,6 +708,10 @@
       INTEGER, PARAMETER :: IDD_PW_Page8c                   =   166
       INTEGER, PARAMETER :: IDF_GSAS_Import_ins             =  1570
       INTEGER, PARAMETER :: ID_Tutorial_6                   = 40026
+      INTEGER, PARAMETER :: IDD_SA_ByDbfFile                =   168
+      INTEGER, PARAMETER :: IDF_GROUP                       =  1577
+      INTEGER, PARAMETER :: IDF_FileName                    =  1578
+      INTEGER, PARAMETER :: IDD_SA_method                   =   169
       INTEGER, PARAMETER :: IDF_SetupMDB                    =  1580
       INTEGER, PARAMETER :: IDF_MDBMinHit                   =  1579
       END MODULE Druid_Header

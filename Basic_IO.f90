@@ -516,6 +516,12 @@
         CASE (IDD_SAW_Page7_RIETAN)
           CALL DealWithRR_RIETAN
           GOTO 10
+        CASE (IDD_SA_method)
+          CALL DealWithWizardWindowSAMethod
+          GOTO 10
+        CASE (IDD_SA_ByDbfFile)
+          CALL DealWithWizardWindowLoadDBFFile
+          GOTO 10
       END SELECT
       DealWithEvent = .FALSE.
       RETURN
