@@ -49,7 +49,7 @@
       INTEGER MaxMoves2
       LOGICAL tSdiIn, tZmIn
 
-      in_batch = .TRUE.
+!     in_batch = .TRUE.
       iFrg = 0
       tSdiIn = .FALSE.
       tZmIn  = .FALSE.
@@ -242,7 +242,7 @@
       ! the .dbf file, because that makes it easier for the user to later relate
       ! the output back to the input.
       CALL PrjReadWrite(PrjFileName, cWrite)
-      CALL DoExit
+      GOTO 892
 
   996 CALL ErrorMessage('Failed to read SDI or ZMATRIX line from '//TRIM(ArgString))
       GOTO 990
@@ -250,7 +250,8 @@
       GOTO 990
   999 CALL ErrorMessage('Problem occurred while processing '//TRIM(keyword)//' record(s)')
   990 CLOSE(hFile)
-      CALL DoExit
+  892 IF (in_batch) CALL DoExit
+      RETURN
 
       END SUBROUTINE BatchMode
 !

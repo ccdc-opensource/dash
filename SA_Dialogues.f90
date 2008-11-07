@@ -127,7 +127,8 @@
             CASE (IDBACK)
 ! Go back to the Pawley refinement or the initial wizard
               CALL EndWizardPastPawley
-              CALL WizardWindowShow(IDD_Polyfitter_Wizard_01)
+              CALL WizardWindowShow(IDD_SA_method)
+              CALL WDialogPutRadioButton(IDF_RADIO1)
             CASE (IDNEXT, IDB_PO)
               Resume_SA = .FALSE. ! Initialisation
 ! Go to the next stage of the SA input
@@ -2636,6 +2637,105 @@
       ENDIF
 
       END SUBROUTINE CheckBiModalBounds 
+!
+!*****************************************************************************
+!
+      SUBROUTINE ShowWithWizardWindowLoadDBFFile
+
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      CHARACTER(MaxPathLength) CTEMP
+
+      CALL PushActiveWindowID
+      CALL SelectDASHDialog(IDD_SA_ByDbfFile)
+      CALL DASHWDialogGetString(IDF_FileName, CTEMP)
+      CALL WDialogFieldStateLogical(IDNEXT, (LEN_TRIM(CTEMP) .NE. 0))
+      CALL WizardWindowShow(IDD_SA_ByDbfFile)
+      CALL PopActiveWindowID
+
+      END SUBROUTINE ShowWithWizardWindowLoadDBFFile
+!
+!*****************************************************************************
+!
+      SUBROUTINE DealWithWizardWindowLoadDBFFile
+
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      CHARACTER(MaxPathLength) CTEMP, tDirName, tFileName
+      INTEGER iFlags
+
+      CALL PushActiveWindowID
+      CALL SelectDASHDialog(IDD_SA_ByDbfFile)
+      SELECT CASE (EventType)
+        CASE (PushButton) ! one of the buttons was pushed
+          SELECT CASE (EventInfo%VALUE1)
+            CASE (IDBACK)
+              CALL WizardWindowShow(IDD_SA_method)
+            CASE (IDCANCEL, IDCLOSE)
+              CALL EndWizard
+            CASE (IDNEXT)
+              CALL DASHWDialogGetString(IDF_FileName, CTEMP)
+              IF (LEN_TRIM(CTEMP) .LE. 0) THEN
+                CALL ErrorMessage('Have you chosen a BDF file?')
+              ELSE
+                CALL SplitPath(CTEMP, tDirName, tFileName)
+                CALL IOsDirChange(tDirName)
+                CALL BatchMode(tFileName)
+              ENDIF
+            CASE (IDBBROWSE)
+              CALL DASHWDialogGetString(IDF_FileName, CTEMP)
+              iFlags = LoadDialog + AppendExt + PromptOn
+              CALL WSelectFile('DASH batch file (*.dbf)|*.dbf|', iFlags, CTEMP, 'Load DASH batch file')
+              IF ((WinfoDialog(4) .EQ. CommonOk) .AND. (LEN_TRIM(CTEMP) .NE. 0)) THEN
+                CALL WDialogPutString(IDF_FileName, CTEMP)
+                CALL WDialogFieldState(IDNEXT, Enabled)
+              ELSE
+                CALL WDialogFieldState(IDNEXT, Disabled)
+              ENDIF
+          END SELECT
+      END SELECT
+      CALL PopActiveWindowID
+
+      END SUBROUTINE DealWithWizardWindowLoadDBFFile
+!
+!*****************************************************************************
+!
+      SUBROUTINE DealWithWizardWindowSAMethod
+
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      INTEGER iOpt
+
+      CALL PushActiveWindowID
+      CALL SelectDASHDialog(IDD_SA_method)
+      SELECT CASE (EventType)
+        CASE (PushButton) ! one of the buttons was pushed
+          SELECT CASE (EventInfo%VALUE1)
+            CASE (IDBACK)
+              CALL WizardWindowShow(IDD_Polyfitter_Wizard_01)
+            CASE (IDCANCEL, IDCLOSE)
+              CALL EndWizard
+            CASE (IDNEXT)
+              CALL DASHWDialogGetRadioButton(IDF_RADIO1, iOpt)
+              IF (iOpt .EQ. 2) THEN
+                CALL ShowWithWizardWindowLoadDBFFile
+              ELSE
+                CALL ShowWizardWindowZmatrices
+              ENDIF
+          END SELECT
+      END SELECT
+      CALL PopActiveWindowID
+
+      END SUBROUTINE DealWithWizardWindowSAMethod
 !
 !*****************************************************************************
 !

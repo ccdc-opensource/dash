@@ -297,7 +297,7 @@
                   CALL Generate_TicMarks
                   CALL WizardWindowShow(IDD_SX_Page1)
                 CASE (3) ! Simulated annealing structure solution
-                  CALL ShowWizardWindowZmatrices
+                  CALL WizardWindowShow(IDD_SA_method)
                 CASE (4) ! Analyse solutions
                   CALL WizardWindowShow(IDD_SAW_Page5)
                   CALL SelectMode(IDB_AnalyseSolutions)
