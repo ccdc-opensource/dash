@@ -44,7 +44,7 @@
                            TimeNowSeconds
       LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
       CHARACTER*100 SA_DurationStr
-      INTEGER StartDate, EndDate, DSLen
+      INTEGER StartDate, EndDate, DSLen, iOpt
       INTEGER StartTime, EndTime
 
 
@@ -52,7 +52,15 @@
       COMMON /BATEXE/ in_batch
 
       IF ( CheckOverwriteSaOutput() .EQ. 0 ) THEN
-        CALL WizardWindowShow(IDD_SA_input4)
+        CALL PushActiveWindowID
+        CALL SelectDASHDialog(IDD_SA_method)
+        CALL DASHWDialogGetRadioButton(IDF_RADIO1, iOpt)
+        IF (iOpt .EQ. 2) THEN
+          CALL ShowWithWizardWindowLoadDBFFile
+        ELSE
+          CALL WizardWindowShow(IDD_SA_input4)
+        ENDIF
+        CALL PopActiveWindowID
         RETURN
       ENDIF
       ! Initialise LOGICALs that tell us if this parameter is either a translation or a torsion
