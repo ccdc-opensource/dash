@@ -125,25 +125,21 @@
       J = 1
       DO WHILE (I .LE. tLength) !length of label
         I = I + 1
-        IF(TempAtomLabel(I:I) .EQ. "(" ) THEN
-          Marker(J) = I
-          J = J+1
-        ENDIF
-        IF(TempAtomLabel(I:I) .EQ. ":" ) THEN
+        SELECT CASE (TempAtomLabel(I:I))
+        CASE("(", ":")
           Marker(J) = I
           J = J + 1
-        ENDIF       
-        IF(TempAtomLabel(I:I) .EQ. ")" ) THEN
+        CASE(")")
           Marker(J) = I
           EXIT
-        ENDIF
+        END SELECT
       ENDDO
       Atom(1) = TempAtomLabel(Marker(1)+1 : Marker(2)-1) 
       Atom(2) = TempAtomLabel(Marker(2)+1 : Marker(3)-1)
       Atom(3) = TempAtomLabel(Marker(3)+1 : Marker(4)-1)
       Atom(4) = TempAtomLabel(Marker(4)+1 : Marker(5)-1)
       DO J = 1,4 ! Mogul does not use atom labels but number of atom in Mol2 file 
-        DO I = 1, MaxDoF
+        DO I = 1, natoms(iFrg)
           IF(Atom(J) .EQ. AtomLabel(izmbid(I,IFrg))) THEN
             AtomID(J) = I
             EXIT 
