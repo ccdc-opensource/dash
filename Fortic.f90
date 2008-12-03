@@ -34,9 +34,11 @@
 
       INTEGER         IBMBER
       COMMON /CCSLER/ IBMBER
-
+      INTEGER, EXTERNAL :: PREFIN
+      INTEGER IDummy
+      
       filnam_root = filnmr
-      CALL PREFIN(PNAME)
+      IDummy = PREFIN(PNAME)
 ! SET UP PRECISE PROBLEM, AND READ MOST L CARDS:
       CALL REFSET
 ! THIS ROUTINE IS ONLY FOR ONE PHASE:
