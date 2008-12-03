@@ -363,7 +363,7 @@
 
       IMPLICIT NONE
 
-      INTEGER, INTENT (IN   ) :: the_assembly(1:MaxAtm_3)
+      INTEGER, INTENT (INOUT) :: the_assembly(1:MaxAtm_3)
 
       INTEGER MaxAAStack
       PARAMETER (MaxAAStack = 300)
