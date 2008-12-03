@@ -19,6 +19,8 @@
       INTEGER nCycle, opt, IErrCode
       CHARACTER(MaxPathLength) tScriptName
       CHARACTER(1) tOptStr
+      INTEGER IDummy
+      INTEGER,EXTERNAL:: SetRefineParameters, CopyRIETANRestraints
 
       ! Initialise to failure
       Launch_RIETAN = 1
@@ -30,7 +32,7 @@
       IF ( opt .LE. 0 ) GOTO 996
       tOptStr = '0'
       IF ( IAND(opt, Z'100') .NE. 0 ) tOptStr = ''
-      CALL SetRefineParameters(input_file_name, opt)
+      IDummy =  SetRefineParameters(input_file_name, opt)
       IF ( CheckRIETANExe(RIETANEXE, tScriptName) .NE. 0 ) RETURN
       ! Launch RIETAN vis script and wait for it to return
       IErrCode = InfoError(1) ! Clear errors
@@ -42,12 +44,12 @@
 ! Follow init, run RIETAN and ORFFE to generate a .ffe file
       IF ( IAND(opt, Z'01') .NE. 0 ) THEN
         ! RIETAN tends to break without parameters to be refined, set both bkg and scale
-        CALL SetRefineParameters(input_file_name, Z'100C')
+        IDummy = SetRefineParameters(input_file_name, Z'100C')
         tOptStr = '2'
         CALL IOSCommand('"'//TRIM(tScriptName)//'" "'//TRIM(RIETANEXE)//'" '// &
                       '"'//TRIM(input_file_name)//'" '//tOptStr, ProcBlocked)
         IF ( InfoError(1) .NE. 0 ) GOTO 998
-        CALL CopyRIETANRestraints(input_file_name)
+        IDummy = CopyRIETANRestraints(input_file_name)
       ENDIF
       CALL WCursorShape(CurCrossHair)
       Launch_RIETAN = 0
