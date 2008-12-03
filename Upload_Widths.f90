@@ -463,7 +463,7 @@
 
       INCLUDE 'PARAMS.INC'
 
-      REAL X(MVAR), DX(MVAR)
+      REAL X(*), DX(*)
 
       INTEGER     MMPAR
       PARAMETER ( MMPAR = MVAR * MVAR )
@@ -510,7 +510,7 @@
 
       INTEGER     MMPAR
       PARAMETER ( MMPAR = MVAR * MVAR )
-      REAL X(MVAR), DX(MVAR), COV(MMPAR)
+      REAL X(*), DX(*), COV(MMPAR)
 
       INTEGER         IBMBER
       COMMON /CCSLER/ IBMBER
@@ -552,7 +552,7 @@
 
       INTEGER     MMPAR
       PARAMETER ( MMPAR = MVAR * MVAR )
-      REAL X(MVAR), DX(MVAR), COV(MMPAR)
+      REAL X(*), DX(*), COV(MMPAR)
 
       INTEGER IBMBER
       COMMON / CCSLER / IBMBER 
