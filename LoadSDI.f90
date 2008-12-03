@@ -16,6 +16,8 @@
       CHARACTER(LEN=60) FILTER
       INTEGER           IFLAGS, IFTYPE 
       CHARACTER(LEN=MaxPathLength) tFileName
+      LOGICAL,EXTERNAL:: SDIFileOpen
+      LOGICAL Dummy
 
       IFLAGS = LoadDialog + DirChange + PromptOn + AppendExt
       FILTER = 'All files (*.*)|*.*|'//&
@@ -31,7 +33,7 @@
 ! the current subroutine is called.
 ! Actually, that is how it works in practice under Windows (try 'Start' -> 'Run...' -> 'Browse...'
 ! it will not actually open the file, just select it).
-      CALL SDIFileOpen(tFileName)
+      Dummy = SDIFileOpen(tFileName)
 
       END SUBROUTINE SDIFileBrowse
 !
