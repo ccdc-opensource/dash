@@ -457,7 +457,8 @@
       INTEGER*4   Offset, CurrDataRange
       INTEGER*2   SizeOfHeader
       REAL        StepTime, Last2Theta
-      LOGICAL     IsFirstRange, NumOfRangesToBeLoaded
+      LOGICAL     IsFirstRange
+      INTEGER     NumOfRangesToBeLoaded
 
 ! Current status, initialise to 'error'
       Load_rawBruker_File = 1
