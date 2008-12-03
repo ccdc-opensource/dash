@@ -14,7 +14,7 @@
       REAL MogulDistributions(-180:180, MVAR)
       COMMON /MDB/ NumMogulBins, MogulBins, MogulDistributions
 
-      INTEGER, External :: InterpolateBins
+      LOGICAL, External :: InterpolateBins
       INTEGER N
 
       ParseDistribution = .FALSE.
@@ -42,7 +42,7 @@
       REAL MogulDistributions(-180:180, MVAR)
       COMMON /MDB/ NumMogulBins, MogulBins, MogulDistributions
 
-      INTEGER, External :: InterpolateBins
+      LOGICAL, External :: InterpolateBins
 
       ProcessDistribution = .FALSE.
       NumMogulBins(Item) = 0
