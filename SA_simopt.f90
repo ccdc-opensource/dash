@@ -1,9 +1,12 @@
 !
 !*****************************************************************************
 !
-! For Auto, if set TestOnlyForAuto, the prof chi or F will be returned, 
-! but global CHIPROBEST, FOPT and XOPT are not changed.
-      REAL FUNCTION LocalMinimise(Auto, TestOnlyForAuto)
+! Avoid using REAL function type, as accidentally CALL a real function 
+! may lead to FPU stack corruption in Intel Fortran (IF10).
+!
+! For Auto, if set TestOnlyForAuto, global CHIPROBEST, FOPT and XOPT are not updated.
+! LMF and LMChiPro are made available through Local_Minimise common block.
+      SUBROUTINE LocalMinimise(Auto, TestOnlyForAuto)
 
       USE WINTERACTER
       USE DRUID_HEADER
@@ -67,23 +70,21 @@
       INTEGER                                                                    HydrogenTreatment
       COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign, HydrogenTreatment
 
-      LOGICAL           Is_SX
-      COMMON  / SXCOM / Is_SX
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+      REAL LMF, LMChiPro
+      COMMON /Local_Minimise/LMF, LMChiPro
 
       LOGICAL, EXTERNAL :: Confirm
       REAL, EXTERNAL :: SA_FCN
       CHARACTER*80 chistr
       INTEGER I, II, III, N
       LOGICAL tAccept, tLOG_HYDROGENS, tUpdate
-      REAL    FTEM, ChiProTem
       REAL    DFTEM
       LOGICAL DesorbHydrogens
       REAL    XSIM(MVAR), DXSIM(MVAR)
 
-      LOGICAL         in_batch
-      COMMON /BATEXE/ in_batch
-
-      LocalMinimise = HUGE(1.0)
       IF (Auto .AND. (.NOT. AutoMinimise)) RETURN
  
       IF ( .NOT. IN_BATCH ) &
@@ -106,13 +107,13 @@
 !C DXSIM = initial step sizes.
         DXSIM(II) = SA_SimplexDampingFactor*0.1*RULB(I)
       ENDDO
-      CALL SA_SIMOPT(XSIM,DXSIM,N,FTEM)
+      CALL SA_SIMOPT(XSIM,DXSIM,N,LMF)
       IF (Auto) THEN
         tAccept = .TRUE.
         tUpdate = .NOT. TestOnlyForAuto
       ELSE
         chistr = 'Chi-squared = 0000.00'
-        WRITE(chistr(15:21),'(F7.2)') FTEM
+        WRITE(chistr(15:21),'(F7.2)') LMF
         tAccept = Confirm(CHISTR//CHAR(13)//'Press Yes to proceed with Simplex results.')
         tUpdate = tAccept
       ENDIF
@@ -125,15 +126,15 @@
             XAtmCoords(III,II,Curr_SA_Run) = XATO(III,II)
           ENDDO
         ENDDO
-        CALL valchipro(ChiProTem)
+        CALL valchipro(LMChiPro)
         IF (tUpdate) THEN
           DO II = 1, N
             I = IP(II)
             XOPT(I) = XSIM(II)
             x_unique(I) = XSIM(II)
           ENDDO
-          FOPT = FTEM
-          CHIPROBEST = ChiProTem
+          FOPT = LMF
+          CHIPROBEST = LMChiPro
           NewOptimumFound = .TRUE.
           IF ( .NOT. IN_BATCH ) THEN
             CALL SelectDASHDialog(IDD_SA_Action1)
@@ -160,13 +161,7 @@
       IF ( .NOT. IN_BATCH ) &
         CALL WCursorShape(CurCrossHair)
 
-      IF (Is_SX) THEN
-        LocalMinimise = FTEM
-      ELSE
-        LocalMinimise = ChiProTem
-      ENDIF
-
-      END FUNCTION LocalMinimise
+      END SUBROUTINE LocalMinimise
 !
 !*****************************************************************************
 !
