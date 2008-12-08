@@ -966,8 +966,10 @@
       REAL             CHIPROBEST
       COMMON /PLTSTO2/ CHIPROBEST
 
-      REAL, EXTERNAL :: LocalMinimise
-      REAL Best_CHI
+      REAL LMF, LMChiPro
+      COMMON /Local_Minimise/LMF, LMChiPro
+
+      REAL Best_CHI, LM_Best_CHI
 
       CheckTerm = .TRUE.
 
@@ -982,7 +984,13 @@
         RETURN
       IF (TestLocalMin) THEN
         IF (Best_CHI .LT. (3*ChiMult*PAWLEYCHISQ)) THEN
-          IF (LocalMinimise(.TRUE., .TRUE.) .LT. (ChiMult*PAWLEYCHISQ)) &
+          CALL LocalMinimise(.TRUE., .TRUE.)
+          IF (Is_SX) THEN
+            LM_Best_CHI = LMF
+          ELSE
+            LM_Best_CHI = LMChiPro
+          ENDIF
+          IF (LM_Best_CHI .LT. (ChiMult*PAWLEYCHISQ)) &
             RETURN
         ENDIF
       ENDIF
