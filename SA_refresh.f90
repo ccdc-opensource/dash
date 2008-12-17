@@ -12,12 +12,14 @@
       INCLUDE 'PARAMS.INC'
 
       INTEGER              iMyExit 
-      LOGICAL                       NewOptimumFound, WasMinimised
-      COMMON / CMN000001 / iMyExit, NewOptimumFound, WasMinimised
+      LOGICAL                       NewOptimumFound, WasMinimised, TestEarlyTermFlag
+      COMMON / CMN000001 / iMyExit, NewOptimumFound, WasMinimised, TestEarlyTermFlag
 
       INTEGER         Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
       REAL                                                           ChiMult
       COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
+
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
 
       CHARACTER*(15) file_name
 
@@ -56,6 +58,9 @@
               CALL SelectDASHDialog(IDD_Summary)
               CALL WDialogShow(-1, -1, 0, Modeless)
           END SELECT
+        CASE (FieldChanged)
+          IF (EventInfo%VALUE1 .EQ. EventInfo%VALUE2 .AND. EventInfo%VALUE2 .EQ. IDF_TestEarlyTerm) &
+            TestEarlyTermFlag = DASHWDialogGetCheckBoxLogical(IDF_TestEarlyTerm)
       END SELECT
       CALL PopActiveWindowID
 

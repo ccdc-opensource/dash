@@ -34,8 +34,8 @@
       COMMON /SIMSTO/ NPAR, IP(MVAR)
 
       INTEGER              iMyExit 
-      LOGICAL                       NewOptimumFound, WasMinimised
-      COMMON / CMN000001 / iMyExit, NewOptimumFound, WasMinimised
+      LOGICAL                       NewOptimumFound, WasMinimised, TestEarlyTermFlag
+      COMMON / CMN000001 / iMyExit, NewOptimumFound, WasMinimised, TestEarlyTermFlag
 
       INTEGER         nvar, ns, nt, iseed1, iseed2
       COMMON /sapars/ nvar, ns, nt, iseed1, iseed2

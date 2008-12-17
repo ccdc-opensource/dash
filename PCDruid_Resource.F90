@@ -716,4 +716,5 @@
       INTEGER, PARAMETER :: IDF_SetupMDB                    =  1580
       INTEGER, PARAMETER :: IDF_MDBMinHit                   =  1579
       INTEGER, PARAMETER :: IDF_SX_Page1_label              =  1372
+      INTEGER, PARAMETER :: IDF_TestEarlyTerm               =  1576
       END MODULE Druid_Header
