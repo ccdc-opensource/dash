@@ -75,8 +75,8 @@
       COMMON /sagdat/ nmpert, bmIHANDLE
 
       INTEGER              iMyExit 
-      LOGICAL                       NewOptimumFound, WasMinimised
-      COMMON / CMN000001 / iMyExit, NewOptimumFound, WasMinimised
+      LOGICAL                       NewOptimumFound, WasMinimised, TestEarlyTermFlag
+      COMMON / CMN000001 / iMyExit, NewOptimumFound, WasMinimised, TestEarlyTermFlag
 
       LOGICAL           Resume_SA
       COMMON /RESUMESA/ Resume_SA
@@ -543,6 +543,8 @@
 !      IF ((iMyExit .NE. 0) .OR. CheckTerm(NTOTMOV, AutoMinimise .AND. MOD(Curr_SA_Iteration,5) .EQ. 0)) THEN
       IF (iMyExit .EQ. 0) THEN
         tTestEarlyTerm = AutoMinimise .AND. tOptimumedSinceTET .AND. MOD(Curr_SA_Iteration,5) .EQ. 0
+        IF ( .NOT. in_batch ) &
+          tTestEarlyTerm = tTestEarlyTerm .AND. TestEarlyTermFlag
         IF ( tTestEarlyTerm ) tOptimumedSinceTET = .FALSE.
         IF (.NOT. CheckTerm(NTOTMOV, tTestEarlyTerm)) &
           GOTO 100 ! Next iteration

@@ -21,8 +21,8 @@
       COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
       INTEGER              iMyExit 
-      LOGICAL                       NewOptimumFound, WasMinimised
-      COMMON / CMN000001 / iMyExit, NewOptimumFound, WasMinimised
+      LOGICAL                       NewOptimumFound, WasMinimised, TestEarlyTermFlag
+      COMMON / CMN000001 / iMyExit, NewOptimumFound, WasMinimised, TestEarlyTermFlag
 
       REAL                    chi_sqd
       INTEGER                                           Curr_Iter, MaxIterationSoFar
@@ -82,6 +82,13 @@
         CALL WDialogFieldState(IDF_LABEL3, Enabled)
 ! Pop up the SA status window
         CALL WizardWindowShow(IDD_SA_Action1)
+        IF (AutoMinimise) THEN
+          CALL WDialogFieldState(IDF_TestEarlyTerm, Enabled)
+        ELSE
+          CALL WDialogPutCheckBox(IDF_TestEarlyTerm, Disabled)
+          CALL WDialogFieldState(IDF_TestEarlyTerm, Disabled)
+        ENDIF
+        TestEarlyTermFlag = DASHWDialogGetCheckBoxLogical(IDF_TestEarlyTerm)
 !O      CALL SelectDASHDialog(IDD_Parameter_Status_2)
 !O      CALL WDialogShow(-1, -1, 0, Modeless)
         CALL WDialogFieldState(IDB_Summary, Enabled)
