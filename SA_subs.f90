@@ -110,7 +110,8 @@
       INTEGER III, IH, KK, iFrg
       INTEGER Last_NUP, Last_NDOWN
       CHARACTER*3 CNruns,CMruns
-      LOGICAL PrevRejected, CurrParsInclPO, PrevParsInclPO, tReadyForSimplexTest
+      LOGICAL PrevRejected, CurrParsInclPO, PrevParsInclPO
+      LOGICAL tTestEarlyTerm, tOptimumedSinceTET
       INTEGER TotNumTrials
       CHARACTER*3 RowLabelStr
       REAL XP(MVAR)
@@ -221,6 +222,7 @@
       ENDDO
       FOPT = F
       NewOptimumFound = .FALSE.
+      tOptimumedSinceTET = .FALSE.
 ! Evaluate the profile chi-squared as well
       CALL valchipro(CHIPROBEST)
       InitialProChiSqrd = CHIPROBEST
@@ -268,7 +270,6 @@
       FPSUM0 = 0.0
       FPSUM1 = 0.0
       FPSUM2 = 0.0
-      tReadyForSimplexTest = .FALSE.
 ! Update the SA status window
       CALL SA_OUTPUT(T,FOPT,FPAV,FPSD,dxvav,xvsig,flav,nvar,Last_NUP,Last_NDOWN,ntotmov)
       CALL sa_move_status(nmpert,0)
@@ -424,7 +425,7 @@
                   ENDDO
                 ENDDO
                 NewOptimumFound = .TRUE.
-                tReadyForSimplexTest = .TRUE.
+                tOptimumedSinceTET = .TRUE.
                 CALL valchipro(CHIPROBEST)
                 ProgressIndicator = 1.0 -( (CHIPROBEST - (ChiMult*PAWLEYCHISQ)) / (InitialProChiSqrd - (ChiMult*PAWLEYCHISQ)))
                 FOPT = FP
@@ -541,7 +542,9 @@
 !  Terminate SA if appropriate.
 !      IF ((iMyExit .NE. 0) .OR. CheckTerm(NTOTMOV, AutoMinimise .AND. MOD(Curr_SA_Iteration,5) .EQ. 0)) THEN
       IF (iMyExit .EQ. 0) THEN
-        IF (.NOT. CheckTerm(NTOTMOV, AutoMinimise .AND. tReadyForSimplexTest)) &
+        tTestEarlyTerm = AutoMinimise .AND. tOptimumedSinceTET .AND. MOD(Curr_SA_Iteration,5) .EQ. 0
+        IF ( tTestEarlyTerm ) tOptimumedSinceTET = .FALSE.
+        IF (.NOT. CheckTerm(NTOTMOV, tTestEarlyTerm)) &
           GOTO 100 ! Next iteration
       ENDIF
 ! End of a run in a multi-run. This is the place for a final local minimisation
