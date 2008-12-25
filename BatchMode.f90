@@ -13,6 +13,7 @@
       CHARACTER*(*), INTENT (IN   ) :: ArgString
 
       INCLUDE 'PARAMS.INC'
+      INCLUDE 'SA_restrain.inc'
 
       LOGICAL         in_batch
       COMMON /BATEXE/ in_batch
@@ -38,7 +39,7 @@
       REAL                                                                          iX, iUB, iLB  
       COMMON /ModalTorsions/ ModalFlag(mvar), RowNumber, iRadio, iX, iUB, iLB
 
-      LOGICAL, EXTERNAL :: SDIFileLoad, ParseDistribution
+      LOGICAL, EXTERNAL :: SDIFileLoad, ParseDistribution, ParseSADistRestraint
       INTEGER, EXTERNAL :: Read_One_zm
 
       INTEGER, PARAMETER :: hFile = 63
@@ -50,6 +51,7 @@
       LOGICAL tSdiIn, tZmIn
 
 !     in_batch = .TRUE.
+      DRestrNumb = 0
       iFrg = 0
       tSdiIn = .FALSE.
       tZmIn  = .FALSE.
@@ -170,6 +172,8 @@
              GOTO 999 ! reading failed
             ENDIF
             tZmIn = .TRUE.
+          CASE ('DIST_RESTRAINT','BOND_RESTRAINT') ! This line must appear later than ZMATRIX in .dbf
+            IF (.NOT. ParseSADistRestraint(line, iFrg)) GOTO 999
           CASE ('PO_DIR')
             CALL INextInteger(line, PO_Direction(1))
             IF (InfoError(1) .NE. 0) GOTO 999
@@ -325,6 +329,8 @@
 
       IMPLICIT NONE
 
+      INCLUDE 'SA_restrain.inc'
+
       CHARACTER*(*), INTENT (IN   ) :: FileName
       LOGICAL,       INTENT (IN   ) :: TruncateSDIFileName ! Quick hack
 
@@ -366,7 +372,7 @@
       LOGICAL , EXTERNAL :: Get_OutputChi2vsMoves
       CHARACTER*20, EXTERNAL :: Integer2String
 
-      INTEGER iHandle, i, j, iFrg, kk
+      INTEGER iHandle, i, j, iFrg, kk, fragID(2), atomSeq(2)
       REAL    tReal
       INTEGER tInt
       INTEGER ExtLength
@@ -510,6 +516,19 @@
           parlabel(kk) = czmpar(i, iFrg)
         ENDDO
       ENDDO
+      IF (DRestrNumb .GT. 0) THEN
+        WRITE(iHandle,'(A)',ERR=999) '# Frag1, Atom1, Frag2, Atom2, Distance, Width, Weight, Spring_flag(0=no,1=yes)'
+        DO i = 1, DRestrNumb
+          DO j = 1, 2
+            CALL AtomID2Frag( DRestrAtomIDs(j,I), fragID(j), atomSeq(j) )
+          ENDDO
+          WRITE(iHandle,'(A,2(X,I2,A))',ERR=999) '#', (fragID(j), ':'//OriginalLabel(atomSeq(j), fragID(j)), j=1, 2)
+! Avoid using atom label: as "relabel" may change internal labels, but those in zmatrics remain unchanged
+          WRITE(iHandle,'(A,X,2(I2,X,I3,X),2(F8.4,X),F8.2,X,I1)',ERR=999) 'DIST_RESTRAINT', &
+                  (fragID(j), atomSeq(j), j=1, 2), &
+                  DRestrLens(I), DRestrWidths(I), DRestrWeights(I), DRestrSpringOpts(I)
+        ENDDO
+      ENDIF
 !C Need limits for all parameters. Since these are by index, we need to write all of them out
       WRITE(iHandle,'(A,X,I3)',ERR=999) 'LIMITS', nvar
       DO i = 1, nvar
