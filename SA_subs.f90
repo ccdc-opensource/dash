@@ -212,9 +212,10 @@
         XOPT(I) = x_unique(I)
         C(I) = 2.0
       ENDDO
+      CALL SetSpringWeight( 0.0 )
 ! Evaluate the function with input X and return value as F.
       IF (PrefParExists) CALL PO_PRECFC(x_unique(iPrfPar))
-      CALL FCN(x_unique,F,0)
+      CALL FCN(x_unique,F,0, .TRUE.)
       DO II = 1, NATOM
         DO III = 1, 3
           XAtmCoords(III,II,Curr_SA_Run) = XATO(III,II)
@@ -258,6 +259,7 @@
       Curr_SA_Iteration = Curr_SA_Iteration + 1
       ! Next line is wrong for single crystal, which should use the intensity chi-sqrd
       ProgressIndicator = 1.0 -( (CHIPROBEST - (ChiMult*PAWLEYCHISQ)) / (InitialProChiSqrd - (ChiMult*PAWLEYCHISQ)))
+      CALL SetSpringWeight( ProgressIndicator )
       NUP = 0
       NDOWN = 0
       DO II = 1, nvar
@@ -385,21 +387,21 @@
               IF (PrevRejected) THEN
                 IF (PrevParsInclPO) THEN
                   IF (CurrParsInclPO) THEN
-                    CALL FCN(XP,FP,iPrfPar)
+                    CALL FCN(XP,FP,iPrfPar, .TRUE.)
                   ELSE
                     CALL PO_PRECFC(XP(iPrfPar))
-                    CALL FCN(XP,FP,0)
+                    CALL FCN(XP,FP,0, .TRUE.)
                   ENDIF
                 ELSE
                   IF (CurrParsInclPO) CALL PO_PRECFC(XP(iPrfPar))
-                  CALL FCN(XP,FP,0)
+                  CALL FCN(XP,FP,0, .TRUE.)
                 ENDIF
               ELSE
-                CALL FCN(XP,FP,H)
+                CALL FCN(XP,FP,H, .TRUE.)
               ENDIF
             ELSE
               IF ((CurrParsInclPO) .OR. (PrevParsInclPO .AND. PrevRejected)) CALL PO_PRECFC(XP(iPrfPar))
-              CALL FCN(XP,FP,0)
+              CALL FCN(XP,FP,0, .TRUE.)
             ENDIF
             PrevParsInclPO = CurrParsInclPO
 

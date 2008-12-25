@@ -155,7 +155,7 @@
       ENDIF
       IF ((.NOT. (tAccept .AND. tUpdate)) .AND. PrefParExists) THEN
         CALL PO_PRECFC(x_unique(iPrfPar))
-        CALL FCN(x_unique,DFTEM,0)
+        CALL FCN(x_unique,DFTEM,0,.FALSE.)
       ENDIF
 
       IF ( .NOT. IN_BATCH ) &
@@ -200,7 +200,7 @@
         DBLEP(I) = P(II)
       ENDDO
       IF (PrefParExists) CALL PO_PRECFC(DBLEP(iPrfPar))
-      CALL FCN(DBLEP, CHIANS, 0)
+      CALL FCN(DBLEP, CHIANS, 0, .FALSE.)
       SA_FCN = CHIANS
 
       END FUNCTION SA_FCN

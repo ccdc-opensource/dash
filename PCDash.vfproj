@@ -111,6 +111,7 @@
 		<File RelativePath=".\SA_move_status.f90"/>
 		<File RelativePath=".\SA_output.f90"/>
 		<File RelativePath=".\SA_refresh.f90"/>
+		<File RelativePath=".\SA_restrain.f90"/>
 		<File RelativePath=".\SA_simopt.f90"/>
 		<File RelativePath=".\SA_soln_store.f90"/>
 		<File RelativePath=".\SA_structure_output.f90"/>
@@ -143,6 +144,7 @@
 		<File RelativePath=".\params.inc"/>
 		<File RelativePath=".\POLY_COLOURS.INC"/>
 		<File RelativePath=".\Reflns.inc"/>
+		<File RelativePath=".\SA_restrain.inc"/>
 		<File RelativePath=".\statlog.inc"/></Filter>
 		<Filter Name="Resource Files" Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe">
 		<File RelativePath=".\res\bimodal.ico"/>
