@@ -12,30 +12,45 @@
       LOGICAL         in_batch
       COMMON /BATEXE/ in_batch
 
+      INTEGER NumbLicencePath
+      CHARACTER*(MaxPathLength) LicencePaths(3)
+      COMMON /LICENCELOC/ NumbLicencePath, LicencePaths
+
       CHARACTER*2 Exp
       TYPE (License_Info) Info
       
+      LicencePaths(1) = TRIM(AllUsersProfileDirectory)//'DashLicense.dat'
+      LicencePaths(2) = TRIM(InstallationDirectory)//'License.dat'
+      LicencePaths(3) = TRIM(StartUpDirectory)//'DashLicense.dat'
+      NumbLicencePath = 3
+      PathToLicenseFile = ''
+
       IF ( in_batch ) THEN
-        CALL ReadLicenceFile(Info)
+        CALL FindLicenceFile(Info, .TRUE.)
         IF (Info%Valid .EQ. 1 ) THEN
           RETURN
         ELSE
-          CALL AppendBatchLogFile('Error: Invalid license')
+          CALL AppendBatchLogFile('Error: Can not find a valid licence')
         ENDIF
         CALL DoExit
       ENDIF
 
       CALL LoadDASHDialog(IDD_LicenceAgreement)
       CALL LoadDASHDialog(IDD_License_Dialog)
-      CALL ReadLicenceFile(Info)
+      CALL FindLicenceFile(Info, .FALSE.)
 
       DO WHILE (Info%Valid .LE. 0) 
         SELECT CASE (Info%Valid)
           CASE (-1)
-            CALL ErrorMessage("Could not find or open the licence file"//CHAR(13)//&
-              TRIM(AllUsersProfileDirectory)//"DashLicense.dat or "//CHAR(13)//&
-              TRIM(InstallationDirectory)//"License.dat or "//CHAR(13)//&
-              TRIM(StartUpDirectory)//"DashLicense.dat")
+            IF (LEN_TRIM(PathToLicenseFile) .GT. 0) THEN
+              CALL ErrorMessage("Could not read the licence file"//CHAR(13)//&
+                              TRIM(PathToLicenseFile))
+            ELSE
+              CALL ErrorMessage("Could not find or open the licence file"//CHAR(13)//&
+                              TRIM(LicencePaths(1))//" or "//CHAR(13)//&
+                              TRIM(LicencePaths(2))//" or "//CHAR(13)//&
+                              TRIM(LicencePaths(3)))
+             ENDIF
           CASE (-2) ! Checksum not OK
             CALL ErrorMessage("Your DASH licence key is not valid.")
           CASE (-3)
@@ -44,7 +59,7 @@
             CALL ErrorMessage("Your DASH licence is invalid for this machine.")
         END SELECT
         CALL GetLicenceKeyDialogue(Info)
-        CALL ReadLicenceFile(Info)
+        CALL FindLicenceFile(Info, .FALSE.)
       ENDDO
       IF (Info%DaysLeft .LE. 7) THEN
         WRITE(Exp,'(I2)') Info%DaysLeft
@@ -57,42 +72,62 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE ReadLicenceFile(Info)
+      SUBROUTINE FindLicenceFile(Info, TillValid)
 
       USE VARIABLES  
 
       IMPLICIT NONE
 
       TYPE(License_Info) Info
+      LOGICAL, INTENT(IN   ) :: TillValid
 
-      LOGICAL         in_batch
-      COMMON /BATEXE/ in_batch
+      INTEGER NumbLicencePath
+      CHARACTER*(MaxPathLength) LicencePaths(3)
+      COMMON /LICENCELOC/ NumbLicencePath, LicencePaths
+
+      LOGICAL exists
+      INTEGER I
+
+! Find the first existing license file and load/check it only
+      DO I = 1, NumbLicencePath
+        INQUIRE(FILE=LicencePaths(I), EXIST=exists)
+        IF (.NOT. exists) CYCLE
+        CALL ReadLicenceFile(Info, LicencePaths(I))
+        IF (TillValid .AND. Info%Valid .LE. 0) CYCLE
+        RETURN
+      END DO
+      Info%Valid = -1
+      Info%KeyStr = ''
+      RETURN
+
+      END SUBROUTINE FindLicenceFile
+!
+!*****************************************************************************
+!
+      SUBROUTINE ReadLicenceFile(Info, LicenseFile)
+
+      USE VARIABLES  
+
+      IMPLICIT NONE
+
+      TYPE(License_Info), INTENT (  OUT) :: Info
+      CHARACTER*(*),      INTENT (IN   ) :: LicenseFile
 
       CHARACTER*80 line, CLString
-      INTEGER      dummy, hFile
+      INTEGER      dummy
+      INTEGER, PARAMETER :: hFile = 10
 
       Info%Valid = -1
       Info%KeyStr = ''
-      hFile = 10
+      PathToLicenseFile = ''
 
-      PathToLicenseFile = TRIM(AllUsersProfileDirectory)//'DashLicense.dat'
-      OPEN(UNIT=hFile,FILE=PathToLicenseFile,STATUS='OLD',ERR=6)
-      GOTO 10
-    6 CLOSE(hFile,iostat=dummy)
-      PathToLicenseFile = TRIM(InstallationDirectory)//'License.dat'
-      OPEN(UNIT=hFile,FILE=PathToLicenseFile,STATUS='OLD',ERR=9)
-      GOTO 10
-    9 CLOSE(hFile,iostat=dummy)
-      PathToLicenseFile = TRIM(StartUpDirectory)//'DashLicense.dat'
-      OPEN(UNIT=hFile,FILE=PathToLicenseFile,STATUS='OLD',ERR=999)
+      OPEN(UNIT=hFile,FILE=LicenseFile,STATUS='OLD',ERR=999)
+      PathToLicenseFile = LicenseFile
    10 READ(hFile,'(A)',ERR=999,END=999) line
       IF (line(1:1) .EQ. '#') GOTO 10
       CALL INextString(line,CLString)
       Info%KeyStr = CLString
       CALL DecodeLicence(CLString,Info)
-      IF (Info%Valid .EQ. 1) THEN
-        IF (Info%LicenceType .EQ. DemoKey .AND. .NOT. in_batch) CALL ShowLicenceAgreement(Info)
-      ENDIF
   999 CLOSE(hFile,iostat=dummy)
 
       END SUBROUTINE ReadLicenceFile
@@ -533,17 +568,21 @@
 
       IMPLICIT NONE
 
+      INTEGER NumbLicencePath
+      CHARACTER*(MaxPathLength) LicencePaths(3)
+      COMMON /LICENCELOC/ NumbLicencePath, LicencePaths
+
       INTEGER, EXTERNAL :: Get_DiskSerialNumber
       CHARACTER*(*)  LString
       CHARACTER*11   Ctypestr
       TYPE (License_Info) Info
       CHARACTER(17) DateStr
-      INTEGER       hFile, tLen
       INTEGER v(2), w(2)
       INTEGER*2 CheckSum
       INTEGER*2 VersionDependentMangler
       INTEGER dummy
-      CHARACTER*MaxPathLength tLicenseFile
+      INTEGER I, iLicenseFileIndex, tLen
+      INTEGER, PARAMETER :: hFile = 10
      
       CALL DecodeLicence(LString,Info)
       IF (Info%Valid .LE. 0) GOTO 99
@@ -557,17 +596,13 @@
         CASE DEFAULT
           GOTO 99
       END SELECT
-      hFile = 10
-      tLicenseFile = TRIM(AllUsersProfileDirectory)//'DashLicense.dat'
-      OPEN(UNIT=hFile,FILE=tLicenseFile,STATUS='UNKNOWN',ERR=6)
-      GOTO 10
-    6 CLOSE(hFile,IOSTAT=dummy)
-      tLicenseFile = TRIM(InstallationDirectory)//'License.dat'
-      OPEN(UNIT=hFile,FILE=tLicenseFile,STATUS='UNKNOWN',ERR=9)
-      GOTO 10
-    9 CLOSE(hFile, IOSTAT=dummy)
-      tLicenseFile = TRIM(StartUpDirectory)//'DashLicense.dat'
-      OPEN(UNIT=hFile,FILE=tLicenseFile,STATUS='UNKNOWN',ERR=99)
+      DO I = 1, NumbLicencePath
+        OPEN(UNIT=hFile,FILE=LicencePaths(I),STATUS='UNKNOWN',ERR=60)
+        iLicenseFileIndex = I
+        GOTO 10
+   60   CLOSE(hFile)
+      END DO
+      GOTO 99
    10 WRITE(hFile,'(A)',ERR=99)     "# Licence File for "//ProgramVersion
       WRITE(hFile,'(A)',ERR=99)     "#"
       WRITE(hFile,'(A,A,A)',ERR=99) '# This is a ',Ctypestr(1:LEN_TRIM(Ctypestr)),' licence '
@@ -605,7 +640,7 @@
       WRITE(hFile,'(A)',ERR=99) LString(1:LEN_TRIM(LString))
       CLOSE(hFile)
       CALL InfoMessage('Licence has been written to file: '//CHAR(13)// &
-                        TRIM(tLicenseFile))
+                        TRIM(LicencePaths(iLicenseFileIndex)))
       RETURN
    99 CONTINUE
       CLOSE(hFile)
