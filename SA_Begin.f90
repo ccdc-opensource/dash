@@ -127,7 +127,8 @@
         CALL SelectDASHDialog(IDD_Summary)
         CALL WDialogHide
         IF (iMyExit .EQ. 5) THEN
-          CALL WizardWindowShow(IDD_SA_Modal_input2)
+          !CALL WizardWindowShow(IDD_SA_Modal_input2)
+          CALL ShowWizardWindowParameterBounds
         ELSE
           CALL SelectMode(IDB_AnalyseSolutions)
           CALL SelectDASHDialog(IDD_SAW_Page5)
