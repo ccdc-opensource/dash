@@ -1475,6 +1475,7 @@
 
       USE WINTERACTER
       USE DRUID_HEADER
+      USE VARIABLES
       USE ZMVAR
 
       IMPLICIT NONE      
@@ -1516,8 +1517,10 @@
            CALL WGridStateCell(IDF_parameter_grid_modal, 5, i, Enabled)
          ENDIF
          IF (kzmpar2(i) .EQ. 3) THEN !torsion angle
-           !CALL WGridColourRow(IDF_parameter_grid_modal, I, WIN_RGB(256, 256, 256), WIN_RGB(256, 256, 256))
            CALL RefreshTorsionRow(i, .TRUE.)
+         ELSE IF (ModalFlag(I) .LE. 1) THEN
+           ! Reset color. Moved here from the back button handler, as wizard can also be closed any time.
+           CALL WGridColourRow(IDF_parameter_grid_modal, I, WIN_RGB(256, 256, 256), WIN_RGB(256, 256, 256))
          ENDIF
       ENDDO
       LimsChanged = .FALSE.
@@ -1529,6 +1532,11 @@
       ENDDO
       MenuOptions(KK+1) = "All"
       CALL WDialogPutMenu(IDF_MENU1, MenuOptions, nfrag+1, 1)
+      IF ( LEN_TRIM(MOGULEXE) .GT. 0 ) THEN
+        CALL WDialogFieldState(IDF_SetupMDB, Enabled)
+      ELSE
+        CALL WDialogFieldState(IDF_SetupMDB, Disabled)
+      ENDIF
       CALL WizardWindowShow(IDD_SA_Modal_input2)
       CALL PopActiveWindowID
 
@@ -1567,7 +1575,8 @@
       COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign, HydrogenTreatment
 
       LOGICAL, EXTERNAL :: Confirm, DASHWDialogGetCheckBoxLogical
-      LOGICAL, EXTERNAL :: NearlyEqual
+      LOGICAL, EXTERNAL :: NearlyEqual, WriteMogulMol2
+      LOGICAL retStat
       REAL    xtem
       INTEGER IFCOl, IFRow, ICHK
       INTEGER I
@@ -1589,10 +1598,7 @@
               IF (LimsChanged) THEN
                 IF (Confirm("Note: Going back will erase the edits made to the current parameters, overwrite changes?")) THEN
                   LimsChanged = .FALSE. 
-                  DO I = 1, nvar
-                    ModalFlag(I) = 0 ! 0 means: not a torsion angle
-                    CALL WGridColourRow(IDF_parameter_grid_modal, I, WIN_RGB(256, 256, 256), WIN_RGB(256, 256, 256))
-                  ENDDO
+                  ModalFlag(:) = 0 ! 0 means: not a torsion angle
                 ENDIF                 
               ENDIF
               IF (.NOT. LimsChanged) THEN
@@ -1617,14 +1623,8 @@
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizardPastPawley
             CASE (IDF_SetupMDB)
-              CALL CheckMogulUse
-              IF (.NOT.UseMogul) THEN
-                CALL WarningMessage('Mogul must be installed and made available '// &
-                                    'using Configuration dialogue')
-              ELSE
-                CALL DASHWDialogGetInteger(IDF_MDBMinHit, iMinHits)
-                CALL SetupMDB(iMinHits)
-              ENDIF
+              CALL DASHWDialogGetInteger(IDF_MDBMinHit, iMinHits)
+              CALL SetupMDB(iMinHits)
             CASE (IDB_Relabel)
               CALL DASHWDialogGetMenu(IDF_MENU1, iOption)
               ! Update memory
@@ -1753,9 +1753,8 @@
           IF (kzmpar2(IFrow) .EQ. 3) THEN
             UndoModalFlag = ModalFlag(iFRow)
           ENDIF
-          IF (UseMogul) THEN
-            CALL WriteMogulMol2(iFRow, .TRUE., .FALSE., 0) !Call Mogul
-          ENDIF
+          IF (UseMogul) &
+            retStat = WriteMogulMol2(iFRow, .TRUE., .FALSE., .FALSE., 0) !Call Mogul
           IF (kzmpar2(IFrow) .EQ. 3) THEN ! Modal Torsion Angle so show dialog
             CALL ShowBiModalDialog(IFRow, xtem, UndoModalFlag)
           ELSE
@@ -1797,19 +1796,26 @@
       COMMON /ModalTorsions/ ModalFlag(MVAR), RowNumber, iRadio, iX, iUB, iLB
 
       CHARACTER*20, EXTERNAL :: Integer2String
+      LOGICAL,      EXTERNAL :: WriteMogulMol2, Confirm
       INTEGER iRow, OrigModalFlag, n, iStatus
+      LOGICAL retStat, init
+      CHARACTER*4 row_str
       
       n = 0
+      init = .TRUE.
       CALL PushActiveWindowID
       CALL SelectDASHDialog(IDD_SA_Modal_input2)
       DO iRow = 1, NVAR
         IF (kzmpar2(iRow) .NE. 3) CYCLE
         CALL DASHWGridGetCellCheckBox(IDF_parameter_grid_modal, 4, iRow, iStatus)
         IF (iStatus .EQ. Checked) CYCLE
+        ! Make the row visible
+        CALL WGridSetCell(IDF_parameter_grid_modal, 4, iRow)
         ! save and reset ModalFlag, as used as an indicator for profile loading
         OrigModalFlag = ModalFlag(iRow)
         ModalFlag(iRow) = 1 
-        CALL WriteMogulMol2(iRow, .FALSE., .TRUE., iMinHits) !Call Mogul
+        retStat = WriteMogulMol2(iRow, .FALSE., .TRUE., init, iMinHits) !Call Mogul
+        init = .FALSE.
         IF (ModalFlag(iRow) .EQ. 4 ) THEN ! Mogul profile
           lb(iRow) = -180.0
           ub(iRow) =  180.0
@@ -1821,16 +1827,28 @@
           ModalFlag(iRow) = OrigModalFlag
         ENDIF
         CALL RefreshTorsionRow(iRow, .FALSE.)
+        IF (.NOT. retStat) THEN
+          WRITE(row_str,'(I4)') iRow
+          IF (iRow .LT. NVAR) THEN
+            IF (.NOT. Confirm('Problem occurred while setting up MDB for the parameter at row '// &
+                              row_str//'. '//CHAR(13)//CHAR(13)// &
+                              'Ignore it and continue to process other parameter(s)?')) & EXIT
+          ELSE
+            ! last row
+            CALL ErrorMessage('Problem occurred while setting up MDB for the parameter at row '// &
+                              row_str//'. ')
+          ENDIF
+        ENDIF
       ENDDO
       IF (n .GT. 1) THEN 
-        CALL InfoMessage(TRIM(Integer2String(n))//' torsion angles are set up'// &
-                         ' for Mogul distribution bias(MDB)')
+        CALL InfoMessage(TRIM(Integer2String(n))//' torsion angles are set up '// &
+                         'for Mogul distribution bias(MDB) by this call. ')
       ELSE IF (n .EQ. 1) THEN 
-        CALL InfoMessage('1 torsion angle is set up'// &
-                         ' for Mogul distribution bias(MDB)')
+        CALL InfoMessage('1 torsion angle is set up '// &
+                         'for Mogul distribution bias(MDB) by this call. ')
       ELSE
-        CALL WarningMessage('No torsion angle set up'// &
-                         ' for Mogul distribution bias(MDB)')
+        CALL WarningMessage('No torsion angle set up '// &
+                         'for Mogul distribution bias(MDB) by this call. ')
       ENDIF
       CALL PopActiveWindowID
 

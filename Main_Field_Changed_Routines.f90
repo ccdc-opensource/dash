@@ -100,6 +100,7 @@
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDCLOSE, IDCANCEL)
 ! Update with user's editing
+              CALL DASHWDialogGetString(IDF_MogulExe, MOGULEXE)
               CALL DASHWDialogGetString(IDF_DICVOLExe, DICVOLEXE)
               CALL DASHWDialogGetString(IDF_McMailleExe, McMailleEXE)
               CALL DASHWDialogGetString(IDF_TOPASExe, TOPASEXE)
@@ -107,6 +108,13 @@
               CALL DASHWDialogGetString(IDF_RIETANExe, RIETANEXE)
               tLogical = DASHWDialogGetCheckBoxLogical(IDC_cif_for_viewer)
               CALL WDialogHide()
+! Update state of button
+              CALL SelectDASHDialog(IDD_SA_Modal_input2)
+              IF ( LEN_TRIM(MOGULEXE) .GT. 0 ) THEN
+                CALL WDialogFieldState(IDF_SetupMDB, Enabled)
+              ELSE
+                CALL WDialogFieldState(IDF_SetupMDB, Disabled)
+              ENDIF
 ! Update state of related radio/check
               CALL SelectDASHDialog(IDD_PW_Page7)
               IF ( LEN_TRIM(DICVOLEXE) .GT. 0 ) THEN
