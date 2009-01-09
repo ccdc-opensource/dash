@@ -25,7 +25,7 @@
       
 !***********************************************************************      
       
-      SUBROUTINE WriteMogulMol2(iFRow, showGUI, isMDBRun, iMDBMinHits)
+      LOGICAL FUNCTION WriteMogulMol2(iFRow, showGUI, isMDBRun, init, iMDBMinHits)
 
 ! Writes Mol2 file for MOGUL.  
 ! Calls GetAtomLineNumbers   
@@ -37,12 +37,13 @@
       IMPLICIT NONE
 
       INTEGER, INTENT (IN   ) :: iFRow, iMDBMinHits
-      LOGICAL, INTENT (IN   ) :: showGUI, isMDBRun
+      LOGICAL, INTENT (IN   ) :: showGUI, isMDBRun, init
 
-      INTEGER            MDBMinHits
-      LOGICAL                        inMDBRun, showMogulGUI 
-      COMMON /MOGUL_CTRL/MDBMinHits, inMDBRun, showMogulGUI 
+      INTEGER            MDBMinHits, curtDoF, curtFrg
+      LOGICAL                                          inMDBRun, showMogulGUI, showMogulErr
+      COMMON /MOGUL_CTRL/MDBMinHits, curtDoF, curtFrg, inMDBRun, showMogulGUI, showMogulErr
  
+      LOGICAL, EXTERNAL :: GetAtomLineNumbers
       INTEGER, EXTERNAL :: WriteMol2
       INTEGER I,K
       CHARACTER(MaxPathLength) MogulMol2
@@ -52,6 +53,8 @@
       showMogulGUI = showGUI
       inMDBRun = isMDBRun
       MDBMinHits = iMDBMinHits
+      IF (init) &
+        showMogulErr = .TRUE.
  
 !     Given the number of the parameter want to know which zmatrix, fragment it belongs to.
       iFrg = 0
@@ -65,6 +68,8 @@
         ENDDO
         IF (iFrg .NE. 0) EXIT
       ENDDO
+      curtDoF = DoF
+      curtFrg = iFrg
       natcry = NATOMS(iFrg)
       CALL makexyz(natcry,BLEN(1, iFrg),ALPH(1, iFrg),BET(1, iFrg),IZ1(1, iFrg),IZ2(1, iFrg),IZ3(1, iFrg),axyzo)
       DO I = 1, natcry
@@ -82,16 +87,17 @@
 
 ! Write mol2 file
       IF (WriteMol2(MogulMol2,.FALSE., iFrg) .EQ. 1) THEN
-        CALL GetAtomLineNumbers(MogulMol2, IFrg, DoF, iFRow)
+        WriteMogulMol2 = GetAtomLineNumbers(MogulMol2, IFrg, DoF, iFRow)
       ELSE
         CALL DebugErrorMessage('Error writing temporary file.')
+        WriteMogulMol2 = .FALSE.
       ENDIF
 
-      END SUBROUTINE WriteMogulMol2
+      END FUNCTION WriteMogulMol2
 
 !*****************************************************************
 
-      SUBROUTINE GetAtomLineNumbers(MogulMol2, iFrg, DoF, iFRow)
+      LOGICAL FUNCTION GetAtomLineNumbers(MogulMol2, iFrg, DoF, iFRow)
 
 ! For parameter, gets corresponding line numbers of atoms from Mol2
 ! file.  MOGUL does not use Atom Labels but AtomIDs.
@@ -107,6 +113,8 @@
       INTEGER, INTENT (IN   ) :: iFRow
 
       CHARACTER(MaxPathLength), INTENT(IN   ) :: MogulMol2
+
+      LOGICAL, EXTERNAL :: WriteMogulScript
 
       CHARACTER*36 TempAtomLabel
       
@@ -146,14 +154,14 @@
           ENDIF
         ENDDO
       ENDDO
-      CALL WriteMogulScript(MogulMol2, AtomID, iFRow)  
+      GetAtomLineNumbers = WriteMogulScript(MogulMol2, AtomID, iFRow)  
 
-      END SUBROUTINE GetAtomLineNumbers
+      END FUNCTION GetAtomLineNumbers
      
      
 !*****************************************************************   
      
-      SUBROUTINE WriteMogulScript(MogulMol2, AtomID, IFRow)
+      LOGICAL FUNCTION WriteMogulScript(MogulMol2, AtomID, IFRow)
 
 ! Writes the Mogul Script file which contains instructions for Mogul such
 ! as molecule file name, output filename, Torsion Angle Fragment.
@@ -169,57 +177,60 @@
       CHARACTER(MaxPathLength), INTENT(IN   ) :: MogulMol2
       INTEGER, INTENT (IN   ) :: iFRow
 
-      INTEGER            MDBMinHits
-      LOGICAL                        inMDBRun, showMogulGUI 
-      COMMON /MOGUL_CTRL/MDBMinHits, inMDBRun, showMogulGUI 
+      INTEGER            MDBMinHits, curtDoF, curtFrg
+      LOGICAL                                          inMDBRun, showMogulGUI, showMogulErr
+      COMMON /MOGUL_CTRL/MDBMinHits, curtDoF, curtFrg, inMDBRun, showMogulGUI, showMogulErr
    
+      LOGICAL, EXTERNAL :: Mogul
+      
       INTEGER I
       CHARACTER(MaxPathLength) CurrentDirectory, Script_file, MogulOutputFile
       INTEGER tLength, olength
+      INTEGER, PARAMETER :: hFile = 240
 
       CALL IOsDirName(CurrentDirectory)
       tLength = LEN_TRIM(MogulMol2)
       Script_file = MogulMol2(1:tLength-10)//'script.qf'
       MogulOutputFile = MogulMol2(1:tLength-10)//'mogul.out'
       olength = LEN_TRIM(MogulOutputfile)
-      OPEN(240,FILE=Script_file,STATUS='UNKNOWN', ERR = 999)
-      WRITE(240,10) MogulMol2(1:tlength)
+      OPEN(hFile,FILE=Script_file,STATUS='UNKNOWN', ERR = 999)
+      WRITE(hFile,10) MogulMol2(1:tlength)
 10    FORMAT(('MOGUL MOLECULE '), A)
-      WRITE(240,20) MogulOutputFile(1:olength)
+      WRITE(hFile,20) MogulOutputFile(1:olength)
 20    FORMAT(('MOGUL OUTPUT_FILE '), A)
-      WRITE(240,25) 
+      WRITE(hFile,25) 
 25    FORMAT('MOGUL EDIT BOND_TYPES GUESS ALL_3D')
-      WRITE(240, 27)
+      WRITE(hFile, 27)
 27    FORMAT('CONFIG SEARCH ALL GENERALISATION ON')
 
       SELECT CASE (kzmpar2(IFrow))
         CASE(3) !Torsion
-          WRITE(240,30) (AtomID(I), I = 1,4)
+          WRITE(hFile,30) (AtomID(I), I = 1,4)
 30        FORMAT(('TORSION '), 4(I3,1X))
         CASE(4) ! Angle
-          WRITE(240,31) (AtomID(I), I= 1,3)
+          WRITE(hFile,31) (AtomID(I), I= 1,3)
 31        FORMAT(('ANGLE '), 3(I3, 1X))
         CASE(5) ! Bond
-          WRITE(240,32) (AtomID(I), I= 1,2)
+          WRITE(hFile,32) (AtomID(I), I= 1,2)
 32        FORMAT(('BOND '), 2(I3, 1X))
       END SELECT
 
-      IF (showMogulGUI) WRITE(240,40)
-40    FORMAT(('MOGUL GUI OPEN'))
+      IF (showMogulGUI) WRITE(hFile,40)
+40    FORMAT('MOGUL GUI OPEN')
       
-      CLOSE (240)
+      CLOSE (hFile)
 
-      CALL Mogul(Script_file, MogulOutputFile, iFRow)
+      WriteMogulScript = Mogul(Script_file, MogulOutputFile, iFRow)
       RETURN       
 
 999   CALL ErrorMessage('Error generating Mogul Script file')
       RETURN
 
-      END SUBROUTINE WriteMogulScript
+      END FUNCTION WriteMogulScript
 
 !********************************************************************************
 
-      SUBROUTINE Mogul(Script_file, MogulOutputFile, iFRow)
+      LOGICAL FUNCTION Mogul(Script_file, MogulOutputFile, iFRow)
 
 ! Calls command to execute Mogul.  Path to Mogul in Configuration Window
       
@@ -233,10 +244,11 @@
       CHARACTER(MaxPathLength), INTENT(IN   ) :: Script_file, MogulOutputFile
       INTEGER, INTENT (IN   ) :: iFRow
             
-      LOGICAL, EXTERNAL :: Confirm, DASHWDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: Confirm, DASHWDialogGetCheckBoxLogical, ProcessMogulOutput
       INTEGER I,M
       LOGICAL exists
 
+      Mogul = .FALSE.
       CALL PushActiveWindowID
       CALL SelectDASHDialog(IDD_Configuration)
       CALL DASHWDialogGetString(IDF_MogulExe, MOGULEXE)
@@ -244,11 +256,14 @@
       I = LEN_TRIM(MOGULEXE)
       INQUIRE(FILE = MOGULEXE(1:I),EXIST=exists)
       IF (.NOT. exists) GOTO 999
+      ! As lack of Mogul exit-state, to catch if it exited abnormally,
+      ! delete any output file remained from the provious run. 
+      CALL IOSDeleteFile(MogulOutputFile)
       M = InfoError(1) ! Clear errors
       CALL IOSCommand(MOGULEXE(1:I)//' -ins '//'"'//Script_file(1:LEN_TRIM(Script_file))//'"', ProcBlocked)
       IF (InfoError(1) .NE. 0) GOTO 999
       IF (kzmpar2(IFRow) .EQ. 3) THEN ! Modal Torsion so try to process
-        CALL ProcessMogulOutput(MogulOutputFile, iFRow)
+        Mogul = ProcessMogulOutput(MogulOutputFile, iFRow)
       ENDIF
       RETURN
 999   CALL ErrorMessage("DASH could not launch Mogul."//CHAR(13)//&
@@ -257,11 +272,11 @@
                         "This can be changed in the Configuration Window"//CHAR(13)//&
                         "under Options in the menu bar.")
 
-      END SUBROUTINE Mogul
+      END FUNCTION Mogul
 
 !********************************************************************************
       
-      SUBROUTINE ProcessMogulOutput(MogulOutputFile, iFRow)
+      LOGICAL FUNCTION ProcessMogulOutput(MogulOutputFile, iFRow)
 
 ! Uses simple criteria to parse the output from Mogul.  Will recommend the 
 ! type of modal torsion angle range and return "standard" torsion angle ranges.
@@ -270,6 +285,7 @@
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
+      USE ZMVAR
 
       IMPLICIT NONE
 
@@ -278,13 +294,20 @@
       CHARACTER(MaxPathLength), INTENT(IN   ) ::  MogulOutputFile
       INTEGER, INTENT (IN   ) :: iFRow
 
-      INTEGER            MDBMinHits
-      LOGICAL                        inMDBRun, showMogulGUI 
-      COMMON /MOGUL_CTRL/MDBMinHits, inMDBRun, showMogulGUI 
+      INTEGER                ModalFlag,       RowNumber, iRadio
+      REAL                                                       iX, iUB, iLB  
+      COMMON /ModalTorsions/ ModalFlag(mvar), RowNumber, iRadio, iX, iUB, iLB
 
-      LOGICAL, External :: ProcessDistribution
+      REAL            X_init,       x_unique,       lb,       ub
+      COMMON /values/ X_init(MVAR), x_unique(MVAR), lb(MVAR), ub(MVAR)
 
-      INTEGER nlin, I
+      INTEGER            MDBMinHits, curtDoF, curtFrg
+      LOGICAL                                          inMDBRun, showMogulGUI, showMogulErr
+      COMMON /MOGUL_CTRL/MDBMinHits, curtDoF, curtFrg, inMDBRun, showMogulGUI, showMogulErr
+
+      LOGICAL, External :: ProcessDistribution, Confirm
+
+      INTEGER I
       CHARACTER*255 line
       CHARACTER*12 Distribution
       CHARACTER*2 Colon
@@ -297,31 +320,39 @@
       INTEGER Lmarker1, Hmarker1, LMarker2, HMarker2 !count of molecules in bin
       INTEGER LIndex1(1), HIndex1(1), LIndex2(1), HIndex2(1)
       INTEGER TotalSum, TempSum
+      INTEGER, PARAMETER :: hFile = 240
 
-      INTEGER                ModalFlag,       RowNumber, iRadio
-      REAL                                                       iX, iUB, iLB  
-      COMMON /ModalTorsions/ ModalFlag(mvar), RowNumber, iRadio, iX, iUB, iLB
-
-      REAL            X_init,       x_unique,       lb,       ub
-      COMMON /values/ X_init(MVAR), x_unique(MVAR), lb(MVAR), ub(MVAR)
-
+      ProcessMogulOutput = .FALSE.
       MogulText = ' '
       
       INQUIRE(FILE = MogulOutputFile,EXIST=exists)
-      IF (.NOT. exists) GOTO 999
+      IF (.NOT. exists) GOTO 998
       NumberofBins = 0 
-      OPEN(240,FILE=MogulOutputFile,STATUS='UNKNOWN', ERR = 999)
-      I = 0
-      DO WHILE (I .EQ. 0)
-        READ(240, 10, END=999) nlin, line
-10      FORMAT (q,a)
-        IF ((line(1:6) .EQ. "NOHITS") .OR. (line(1:6) .EQ. "ERROR")) GOTO 888
-        IF (line(1:5).eq."STATS") THEN
-          READ(240,*, ERR = 999) Distribution, MinAngle, MaxAngle, Bin, NumberofBins, Colon, TC(1:NumberofBins)
-          I = 1 
-        ENDIF
+      OPEN(hFile,FILE=MogulOutputFile,STATUS='UNKNOWN', ERR=999)
+      DO WHILE (.TRUE.)
+        READ(hFile, '(A)', END=999, ERR=999) line
+        SELECT CASE (line(1:6))
+          CASE ("NOHITS")
+            IF (inMDBRun) & ! Allow 'NOHITS' in MDB
+              ProcessMogulOutput = .TRUE.
+            CLOSE(hFile)
+            GOTO 888
+          CASE ("ERROR")
+            IF (inMDBRun) THEN
+              IF (showMogulErr) &
+                showMogulErr = .NOT. Confirm(czmpar(curtDoF, curtFrg)//CHAR(13)// &
+                                     TRIM(line(7:))//CHAR(13)//CHAR(13)// &
+                                     'Ignore this error till end of current "Set MDB"? ')
+              ProcessMogulOutput = .NOT. showMogulErr
+            ENDIF
+            CLOSE(hFile)
+            GOTO 888
+          CASE ("STATS")
+            READ(hFile,*, END=999, ERR=999) Distribution, MinAngle, MaxAngle, Bin, NumberofBins, Colon, TC(1:NumberofBins)
+            EXIT
+        END SELECT
       ENDDO
-      CLOSE(240)
+      CLOSE(hFile)
 ! Will not delete Mogul Output in this release as it may be useful for support problems
 ! If DASH_Mogul comes about, may want to delete output file.
 !      CALL IosDeleteFile(MogulOutputFile) 
@@ -332,10 +363,15 @@
       ENDDO
 
       IF (inMDBRun) THEN
-        IF (TotalSum .LT. MDBMinHits) GOTO 888
+        IF (TotalSum .LT. MDBMinHits) THEN
+          ProcessMogulOutput = .TRUE.
+          GOTO 888
+        ENDIF
         IF (MinAngle .NE. 0 .OR. MaxAngle .NE. 180) GOTO 990
         IF (.NOT. ProcessDistribution(NumberofBins, TC, IFRow)) GOTO 995
+        ! Done
         ModalFlag(IFRow) = 4
+        ProcessMogulOutput = .TRUE.
         RETURN
       ENDIF
 
@@ -449,16 +485,18 @@
       ENDIF
       CALL SelectDASHDialog(IDD_ModalDialog)
       CALL WDialogPutString(IDF_MogulText, MogulText)
+      ProcessMogulOutput = .TRUE.
       RETURN
 
-999   CALL ErrorMessage("DASH could not read Mogul Output File.")
+999   CLOSE(hFile)
+998   CALL ErrorMessage("DASH could not read Mogul Output File.")
       GOTO 888
 995   CALL ErrorMessage("Failed processing Mogul profile.")
       GOTO 888
 990   CALL ErrorMessage("Mogul profile must fill the range of 0-180 degrees.")
 888   ModalFlag(IFRow) = 1 ! Will not default to modal ranges in dialog
 
-      END SUBROUTINE ProcessMogulOutput
+      END FUNCTION ProcessMogulOutput
 
 !*********************************************************************************
 
