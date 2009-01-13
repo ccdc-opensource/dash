@@ -460,8 +460,8 @@
 
       CABOUT = 'DASH: A structure solution package for X-ray powder '//CHAR(13)//&
                'diffraction, developed and distributed in collaboration'//CHAR(13)//&
-               'between the Council for the Central Laboratory of the Research '//CHAR(13)//&
-               'Councils (CCLRC) at the ISIS Facility of the Rutherford Appleton '//CHAR(13)//&
+               'between the Science and Technology Facilities Council '//CHAR(13)//&
+               '(STFC) at the ISIS Facility of the Rutherford Appleton '//CHAR(13)//&
                'Laboratory and CCDC Software Ltd. (CCDC).'//CHAR(13)//&
                CHAR(13)//&
                'Access to this software product is permitted only under the'//CHAR(13)//&
@@ -481,7 +481,7 @@
 !DEC$ ENDIF
       tLen = LEN_TRIM(CABOUT)
       CABOUT = CABOUT(1:tLen)//CHAR(13)//CHAR(13)//&
-               'Copyright CCDC and CCLRC, February 2008'//CHAR(13)//CHAR(13)//&
+               'Copyright CCDC and STFC, February 2008'//CHAR(13)//CHAR(13)//&
                'Licence file:'//CHAR(13)
       CALL WMessageBox(OkOnly, InformationIcon, CommonOk, TRIM(CABOUT)//TRIM(PathToLicenseFile), 'About DASH')
 

@@ -357,7 +357,7 @@
                 'DASH, excluding the component program Mercury DASH which is a copyright work of '// &
                 'the Cambridge Crystallographic Data Centre, and its associate documentation  and software '// &
                 'have been jointly developed by and are copyright works of  '// &
-                'CCDC Software Limited (CCDC) and the Council for the Central Laboratory of the Research Councils (CCLRC) '// &
+                'CCDC Software Limited (CCDC) and the Science and Technology Facilities Council (STFC) '// &
                 'and all rights are protected.' //NextLine// &
                 'In consideration of the access to DASH the "Program" (including any or all '// &
                 'components) granted you, you agree to run and use the '// &
