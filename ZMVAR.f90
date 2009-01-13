@@ -54,6 +54,9 @@
       INTEGER zm2Par(1:MaxDOF, 1:maxfrg)
 ! Mapping of parameters per degree of freedom per Z-matrix
 
+      INTEGER zm2Atm(1:MaxDOF, 1:maxfrg)
+! Mapping of atomID per degree of freedom per Z-matrix
+
       INTEGER          nFrag
 ! nfrag = number of fragments
 

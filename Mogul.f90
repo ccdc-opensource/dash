@@ -43,12 +43,12 @@
       LOGICAL                                          inMDBRun, showMogulGUI, showMogulErr
       COMMON /MOGUL_CTRL/MDBMinHits, curtDoF, curtFrg, inMDBRun, showMogulGUI, showMogulErr
  
-      LOGICAL, EXTERNAL :: GetAtomLineNumbers
+      LOGICAL, EXTERNAL :: WriteMogulScript
       INTEGER, EXTERNAL :: WriteMol2
       INTEGER I,K
       CHARACTER(MaxPathLength) MogulMol2
       INTEGER tLength, BondNr
-      INTEGER iFrg, DoF
+      INTEGER iFrg, DoF, AtomID(4)
 
       showMogulGUI = showGUI
       inMDBRun = isMDBRun
@@ -87,7 +87,12 @@
 
 ! Write mol2 file
       IF (WriteMol2(MogulMol2,.FALSE., iFrg) .EQ. 1) THEN
-        WriteMogulMol2 = GetAtomLineNumbers(MogulMol2, IFrg, DoF, iFRow)
+        I = zm2Atm(DoF, iFrg)
+        AtomID(1) = izmoid(I, iFrg)
+        AtomID(2) = izmoid(iz1(I, iFrg), iFrg)
+        AtomID(3) = izmoid(iz2(I, iFrg), iFrg)
+        AtomID(4) = izmoid(iz3(I, iFrg), iFrg)
+        WriteMogulMol2 = WriteMogulScript(MogulMol2, AtomID, iFRow)
       ELSE
         CALL DebugErrorMessage('Error writing temporary file.')
         WriteMogulMol2 = .FALSE.
@@ -96,70 +101,6 @@
       END FUNCTION WriteMogulMol2
 
 !*****************************************************************
-
-      LOGICAL FUNCTION GetAtomLineNumbers(MogulMol2, iFrg, DoF, iFRow)
-
-! For parameter, gets corresponding line numbers of atoms from Mol2
-! file.  MOGUL does not use Atom Labels but AtomIDs.
-! Calls WriteMogulScript.
-      
-      USE VARIABLES
-      USE ZMVAR
-      USE SAMVAR
-
-      IMPLICIT NONE
-
-      INTEGER, INTENT (IN   ) :: iFrg, DoF
-      INTEGER, INTENT (IN   ) :: iFRow
-
-      CHARACTER(MaxPathLength), INTENT(IN   ) :: MogulMol2
-
-      LOGICAL, EXTERNAL :: WriteMogulScript
-
-      CHARACTER*36 TempAtomLabel
-      
-      CHARACTER*5, Atom(4)
-      INTEGER Marker(5), AtomID(4)
-      INTEGER I,J
-      INTEGER tLength
-
-      TempAtomLabel = czmpar(DoF, iFrg)
-      tLength = LEN_TRIM(TempAtomLabel)
-
-      DO I = 1,4
-       Atom(I) = '     '
-      END DO
-      I = 0
-      J = 1
-      DO WHILE (I .LE. tLength) !length of label
-        I = I + 1
-        SELECT CASE (TempAtomLabel(I:I))
-        CASE("(", ":")
-          Marker(J) = I
-          J = J + 1
-        CASE(")")
-          Marker(J) = I
-          EXIT
-        END SELECT
-      ENDDO
-      Atom(1) = TempAtomLabel(Marker(1)+1 : Marker(2)-1) 
-      Atom(2) = TempAtomLabel(Marker(2)+1 : Marker(3)-1)
-      Atom(3) = TempAtomLabel(Marker(3)+1 : Marker(4)-1)
-      Atom(4) = TempAtomLabel(Marker(4)+1 : Marker(5)-1)
-      DO J = 1,4 ! Mogul does not use atom labels but number of atom in Mol2 file 
-        DO I = 1, natoms(iFrg)
-          IF(Atom(J) .EQ. AtomLabel(izmbid(I,IFrg))) THEN
-            AtomID(J) = I
-            EXIT 
-          ENDIF
-        ENDDO
-      ENDDO
-      GetAtomLineNumbers = WriteMogulScript(MogulMol2, AtomID, iFRow)  
-
-      END FUNCTION GetAtomLineNumbers
-     
-     
-!*****************************************************************   
      
       LOGICAL FUNCTION WriteMogulScript(MogulMol2, AtomID, IFRow)
 
