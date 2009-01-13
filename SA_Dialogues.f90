@@ -191,6 +191,7 @@
                 frag_file(iFrg) = tFileName
                 zmread = Read_One_ZM(iFrg)
                 IF (zmread .EQ. 0) THEN ! successful read
+                  CALL CheckLabelsUnique(iFrg)
                   IF (iFrg .GT. nFrag) nFrag = nFrag + 1
                 ELSE 
                   CALL FileErrorPopup(frag_file(iFrg), zmread)
@@ -203,6 +204,7 @@
                 frag_file(iFrg) = DirName(1:LEN_TRIM(DirName))//tZmatrices(tNextzmNum)
                 zmread = Read_One_ZM(iFrg)
                 IF (zmread .EQ. 0) THEN ! successful read
+                  CALL CheckLabelsUnique(iFrg)
                   IF (iFrg .GT. nFrag) THEN ! iFrg could have been lower for the _first_ Z-matrix
                     nFrag = nFrag + 1
                     IF (nFrag .EQ. maxfrg) THEN
@@ -252,6 +254,47 @@
       CALL PopActiveWindowID
 
       END SUBROUTINE DealWithWizardWindowZmatrices
+!
+!*****************************************************************************
+!
+      SUBROUTINE CheckLabelsUnique(iFrg)
+
+      USE ZMVAR
+
+      IMPLICIT NONE
+
+      INTEGER, INTENT (IN   ) :: iFrg
+      
+      LOGICAL, EXTERNAL :: Confirm
+
+      INTEGER I, J, N
+      LOGICAL Unique
+      
+      Unique = .TRUE.
+      N = nAtoms(iFrg)
+      IF (N .GT. 1) THEN
+        DO I = 1, N - 1
+          DO J = I + 1, N
+            IF (OriginalLabel(I, iFrg) .NE. OriginalLabel(J, iFrg)) CYCLE
+            Unique = .FALSE.
+            GOTO 10
+          END DO
+        END DO
+      ENDIF
+ 10   CONTINUE
+      
+      IF (.NOT. Unique) THEN
+        IF (Confirm('Not all atom labels are unique within this zmatrix. '//CHAR(13)//CHAR(13)// &
+            'It is recommended to assign each atom a new unique label. '//CHAR(13)// &
+            'This can be done by clicking "Re-label" button on the relevant '//CHAR(13)// &
+            'dialogs or simply click "Yes" button below.'//CHAR(13)//CHAR(13)// &
+            'Note: the zmatrix file will not be updated unless explicitly '//CHAR(13)// &
+            '"Save" it from the dialog popped-up by clicking "Edit...".'//CHAR(13)//CHAR(13)// &
+            'Re-label atoms for this zmatrix now?')) &
+          CALL zmRelabel(iFrg)
+      ENDIF
+
+      END SUBROUTINE CheckLabelsUnique
 !
 !*****************************************************************************
 !
