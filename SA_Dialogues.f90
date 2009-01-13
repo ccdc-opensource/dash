@@ -1848,6 +1848,7 @@
       init = .TRUE.
       CALL PushActiveWindowID
       CALL SelectDASHDialog(IDD_SA_Modal_input2)
+      CALL WCursorShape(CurHourGlass)
       DO iRow = 1, NVAR
         IF (kzmpar2(iRow) .NE. 3) CYCLE
         CALL DASHWGridGetCellCheckBox(IDF_parameter_grid_modal, 4, iRow, iStatus)
@@ -1883,15 +1884,16 @@
           ENDIF
         ENDIF
       ENDDO
+      CALL WCursorShape(CurCrossHair)
       IF (n .GT. 1) THEN 
         CALL InfoMessage(TRIM(Integer2String(n))//' torsion angles are set up '// &
-                         'for Mogul distribution bias(MDB) by this call. ')
+                         'for Mogul distribution bias(MDB) by this operation. ')
       ELSE IF (n .EQ. 1) THEN 
         CALL InfoMessage('1 torsion angle is set up '// &
-                         'for Mogul distribution bias(MDB) by this call. ')
+                         'for Mogul distribution bias(MDB) by this operation. ')
       ELSE
         CALL WarningMessage('No torsion angle set up '// &
-                         'for Mogul distribution bias(MDB) by this call. ')
+                         'for Mogul distribution bias(MDB) by this operation. ')
       ENDIF
       CALL PopActiveWindowID
 
