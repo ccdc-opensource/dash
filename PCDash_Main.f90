@@ -139,6 +139,7 @@
             frag_file(iFrg) = ArgString
             iDummy = Read_One_ZM(iFrg)
             IF (iDummy .EQ. 0) THEN ! successful read
+              CALL CheckLabelsUnique(iFrg)
               nFrag = 1
             ELSE 
               CALL FileErrorPopup(frag_file(iFrg), iDummy)
@@ -158,6 +159,7 @@
             frag_file(iFrg) = tDirName(1:LEN_TRIM(tDirName))//tZmatrices(tNextzmNum)
             iDummy = Read_One_ZM(iFrg)
             IF (iDummy .EQ. 0) THEN ! successful read
+              CALL CheckLabelsUnique(iFrg)
               iFrg = iFrg + 1
               IF (iFrg .EQ. maxfrg+1) THEN
 ! If no free slot found, exit
