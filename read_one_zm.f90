@@ -175,6 +175,7 @@
 ! kzmpar = type of parameter (1 = translation, 2 = rotation)
 ! xzmpar = initial value of parameter
 ! czmpar = Character string associated with this parameter value
+! zm2Atm = atomID associated with this parameter (0 for xyz and quaternions)
       czmpar(1, iFrg) = ' x(frag )'
       czmpar(2, iFrg) = ' y(frag )'
       czmpar(3, iFrg) = ' z(frag )'
@@ -209,6 +210,7 @@
       DO ii = 1, izmpar(iFrg)
         WRITE (czmpar(ii, iFrg)(8:8),'(I1)') iFrg
       ENDDO
+      zm2Atm(1:izmpar(iFrg), iFrg) = 0
       DO i = 1, natoms(iFrg)
 ! IOPTB = 1 OPTIMISE BOND
         IF (ioptb(i, iFrg).EQ.1) THEN
@@ -219,6 +221,7 @@
                                   OriginalLabel(iz1(i, iFrg), iFrg)(1:LEN_TRIM(OriginalLabel(iz1(i, iFrg), iFrg)))// &
                              ') bond'
           xzmpar(izm, iFrg) = blen(i, iFrg)
+          zm2Atm(izm, iFrg) = i
         ENDIF
 ! IOPTA = 1 OPTIMISE ANGLE
         IF (iopta(i, iFrg).EQ.1) THEN
@@ -230,6 +233,7 @@
                                   OriginalLabel(iz2(i, iFrg), iFrg)(1:LEN_TRIM(OriginalLabel(iz2(i, iFrg), iFrg)))// &
                              ') angle'
           xzmpar(izm, iFrg) = alph(i, iFrg)
+          zm2Atm(izm, iFrg) = i
         ENDIF
 ! IOPTT = 1 OPTIMISE TORSION
         IF (ioptt(i, iFrg).EQ.1) THEN
@@ -246,6 +250,7 @@
                                     OriginalLabel(iz3(i, iFrg), iFrg)(1:LEN_TRIM(OriginalLabel(iz3(i, iFrg), iFrg)))// &
                                ') torsion'
             xzmpar(izm, iFrg) = bet(i, iFrg)
+            zm2Atm(izm, iFrg) = i
           ENDIF
         ENDIF
       ENDDO
