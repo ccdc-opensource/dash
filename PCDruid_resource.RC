@@ -2360,7 +2360,7 @@ BEGIN
 ,0
 END
 
-IDD_zmEdit DIALOG 0, 0,  252,  299
+IDD_zmEdit DIALOG 0, 0,  252,  334
 STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
 CAPTION "Edit Atomic Properties / Z-Matrix"
@@ -2381,6 +2381,7 @@ BEGIN
     CONTROL "Sa&ve",IDBSAVE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   49,  276,   42,   14
     CONTROL "Re-or&der",IDB_ReOrder,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,    6,  255,   42,   14
     CONTROL "&Rotations...",IDB_Rotations,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  100,  255,   50,   14
+    CONTROL "Following any editing to atomic properties, before commit (by clicking 'OK') the changes to the in-memory copy, it is recommended to 'Save' or 'Save As...' to a Z-matrix file. Because the file may need to be read again, e.g. in a batch mode SA run.",IDF_LABEL5,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,    6,  294,  236,   34
 END
 
 IDD_zmEdit RCDATA
