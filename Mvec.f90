@@ -459,6 +459,30 @@
       ENDDO
 
       END SUBROUTINE GMEQ
+      
+!
+!*****************************************************************************
+!
+      SUBROUTINE INGMEQ(A,B,NI,NJ)
+!
+! *** GMEQ by PJB/JCM 28 Jun 83 ***
+!
+!X
+!C 12C
+!H Sets matrix B = matrix A.
+!A On entry A is a real matrix of dimension NIxNJ
+!A On exit  B is a real matrix equal to A
+!N NI and NJ must be at least 1
+! 
+      INTEGER A,B
+      DIMENSION A(NI,NJ), B(NI,NJ)
+      DO I = 1, NI
+        DO J = 1, NJ
+          B(I,J) = A(I,J)
+        ENDDO
+      ENDDO
+
+      END SUBROUTINE INGMEQ      
 !
 !*****************************************************************************
 !
@@ -481,6 +505,28 @@
       ENDDO
 
       END SUBROUTINE GMREV
+
+!
+      SUBROUTINE CPGMREV(A,B,NI,NJ)
+!
+! *** GMREV by PJB/JCM 28 Jun 83 ***
+!
+!X
+!C 12C
+!H Reverses the signs of the elements of an NI X NJ matrix.
+!A On entry A is a real matrix of dimension NIxNJ
+!A On exit  B is a real matrix holding -A
+!N A and B may be the same matrix
+!
+      COMPLEX A,B
+      DIMENSION A(NI,NJ), B(NI,NJ)
+      DO I = 1, NI
+        DO J = 1, NJ
+          B(I,J) = -A(I,J)
+        ENDDO
+      ENDDO
+
+      END SUBROUTINE CPGMREV
 !
 !*****************************************************************************
 !
@@ -1059,7 +1105,7 @@
 ! As such, I've added in a check on the values of G and F to prevent it happening
 ! This ought to be tested - why is it causing the crash: the input data must be corrupt
 ! somehow.
-            IF (ABS(F).GT.0.0 .OR. ABS(G).GT.0.0) THEN
+            IF (ABS(F).GT. TINY(F)  .OR. ABS(G).GT.TINY(G)) THEN
               IF (ABS(F).GE.ABS(G)) THEN
                 C = G/F
                 R = SQRT(C**2+1.)
