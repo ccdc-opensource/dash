@@ -12,7 +12,9 @@
       IMPLICIT NONE
 
       INTEGER, EXTERNAL :: Read_One_zm, DiffractionFileOpen
-      LOGICAL, EXTERNAL :: FnPatternOK
+      LOGICAL, EXTERNAL :: FnPatternOK, SDIFileOpen
+      LOGICAL Dummy
+
       INTEGER IWID, IWIDTHS(10)
       CHARACTER(MaxPathLength) ArgString, tDirName, tFileName
       CHARACTER(7) StrFileExtension ! maximum = 7 = .zmatrix
@@ -146,7 +148,7 @@
             ENDIF ! If the read on the Z-matrix was ok
             CALL ShowWizardWindowZmatrices
           CASE ('SDI    ')
-            CALL SDIFileOpen(ArgString)
+            Dummy = SDIFileOpen(ArgString)
             CALL ShowWizardWindowZmatrices
           CASE ('PDB    ', 'MOL    ', 'MOL2   ', 'ML2    ', 'MDL    ', 'RES    ', 'XYZ    ', 'CSSR   ', 'CIF    ')
             CALL ViewStructure(ArgString, .TRUE.)

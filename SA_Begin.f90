@@ -263,8 +263,9 @@
       CHARACTER*10 filnam_root
       COMMON /commun/ filnam_root
 
-      INTEGER, EXTERNAL :: GetCrystalSystem
+      INTEGER, EXTERNAL :: GetCrystalSystem, PREFIN
       REAL, EXTERNAL :: VCTMOD, SCLPRD
+      INTEGER IDummy
       CHARACTER*6 PNAME
       INTEGER hFile, iSym
       REAL phases(1:48), RefHT(1:3,1:48)
@@ -291,7 +292,7 @@
       PNAME = 'SPGMAK'
       filnam_root = 'polys'
       NINIT = 1
-      CALL PREFIN(PNAME)
+      IDummy = PREFIN(PNAME)
       CALL SYMOP
       IF (IBMBER .EQ. 0) THEN
         CALL OPSYM(1)

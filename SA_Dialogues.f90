@@ -104,7 +104,8 @@
                      first_zm_in_win
 
       INTEGER, EXTERNAL :: Read_One_Zm
-      LOGICAL, EXTERNAL :: Confirm, DASHWDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: Confirm, DASHWDialogGetCheckBoxLogical, SDIFileOpen
+      LOGICAL        Dummy
       INTEGER        iFlags
       INTEGER        zmread
       INTEGER        iFrg, iSelection, DelFrg
@@ -150,7 +151,7 @@
               CALL SDIFileBrowse
             CASE (IDB_SA_Project_Open)
               CALL DASHWDialogGetString(IDF_SA_Project_Name, SDIFile)
-              CALL SDIFileOpen(SDIFile)
+              Dummy = SDIFileOpen(SDIFile)
             CASE (IDB_zmDelete1, IDB_zmDelete2, IDB_zmDelete3, IDB_zmDelete4)
               IF (Confirm('Do you want to clear this Z-matrix?')) THEN
                 DelFrg = 1
