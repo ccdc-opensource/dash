@@ -594,6 +594,9 @@
       REAL                            WTJ,         AJOBS
       COMMON /SXFSTO/ jHKL(3,MFCSTO), WTJ(MFCSTO), AJOBS(MFCSTO)
 
+      INTEGER, EXTERNAL :: PREFIN
+      INTEGER IDummy
+
       REAL   DStarTem(MFCSTO)
       INTEGER iR, jR, I, hFile
       INTEGER iOrdTem(MFCSTO), KK
@@ -601,7 +604,7 @@
 
       filnam_root = filnmr
       NINIT = 1
-      CALL PREFIN(PNAME)
+      IDummy = PREFIN(PNAME)
       CALL SYMOP
       CALL RECIP
       IF (IBMBER .NE. 0) RETURN
