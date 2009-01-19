@@ -597,6 +597,7 @@
         CALL WDialogFieldState(IDF_LABEL6, DialogHidden)
         CALL WDialogFieldState(IDF_BKG_TERM_RIETAN, DialogHidden)
         CALL SelectDASHDialog(IDD_PW_Page4)
+        CALL WDialogFieldState(IDB_PO, DialogHidden)
         CALL WDialogFieldState(IDF_GSAS_Import_ins, DialogHidden)
 ! Grey out 'Remove background' button on toolbar
         CALL WMenuSetState(ID_Remove_Background, ItemEnabled, WintOff)

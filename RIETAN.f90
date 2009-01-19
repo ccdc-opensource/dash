@@ -695,10 +695,6 @@
           tLine = 'IHP1 = 1'  ! PO hkl can't be 000
           IF ( PrefParExists ) THEN
             WRITE(tLine, '(A,I3)', ERR=998) 'IHP1 = ', PO_Direction(1)
-            CALL InfoMessage('The preferred orientation that was used during the '// &
-                       'Simulated Annealing'//CHAR(13)//&
-                       'will be written out to the RIETAN .ins file: if you are using'//CHAR(13)//&
-                       'a different experimental pattern, you may need to remove this.')
           ENDIF
         CASE ('IKP1')
           WRITE(tLine, '(A,I3)', ERR=998) 'IKP1 = ', PO_Direction(2)

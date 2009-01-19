@@ -611,9 +611,6 @@
 ! Also need to write out PO if used during SA
           IF ( PrefParExists ) THEN
             WRITE(hFileTOPAS, '(A,F5.3,A,I3,1X,I3,1X,I3,1X,A)', ERR=999) '    PO(@, ', RR_PO, ', , ', PO_Direction(1:3), ')'
-            CALL InfoMessage('The preferred orientation that was used during the Simulated Annealing'//CHAR(13)//&
-                             'has been written out to the TOPAS .inp file: if you are using'//CHAR(13)//&
-                             'a different experimental pattern, you may need to remove this.')
           ELSE
             WRITE(hFileTOPAS, '(A)', ERR=999) "'    PO(@, 1.0, , 0 0 1)"
           ENDIF

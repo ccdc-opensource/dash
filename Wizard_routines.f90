@@ -589,14 +589,23 @@
               ELSE
                 CALL WizardWindowShow(IDD_PW_Page3)
               ENDIF
-            CASE (IDNEXT)
+            CASE (IDNEXT, IDB_PO)
               IF (.NOT. FnWavelengthOK()) THEN
                 CALL ErrorMessage('Invalid wavelength.')
-              ELSE
-                CALL DASHWDialogGetReal(IDF_wavelength1, Temp)
-                CALL Set_Wavelength(Temp)
-                CALL WizardWindowShow(IDD_PW_Page5)
+                GOTO 100
               ENDIF
+              CALL DASHWDialogGetReal(IDF_wavelength1, Temp)
+              CALL Set_Wavelength(Temp)
+              IF (iRietveldMethod .NE. INTERNAL_RB) THEN
+                CALL SelectDASHDialog(IDD_SAW_Page2)
+                IF ((EventInfo%VALUE1 .EQ. IDB_PO) .OR. &
+                     DASHWDialogGetCheckBoxLogical(IDF_Use_PO)) THEN
+                  CALL WizardWindowShow(IDD_SAW_Page2)
+                  GOTO 100
+                ENDIF
+              ENDIF
+              CALL WizardWindowShow(IDD_PW_Page5)
+ 100          CONTINUE
             CASE (IDCANCEL, IDCLOSE)
               IF ( iRietveldMethod .NE. INTERNAL_RB ) THEN
                 CALL CopyBackup2Pattern()

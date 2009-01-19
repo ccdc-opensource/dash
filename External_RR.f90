@@ -167,6 +167,7 @@
       USE DRUID_HEADER
       USE TAVAR
       USE REFVAR
+      USE PO_VAR
       USE VARIABLES
 
       IMPLICIT NONE
@@ -198,6 +199,8 @@
       old_NumOfRef = NumOfRef 
       NumOfRef = 0
       old_FNAME = FNAME
+      SA_PrefParExists = PrefParExists
+      SA_PO_Direction(1:3) = PO_Direction(1:3)
       CALL Profile_Plot
       CALL PushActiveWindowID
       ! Must clear old file name and grey out the 'Next' button
@@ -229,6 +232,7 @@
       ! Enable the "Monochromated" checkbox
       CALL SelectDASHDialog(IDD_PW_Page4)
       CALL WDialogFieldState(IDC_Monochromated, Enabled)
+      CALL WDialogFieldState(IDB_PO, Enabled)
       IF ( iRietveldMethod .EQ. FOR_GSAS  ) &
         CALL WDialogFieldState(IDF_GSAS_Import_ins, Enabled)
       CALL SelectDASHDialog(IDD_PW_Page6)
@@ -272,6 +276,7 @@
       USE WINTERACTER
       USE TAVAR
       USE REFVAR
+      USE PO_VAR
       USE VARIABLES
 
       IMPLICIT NONE
@@ -310,6 +315,8 @@
       JRadOption = TARADIATION
       NumOfRef = old_NumOfRef
       FNAME = old_FNAME
+      PrefParExists = SA_PrefParExists
+      PO_Direction(1:3) = SA_PO_Direction(1:3)
       CALL PushActiveWindowID
       CALL WindowOutStatusBar(1, FNAME)
       CALL SelectDASHDialog(IDD_PW_Page3)
@@ -323,6 +330,7 @@
       CALL SelectDASHDialog(IDD_PW_Page4)
       CALL WDialogPutCheckBox(IDC_Monochromated, Checked)
       CALL WDialogFieldState(IDC_Monochromated, Disabled)
+      CALL WDialogFieldState(IDB_PO, DialogHidden)
       CALL WDialogFieldState(IDF_GSAS_Import_ins, DialogHidden)
       ! Restore "Subtract background" checkbox
       CALL SelectDASHDialog(IDD_PW_Page6)
@@ -347,6 +355,20 @@
       CALL WDialogFieldState(IDF_BKG_TERM_GSAS, DialogHidden)
       CALL WDialogFieldState(IDF_LABEL6, DialogHidden)
       CALL WDialogFieldState(IDF_BKG_TERM_RIETAN, DialogHidden)
+! Restore PO
+      CALL SelectDASHDialog(IDD_SAW_Page2)
+      CALL WDialogPutCheckBoxLogical(IDF_Use_PO, PrefParExists)
+      tFieldState = Disabled
+      IF (PrefParExists) tFieldState = Enabled
+      CALL WDialogPutInteger(IDF_PO_a, PO_Direction(1))
+      CALL WDialogPutInteger(IDF_PO_b, PO_Direction(2))
+      CALL WDialogPutInteger(IDF_PO_c, PO_Direction(3))
+      CALL WDialogFieldState(IDF_PO_a, tFieldState)
+      CALL WDialogFieldState(IDF_PO_b, tFieldState)
+      CALL WDialogFieldState(IDF_PO_c, tFieldState)
+      CALL WDialogFieldState(IDF_LABELa, tFieldState)
+      CALL WDialogFieldState(IDF_LABELb, tFieldState)
+      CALL WDialogFieldState(IDF_LABELc, tFieldState)
       CALL PopActiveWindowID
       ! Must also restore Rebin_Profile
       LBIN = 1
