@@ -1462,6 +1462,8 @@
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
+      USE PO_VAR
+      USE TAVAR
 
       IMPLICIT NONE      
 
@@ -1475,9 +1477,13 @@
         CASE (PushButton)
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
+              IF (iRietveldMethod .NE. INTERNAL_RB) THEN
+                CALL WizardWindowShow(IDD_PW_Page4)
+              ELSE
 ! Ungrey 'Load DASH Pawley file' button on toolbar
-              CALL WMenuSetState(ID_import_dpj_file, ItemEnabled, WintOn)
-              CALL WizardWindowShow(IDD_SAW_Page1)
+                CALL WMenuSetState(ID_import_dpj_file, ItemEnabled, WintOn)
+                CALL WizardWindowShow(IDD_SAW_Page1)
+              ENDIF
             CASE (IDNEXT)
               IF (DASHWDialogGetCheckBoxLogical(IDF_Use_PO)) THEN
                 CALL DASHWDialogGetInteger(IDF_PO_a, h)
@@ -1485,12 +1491,27 @@
                 CALL DASHWDialogGetInteger(IDF_PO_c, l)
                 IF ((h .EQ. 0) .AND. (k .EQ. 0) .AND. (l .EQ. 0)) THEN
                   CALL ErrorMessage("h, k and l cannot all be zero.")
-                  RETURN
+                  GOTO 100
                 ENDIF
               ENDIF
-              CALL SA_Parameter_Set
-              CALL ShowWizardWindowParameterBounds
+              IF (iRietveldMethod .NE. INTERNAL_RB) THEN
+                PrefParExists = DASHWDialogGetCheckBoxLogical(IDF_Use_PO)
+                IF ( PrefParExists ) THEN
+                  PO_Direction(1) = h
+                  PO_Direction(2) = k
+                  PO_Direction(3) = l
+                ENDIF
+                CALL WizardWindowShow(IDD_PW_Page5)
+              ELSE
+                CALL SA_Parameter_Set
+                CALL ShowWizardWindowParameterBounds
+              ENDIF
+ 100          CONTINUE
             CASE (IDCANCEL, IDCLOSE)
+              IF (iRietveldMethod .NE. INTERNAL_RB) THEN
+                CALL CopyBackup2Pattern()
+                iRietveldMethod = INTERNAL_RB
+              ENDIF
               CALL EndWizardPastPawley
           END SELECT
         CASE (FieldChanged)

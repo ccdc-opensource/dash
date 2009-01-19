@@ -585,10 +585,6 @@
         WRITE(chFileGSAS, '(A)', ERR=999) '# MD preferred orientation'
         ! PREFO type 0
         WRITE(chFileGSAS, '(A,F5.3,3(1X,I3))', ERR=999) 'PREFO 0 ', RR_PO, PO_Direction(1:3)
-        CALL InfoMessage('The preferred orientation that was used during the '// &
-                         'Simulated Annealing'//CHAR(13)//&
-                         'will be written out to the GSAS .exp file: if you are using'//CHAR(13)//&
-                         'a different experimental pattern, you may need to remove this.')
       ENDIF
       WRITE(chFileGSAS, '(A)', ERR=999) '# number of background terms'
       WRITE(chFileGSAS, '(A, I3)', ERR=999) 'NBKG ', NumOfBkgTerm
