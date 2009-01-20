@@ -728,6 +728,7 @@
 #define IDF_GSAS_Import_ins              1570
 #define ID_Tutorial_6                   40026
 #define IDC_Anisotropic_broadening       1372
+#define IDB_RESTORE                      1475
 #define IDF_PW_Page1_label               1475
 #define IDD_SA_ByDbfFile                  168
 #define IDF_GROUP                        1577
@@ -3583,6 +3584,8 @@ BEGIN
     CONTROL "Distance",IDF_LABEL5,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  107,   81,   62,    8
     CONTROL "Angle",IDF_LABEL6,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,  107,   93,   62,    8
     CONTROL "Flatten",IDF_LABEL7,"STATIC",WS_CHILD | WS_VISIBLE | SS_LEFT,  107,  106,   62,    8
+    CONTROL "&Restore",IDB_RESTORE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   90,  135,   35,   14
+    CONTROL "saved .inp and .out files",IDF_LABEL4,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  127,  136,   78,    9
 END
 
 IDD_SAW_Page7_TOPAS RCDATA
