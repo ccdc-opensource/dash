@@ -709,6 +709,7 @@
       INTEGER, PARAMETER :: IDF_GSAS_Import_ins             =  1570
       INTEGER, PARAMETER :: ID_Tutorial_6                   = 40026
       INTEGER, PARAMETER :: IDC_Anisotropic_broadening      =  1372
+      INTEGER, PARAMETER :: IDB_RESTORE                     =  1475
       INTEGER, PARAMETER :: IDF_PW_Page1_label              =  1475
       INTEGER, PARAMETER :: IDD_SA_ByDbfFile                =   168
       INTEGER, PARAMETER :: IDF_GROUP                       =  1577
