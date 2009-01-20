@@ -670,7 +670,7 @@
       INTEGER, PARAMETER :: IDF_TOPASExe                    =  1214
       INTEGER, PARAMETER :: IDBBROWSE4                      =  1555
       INTEGER, PARAMETER :: IDC_TOPAS_in_background         =  1296
-      INTEGER, PARAMETER :: IDC_Anisotropic_broadening      =  1370
+      INTEGER, PARAMETER :: IDC_Use_anisotropic_broadening  =  1370
       INTEGER, PARAMETER :: IDF_K1                          =  1399
       INTEGER, PARAMETER :: IDC_Monochromated               =  1442
       INTEGER, PARAMETER :: IDD_SAW_Page7_GSAS              =   140
@@ -708,6 +708,7 @@
       INTEGER, PARAMETER :: IDD_PW_Page8c                   =   166
       INTEGER, PARAMETER :: IDF_GSAS_Import_ins             =  1570
       INTEGER, PARAMETER :: ID_Tutorial_6                   = 40026
+      INTEGER, PARAMETER :: IDC_Anisotropic_broadening      =  1372
       INTEGER, PARAMETER :: IDF_PW_Page1_label              =  1475
       INTEGER, PARAMETER :: IDD_SA_ByDbfFile                =   168
       INTEGER, PARAMETER :: IDF_GROUP                       =  1577

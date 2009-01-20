@@ -304,11 +304,25 @@
 
       CALL PushActiveWindowID
       CALL SelectDASHDialog(IDD_SAW_Page7_TOPAS)
-      IF ( .NOT. DASHWDialogGetCheckBoxLogical(IDC_UseDASHRecommendation) ) RETURN
+      IF ( ext_RR_stage .GE. 3 ) THEN
+        CALL WDialogFieldState(IDC_Use_anisotropic_broadening,         Disabled)
+      ELSE
+        ! Initial state
+        CALL WDialogFieldState(IDC_Use_anisotropic_broadening,         Enabled)
+        CALL WDialogFieldState(IDC_Anisotropic_broadening,             Disabled)
+        CALL WDialogPutCheckBoxLogical(IDC_Use_anisotropic_broadening, .TRUE.)
+        CALL WDialogPutCheckBoxLogical(IDC_Anisotropic_broadening,     .TRUE.)
+      ENDIF
+      IF ( .NOT. DASHWDialogGetCheckBoxLogical(IDC_UseDASHRecommendation) ) THEN
+        IF ( ext_RR_stage .GE. 3 .AND. DASHWDialogGetCheckBoxLogical(IDC_Use_anisotropic_broadening) ) &
+            CALL WDialogFieldState(IDC_Anisotropic_broadening,         Enabled)
+        IF ( ext_RR_stage .EQ. 3 ) &
+          CALL WDialogPutCheckBoxLogical(IDC_Anisotropic_broadening,   .FALSE.)
+        RETURN
+      ENDIF
       SELECT CASE ( ext_RR_stage )
         CASE ( 2 ) ! Anisotropic Pawley refinement
-          CALL WDialogFieldState(IDC_Anisotropic_broadening, Enabled)
-          CALL WDialogPutCheckBoxLogical(IDC_Anisotropic_broadening, .TRUE.)
+          CALL WDialogPutCheckBoxLogical(IDC_Anisotropic_broadening,   .TRUE.)
           CALL WDialogPutCheckBoxLogical(IDC_Scale,       .FALSE.)
           CALL WDialogPutCheckBoxLogical(IDC_Background,  .FALSE.)
           CALL WDialogPutCheckBoxLogical(IDC_Biso,        .FALSE.)
@@ -317,7 +331,7 @@
           CALL WDialogPutCheckBoxLogical(IDC_SaveProfile, .FALSE.)
           CALL WDialogPutCheckBoxLogical(IDC_WriteCIF,    .TRUE.)
         CASE ( 3 ) ! First Rietveld refinement: refine scale only
-          CALL WDialogFieldState(IDC_Anisotropic_broadening, Disabled)
+          CALL WDialogPutCheckBoxLogical(IDC_Anisotropic_broadening,   .FALSE.)
           CALL WDialogPutCheckBoxLogical(IDC_Scale,       .TRUE.)
           CALL WDialogPutCheckBoxLogical(IDC_Background,  .FALSE.)
           CALL WDialogPutCheckBoxLogical(IDC_Biso,        .FALSE.)
@@ -326,6 +340,7 @@
           CALL WDialogPutCheckBoxLogical(IDC_SaveProfile, .FALSE.)
           CALL WDialogPutCheckBoxLogical(IDC_WriteCIF,    .TRUE.)
         CASE ( 4 ) ! Second Rietveld refinement: include background
+          CALL WDialogPutCheckBoxLogical(IDC_Anisotropic_broadening,   .FALSE.)
           CALL WDialogPutCheckBoxLogical(IDC_Scale,       .TRUE.)
           CALL WDialogPutCheckBoxLogical(IDC_Background,  .TRUE.)
           CALL WDialogPutCheckBoxLogical(IDC_Biso,        .FALSE.)
@@ -334,6 +349,7 @@
           CALL WDialogPutCheckBoxLogical(IDC_SaveProfile, .FALSE.)
           CALL WDialogPutCheckBoxLogical(IDC_WriteCIF,    .TRUE.)
         CASE ( 5 ) ! Third Rietveld refinement: include Biso
+          CALL WDialogPutCheckBoxLogical(IDC_Anisotropic_broadening,  .FALSE.)
           CALL WDialogPutCheckBoxLogical(IDC_Scale,       .TRUE.)
           CALL WDialogPutCheckBoxLogical(IDC_Background,  .TRUE.)
           CALL WDialogPutCheckBoxLogical(IDC_Biso,        .TRUE.)
@@ -342,6 +358,19 @@
           CALL WDialogPutCheckBoxLogical(IDC_SaveProfile, .FALSE.)
           CALL WDialogPutCheckBoxLogical(IDC_WriteCIF,    .TRUE.)
         CASE ( 6 ) ! Fourth Rietveld refinement: include coordinates
+          CALL WDialogPutCheckBoxLogical(IDC_Anisotropic_broadening,  .FALSE.)
+          CALL WDialogPutCheckBoxLogical(IDC_Scale,       .TRUE.)
+          CALL WDialogPutCheckBoxLogical(IDC_Background,  .TRUE.)
+          CALL WDialogPutCheckBoxLogical(IDC_Biso,        .TRUE.)
+          CALL WDialogPutCheckBoxLogical(IDC_Coordinates, .TRUE.)
+          CALL WDialogPutCheckBoxLogical(IDC_IncludeESDs, .TRUE.)
+          CALL WDialogPutCheckBoxLogical(IDC_SaveProfile, .TRUE.)
+          CALL WDialogPutCheckBoxLogical(IDC_WriteCIF,    .TRUE.)
+        CASE ( 7 ) ! Fifth Rietveld refinement: reenable+include aniso broadening
+          IF ( DASHWDialogGetCheckBoxLogical(IDC_Use_anisotropic_broadening) ) THEN
+            CALL WDialogFieldState(IDC_Anisotropic_broadening,         Enabled)
+            CALL WDialogPutCheckBoxLogical(IDC_Anisotropic_broadening, .TRUE.)
+          ENDIF
           CALL WDialogPutCheckBoxLogical(IDC_Scale,       .TRUE.)
           CALL WDialogPutCheckBoxLogical(IDC_Background,  .TRUE.)
           CALL WDialogPutCheckBoxLogical(IDC_Biso,        .TRUE.)
@@ -370,6 +399,8 @@
       INTEGER, EXTERNAL :: WriteTOPASFileRietveld2
       INTEGER, EXTERNAL :: WriteTOPASPawleyAnisotropic
 
+      INTEGER iStat
+
       CALL PushActiveWindowID
       CALL SelectDASHDialog(IDD_SAW_Page7_TOPAS)
       SELECT CASE (EventType)
@@ -392,7 +423,7 @@
 
               IF ( ext_RR_stage .EQ. 2 ) THEN
                 ! Anisotropic broadening...
-                use_anisotropic_broadening = DASHWDialogGetCheckBoxLogical(IDC_Anisotropic_broadening)
+                use_anisotropic_broadening = DASHWDialogGetCheckBoxLogical(IDC_Use_anisotropic_broadening)
                 IF ( use_anisotropic_broadening ) THEN
                   IF ( WriteTOPASPawleyAnisotropic(ext_RR_input_file_name) .EQ. 0 ) THEN
                     CALL Launch_TOPAS(ext_RR_input_file_name)
@@ -411,6 +442,22 @@
                 CALL UpdateTOPASCheckBoxes()
               ENDIF
           END SELECT
+        CASE (FieldChanged)
+          SELECT CASE (EventInfo%VALUE1)
+            CASE (IDC_Use_anisotropic_broadening)
+              CALL WDialogPutCheckBoxLogical(IDC_Anisotropic_broadening, &
+                       DASHWDialogGetCheckBoxLogical(IDC_Use_anisotropic_broadening))
+            CASE (IDC_UseDASHRecommendation)
+              iStat = Disabled
+              IF (DASHWDialogGetCheckBoxLogical(IDC_UseDASHRecommendation)) THEN
+                IF (ext_RR_stage .GE. 7 .AND. DASHWDialogGetCheckBoxLogical(IDC_Use_anisotropic_broadening)) &
+                  iStat = Enabled
+              ELSE
+                IF (ext_RR_stage .GE. 3 .AND. DASHWDialogGetCheckBoxLogical(IDC_Use_anisotropic_broadening)) &
+                  iStat = Enabled
+              ENDIF
+              CALL WDialogFieldState(IDC_Anisotropic_broadening, iStat)
+          END SELECT                
       END SELECT
       CALL PopActiveWindowID
 
@@ -507,9 +554,9 @@
 
       INCLUDE 'Lattice.inc'
 
-      INTEGER, EXTERNAL :: StrFind, assembly_size
+      INTEGER, EXTERNAL :: StrFind
       CHARACTER*20, EXTERNAL :: Integer2String
-      LOGICAL, EXTERNAL :: assembly_contains, has_aromatic_bond, DASHWDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
       LOGICAL, EXTERNAL :: PutAtomsForSpecailPosition
       LOGICAL, EXTERNAL :: PutRestraints, TOPASWriteDistance, TOPASWriteAngle, TOPASWritePlane
       INTEGER hFileTOPAS, hOutputFile
@@ -580,8 +627,13 @@
         ELSE
           ! Undocumented TOPAS stuff, such as y20 or k61
           IF ( word(1:1) .EQ. 'Y' .OR. word(1:1) .EQ. 'K' ) THEN
-            iPos = StrFind(tLine, iLen, '  sh_', 5)
-            IF ( iPos .NE. 0 ) tLine(iPos+1:iPos+1) = '!'
+            IF ( DASHWDialogGetCheckBoxLogical(IDC_Anisotropic_broadening) ) THEN
+              iPos = StrFind(tLine, iLen, ' !sh_', 5)
+              IF ( iPos .NE. 0 .AND. tLine(iPos:iPos+7) .NE. ' !sh_c00' ) tLine(iPos+1:iPos+1) = ' '
+            ELSE
+              iPos = StrFind(tLine, iLen, '  sh_', 5)
+              IF ( iPos .NE. 0 ) tLine(iPos+1:iPos+1) = '!'
+            ENDIF
           ENDIF
         ENDIF
         WRITE(hFileTOPAS, '(A)', ERR=999) tLine(1:iLen)
@@ -694,7 +746,11 @@
         ! Need to check if this is the "prm sh_scale 1.0 min 0.0001" line.
         iPos = StrFind(tLine, iLen, 'sh_scale', 8)
         IF ( iPos .NE. 0 ) THEN
-          tLine(iPos-1:iPos-1) = '!'
+          IF ( DASHWDialogGetCheckBoxLogical(IDC_Anisotropic_broadening) ) THEN
+            tLine(iPos-1:iPos-1) = ' '
+          ELSE
+            tLine(iPos-1:iPos-1) = '!'
+          ENDIF
           in_spherical_harmonics = .TRUE.
         ELSE
           ! Need to check if this is the "prm bnonh 3.000" line.
