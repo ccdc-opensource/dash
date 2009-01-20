@@ -306,12 +306,14 @@
       CALL SelectDASHDialog(IDD_SAW_Page7_TOPAS)
       IF ( ext_RR_stage .GE. 3 ) THEN
         CALL WDialogFieldState(IDC_Use_anisotropic_broadening,         Disabled)
+        CALL WDialogFieldState(IDB_RESTORE,                            Enabled)
       ELSE
         ! Initial state
         CALL WDialogFieldState(IDC_Use_anisotropic_broadening,         Enabled)
         CALL WDialogFieldState(IDC_Anisotropic_broadening,             Disabled)
         CALL WDialogPutCheckBoxLogical(IDC_Use_anisotropic_broadening, .TRUE.)
         CALL WDialogPutCheckBoxLogical(IDC_Anisotropic_broadening,     .TRUE.)
+        CALL WDialogFieldState(IDB_RESTORE,                            Disabled)
       ENDIF
       IF ( .NOT. DASHWDialogGetCheckBoxLogical(IDC_UseDASHRecommendation) ) THEN
         IF ( ext_RR_stage .GE. 3 .AND. DASHWDialogGetCheckBoxLogical(IDC_Use_anisotropic_broadening) ) &
@@ -395,11 +397,12 @@
 
       IMPLICIT NONE
 
-      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical, Confirm
       INTEGER, EXTERNAL :: WriteTOPASFileRietveld2
       INTEGER, EXTERNAL :: WriteTOPASPawleyAnisotropic
+      INTEGER, EXTERNAL :: BackupRestorTopasFiles
 
-      INTEGER iStat
+      INTEGER iStat, iRetCode
 
       CALL PushActiveWindowID
       CALL SelectDASHDialog(IDD_SAW_Page7_TOPAS)
@@ -414,6 +417,16 @@
                 iRietveldMethod = INTERNAL_RB
               ENDIF
               CALL EndWizardPastPawley
+            CASE (IDB_RESTORE)
+              IF (Confirm('This will restore .inp and .out files to the moment'//CHAR(13)// &
+                          'immediately after last writting.'//CHAR(13)//CHAR(13)// &
+                          'Continue to verwrite current .inp and .out files ?')) THEN
+                IF (BackupRestorTopasFiles(ext_RR_input_file_name, .FALSE.) .EQ. 0) THEN
+                  CALL InfoMessage('The backuped .inp and .out files have been restored.'//CHAR(13))
+                ELSE
+                  CALL ErrorMessage("Error while trying to restore .inp and/or .out files."//CHAR(13))
+                ENDIF
+              ENDIF
             CASE (IDB_WRITE)
               ! ## The way I have programmed it at the moment (inserting an extra stage "2" that
               ! is simply skipped when no aniso) means that we could move the two lines:
@@ -428,6 +441,7 @@
                   IF ( WriteTOPASPawleyAnisotropic(ext_RR_input_file_name) .EQ. 0 ) THEN
                     CALL Launch_TOPAS(ext_RR_input_file_name)
                     ext_RR_stage = ext_RR_stage + 1
+                    iRetCode = BackupRestorTopasFiles(ext_RR_input_file_name, .TRUE.)
                     CALL UpdateTOPASCheckBoxes()
                   ENDIF
                   CALL PopActiveWindowID
@@ -439,6 +453,7 @@
               IF ( WriteTOPASFileRietveld2(ext_RR_input_file_name) .EQ. 0 ) THEN
                 CALL Launch_TOPAS(ext_RR_input_file_name)
                 ext_RR_stage = ext_RR_stage + 1
+                iRetCode = BackupRestorTopasFiles(ext_RR_input_file_name, .TRUE.)
                 CALL UpdateTOPASCheckBoxes()
               ENDIF
           END SELECT
@@ -1029,4 +1044,44 @@
       END FUNCTION TOPASWritePlane
 !
 !*****************************************************************************
+! 
+! This function backup/restore both .inp and .out files.
+      INTEGER FUNCTION BackupRestorTopasFiles(FileName, Backup)
+
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      CHARACTER*(*), INTENT (IN   ) :: FileName
+      LOGICAL,       INTENT (IN   ) :: Backup
+
+      INTEGER, EXTERNAL :: LoadTopasPlotFile
+!      CHARACTER*20, EXTERNAL :: Integer2String
+!      CHARACTER*20 tStr
+      CHARACTER*(*), PARAMETER :: cBackSuffix = '.bak'
+      CHARACTER*4 tSuffix(2)
+      DATA tSuffix/'.inp', '.out'/
+      CHARACTER(MaxPathLength) tDirName, tFileName, tName
+      INTEGER ExtLength, I, iRetCode
+
+      BackupRestorTopasFiles = 0
+      ExtLength = 3
+      CALL SplitPath2(FileName, tDirName, tFileName, tName, ExtLength)
+      iRetCode = InfoError(1)
+      DO I = 1, 2
+        tName = TRIM(tDirName)//TRIM(tFileName)//tSuffix(I)
+        IF (Backup) THEN
+          CALL IOsCopyFile(TRIM(tName), TRIM(tName)//cBackSuffix)
+        ELSE
+          CALL IOsCopyFile(TRIM(tName)//cBackSuffix, TRIM(tName))
+        ENDIF
+        IF (InfoError(1) .EQ. ErrOSCommand) BackupRestorTopasFiles = BackupRestorTopasFiles + 1
+      ENDDO
+      RETURN
+
+      END FUNCTION BackupRestorTopasFiles
 !
+!*****************************************************************************
+!
+
