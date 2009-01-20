@@ -456,6 +456,8 @@
                 iRetCode = BackupRestorTopasFiles(ext_RR_input_file_name, .TRUE.)
                 CALL UpdateTOPASCheckBoxes()
               ENDIF
+            CASE (IDB_View)
+              CALL Launch_Viewer(ext_RR_input_file_name, '.cif')
           END SELECT
         CASE (FieldChanged)
           SELECT CASE (EventInfo%VALUE1)
