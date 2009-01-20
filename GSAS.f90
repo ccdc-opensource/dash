@@ -21,8 +21,7 @@
       INTEGER, PARAMETER :: chFile = 116
       REAL factr_dist, factr_angle, factr_plane
       CHARACTER(MaxPathLength) tScriptName, tDirName, tFileNameRoot
-      CHARACTER*40 opt_str
-      CHARACTER*8 tExtension
+      CHARACTER*8 tExtension, opt_str
 
       ! Initialise to failure
       Launch_GSAS = 1
@@ -185,7 +184,7 @@
       IF ( DASHWDialogGetCheckBoxLogical(IDC_WriteCIF) ) opt = opt + Z'100'
       CALL PopActiveWindowID
 
-      WRITE(OptStr,'(Z32)') opt
+      WRITE(OptStr,'(Z8.3)') opt
       FillOptStr = opt
 
       END FUNCTION FillOptStr
@@ -458,8 +457,8 @@
         UVW(3) = 2.0
         LXY(1) = 0.0
         LXY(1) = 0.0
-        Pola = 0.0 
-        iPola = 2 ! none
+        Pola = 1.0 
+        iPola = 0 ! diffracted beam
       ELSE
         CALL ErrorMessage('Unknown radiation type.')
         RETURN

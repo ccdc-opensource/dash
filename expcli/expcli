@@ -271,7 +271,7 @@ proc exp_set_MD_po {rec {h 1} {p 1}} {
 		if ![string length [MDprefinfo $h $p $n ratio]] {
 			MDprefinfo $h $p $n new set
 		}
-		foreach {r t h k l} $line {
+		foreach {t r h k l} $line {
 			MDprefinfo $h $p $n ratio set $r
 			MDprefinfo $h $p $n type set $t
 			MDprefinfo $h $p $n h set $h
