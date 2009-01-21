@@ -522,6 +522,9 @@
         CASE (IDD_SA_ByDbfFile)
           CALL DealWithWizardWindowLoadDBFFile
           GOTO 10
+        CASE (IDD_SA_Dist_Rest)
+          CALL DealWithWizardWindowSADistRestraints
+          GOTO 10
       END SELECT
       DealWithEvent = .FALSE.
       RETURN

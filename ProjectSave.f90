@@ -380,8 +380,11 @@
         CALL MakRHm
       ENDIF
       CALL PrjErrTrace
+      IF (RW .EQ. cRead) THEN
+        CALL InitSADistRestraint
 ! Update ranges and fixed yes/no per parameter
-      IF (RW .EQ. cRead) CALL SA_Parameter_Set
+        CALL SA_Parameter_Set
+      ENDIF
 ! Read / Write solutions
       CALL PrjReadWriteSolutions
       CALL PrjErrTrace

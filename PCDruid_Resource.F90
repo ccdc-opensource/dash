@@ -719,4 +719,10 @@
       INTEGER, PARAMETER :: IDF_MDBMinHit                   =  1579
       INTEGER, PARAMETER :: IDF_SX_Page1_label              =  1372
       INTEGER, PARAMETER :: IDF_TestEarlyTerm               =  1576
+      INTEGER, PARAMETER :: IDF_SA_Dist_Rest_Grid           =  1582
+      INTEGER, PARAMETER :: IDD_TEMPLATE018                 =   172
+      INTEGER, PARAMETER :: IDD_SA_Dist_Rest                =   173
+      INTEGER, PARAMETER :: IDF_SA_label                    =  1581
+      INTEGER, PARAMETER :: IDF_ClearDistRest               =  1583
+      INTEGER, PARAMETER :: IDF_SA_Dist_Rest                =  1584
       END MODULE Druid_Header

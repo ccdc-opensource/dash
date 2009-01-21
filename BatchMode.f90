@@ -51,10 +51,10 @@
       LOGICAL tSdiIn, tZmIn
 
 !     in_batch = .TRUE.
-      DRestrNumb = 0
       iFrg = 0
       tSdiIn = .FALSE.
       tZmIn  = .FALSE.
+      CALL InitSADistRestraint
       OPEN (UNIT=hFile, FILE=ArgString, STATUS='OLD', ERR=998)
 ! Loop over all records
       DO WHILE ( .TRUE. )

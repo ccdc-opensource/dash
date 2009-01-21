@@ -1,6 +1,18 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE InitSADistRestraint
+
+      IMPLICIT NONE      
+
+      INCLUDE 'SA_restrain.inc'
+
+      DRestrNumb = 0
+
+      END SUBROUTINE InitSADistRestraint
+!
+!*****************************************************************************
+!
       LOGICAL FUNCTION ParseSADistRestraint( line, iFrg )
 
       USE ZMVAR
