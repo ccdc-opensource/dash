@@ -140,6 +140,7 @@
               IF ((EventInfo%VALUE1 .EQ. IDB_PO) .OR. DASHWDialogGetCheckBoxLogical(IDF_Use_PO)) THEN
                 CALL WizardWindowShow(IDD_SAW_Page2)
               ELSE
+                CALL InitSADistRestraint
                 CALL SA_Parameter_Set
                 CALL ShowWizardWindowParameterBounds
               ENDIF
@@ -1503,6 +1504,7 @@
                 ENDIF
                 CALL WizardWindowShow(IDD_PW_Page5)
               ELSE
+                CALL InitSADistRestraint
                 CALL SA_Parameter_Set
                 CALL ShowWizardWindowParameterBounds
               ENDIF
@@ -1619,6 +1621,7 @@
       IMPLICIT NONE      
 
       INCLUDE 'PARAMS.INC'
+      INCLUDE 'SA_restrain.inc'
 
       REAL            X_init,       x_unique,       lb,       ub
       COMMON /values/ X_init(MVAR), x_unique(MVAR), lb(MVAR), ub(MVAR)
@@ -1660,21 +1663,22 @@
             CASE (IDBACK)
 ! Go back to the 1st window
 ! Check if the limits have changed and warn about it 
-              IF (LimsChanged) THEN
-                IF (Confirm("Note: Going back will erase the edits made to the current parameters, overwrite changes?")) THEN
-                  LimsChanged = .FALSE. 
-                  ModalFlag(:) = 0 ! 0 means: not a torsion angle
-                ENDIF                 
+              IF (LimsChanged .OR. DRestrNumb .GT. 0) THEN
+                IF (.NOT. Confirm("Note: Going back will erase the edits made to the current"//CHAR(13)// &
+                            "parameters and/or SA restraints."//CHAR(13)//CHAR(13)// &
+                            "Overwrite changes?")) GOTO 100
+                LimsChanged = .FALSE.
+                ModalFlag(:) = 0 ! 0 means: not a torsion angle
+                DRestrNumb = 0
               ENDIF
-              IF (.NOT. LimsChanged) THEN
 ! If the user has requested preferred orientation, make sure we pass the pertinent Wizard window
-                CALL SelectDASHDialog(IDD_SAW_Page2)
-                IF (DASHWDialogGetCheckBoxLogical(IDF_Use_PO)) THEN
-                  CALL WizardWindowShow(IDD_SAW_Page2)
-                ELSE
-                  CALL WizardWindowShow(IDD_SAW_Page1)
-                ENDIF
+              CALL SelectDASHDialog(IDD_SAW_Page2)
+              IF (DASHWDialogGetCheckBoxLogical(IDF_Use_PO)) THEN
+                CALL WizardWindowShow(IDD_SAW_Page2)
+              ELSE
+                CALL WizardWindowShow(IDD_SAW_Page1)
               ENDIF
+100           CONTINUE
             CASE (IDNEXT)
 ! Go to the next stage of the SA input
               RandomInitVal = DASHWDialogGetCheckBoxLogical(IDF_RandomInitVal)
@@ -1684,7 +1688,13 @@
                 CALL DASHWGridGetCellReal(IDF_parameter_grid_modal, 3, I, UB(I))
                 CALL ParseRawInput(I)
               ENDDO
-              CALL ShowWithWizardWindowSASettings
+              IF (DRestrNumb .GT. 0) &
+                CALL WDialogPutCheckBoxLogical(IDF_SA_Dist_Rest, Checked)
+              IF (DASHWDialogGetCheckBoxLogical(IDF_SA_Dist_Rest)) THEN
+                CALL ShowWizardWindowSADistRestraints
+              ELSE
+                CALL ShowWithWizardWindowSASettings
+              ENDIF
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizardPastPawley
             CASE (IDF_SetupMDB)
@@ -1830,6 +1840,155 @@
       CALL PopActiveWindowID
 
       END SUBROUTINE DealWithWizardWindowParameterBounds      
+!
+!*****************************************************************************
+!
+      SUBROUTINE ClearSADistRestraintsGrid
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE ZMVAR
+
+      IMPLICIT NONE      
+
+      INTEGER I, J, N, dummy(1)
+      CHARACTER*8 frag_str(maxatm+1)
+
+      CALL PushActiveWindowID
+      CALL SelectDASHDialog(IDD_SA_Dist_Rest)
+      CALL WDialogClearField(IDF_SA_Dist_Rest_Grid)
+      N = 1
+      frag_str(N) = ' '
+      DO I = 1, nFrag
+        DO j = 1, nAtoms(I)
+          N = N + 1
+          WRITE(frag_str(N),'(I2,A)') I, ':'//OriginalLabel(J,I)
+        ENDDO
+      ENDDO
+      CALL WGridPutMenu(IDF_SA_Dist_Rest_Grid, 1, frag_str, n, dummy, 0)
+      CALL WGridPutMenu(IDF_SA_Dist_Rest_Grid, 2, frag_str, n, dummy, 0)
+      DO I = 1, WInfoGrid(IDF_SA_Dist_Rest_Grid, GridRowsMax)
+        CALL WGridLabelRow(IDF_SA_Dist_Rest_Grid, I, '')
+        CALL WGridColourRow(IDF_SA_Dist_Rest_Grid, I, WIN_RGB(256, 256, 256), WIN_RGB(256, 256, 256))  
+      ENDDO
+      CALL PopActiveWindowID
+ 
+      END SUBROUTINE ClearSADistRestraintsGrid
+!
+!*****************************************************************************
+!
+      SUBROUTINE ShowWizardWindowSADistRestraints
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE ZMVAR
+
+      IMPLICIT NONE
+
+      INCLUDE 'SA_restrain.inc'
+
+      CHARACTER*20, EXTERNAL :: Integer2String
+
+      INTEGER IFRow
+
+      CALL PushActiveWindowID
+      CALL SelectDASHDialog(IDD_SA_Dist_Rest)
+      CALL WGridRows(IDF_SA_Dist_Rest_Grid, MaxSADRestr)
+      CALL ClearSADistRestraintsGrid
+      DO IFRow = 1, DRestrNumb
+        CALL WGridLabelRow(IDF_SA_Dist_Rest_Grid, IFRow, TRIM(Integer2String(IFRow)))
+        CALL WGridPutCellOption(IDF_SA_Dist_Rest_Grid, 1, IFRow, DRestrAtomIDs(1,IFRow)+1)
+        CALL WGridPutCellOption(IDF_SA_Dist_Rest_Grid, 2, IFRow, DRestrAtomIDs(2,IFRow)+1)
+        CALL WGridPutCellReal(IDF_SA_Dist_Rest_Grid, 3, IFRow, DRestrLens(IFRow), '(F12.5)')
+        CALL WGridPutCellReal(IDF_SA_Dist_Rest_Grid, 4, IFRow, DRestrWidths(IFRow), '(F12.5)')
+        CALL WGridPutCellReal(IDF_SA_Dist_Rest_Grid, 5, IFRow, DRestrWeights(IFRow), '(F12.5)')
+        IF (DRestrSpringOpts(IFRow) .NE. 0) THEN
+          CALL WGridPutCellCheckBox(IDF_SA_Dist_Rest_Grid, 6, IFRow, Enabled)
+        ELSE
+          CALL WGridPutCellCheckBox(IDF_SA_Dist_Rest_Grid, 6, IFRow, Disabled)
+        ENDIF
+      ENDDO
+      CALL WizardWindowShow(IDD_SA_Dist_Rest)
+      CALL PopActiveWindowID
+
+      END SUBROUTINE ShowWizardWindowSADistRestraints
+!
+!*****************************************************************************
+!
+      SUBROUTINE DealWithWizardWindowSADistRestraints
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+      USE ZMVAR
+
+      IMPLICIT NONE      
+
+      INCLUDE 'SA_restrain.inc'
+
+      INTEGER, EXTERNAL :: AtomLabel2Seq
+      LOGICAL, EXTERNAL :: Confirm
+      CHARACTER*20, EXTERNAL :: Integer2String
+      
+      INTEGER IFRow, NROW, n, iOpt, iAtomSeqs(2), iFragIDs(2), nErr
+
+      CALL PushActiveWindowID
+      CALL SelectDASHDialog(IDD_SA_Dist_Rest)
+      SELECT CASE (EventType)
+        CASE (PushButton)
+          SELECT CASE (EventInfo%VALUE1)
+            CASE (IDBACK)
+              CALL WizardWindowShow(IDD_SA_Modal_input2)
+            CASE (IDNext)
+              nErr = 0
+              n = 1
+              NROW = WInfoGrid(IDF_SA_Dist_Rest_Grid, GridRowsMax)
+              DO IFRow = 1, NROW
+                CALL WGridLabelRow(IDF_SA_Dist_Rest_Grid, IFRow, '')
+                CALL WGridColourRow(IDF_SA_Dist_Rest_Grid, IFRow, WIN_RGB(256, 256, 256), WIN_RGB(256, 256, 256))  
+              ENDDO
+              DO IFRow = 1, NROW
+                CALL WGridGetCellMenu(IDF_SA_Dist_Rest_Grid, 1, IFRow, iOpt)
+                DRestrAtomIDs(1,n) = iOpt - 1
+                CALL WGridGetCellMenu(IDF_SA_Dist_Rest_Grid, 2, IFRow, iOpt)
+                DRestrAtomIDs(2,n) = iOpt - 1
+                IF (DRestrAtomIDs(1,n) .LE. 0  .AND. DRestrAtomIDs(2,n) .LE. 0 ) &
+                  CYCLE
+                iOpt = InfoError(1)
+                CALL DASHWGridGetCellReal(IDF_SA_Dist_Rest_Grid, 3, IFRow, DRestrLens(n))
+                CALL DASHWGridGetCellReal(IDF_SA_Dist_Rest_Grid, 4, IFRow, DRestrWidths(n))
+                CALL DASHWGridGetCellReal(IDF_SA_Dist_Rest_Grid, 5, IFRow, DRestrWeights(n))
+                CALL DASHWGridGetCellCheckBox(IDF_SA_Dist_Rest_Grid, 6, IFRow, DRestrSpringOpts(n))
+                IF (InfoError(1) .EQ. 0 .AND. DRestrAtomIDs(1,n) .GT. 0 &
+                                        .AND. DRestrAtomIDs(2,n) .GT. 0 ) THEN
+                  CALL WGridLabelRow(IDF_SA_Dist_Rest_Grid, IFRow, TRIM(Integer2String(n)))
+                  CALL AtomID2Frag( DRestrAtomIDs(1,n), iFragIDs(1),  iAtomSeqs(1))
+                  CALL AtomID2Frag( DRestrAtomIDs(2,n), iFragIDs(2),  iAtomSeqs(2))
+                  IF ( iFragIDs(1) .EQ. iFragIDs(2) ) &
+                    CALL CheckZMBondAtoms(iAtomSeqs, iFragIDs(1))
+                  n = n + 1
+                ELSE
+                  CALL WGridColourRow(IDF_SA_Dist_Rest_Grid, IFRow, WIN_RGB(256, 256, 256), WIN_RGB(255, 127, 127))  
+                  nErr = nErr + 1
+                ENDIF
+              ENDDO
+              DRestrNumb = n - 1
+              IF (nErr .EQ. 0) THEN
+                CALL ShowWithWizardWindowSASettings
+              ELSE
+                CALL ErrorMessage('Problem occurred when processing the row(s) in red.')
+              ENDIF
+            CASE (IDCANCEL, IDCLOSE)
+              CALL EndWizardPastPawley
+            CASE (IDF_ClearDistRest)
+              IF (Confirm('This will erase all distance restraints in the table.' &
+                          //CHAR(13)//CHAR(13)//'Continue?')) &
+                CALL ClearSADistRestraintsGrid
+          END SELECT
+      END SELECT
+      CALL PopActiveWindowID
+
+      END SUBROUTINE DealWithWizardWindowSADistRestraints
 !
 !*****************************************************************************
 !
@@ -2024,6 +2183,7 @@
       LOGICAL           Resume_SA
       COMMON /RESUMESA/ Resume_SA
 
+      LOGICAL, EXTERNAL :: Confirm, DASHWDialogGetCheckBoxLogical
       INTEGER, EXTERNAL :: WriteSAParametersToFile
       INTEGER IHANDLE, KPOS
       REAL    MaxMoves1
@@ -2037,7 +2197,12 @@
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
 ! Go back to the 2nd window
-              CALL WizardWindowShow(IDD_SA_Modal_input2)
+              CALL SelectDASHDialog(IDD_SA_Modal_input2)
+              IF (DASHWDialogGetCheckBoxLogical(IDF_SA_Dist_Rest)) THEN
+                CALL WizardWindowShow(IDD_SA_Dist_Rest)
+              ELSE
+                CALL WizardWindowShow(IDD_SA_Modal_input2)
+              ENDIF
             CASE (IDNEXT)
               CALL DASHWDialogGetReal(IDF_MaxMoves1, MaxMoves1)
               CALL DASHWDialogGetInteger(IDF_MaxMoves2, MaxMoves2)

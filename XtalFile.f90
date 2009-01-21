@@ -293,6 +293,7 @@
         ENDDO
       ENDDO
       CALL UpdateZmatrixSelection
+      CALL InitSADistRestraint
       CALL SA_Parameter_Set1(3) ! Has to be setup with explict hydrogen treatment
       CALL Clear_SA
       XtalFileLoad = 0
