@@ -224,6 +224,8 @@
       INTEGER I, j, RW
       CHARACTER*(255) tString
       CHARACTER*(10) Version  ! We have patch releases like "DASH 2.1.1"
+      REAL VerFig, PatchLevel
+      REAL, PARAMETER :: TOLER = 1E-6
 
       INTEGER     BFIOErrorCode
       COMMON /IO/ BFIOErrorCode
@@ -246,10 +248,14 @@
       CALL FileRWString(hPrjFile, iPrjRecNr, RW, tString)
       ! If read, store program version for later reference
       IF (RW .EQ. cRead) THEN
+        ! Convert version string to real, include patch level
+        READ (tString(6:8),*) VerFig
         IF ( tString(9:9) .EQ. " " ) THEN
           Version = tString(1:8)
         ELSE
           Version = tString(1:10)
+          READ (tString(10:10),*) PatchLevel
+          VerFig = VerFig + PatchLevel / 100.0
         ENDIF
       ENDIF
 ! Read / Write radiation source
@@ -384,6 +390,15 @@
         CALL InitSADistRestraint
 ! Update ranges and fixed yes/no per parameter
         CALL SA_Parameter_Set
+      ENDIF
+! Read / Write MDB and SA Distance restraints. Version 3.2 onward
+      IF ( (RW .EQ. cWrite) .OR. (VerFig .GT. 3.2 - TOLER) ) THEN
+        CALL PrjReadWriteParameterBoundsIncludeMDB
+        IF ( BFIOErrorCode .EQ. 1 ) GOTO 999
+        CALL PrjErrTrace
+        CALL PrjReadWriteSADistRestraint
+        IF ( BFIOErrorCode .EQ. 1 ) GOTO 999
+        CALL PrjErrTrace
       ENDIF
 ! Read / Write solutions
       CALL PrjReadWriteSolutions
@@ -840,6 +855,87 @@
       ENDIF
 
       END SUBROUTINE PrjReadWriteZmatrices
+!
+!*****************************************************************************
+!
+      SUBROUTINE PrjReadWriteParameterBoundsIncludeMDB
+!
+! Reads or writes information on MDB to / from binary project file.
+!
+      USE PRJVAR
+
+      IMPLICIT NONE
+
+      INCLUDE 'PARAMS.INC'
+
+      INTEGER         nvar, ns, nt, iseed1, iseed2
+      COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
+
+      INTEGER                ModalFlag,       RowNumber, iRadio
+      REAL                                                                          iX, iUB, iLB  
+      COMMON /ModalTorsions/ ModalFlag(mvar), RowNumber, iRadio, iX, iUB, iLB
+
+      REAL            X_init,       x_unique,       lb,       ub
+      COMMON /values/ X_init(MVAR), x_unique(MVAR), lb(MVAR), ub(MVAR)
+
+      INTEGER NumMogulBins(MVAR), MogulBins(MaxMogulBin, MVAR)
+      REAL MogulDistributions(-180:180, MVAR)
+      COMMON /MDB/ NumMogulBins, MogulBins, MogulDistributions
+
+      LOGICAL, EXTERNAL :: FileErrorOccurred
+
+      INTEGER I, J, RW
+      
+! Read or Write?
+      RW = iPrjReadOrWrite
+      DO I = 1, nvar
+        CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, ModalFlag(I))
+        CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, lb(I))
+        CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, ub(I))
+        IF ( FileErrorOccurred() ) EXIT
+        IF (ModalFlag(I) .NE. 4) CYCLE
+        DO J = -180, 180
+          CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, MogulDistributions(J, I))
+        ENDDO
+        CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, NumMogulBins(I))
+        DO J = 1, MaxMogulBin
+          CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, MogulBins(J, I))
+        ENDDO
+      ENDDO
+
+      END SUBROUTINE PrjReadWriteParameterBoundsIncludeMDB
+!
+!*****************************************************************************
+!
+      SUBROUTINE PrjReadWriteSADistRestraint
+!
+! Reads or writes information on SA distace restraint to / from binary project file.
+!
+      USE PRJVAR
+
+      IMPLICIT NONE
+ 
+      INCLUDE 'SA_restrain.inc'
+
+      LOGICAL, EXTERNAL :: FileErrorOccurred
+
+      INTEGER I, RW
+      
+! Read or Write?
+      RW = iPrjReadOrWrite
+      CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, DRestrNumb)
+      IF ( FileErrorOccurred() ) RETURN
+      DO I = 1, DRestrNumb
+        CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, DRestrAtomIDs(1, I))
+        CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, DRestrAtomIDs(2, I))
+        CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, DRestrLens(I))
+        CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, DRestrWidths(I))
+        CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, DRestrWeights(I))
+        CALL FileRWLogical(hPrjFile, iPrjRecNr, RW, DRestrSpringOpts(I))
+        IF ( FileErrorOccurred() ) EXIT
+      ENDDO
+      
+      END SUBROUTINE PrjReadWriteSADistRestraint
 !
 !*****************************************************************************
 !
