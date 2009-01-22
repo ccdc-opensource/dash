@@ -1,7 +1,7 @@
 ! Common blocks to be included in the various FFCALC function calls
 
       USE REFVAR
-	  USE ATMVAR
+      USE ATMVAR
 
       INTEGER         NATOM
       REAL                   X
