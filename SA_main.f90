@@ -538,7 +538,6 @@
 !
       SUBROUTINE zmConvert(TheInputFile, TheNumOfZmatrices, TheZmatrices)
 
-      USE WINTERACTER
       USE VARIABLES
 
       IMPLICIT NONE
@@ -548,14 +547,56 @@
       CHARACTER(80), INTENT (  OUT) :: TheZmatrices
       DIMENSION TheZmatrices(10)
 
-      INTEGER, EXTERNAL :: CSSR2Mol2
-      INTEGER iLen, iPos
-      CHARACTER*4 ExtensionStr
-      CHARACTER(MaxPathLength) tInputFile ! to resolve call by reference/value ambiguity
-      CHARACTER(5) fmt
-      INTEGER iStat, iStart, I
+      LOGICAL, EXTERNAL :: RunZmConv
+      INTEGER iStat
 
       TheNumOfZmatrices = 0
+      IF (.NOT. RunZmConv(TheInputFile, .FALSE.)) RETURN
+! Check return status
+      OPEN(UNIT=145, FILE='MakeZmatrix.log',STATUS='OLD',IOSTAT = iStat)
+      IF ((iStat .NE. 0)) THEN
+! An error occurred
+        CALL ErrorMessage("Sorry, could not create Z-matrices.")
+! Prompt with files created
+      ELSE ! All OK: Need to read in the file names
+        DO WHILE (TheNumOfZmatrices .LT. 10)
+          READ (145,'(A)',ERR=20,END=20) TheZmatrices(TheNumOfZmatrices+1)
+          IF (LEN_TRIM(TheZmatrices(TheNumOfZmatrices+1)) .NE. 0) CALL INC(TheNumOfZmatrices)
+        ENDDO
+ 20     CLOSE(145)
+      ENDIF
+
+      END SUBROUTINE zmConvert
+!
+!*****************************************************************************
+!
+! Call zmconv.exe
+! The result of merging samilar code spreaded in three places 
+      LOGICAL FUNCTION RunZmConv(TheInputFile, CellOnly)
+
+      USE WINTERACTER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      CHARACTER*(*), INTENT (IN   ) :: TheInputFile
+      LOGICAL,       INTENT (IN   ) :: CellOnly
+
+      INTEGER, EXTERNAL :: CSSR2Mol2
+      INTEGER iLen, iPos
+      CHARACTER*8 ExtensionStr, fmt
+      CHARACTER*10 tExtraArg
+      CHARACTER(MaxPathLength) tInputFile ! to resolve call by reference/value ambiguity
+      INTEGER iStat, iStart, I
+
+      RunZmConv = .FALSE. ! Initialise to error
+
+      IF (CellOnly) THEN
+        tExtraArg = ' cell_only'
+      ELSE
+        tExtraArg = ''
+      ENDIF
+
       tInputFile = TheInputFile
       iLen = LEN_TRIM(tInputFile)
 ! Find the last occurence of '.' in tInputFile
@@ -567,16 +608,15 @@
 ! If we haven't found a '.' by now, we cannot deal with the extension anyway
       IF (tInputFile(iPos:iPos) .NE. '.') THEN
         CALL ErrorMessage('Invalid extension.') 
-        RETURN
+        GOTO 200
       ENDIF
-      ExtensionStr = '    '
       ExtensionStr = tInputFile(iPos+1:iLen)
       CALL ILowerCase(ExtensionStr)
       SELECT CASE (ExtensionStr)
         CASE ('cif ')
           fmt = '-cif'
         CASE ('cssr')
-          IF (CSSR2Mol2(tInputFile) .NE. 1) RETURN
+          IF (CSSR2Mol2(tInputFile) .NE. 1) GOTO 200
 ! Replace 'cssr' by 'mol2'
           tInputFile = tInputFile(1:iLen-4)//'mol2'
           iLen = LEN_TRIM(tInputFile)
@@ -600,25 +640,21 @@
         IF (tInputFile(I:I) .EQ. DIRSPACER) iStart = I + 1
       ENDDO
       CALL WCursorShape(CurHourGlass)
-      CALL IOSCommand(InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//'zmconv.exe'// &
-        ' '//fmt(1:LEN_TRIM(fmt))//' "'//tInputFile(iStart:iLen)//'"', ProcSilent+ProcBlocked)
-! Check return status
-      OPEN(UNIT=145, FILE='MakeZmatrix.log',STATUS='OLD',IOSTAT = iStat)
-      IF ((InfoError(1) .EQ. ErrOSCommand) .OR. (iStat .NE. 0)) THEN
-        CALL WCursorShape(CurCrossHair)
+      CALL IOSCommand(TRIM(InstallationDirectory)//'zmconv.exe '// &
+        TRIM(fmt)//' "'//tInputFile(iStart:iLen)//'"'//TRIM(tExtraArg), &
+        ProcSilent+ProcBlocked)
+      iStat = InfoError(1) 
+      CALL WCursorShape(CurCrossHair)
+      IF (iStat .EQ. ErrOSCommand) THEN
 ! An error occurred
-        CALL ErrorMessage("Sorry, could not create Z-matrices.")
-! Prompt with files created
-      ELSE ! All OK: Need to read in the file names
-        CALL WCursorShape(CurCrossHair)
-        DO WHILE (TheNumOfZmatrices .LT. 10)
-          READ (145,'(A)',ERR=20,END=20) TheZmatrices(TheNumOfZmatrices+1)
-          IF (LEN_TRIM(TheZmatrices(TheNumOfZmatrices+1)) .NE. 0) CALL INC(TheNumOfZmatrices)
-        ENDDO
- 20     CLOSE(145)
+        CALL ErrorMessage("Error occurred when running zmconv.exe.")
+        GOTO 200
       ENDIF
+      RunZmConv = .TRUE.
+ 
+ 200  RETURN
 
-      END SUBROUTINE zmConvert
+      END FUNCTION RunZmConv
 !
 !*****************************************************************************
 !
