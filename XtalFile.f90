@@ -103,71 +103,25 @@
       COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign, HydrogenTreatment
 
       INTEGER, EXTERNAL :: Read_One_Zm
-      LOGICAL, EXTERNAL :: FnUnitCellOK, nearly_equal
-      INTEGER, EXTERNAL :: CSSR2Mol2
+      LOGICAL, EXTERNAL :: FnUnitCellOK, nearly_equal, RunZmConv
       INTEGER iHandle
       CHARACTER(MaxPathLength) :: line
-      CHARACTER(MaxPathLength) :: tFileName
       CHARACTER(MaxPathLength) :: globFile
       CHARACTER(MaxPathLength) :: ExtensionStr
-      INTEGER nl, iStat, iStart
+      INTEGER nl, iStat
       CHARACTER(20) KeyChar
-      CHARACTER(5) fmt
       INTEGER iFrg
       INTEGER KK, I, ExtLen
-      INTEGER iLen, iPos
+      INTEGER iLen
       REAL unit_cell_parameters(1:6)
       LOGICAL OK
 
       XtalFileLoad = 1 ! Initialise to error
-      tFileName = TheFileName
-      iLen = LEN_TRIM(tFileName)
-! Find the last occurence of '.' in tFileName
-      iPos = iLen - 1 ! Last character of tFileName is not tested
-! The longest extension possible is five
-      DO WHILE ((iPos .NE. 0) .AND. (tFileName(iPos:iPos) .NE. '.') .AND. (iPos .NE. (iLen-5)))
-        iPos = iPos - 1
-      ENDDO
-! If we haven't found a '.' by now, we cannot deal with the extension anyway
-      IF (tFileName(iPos:iPos) .NE. '.') THEN
-        CALL ErrorMessage('Invalid extension.') 
-        RETURN
-      ENDIF
-      ExtensionStr = tFileName(iPos+1:iLen)
-      CALL ILowerCase(ExtensionStr)
-      SELECT CASE (ExtensionStr)
-        CASE ('cif ')
-          fmt = '-cif'
-        CASE ('cssr')
-          IF (CSSR2Mol2(tFileName) .NE. 1) RETURN
-! Replace 'cssr' by 'mol2'
-          tFileName = tFileName(1:iLen-4)//'mol2'
-          iLen = LEN_TRIM(tFileName)
-          fmt = '-mol2'
-        CASE ('res ')
-          fmt = '-res'
-        CASE ('pdb ')
-          fmt = '-pdb'
-        CASE ('mol2','ml2 ')
-          fmt = '-mol2'
-        CASE ('mol ','mdl ')
-          fmt = '-mol'
-      END SELECT
-! Run silently, 
-      CALL IOSDeleteFile('MakeZmatrix.log')
-      iStat = InfoError(1) ! Clear any errors 
-      iStart = 1
-      DO I = 1, iLen
-        IF (tFileName(I:I) .EQ. DIRSPACER) iStart = I + 1
-      ENDDO
-      CALL WCursorShape(CurHourGlass)
-      CALL IOSCommand(InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//'zmconv.exe'// &
-        ' '//fmt(1:LEN_TRIM(fmt))//' "'//tFileName(iStart:iLen)//'"',3)
-        CALL WCursorShape(CurCrossHair)
+      IF (.NOT. RunZmConv(TheFileName, .FALSE.)) RETURN
 ! Check return status
       OPEN(UNIT=145, FILE='MakeZmatrix.log',STATUS='OLD',IOSTAT = iStat)
       CLOSE(145)
-      IF ((InfoError(1) .EQ. ErrOSCommand) .OR. (iStat .NE. 0)) THEN
+      IF (iStat .NE. 0) THEN
         CALL ErrorMessage("Sorry, could not create Z-matrices.")
         RETURN
       ENDIF
@@ -178,8 +132,8 @@
         CALL ErrorMessage("Error parsing file extension")
         RETURN
       ENDIF
-      iLen = LEN_TRIM(tFileName)
-      globFile = tFileName(1:iLen-ExtLen)//"glob"
+      iLen = LEN_TRIM(TheFileName)
+      globFile = TheFileName(1:iLen-ExtLen)//"glob"
 !C Load .glob file
       iHandle = 10
       OPEN(iHandle, FILE=globFile(1:LEN_TRIM(globFile)), STATUS='OLD', ERR=999)
@@ -383,61 +337,17 @@
       CHARACTER*(*), INTENT (IN   ) :: TheFileName
 
       INTEGER, EXTERNAL :: CSSR2Mol2, proposed_crystal_system
+      LOGICAL, EXTERNAL :: RunZmConv
       INTEGER iHandle
       CHARACTER(MaxPathLength) :: line
-      CHARACTER(MaxPathLength) :: tFileName
       CHARACTER(MaxPathLength) :: globFile
       CHARACTER(MaxPathLength) :: ExtensionStr
-      INTEGER nl, iStat, iStart
+      INTEGER nl
       CHARACTER(20) KeyChar
-      CHARACTER(5) fmt
       INTEGER I, ExtLen
-      INTEGER iLen, iPos
+      INTEGER iLen
 
-      tFileName = TheFileName
-      iLen = LEN_TRIM(tFileName)
-! Find the last occurence of '.' in tFileName
-      iPos = iLen - 1 ! Last character of tFileName is not tested
-! The longest extension possible is five
-      DO WHILE ((iPos .NE. 0) .AND. (tFileName(iPos:iPos) .NE. '.') .AND. (iPos .NE. (iLen-5)))
-        iPos = iPos - 1
-      ENDDO
-! If we haven't found a '.' by now, we cannot deal with the extension anyway
-      IF (tFileName(iPos:iPos) .NE. '.') THEN
-        CALL ErrorMessage('Invalid extension.') 
-        RETURN
-      ENDIF
-      ExtensionStr = tFileName(iPos+1:iLen)
-      CALL ILowerCase(ExtensionStr)
-      SELECT CASE (ExtensionStr)
-        CASE ('cif ')
-          fmt = '-cif'
-        CASE ('cssr')
-          IF (CSSR2Mol2(tFileName) .NE. 1) RETURN
-! Replace 'cssr' by 'mol2'
-          tFileName = tFileName(1:iLen-4)//'mol2'
-          iLen = LEN_TRIM(tFileName)
-          fmt = '-mol2'
-        CASE ('res ', 'ins ')
-          fmt = '-res'
-        CASE ('pdb ')
-          fmt = '-pdb'
-        CASE ('mol2','ml2 ')
-          fmt = '-mol2'
-        CASE ('mol ','mdl ')
-          fmt = '-mol'
-      END SELECT
-! Run silently 
-      CALL IOSDeleteFile('MakeZmatrix.log')
-      iStat = InfoError(1) ! Clear any errors 
-      iStart = 1
-      DO I = 1, iLen
-        IF (tFileName(I:I) .EQ. DIRSPACER) iStart = I + 1
-      ENDDO
-      CALL WCursorShape(CurHourGlass)
-      CALL IOSCommand(InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//'zmconv.exe'// &
-        ' '//fmt(1:LEN_TRIM(fmt))//' "'//tFileName(iStart:iLen)//'" cell_only',3)
-      CALL WCursorShape(CurCrossHair)
+      IF (.NOT. RunZmConv(TheFileName, .TRUE.)) RETURN
 !C Replace extension by .glob
       ExtLen = 5 ! Maximum length of a valid extension
       CALL FileGetExtension(TheFileName, ExtensionStr, ExtLen)
@@ -445,8 +355,8 @@
         CALL ErrorMessage("Error parsing file extension")
         RETURN
       ENDIF
-      iLen = LEN_TRIM(tFileName)
-      globFile = tFileName(1:iLen-ExtLen)//"glob"
+      iLen = LEN_TRIM(TheFileName)
+      globFile = TheFileName(1:iLen-ExtLen)//"glob"
 !C Load .glob file
       iHandle = 10
       OPEN(iHandle, FILE=globFile(1:LEN_TRIM(globFile)), STATUS='OLD', ERR=999)
