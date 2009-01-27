@@ -574,7 +574,7 @@
 ! The result of merging samilar code spreaded in three places 
       LOGICAL FUNCTION RunZmConv(TheInputFile, CellOnly)
 
-      USE WINTERACTER
+      USE DRUID_HEADER
       USE VARIABLES
 
       IMPLICIT NONE
@@ -593,6 +593,8 @@
 
       IF (CellOnly) THEN
         tExtraArg = ' cell_only'
+      ELSE IF (IsConfiguredToSortH()) THEN
+        tExtraArg = ' sort_H'
       ELSE
         tExtraArg = ''
       ENDIF
@@ -653,6 +655,17 @@
       RunZmConv = .TRUE.
  
  200  RETURN
+
+      CONTAINS
+
+      LOGICAL FUNCTION IsConfiguredToSortH()
+
+      CALL PushActiveWindowID
+      CALL SelectDASHDialog(IDD_Configuration)
+      CALL DASHWDialogGetCheckBox(IDC_Sort_H_Down, IsConfiguredToSortH)
+      CALL PopActiveWindowID
+
+      END FUNCTION IsConfiguredToSortH
 
       END FUNCTION RunZmConv
 !

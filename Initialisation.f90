@@ -991,6 +991,7 @@
       CALL FileWriteLogical(hFile, RecNr, Get_WriteWavelength2XYEFile())
       CALL FileWriteLogical(hFile, RecNr, DASHWDialogGetCheckBoxLogical(IDF_BuiltIn_Mercury))
       CALL FileWriteLogical(hFile, RecNr, DASHWDialogGetCheckBoxLogical(IDC_cif_for_viewer))
+      CALL FileWriteLogical(hFile, RecNr, DASHWDialogGetCheckBoxLogical(IDC_Sort_H_Down))
 ! Save defaults for background subtraction
       CALL SelectDASHDialog(IDD_PW_Page6)
   ! Use window smooth YES / NO
@@ -1400,10 +1401,13 @@
           CALL WDialogFieldState(IDF_ViewArg, Enabled)
         ENDIF
       ENDIF
+      CALL FileReadLogical(hFile, RecNr, tLogical)
+      IF ( .NOT. IN_BATCH ) &
+        CALL WDialogPutCheckBoxLogical(IDC_cif_for_viewer, tLogical)
 
       CALL FileReadLogical(hFile, RecNr, tLogical)
       IF ( .NOT. IN_BATCH ) THEN
-        CALL WDialogPutCheckBoxLogical(IDC_cif_for_viewer, tLogical)
+        CALL WDialogPutCheckBoxLogical(IDC_Sort_H_Down, tLogical)
 ! Update state of related radio/check
         CALL SelectDASHDialog(IDD_PW_Page7)
         IF ( LEN_TRIM(DICVOLEXE) .GT. 0 ) THEN
