@@ -8,7 +8,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 08/Nov/2008 15:55:10
+// Modified : 27/Jan/2009 15:19:21
 //
 ///////////////////////////////////////////////////
 //
@@ -744,6 +744,7 @@
 #define IDF_SA_label                     1581
 #define IDF_ClearDistRest                1583
 #define IDF_SA_Dist_Rest                 1584
+#define IDC_Sort_H_Down                  1585
 
 ///////////////////////////////////////////////////
 //
@@ -1918,7 +1919,7 @@ BEGIN
     CONTROL "B&rowse...",IDBBROWSE6,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  234,  141,   40,   14
     CONTROL "Colour flexible &torsions",IDF_ColFlexTors,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   12,  162,  120,   14
     CONTROL "Write wavelength to .xye files",IDC_wl_in_xye,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   12,  176,  120,   14
-    CONTROL "Run TOPAS in background",IDC_TOPAS_in_background,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   12,  190,  120,   14
+    CONTROL "Run TOPAS in background",IDC_TOPAS_in_background,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  160,  192,  120,   14
     CONTROL "Write CIF for viewer",IDC_cif_for_viewer,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  160,  162,  110,   14
     CONTROL "Run single instance of built in Mercury",IDF_Use_Client,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT | BS_MULTILINE,  160,  176,   94,   15
     CONTROL "Viewer",IDF_LABEL1,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,    5,   11,   38,    8
@@ -1929,6 +1930,7 @@ BEGIN
     CONTROL "EXPGUI Tcl",IDF_LABEL6,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,    2,  124,   41,   11
     CONTROL "RIETAN",IDF_LABEL7,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,    5,  144,   38,    8
     CONTROL "McMaille",IDF_LABEL8,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,    5,   86,   38,    8
+    CONTROL "Sort H down when converting a model file to Z-matrices",IDC_Sort_H_Down,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT | BS_MULTILINE,   12,  192,  130,   14
 END
 
 IDD_Configuration RCDATA
@@ -1940,6 +1942,7 @@ BEGIN
 " 1296 0 \n"
 " 1562 1 \n"
 " 1569 1 \n"
+" 1585 1 \n"
 "[Ranges] \n"
 "[Lengths] \n"
 " 1257   255 \n"
@@ -4033,4 +4036,4 @@ END
 //*WI* FILENAME    PCDruid_Resource.F90
 //*WI* FMODNAME    Druid_Header
 //*WI* LASTTYPE        2
-//*WI* LASTRES        18
+//*WI* LASTRES        30
