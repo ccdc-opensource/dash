@@ -910,7 +910,7 @@
       CALL DASHWDialogGetString(IDF_ViewArg, ViewArg)
       CALL FileWriteString(hFile, RecNr, ViewArg)
 ! Save hydrogen treatment 1 = ignore, 2 = absorb, 3 = explicit
-      CALL FileWriteLogical(hFile, RecNr, HydrogenTreatment)
+      CALL FileWriteInteger(hFile, RecNr, HydrogenTreatment)
 ! Colour flexible torsions (in Z-matrix viewer) YES / NO
       CALL FileWriteLogical(hFile, RecNr, Get_ColourFlexibleTorsions())
 ! Save YES / NO which molecular file formats are to be written out when a best solution is found
@@ -1436,8 +1436,10 @@
       ENDIF
 
       CALL FileReadLogical(hFile, RecNr, tLogical)
-      IF ( .NOT. IN_BATCH ) &
+      IF ( .NOT. IN_BATCH ) THEN
+        CALL SelectDASHDialog(IDD_Configuration)
         CALL WDialogPutCheckBoxLogical(IDC_Sort_H_Down, tLogical)
+      ENDIF
 
 ! Read defaults for background subtraction
       IF ( .NOT. IN_BATCH ) &

@@ -899,7 +899,7 @@
         ENDDO
         CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, NumMogulBins(I))
         DO J = 1, MaxMogulBin
-          CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, MogulBins(J, I))
+          CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, MogulBins(J, I))
         ENDDO
       ENDDO
 
@@ -931,7 +931,7 @@
         CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, DRestrLens(I))
         CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, DRestrWidths(I))
         CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, DRestrWeights(I))
-        CALL FileRWLogical(hPrjFile, iPrjRecNr, RW, DRestrSpringOpts(I))
+        CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, DRestrSpringOpts(I))
         IF ( FileErrorOccurred() ) EXIT
       ENDDO
       
