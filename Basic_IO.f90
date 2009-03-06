@@ -229,12 +229,19 @@
 ! that deals with that child window.
 ! The registration must be undone manually by a call to UnRegisterChildWindow.
 !
+#ifdef __G95__
+      USE FOR_G95
+#endif
       IMPLICIT NONE
 
       INTEGER, INTENT (IN   ) :: TheIHANDLE
       EXTERNAL TheSubroutine
 
+#ifdef __G95__
+      TYPE(CallbackPointer) ChildWinHandler
+#else
       INTEGER*4         ChildWinHandler
+#endif
       LOGICAL                                  ChildWinHandlerSet
       COMMON /ChWinHan/ ChildWinHandler(1:20), ChildWinHandlerSet(1:20)
 
@@ -242,7 +249,11 @@
         CALL DebugErrorMessage('Invalid Child Window ID in RegisterChildWindow')
         RETURN
       ENDIF
+#ifdef __G95__
+      ChildWinHandler(TheIHANDLE)%p => TheSubroutine
+#else
       ChildWinHandler(TheIHANDLE)    = LOC(TheSubroutine)
+#endif
       ChildWinHandlerSet(TheIHANDLE) = .TRUE.
 
       END SUBROUTINE RegisterChildWindow
@@ -253,11 +264,18 @@
 !
 ! This routine undoes the action of RegisterChildWindow
 !
+#ifdef __G95__
+      USE FOR_G95
+#endif
       IMPLICIT NONE
 
       INTEGER,  INTENT (IN   ) :: TheIHANDLE
 
+#ifdef __G95__
+      TYPE(CallbackPointer) ChildWinHandler
+#else
       INTEGER*4         ChildWinHandler
+#endif
       LOGICAL                                  ChildWinHandlerSet
       COMMON /ChWinHan/ ChildWinHandler(1:20), ChildWinHandlerSet(1:20)
 
@@ -275,7 +293,9 @@
 
       USE DRUID_HEADER
       USE VARIABLES
-
+#ifdef __G95__
+      USE FOR_G95
+#endif
       IMPLICIT NONE
 
       INTEGER         CurrentWizardWindow
@@ -294,13 +314,21 @@
       LOGICAL           ChildWinAutoClose
       COMMON /ChWinAC/  ChildWinAutoClose(1:20)
 
+#ifdef __G95__
+      TYPE(CallbackPointer) ChildWinHandler
+#else
       INTEGER*4         ChildWinHandler
+#endif
       LOGICAL                                  ChildWinHandlerSet
       COMMON /ChWinHan/ ChildWinHandler(1:20), ChildWinHandlerSet(1:20)
 
+#ifdef __G95__
+      PROCEDURE (CallbackFunc), POINTER :: Handler
+#else
+! 'p' is now a code pointer to the subroutine 'Handler'
       EXTERNAL Handler
       POINTER (p, Handler)
-! 'p' is now a code pointer to the subroutine 'Handler'
+#endif
 
       SELECT CASE (EventInfo%WIN)
         CASE (0) ! Main window
@@ -362,7 +390,14 @@
             GOTO 10
           ENDIF
           IF (ChildWinHandlerSet(EventInfo%WIN)) THEN
+#ifdef __G95__
+            ! Can't directly call a procedure pointed by an arraya element, as the
+            ! brackets causing confusion. G95 reports this line as conflicts:
+            ! CALL ChildWinHandler(EventInfo%WIN)%p()
+            Handler => ChildWinHandler(EventInfo%WIN)%p
+#else
             p = ChildWinHandler(EventInfo%WIN)
+#endif
             CALL Handler
             GOTO 10
           ENDIF
