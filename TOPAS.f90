@@ -1058,7 +1058,6 @@
       CHARACTER*(*), INTENT (IN   ) :: FileName
       LOGICAL,       INTENT (IN   ) :: Backup
 
-      INTEGER, EXTERNAL :: LoadTopasPlotFile
 !      CHARACTER*20, EXTERNAL :: Integer2String
 !      CHARACTER*20 tStr
       CHARACTER*(*), PARAMETER :: cBackSuffix = '.bak'
