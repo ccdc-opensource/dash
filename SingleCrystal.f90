@@ -568,6 +568,9 @@
       USE DRUID_HEADER
       USE REFVAR
       USE VARIABLES
+#ifdef __G95__
+      USE FOR_G95
+#endif
 
       IMPLICIT NONE
 

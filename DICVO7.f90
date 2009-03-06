@@ -55,7 +55,7 @@
         RETURN
       ENDIF
 ! Misnomer...
-      CALL DICVOL_FinishedCrystalSystem(LSHIFT(1,Ind-1))
+      CALL DICVOL_FinishedCrystalSystem(ISHFT(1,Ind-1))
       DO I = 1, 3
         Error(I) = 0.0001
         Error(I+3) = .001
