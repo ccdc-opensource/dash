@@ -1681,7 +1681,7 @@
       SolutionAppend = .FALSE.
       iStage = 0
       OPEN(UNIT=hFile, FILE=DV_FileName, STATUS='OLD', ERR=999)
-      DO WHILE ( .NOT. EOF(hFile) )
+      DO WHILE ( .TRUE. )
         READ(hFile, '(A)', ERR=999, END=100) tLine
         iLen = LEN_TRIM(tLine)
         IF ( iLen .LT. 1 ) CYCLE
