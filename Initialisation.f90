@@ -5,7 +5,9 @@
  
       USE WINTERACTER
       USE VARIABLES
+#ifdef _WIN32
       USE KERNEL32
+#endif
 
       IMPLICIT NONE
 
@@ -16,7 +18,9 @@
 ! Determine the directory where DASH.exe resides and store it in "InstallationDirectory"
       tSize = MaxPathLength
       tProcess = 0 ! this program
+#ifdef _WIN32
       IDummy = GetModuleFileName(tProcess, tString, LOC(tSize))
+#endif
       
 ! tString should now contain the full path to DASH.exe irrespective of the way
 ! DASH has been invoked.
@@ -61,8 +65,9 @@
  
       USE WINTERACTER
       USE VARIABLES
+#ifdef _WIN32
       USE KERNEL32
-
+#endif
       IMPLICIT NONE
 
       INTEGER :: IFlags

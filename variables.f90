@@ -29,8 +29,11 @@
       CHARACTER(MaxPathLength) ::  AppDataDirectory
       CHARACTER(MaxPathLength) ::  PathToLicenseFile
 
-      CHARACTER                ::  DIRSPACER
-      DATA DIRSPACER / '\' / ! Windows spacer
+#ifdef _WIN32
+      CHARACTER(1), PARAMETER :: DIRSPACER= '\' ! Windows spacer
+#else
+      CHARACTER(1), PARAMETER :: DIRSPACER = '/' ! Unix spacer
+#endif
 
       CHARACTER(MaxPathLength) :: VIEWEXE
       CHARACTER(20)            :: VIEWARG

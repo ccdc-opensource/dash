@@ -95,8 +95,8 @@
       CHARACTER*(*), INTENT (IN   ) :: ExpguiExe
       LOGICAL,       INTENT (IN   ) :: fg_EXPGUI
 
-!TMP     CHARACTER*(*), PARAMETER :: ctScriptFile = 'dashexpcli', ctScriptDir = 'dashexpcli\'
-      CHARACTER*(*), PARAMETER :: ctScriptFile = 'expcli', ctScriptDir = 'expcli\'
+!TMP     CHARACTER*(*), PARAMETER :: ctScriptFile = 'dashexpcli', ctScriptDir = 'dashexpcli'
+      CHARACTER*(*), PARAMETER :: ctScriptFile = 'expcli', ctScriptDir = 'expcli'
       CHARACTER(MaxPathLength) :: tDirName, tFileName
       LOGICAL exists
       INTEGER L, ExtLength
@@ -110,9 +110,10 @@
       IF ( .NOT. exists ) GOTO 998
       ExtLength = len(tExtension)
       CALL SplitPath2(ExpguiExe, tDirName, tFileName, tExtension, ExtLength)
+#ifdef _WIN32
       CALL StrUpperCase(tExtension)
       IF ( tExtension .NE. 'EXE' ) goto 998
-
+#endif
       L = LEN_TRIM(tDirName)
       IF ( fg_EXPGUI ) THEN
         ScriptName = tDirName(:L)//'expgui'
@@ -125,13 +126,13 @@
       INQUIRE(FILE=ScriptName, EXIST=exists)
       IF ( exists ) GOTO 10
       ! remove tailing "\"
-      IF ( L .GT. 1 .AND. tDirName(L:L) .EQ. '\' .AND. tDirName(L-1:L-1) .NE. ':' ) L = L - 1
+      IF ( L .GT. 1 .AND. tDirName(L:L) .EQ. DIRSPACER .AND. tDirName(L-1:L-1) .NE. ':' ) L = L - 1
       ScriptName = tDirName(:L) 
       CALL SplitPath(ScriptName, tDirName, tFileName)
-      ScriptName = TRIM(tDirName)//ctScriptDir//ctScriptFile
+      ScriptName = TRIM(tDirName)//ctScriptDir//DIRSPACER//ctScriptFile
       INQUIRE(FILE=ScriptName, EXIST=exists)
       IF ( exists ) GOTO 10
-      ScriptName = TRIM(InstallationDirectory)//ctScriptDir//ctScriptFile
+      ScriptName = TRIM(InstallationDirectory)//ctScriptDir//DIRSPACER//ctScriptFile
       INQUIRE(FILE=ScriptName, EXIST=exists)
       IF ( .NOT. exists ) GOTO 999
  10   CheckEXPGUIExe = 0
@@ -467,8 +468,10 @@
       tFileName = FileNameBase(1:iBaseLen)//'.ins'
       tLen = iBaseLen + 4
       IF (DASHWDialogGetCheckBoxLogical(IDF_GSAS_Import_ins)) THEN
+#ifdef _WIN32
         CALL ILowerCase(GSASINS)
         CALL ILowerCase(tFileName)
+#endif
         IErrCode = InfoError(1) ! Clear errors
         CALL IOsCopyFile(GSASINS, tFileName(1:tLen))
         I = InfoError(1)
