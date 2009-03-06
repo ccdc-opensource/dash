@@ -277,14 +277,14 @@
       OPEN(UNIT=chFileR,FILE=TRIM(TheFileName),STATUS='old',ERR=997)
       iNBT = NumOfBkgTerm
 
-      DO WHILE ( .NOT. EOF(chFileR) )
-        READ(chFileR, '(A)', ERR=997) tLine
+      DO WHILE ( .TRUE. )
+        READ(chFileR, '(A)', ERR=997, END=300) tLine
         WRITE(chFileW, '(A)', ERR=998) TRIM(tLine)
         IF ( tLine(1:ciPMarkLen) .NE. ctPMark ) CYCLE
         READ(tLine(ciPMarkLen+1:),*, ERR=998) tKeyWord
         kLen = LEN_TRIM(tKeyWord)
         IF ( kLen .LE. 0 ) CYCLE
-        READ(chFileR, '(A)', ERR=997) tLine2
+        READ(chFileR, '(A)', ERR=997, END=300) tLine2
 
         IF ( tKeyWord .EQ. 'NCYCL') THEN
           CALL PushActiveWindowID
@@ -367,7 +367,7 @@
         WRITE(chFileW, '(A)', ERR=998) TRIM(tLine2)
 
       ENDDO
-
+ 300  CONTINUE
       CLOSE(chFileW)
       CLOSE(chFileR, STATUS='delete')
 !      CALL IOSCommand('CMD.exe /C copy /Y "'//TRIM(TheFileName)//'.tmp" '// &
@@ -636,8 +636,8 @@
           CALL INC(NumOfAtmPerElm(zmElementCSD(i,iFrg)))
         ENDDO
       ENDDO
-      DO WHILE ( .NOT. EOF(chFileTmp) )
-        READ(chFileTmp, '(A)', ERR=997) tLine
+      DO WHILE ( .TRUE. )
+        READ(chFileTmp, '(A)', ERR=997, END=300) tLine
         IF ( tLine(1:ciMarkLen) .NE. ctMark ) THEN
           WRITE(chFileIns, '(A)', ERR=998) TRIM(tLine)
           CYCLE
@@ -713,8 +713,9 @@
         END SELECT
 ! Replace next line
         WRITE(chFileIns, '(A)', ERR=998) TRIM(tLine)
-        READ(chFileTmp, '(A)', ERR=997)
+        READ(chFileTmp, '(A)', ERR=997, END=300)
       ENDDO
+ 300  CONTINUE
       WriteRIETANFiles = 0
 
   999 CLOSE(chFileIns)
@@ -823,8 +824,8 @@
       prm_len = 0
       iNumAtom = 0
       id(4) = 1
-      DO WHILE ( .NOT. EOF(chSPFile) )
-        READ(chSPFile, '(A)', ERR=996) tLine
+      DO WHILE ( .TRUE. )
+        READ(chSPFile, '(A)', ERR=996, END=300) tLine
         IF ( LEN_TRIM(tLine) .LE. 0 ) CYCLE
         READ(tLine, *, ERR=996, END=996) word
         IF ( word .EQ. 'prm' ) THEN
@@ -905,15 +906,17 @@
         iNumAtom = iNumAtom + 1
         prm_len = 0 ! only valid for single atom line
       END DO
+ 300  CONTINUE
       CLOSE(chSPFile)
       WRITE(hFileIns, '(/A/A/)', ERR=999) 'end if', '} End of atoms'
       WRITE(hFileIns, '(A)', ERR=999) 'If NMODE <> 1 and NMODE <> 4 then'
       WRITE(hFileIns, '(A/)', ERR=999) 'Constraints {'
       REWIND (chFileTmp)
-      DO WHILE ( .NOT. EOF(chFileTmp) )
-        READ(chFileTmp, '(A)', ERR=999) tLine
+      DO WHILE ( .TRUE. )
+        READ(chFileTmp, '(A)', ERR=999, END=302) tLine
         WRITE(hFileIns, '(A)', ERR=999) tLine
       ENDDO
+ 302  CONTINUE
       IF ( iNumAtom .GT. 1 ) WRITE(hFileIns, '(/A/)', ERR=999) '} End of constraints'
       CLOSE(chFileTmp)
 
@@ -1091,44 +1094,48 @@
       IF ( .NOT. exists ) GOTO 998
 ! Wind ffe file
       OPEN(UNIT=chFileFfe, FILE=FileNameBase(:iBaseLen)//'.ffe', STATUS='unknown', ERR=998)
-      DO WHILE ( .NOT. EOF(chFileFfe) )
-        READ(chFileFfe, '(A)', ERR=998) tLine
+      DO WHILE ( .TRUE. )
+        READ(chFileFfe, '(A)', ERR=998, END=300) tLine
         IF ( tLine(1:34) .EQ. ' INTERATOMIC DISTANCE IN ANGSTROMS') EXIT
       END DO
+ 300  CONTINUE
 ! Copy ins up to restraint record
       OPEN(UNIT=chFileInsR, FILE=TheFileName, STATUS='old', ERR=996)
       OPEN(UNIT=chFileInsW, FILE=TRIM(TheFileName)//'.tmp', &
            STATUS='unknown', ERR=996)
-      DO WHILE ( .NOT. EOF(chFileInsR) )
-        READ(chFileInsR, '(A)', Err=996) tLine
+      DO WHILE ( .TRUE. )
+        READ(chFileInsR, '(A)', Err=996, END=302) tLine
         WRITE(chFileInsW, '(A)', Err=996) TRIM(tLine)
         IF ( tLine(:ciRMarkLen) .EQ. ctRMark ) THEN
-          DO WHILE ( .NOT. EOF(chFileInsR) )
-            READ(chFileInsR, '(A)', Err=996) tLine
+          DO WHILE ( .TRUE. )
+            READ(chFileInsR, '(A)', Err=996, END=301) tLine
             IF ( tLine(:ciRMarkLen+3) .EQ. ctRMark//'END' ) THEN
               BACKSPACE(chFileInsR)
               GOTO 20
             ENDIF
           END DO
+ 301      CONTINUE
           EXIT
         ENDIF
       END DO
+ 302  CONTINUE
       GOTO 996
 ! Copy distance and angle restraints from pha to ins and ffe files
   20  OPEN(UNIT=chFilePha, FILE=FileNameBase(:iBaseLen)//'.pha', STATUS='old', ERR=997)
       n = 0
-      DO WHILE ( .NOT. EOF(chFilePha) )
-        READ(chFilePha, '(A)', Err=997) tLine
+      DO WHILE ( .TRUE. )
+        READ(chFilePha, '(A)', Err=997, END=304) tLine
         IF ( tLine(1:4) .NE. 'DIST') CYCLE
         READ(tLine(5:), *, Err=997) a1, a2, value, std
         n = n + 1
         WRITE(chFileFfe,'(I6,4X,2(A,I'//w//'),A/)', ERR=998) n,' (', a1,',    0) (',a2,',    0)'
         WRITE(chFileInsW,'(I6,2(1X,F8.4))', Err=996) n, value, std
       END DO
+ 304  CONTINUE
       WRITE(chFileFfe,'(//A)') ' BOND ANGLE IN DEGREES.  CENTRAL ATOM IS VERTEX'
       REWIND(chFilePha, Err=997)
-      DO WHILE ( .NOT. EOF(chFilePha) )
-        READ(chFilePha, '(A)', Err=997) tLine
+      DO WHILE ( .TRUE. )
+        READ(chFilePha, '(A)', Err=997, END=306) tLine
         IF ( tLine(1:4) .NE. 'ANGL') CYCLE
         READ(tLine(5:), *, Err=997) a1, a2, a3, value, std
         n = n + 1
@@ -1136,13 +1143,15 @@
                          ',    0) (', a3,',    0)'
         WRITE(chFileInsW,'(I6,2(1X,F8.2))', Err=996) n, value, std
       END DO
+ 306  CONTINUE
       CLOSE(chFileFfe)
       CLOSE(chFilePha)
 ! Copy rest of ins
-      DO WHILE ( .NOT. EOF(chFileInsR) )
-        READ(chFileInsR, '(A)', Err=996) tLine
+      DO WHILE ( .TRUE. )
+        READ(chFileInsR, '(A)', Err=996, END=308) tLine
         WRITE(chFileInsW, '(A)', Err=996) TRIM(tLine)
       END DO
+ 308  CONTINUE
       CLOSE(chFileInsW)
       CLOSE(chFileInsR, STATUS='delete')
       IErrCode = InfoError(1)
