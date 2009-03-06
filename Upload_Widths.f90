@@ -583,6 +583,9 @@
 !
       REAL FUNCTION Chisq_Sigma(N,P)
 
+#ifdef __G95__
+      USE FOR_G95
+#endif
       IMPLICIT NONE
 
       INCLUDE 'params.inc'
@@ -616,6 +619,9 @@
 !
       REAL FUNCTION Chisq_Gamma(N,P)
 
+#ifdef __G95__
+      USE FOR_G95
+#endif
       IMPLICIT NONE
 
       INCLUDE 'params.inc'

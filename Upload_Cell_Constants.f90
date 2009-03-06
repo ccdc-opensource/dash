@@ -5,6 +5,9 @@
 
       USE WINTERACTER
       USE DRUID_HEADER
+#ifdef __G95__
+      USE FOR_G95
+#endif
 
       IMPLICIT NONE
 
@@ -228,6 +231,9 @@
 !
       REAL FUNCTION ChiGetLattice(N,P)
 
+#ifdef __G95__
+      USE FOR_G95
+#endif
       IMPLICIT NONE
 
       INCLUDE 'params.inc'

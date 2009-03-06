@@ -7,6 +7,10 @@
       USE DRUID_HEADER
       USE VARIABLES
       USE ZMVAR
+#ifdef __G95__
+      USE FOR_G95
+#endif
+      
 
       IMPLICIT NONE
 
@@ -561,6 +565,9 @@
       USE DRUID_HEADER
       USE VARIABLES
       USE ZMVAR
+#ifdef __G95__
+      USE FOR_G95
+#endif
 
       IMPLICIT NONE
 

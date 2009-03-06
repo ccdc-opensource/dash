@@ -735,4 +735,22 @@
 !
 !*****************************************************************************
 !
+#else
+
+      SUBROUTINE GetPathToMercuryFromRegistry()
+      IMPLICIT NONE
+      END SUBROUTINE GetPathToMercuryFromRegistry
+      
+      SUBROUTINE GetPathToMogulFromRegistry()
+      IMPLICIT NONE
+      END SUBROUTINE GetPathToMogulFromRegistry
+      
+      SUBROUTINE GetPathToTopasFromRegistry()
+      IMPLICIT NONE
+      END SUBROUTINE GetPathToTopasFromRegistry
+      
+      SUBROUTINE GetPathToExpguiFromRegistry()
+      IMPLICIT NONE
+      END SUBROUTINE GetPathToExpguiFromRegistry
+
 #endif
