@@ -6,8 +6,10 @@
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
-      use kernel32
-      use dfwinty
+#ifdef _WIN32
+      USE KERNEL32
+      USE dfwinty
+#endif
  
       IMPLICIT NONE
 
@@ -58,8 +60,10 @@
       CALL WHelpFile(' ') ! In case the help file is open already
       CALL WHelpFile(TutorialFileName)
 
+#ifdef _WIN32
       d=WinExec('cmd /c "'//TRIM(TutorialFileName)//'" 'C,SW_HIDE)
-
+#else
+#endif
 
       CALL IOsDirChange(TRIM(DestineDir))
 

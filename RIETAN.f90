@@ -80,7 +80,11 @@
       CHARACTER*(*), INTENT (  OUT) :: ScriptName
       CHARACTER*(*), INTENT (IN   ) :: ExeName
 
+#ifdef _WIN32
       CHARACTER*(*), PARAMETER :: ctScriptFile = 'RIETAN.CMD'
+#else
+      CHARACTER*(*), PARAMETER :: ctScriptFile = 'rietan.sh'
+#endif
       CHARACTER(MaxPathLength) :: tDirName, tFileName
       LOGICAL exists
       INTEGER ExtLength
@@ -94,9 +98,10 @@
       IF ( .NOT. exists ) GOTO 998
       ExtLength = len(tExtension)
       CALL SplitPath2(ExeName, tDirName, tFileName, tExtension, ExtLength)
+#ifdef _WIN32
       CALL StrUpperCase(tExtension)
       IF ( tExtension .NE. 'EXE' ) goto 998
-
+#endif
       ScriptName = TRIM(InstallationDirectory)//ctScriptFile
       INQUIRE(FILE=ScriptName, EXIST=exists)
       IF ( .NOT. exists ) GOTO 999

@@ -295,7 +295,9 @@
 !
       INTEGER FUNCTION Get_DiskSerialNumber( lpszDriveName )
 
+#ifdef _WIN32
       USE DFWIN
+#endif
 
       IMPLICIT NONE
 
@@ -310,6 +312,7 @@
       INTEGER*4       ret
       CHARACTER*50    Volume
 
+#ifdef _WIN32
       nSystemNameSize   = 100
       lpszSerialNumber    = 1
       ret = lstrcpy(lpszSystemName, "                               "C)
@@ -322,6 +325,7 @@
                            NULL,                             &
                            lpszSystemName,                   &
                            nSystemNameSize)
+#endif
       Get_DiskSerialNumber = IEOR(lpszSerialNumber,Mangler)
 
       END FUNCTION Get_DiskSerialNumber

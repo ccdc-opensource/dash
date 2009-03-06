@@ -72,7 +72,7 @@
 
       LOGICAL, EXTERNAL :: Confirm
 
-!DEC$ IF DEFINED (ONTBUG)
+#ifdef ONTBUG
       IF ( in_batch ) THEN
         CALL AppendBatchLogFile("Debug error: "//TheMessage)
       ELSE
@@ -80,7 +80,7 @@
           ShowAgain = Confirm('Debug error : '//TheMessage(1:LEN_TRIM(TheMessage))//CHAR(13)//'More Debug Error messages?')
         ENDIF
       ENDIF
-!DEC$ ENDIF
+#endif
 
       END SUBROUTINE DebugErrorMessage
 !
@@ -104,7 +104,7 @@
       CHARACTER*(255) tMessage
       INTEGER         tLen
 
-!DEC$ IF DEFINED (ONTBUG)
+#ifdef ONTBUG
       Counter = Counter + 1
 ! Update the status bar at the bottom of the screen.
       tMessage = TheMessage
@@ -112,7 +112,7 @@
       tMessage = tMessage(1:tLen)//" "//Integer2String(Counter)
       tLen = LEN_TRIM(tMessage)
       CALL WindowOutStatusBar(1, tMessage(1:tLen))
-!DEC$ ENDIF
+#endif
 
       END SUBROUTINE DebugShow
 !

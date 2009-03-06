@@ -420,8 +420,10 @@
 
       USE WINTERACTER
       USE VARIABLES
-      use kernel32
-      use dfwinty
+#ifdef _WIN32
+      USE KERNEL32
+      USE dfwinty
+#endif
  
       IMPLICIT NONE
 
@@ -435,13 +437,12 @@
       ManualDir = TRIM(InstallationDirectory)//&
                   'Documentation'//DIRSPACER//&
                   'manual'//DIRSPACER//'portable_html'
-
-      CALL IOsDirChange(TRIM(ManualDir))      
-
      
+#ifdef _WIN32
+      CALL IOsDirChange(TRIM(ManualDir))      
       d=WinExec('cmd /c "TOC.html" 'C,SW_HIDE)
-
       CALL IOsDirChange(TRIM(WorkingDir))
+#endif
 
       END SUBROUTINE LaunchHelp
 !
@@ -475,11 +476,11 @@
                CHAR(13)//&
                ProgramVersion
       tLen = LEN_TRIM(CABOUT)
-!DEC$ IF DEFINED (ONTBUG)
+#ifdef ONTBUG
       CABOUT = CABOUT(1:tLen)//' (Debug version)'
-!DEC$ ELSE
+#else
       CABOUT = CABOUT(1:tLen)//' Release'
-!DEC$ ENDIF
+#endif
       tLen = LEN_TRIM(CABOUT)
       CABOUT = CABOUT(1:tLen)//CHAR(13)//CHAR(13)//&
                'Copyright CCDC and STFC, February 2008'//CHAR(13)//CHAR(13)//&
