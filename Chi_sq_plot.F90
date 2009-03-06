@@ -8,7 +8,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       INTEGER                    ChiHandle
       COMMON /ChiSqdWindowsUsed/ ChiHandle
@@ -77,7 +77,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       INTEGER         Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
       REAL                                                           ChiMult
@@ -116,7 +116,7 @@
 !
 !  Definitions and array declarations.
 !
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       REAL             CHIPROBEST
       COMMON /PLTSTO2/ CHIPROBEST
@@ -178,8 +178,8 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
-      INCLUDE 'poly_colours.inc'
+      INCLUDE 'params.inc'
+      INCLUDE 'Poly_Colours.inc'
 
       REAL                    chi_sqd
       INTEGER                                           Curr_Iter, MaxIterationSoFar
@@ -336,7 +336,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       INTEGER                    ChiHandle
       COMMON /ChiSqdWindowsUsed/ ChiHandle
@@ -428,7 +428,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'Poly_Colours.inc'
 
       REAL                    chi_sqd
@@ -520,7 +520,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       REAL                    chi_sqd
       INTEGER                                           Curr_Iter, MaxIterationSoFar

@@ -1,7 +1,7 @@
 !
 !*****************************************************************************
 !
-      INTEGER FUNCTION TimeNowSeconds
+      INTEGER FUNCTION TimeNowSeconds()
 !
 ! RETURNS : current time in seconds elapsed since 00:00 (midnight)
 !
@@ -64,7 +64,7 @@
 !
 !*****************************************************************************
 !
-      INTEGER FUNCTION DateToday
+      INTEGER FUNCTION DateToday()
 !
 ! RETURNS : today's date as an INTEGER. '20010215' for 15 Feb 2001  
 !

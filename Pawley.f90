@@ -11,8 +11,8 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
-      INCLUDE 'lattice.inc'
+      INCLUDE 'params.inc'
+      INCLUDE 'Lattice.inc'
       INCLUDE 'statlog.inc'
 
       INTEGER         CurrentWizardWindow
@@ -97,9 +97,9 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'GLBVAR.INC'
-      INCLUDE 'lattice.inc'
+      INCLUDE 'Lattice.inc'
       INCLUDE 'statlog.inc'
 
       REAL            CELL,       V,     ORTH,        CPARS
@@ -423,7 +423,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'statlog.inc'
       INCLUDE 'Lattice.inc'
@@ -597,7 +597,7 @@
 !
 !*****************************************************************************
 !
-      INTEGER FUNCTION Quick_Pawley_Fit
+      INTEGER FUNCTION Quick_Pawley_Fit()
 
       USE WINTERACTER
 
@@ -606,7 +606,7 @@
 ! DIMENSION OF ALSQ BELOW, AND SETTING OF MATSZ, TO BE ALTERED TO BE SOMETHING
 ! A LITTLE LARGER THAN N*(N+3)/2 WHERE THERE WILL BE N BASIC VARIABLES
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       
       EXTERNAL PCCN01,PFCN03,DUMMY,CALPR
 
@@ -649,7 +649,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       LOGICAL           copypik, copytic, copyhcv, copyhkl
       COMMON / PBCKUP / copypik, copytic, copyhcv, copyhkl
@@ -706,7 +706,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       LOGICAL           copypik, copytic, copyhcv, copyhkl
       COMMON / PBCKUP / copypik, copytic, copyhcv, copyhkl
@@ -866,7 +866,7 @@
 !
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'Lattice.inc'
       INCLUDE 'GLBVAR.INC'
 
@@ -909,7 +909,7 @@
 !
 !*****************************************************************************
 !
-      LOGICAL FUNCTION SaveProject
+      LOGICAL FUNCTION SaveProject()
 
       USE WINTERACTER
       USE VARIABLES

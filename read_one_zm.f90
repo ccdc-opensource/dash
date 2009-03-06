@@ -61,7 +61,8 @@
       DO i = 1, natoms(iFrg)
 ! Remaining lines contain the Z-matrix
 !  C      1.5152617  0  113.2370014  0 -179.8250018  0   54   51   48  3.0  1.0   58 C6 C7 C8 C9
-        READ (19, 1900, ERR=999, IOSTAT=ErrorStatus) nlin, line
+        READ (19, '(A)', ERR=999, IOSTAT=ErrorStatus) line
+        nlin = LEN_TRIM(line)
 ! JCC Added in traps on internal read
         READ (line(3:5), '(A3)', ERR=999, IOSTAT=ErrorStatus) tStr3
         CALL StrClean(tStr3,AsymLen)
@@ -155,7 +156,6 @@
   999 Read_One_Zm = ErrorStatus
       CLOSE (19)
       RETURN
- 1900 FORMAT (Q,A)
 
       END FUNCTION Read_One_Zm
 !

@@ -28,8 +28,8 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
-      INCLUDE 'lattice.inc' ! Cellpar, space group strings and NumberSGTable
+      INCLUDE 'params.inc'
+      INCLUDE 'Lattice.inc' ! Cellpar, space group strings and NumberSGTable
 
       INTEGER         Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
       REAL                                                           ChiMult
@@ -133,12 +133,13 @@
 
       OPEN(220,FILE=InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//'SpaceGroupSymbols.dat',STATUS='OLD', ERR = 10)
       DO j = 1,(NumberSGTable-1)
-        READ (220, 50) nlin, line
-50      FORMAT(q,a)
+        READ (220, 50) line
+        nlin = LEN_TRIM(line)
+50      FORMAT(a)
       ENDDO
       READ(220,55) Inversion, NumOfShifts, ShiftString
 !55    FORMAT(28x, I1, 4x, I1, x, A40)
-55    FORMAT(75x, I1, 4x, I1, x, A20)
+55    FORMAT(75x, I1, 4x, I1, 1x, A20)
       DO j = 1,NumofShifts
         Shift(j) = ShiftString(((j*5)-4):(j*5))
       ENDDO 

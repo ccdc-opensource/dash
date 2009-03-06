@@ -105,10 +105,10 @@
 
       CHARACTER*(*), INTENT (IN   ) ::  SDIFile
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'Lattice.inc'
-      INCLUDE 'reflns.inc'
+      INCLUDE 'Reflns.inc'
 
       REAL            ALAMBD
       INTEGER                      NLAMB
@@ -277,7 +277,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'Lattice.inc'
 
@@ -437,7 +437,7 @@
       CHARACTER*(*), INTENT (IN   ) :: TheFileName
       INTEGER,       INTENT (  OUT) :: iErr
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       CHARACTER*255 LINE
       INTEGER NKKOR(MCHIHS)
@@ -461,7 +461,8 @@
       KKOR = 0
       MINCOR = 20
       DO iR = 1, MFCSTO
-        READ(hFile,'(Q,A)',END=100,ERR=999) NLIN, LINE
+        READ(hFile,'(A)',END=100,ERR=999) LINE
+        NLIN = LEN_TRIM(LINE)
         NCOR = GetNumOfColumns(LINE) - 6
         READ(LINE(1:NLIN),*,END=999,ERR=999) (iHKL(I,iR),I=1,3), AIOBS(iR), WTI(iR), KL, (IHCOV(I,iR),I=1,NCOR)
         KK = iR
@@ -505,7 +506,7 @@
       CHARACTER*(*), INTENT (IN   ) :: TheFileName
       INTEGER,       INTENT (  OUT) :: iErr
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       INTEGER          NFITA, IFITA
       REAL                                 WTSA

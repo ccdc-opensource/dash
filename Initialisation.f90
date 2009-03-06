@@ -300,8 +300,9 @@
       OPEN(110,FILE=TRIM(InstallationDirectory)//'SpaceGroupSymbols.dat',STATUS='OLD', ERR = 999)
       i = 0
  10   lintem=' '
-      READ(110,1100,END=100) nl, lintem
- 1100 FORMAT(Q,A)
+      READ(110,1100,END=100) lintem
+      nl = LEN_TRIM(lintem)
+ 1100 FORMAT(A)
       IF (lintem(1:1) .EQ. '-') GOTO 100
       IF (nl .LT. 70) THEN
         DO ii = nl+1, 70
@@ -359,10 +360,10 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'statlog.inc'
-      INCLUDE 'lattice.inc'
+      INCLUDE 'Lattice.inc'
       INCLUDE 'Poly_Colours.inc'
 
       INTEGER                 IXPos_IDD_Wizard, IYPos_IDD_Wizard
@@ -759,8 +760,8 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
-      INCLUDE 'lattice.inc'
+      INCLUDE 'params.inc'
+      INCLUDE 'Lattice.inc'
       INCLUDE 'Poly_Colours.inc'
 
       INTEGER     BFIOErrorCode
@@ -784,8 +785,8 @@
       LOGICAL, EXTERNAL :: Get_WriteWavelength2XYEFile
       LOGICAL, EXTERNAL :: Get_ShowCumChiSqd, Get_AutoAlign
       REAL, EXTERNAL :: WavelengthOf, PlotEsdMultiplier
-      CHARACTER*MaxPathLength tFileName
-      CHARACTER*MaxPathLength DefaultWorkingDir
+      CHARACTER(MaxPathLength) tFileName
+      CHARACTER(MaxPathLength) DefaultWorkingDir
       INTEGER   RecNr
       INTEGER*4 tInteger
       REAL*4    tReal
@@ -1023,8 +1024,8 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
-      INCLUDE 'lattice.inc'
+      INCLUDE 'params.inc'
+      INCLUDE 'Lattice.inc'
       INCLUDE 'Poly_Colours.inc'
 
       INTEGER     BFIOErrorCode
@@ -1034,12 +1035,12 @@
       REAL, EXTERNAL :: dSpacing2TwoTheta
       INTEGER, EXTERNAL :: GetBFIOError
       LOGICAL, EXTERNAL :: SetRRMethodRadioState
-      CHARACTER*MaxPathLength tFileName
+      CHARACTER(MaxPathLength) tFileName
       INTEGER   RecNr, RW
       INTEGER   hFile
-      CHARACTER*MaxPathLength tString
-      CHARACTER*MaxPathLength MainVersionStr
-      CHARACTER*MaxPathLength SubVersionStr
+      CHARACTER(MaxPathLength) tString
+      CHARACTER(MaxPathLength) MainVersionStr
+      CHARACTER(MaxPathLength) SubVersionStr
       INTEGER*4 tInteger
       LOGICAL*4 tLogical
       REAL*4    tReal

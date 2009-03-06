@@ -22,7 +22,7 @@
 
       INTEGER, INTENT (IN   ) :: TheSolutionNr
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
 ! Used to manage the child windows which display the profile plots
       INTEGER                 SAUsedChildWindows
@@ -126,7 +126,7 @@
 !
       INTEGER, PARAMETER :: NSETS =  3
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'Poly_Colours.inc'
 
       INTEGER          NBIN, LBIN

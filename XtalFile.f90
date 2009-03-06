@@ -2,7 +2,7 @@
 !
 !*****************************************************************************
 !
-      INTEGER FUNCTION XtalFileBrowse
+      INTEGER FUNCTION XtalFileBrowse()
 !
 ! This routine lets the user browse a directory for a crystal structure file.
 ! If a valid file has been selected, it will be opened automatically.
@@ -94,7 +94,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'LATTICE.INC'
+      INCLUDE 'Lattice.inc'
 
       CHARACTER*(*), INTENT (IN   ) :: TheFileName
 
@@ -332,7 +332,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'LATTICE.INC'
+      INCLUDE 'Lattice.inc'
 
       CHARACTER*(*), INTENT (IN   ) :: TheFileName
 

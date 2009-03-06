@@ -12,7 +12,7 @@
 
       CHARACTER*(*), INTENT (IN   ) :: ArgString
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'SA_restrain.inc'
 
       LOGICAL         in_batch
@@ -142,11 +142,11 @@
           CASE ('USECCOM') ! Use crystallographic centre of mass
             CALL INextString(line, tString)
             IF (InfoError(1) .NE. 0) GOTO 999
-            UseCCoM = (tString(1:LEN_TRIM(tString) ) .EQ. "TRUE")
+            UseCCoM = (TRIM(tString) .EQ. "TRUE")
           CASE ('AUTOALIGN') ! Auto align
             CALL INextString(line, tString)
             IF (InfoError(1) .NE. 0) GOTO 999
-            LAlign = (tString(1:LEN_TRIM(tString)) .EQ. "TRUE")
+            LAlign = (TRIM(tString) .EQ. "TRUE")
           CASE ('HYDROGEN') ! Hydrogen treatment
             CALL INextInteger(line, iTem)
             IF (InfoError(1) .NE. 0) GOTO 999
@@ -288,7 +288,7 @@
 !
 !*****************************************************************************
 !
-      INTEGER FUNCTION BatchFileSaveAs
+      INTEGER FUNCTION BatchFileSaveAs()
 !
 ! RETURNS 0 for success
 !
@@ -334,7 +334,7 @@
       CHARACTER*(*), INTENT (IN   ) :: FileName
       LOGICAL,       INTENT (IN   ) :: TruncateSDIFileName ! Quick hack
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       INTEGER                  OFBN_Len
       CHARACTER(MaxPathLength)           OutputFilesBaseName
@@ -397,8 +397,8 @@
       WRITE(iHandle,'(A)',ERR=999) '# SEED1 and SEED2 have different values in every file.'
       WRITE(iHandle,'(A)',ERR=999) '# DASH increments SEED1 and SEED2 with the number of the run at the start of'
       WRITE(iHandle,'(A)',ERR=999) '# each run.'
-      WRITE(iHandle,'(A,X,I6)',ERR=999) 'SEED1', iSeed1
-      WRITE(iHandle,'(A,X,I6)',ERR=999) 'SEED2', iSeed2
+      WRITE(iHandle,'(A,1X,I6)',ERR=999) 'SEED1', iSeed1
+      WRITE(iHandle,'(A,1X,I6)',ERR=999) 'SEED2', iSeed2
 
       WRITE(iHandle,'(A)',ERR=999) '# You can customize output by uncommenting some of the lines below'
 
@@ -452,18 +452,18 @@
   
       WRITE(iHandle,'(A)',ERR=999) '# On a distributed system, NRUNS should probably be set to:'
       WRITE(iHandle,'(A)',ERR=999) '#     (total number of runs / number of processors)'
-      WRITE(iHandle,'(A,X,I3)',ERR=999) 'NRUNS', MaxRuns
+      WRITE(iHandle,'(A,1X,I3)',ERR=999) 'NRUNS', MaxRuns
       WRITE(iHandle,'(A)',ERR=999) '# Maximum number of moves: real followed by integer e.g. "3.0 7" means "3.0E7"'
       CALL NMoves2RealInt(MaxMoves, tReal, tInt)
-      WRITE(iHandle,'(A,X,F9.5,X,I2)',ERR=999) 'MAXMOVES', tReal, tInt
+      WRITE(iHandle,'(A,1X,F9.5,1X,I2)',ERR=999) 'MAXMOVES', tReal, tInt
       WRITE(iHandle,'(A)',ERR=999) '# Termination criterion: a Simulated Annealing run stops when '
       WRITE(iHandle,'(A)',ERR=999) '# the profile chi-sqrd is lower than MULTIPLIER times the Pawley chi-sqrd'
-      WRITE(iHandle,'(A,X,F9.5)',ERR=999) 'MULTIPLIER', ChiMult
+      WRITE(iHandle,'(A,1X,F9.5)',ERR=999) 'MULTIPLIER', ChiMult
       WRITE(iHandle,'(A)',ERR=999) '# Changing settings below this point is probably not necessary'
-      WRITE(iHandle,'(A,X,F9.5)',ERR=999) 'T0', T0
-      WRITE(iHandle,'(A,X,F9.5)',ERR=999) 'COOL', RT
-      WRITE(iHandle,'(A,X,I3)',ERR=999) 'N1', NS
-      WRITE(iHandle,'(A,X,I3)',ERR=999) 'N2', NT
+      WRITE(iHandle,'(A,1X,F9.5)',ERR=999) 'T0', T0
+      WRITE(iHandle,'(A,1X,F9.5)',ERR=999) 'COOL', RT
+      WRITE(iHandle,'(A,1X,I3)',ERR=999) 'N1', NS
+      WRITE(iHandle,'(A,1X,I3)',ERR=999) 'N2', NT
       WRITE(iHandle,'(A)',ERR=999) '# Randomise initial values'
       IF ( RandomInitVal ) THEN
         WRITE(iHandle,'(A)',ERR=999) 'RANDOMISE TRUE'
@@ -477,7 +477,7 @@
         WRITE(iHandle,'(A)',ERR=999) 'USECCOM FALSE'
       ENDIF
       WRITE(iHandle,'(A)',ERR=999) '# 1 = ignore, 2 = absorb, 3 = explicit'
-      WRITE(iHandle,'(A,X,I2)',ERR=999) 'HYDROGEN', HydrogenTreatment
+      WRITE(iHandle,'(A,1X,I2)',ERR=999) 'HYDROGEN', HydrogenTreatment
       WRITE(iHandle,'(A)',ERR=999) '# Auto local minimise'
       IF ( AutoMinimise ) THEN
         WRITE(iHandle,'(A)',ERR=999) 'AUTOMIN TRUE'
@@ -500,16 +500,16 @@
       WRITE(iHandle,'(A)',ERR=999) '# Do not edit beyond this point.'
       IF ( PrefParExists ) THEN
         WRITE(iHandle,'(A)',ERR=999) '#Preferred Orientation DIRection'
-        WRITE(iHandle,'(A,3(X,I3))',ERR=999) 'PO_DIR', (PO_Direction(i),i=1,3)
+        WRITE(iHandle,'(A,3(1X,I3))',ERR=999) 'PO_DIR', (PO_Direction(i),i=1,3)
       ENDIF
       kk = 0
       DO iFrg = 1, nfrag
         IF ( TruncateSDIFileName ) THEN
           ExtLength = 7
-          CALL SplitPath2(frag_file(iFrg)(1:LEN_TRIM(frag_file(iFrg))), tDirName, tFileName, tExtension, ExtLength)
-          WRITE(iHandle,'(A)',ERR=999) "ZMATRIX "//tFileName(1:LEN_TRIM(tFileName))//'.zmatrix'
+          CALL SplitPath2(TRIM(frag_file(iFrg)), tDirName, tFileName, tExtension, ExtLength)
+          WRITE(iHandle,'(A)',ERR=999) "ZMATRIX "//TRIM(tFileName)//'.zmatrix'
         ELSE
-          WRITE(iHandle,'(A)',ERR=999) "ZMATRIX "//frag_file(iFrg)(1:LEN_TRIM(frag_file(iFrg)))
+          WRITE(iHandle,'(A)',ERR=999) "ZMATRIX "//TRIM(frag_file(iFrg))
         ENDIF
         DO i = 1, izmpar(iFrg)
           kk = kk + 1
@@ -522,27 +522,27 @@
           DO j = 1, 2
             CALL AtomID2Frag( DRestrAtomIDs(j,I), fragID(j), atomSeq(j) )
           ENDDO
-          WRITE(iHandle,'(A,2(X,I2,A))',ERR=999) '#', (fragID(j), ':'//OriginalLabel(atomSeq(j), fragID(j)), j=1, 2)
+          WRITE(iHandle,'(A,2(1X,I2,A))',ERR=999) '#', (fragID(j), ':'//OriginalLabel(atomSeq(j), fragID(j)), j=1, 2)
 ! Avoid using atom label: as "relabel" may change internal labels, but those in zmatrics remain unchanged
-          WRITE(iHandle,'(A,X,2(I2,X,I3,X),2(F8.4,X),F8.2,X,I1)',ERR=999) 'DIST_RESTRAINT', &
+          WRITE(iHandle,'(A,1X,2(I2,1X,I3,1X),2(F8.4,1X),F8.2,1X,I1)',ERR=999) 'DIST_RESTRAINT', &
                   (fragID(j), atomSeq(j), j=1, 2), &
                   DRestrLens(I), DRestrWidths(I), DRestrWeights(I), DRestrSpringOpts(I)
         ENDDO
       ENDIF
 !C Need limits for all parameters. Since these are by index, we need to write all of them out
-      WRITE(iHandle,'(A,X,I3)',ERR=999) 'LIMITS', nvar
+      WRITE(iHandle,'(A,1X,I3)',ERR=999) 'LIMITS', nvar
       DO i = 1, nvar
         WRITE(iHandle,'(2A)',ERR=999) '# ', TRIM(parlabel(i))
         SELECT CASE ( ModalFlag(i) )
           CASE ( 0, 1 ) ! Not a torsion/ a unimodal torsion
-            WRITE(iHandle,'(F10.5,X,A,X,F10.5,X,F10.5)',ERR=999) X_init(i), 'LBUB', LB(i), UB(i)
+            WRITE(iHandle,'(F10.5,1X,A,1X,F10.5,1X,F10.5)',ERR=999) X_init(i), 'LBUB', LB(i), UB(i)
           CASE ( 2 ) ! Bimodal torsion
-            WRITE(iHandle,'(F10.5,X,A,X,F10.5,X,F10.5)',ERR=999) X_init(i), 'BIMODAL', LB(i), UB(i)
+            WRITE(iHandle,'(F10.5,1X,A,1X,F10.5,1X,F10.5)',ERR=999) X_init(i), 'BIMODAL', LB(i), UB(i)
           CASE ( 3 ) ! Trimodal torsion
-            WRITE(iHandle,'(F10.5,X,A,X,F10.5,X,F10.5)',ERR=999) X_init(i), 'TRIMODAL', LB(i), UB(i)
+            WRITE(iHandle,'(F10.5,1X,A,1X,F10.5,1X,F10.5)',ERR=999) X_init(i), 'TRIMODAL', LB(i), UB(i)
           CASE ( 4 ) ! Mogul distribution torsion
-            WRITE(iHandle,'(F10.5,X,A,X,F10.5,X,F10.5$)',ERR=999) X_init(i), 'MDB', LB(i), UB(i)
-            WRITE(iHandle,'(X,I2,200(X,A))',ERR=999) NumMogulBins(i), &
+            WRITE(iHandle,'(F10.5,1X,A,1X,F10.5,1X,F10.5$)',ERR=999) X_init(i), 'MDB', LB(i), UB(i)
+            WRITE(iHandle,'(1X,I2,200(1X,A))',ERR=999) NumMogulBins(i), &
                  (TRIM(Integer2String(MogulBins(j, i))), j=1,NumMogulBins(i))
         END SELECT
       ENDDO
@@ -574,7 +574,7 @@
       CHARACTER*(*), INTENT (IN   ) :: DirName
       CHARACTER*(*), INTENT (IN   ) :: OutputFileName
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'GLBVAR.INC'
 
       INTEGER         Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves

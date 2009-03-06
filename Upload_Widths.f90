@@ -8,7 +8,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       REAL              XPF_Range
       LOGICAL                                       RangeFitYN
@@ -325,7 +325,7 @@
 
       INTEGER, INTENT (IN   ) :: IPtPS
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       REAL              XPF_Range
       LOGICAL                                       RangeFitYN
@@ -401,7 +401,7 @@
 
       INTEGER, INTENT (IN   ) :: IPtPS
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       REAL              XPF_Range
       LOGICAL                                       RangeFitYN
@@ -461,7 +461,7 @@
 
       INTEGER, INTENT (IN   ) :: N
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       REAL X(*), DX(*)
 
@@ -506,7 +506,7 @@
 
       REAL, EXTERNAL :: Chisq_Gamma
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       INTEGER     MMPAR
       PARAMETER ( MMPAR = MVAR * MVAR )
@@ -548,7 +548,7 @@
 
       REAL, EXTERNAL :: Chisq_Constant
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       INTEGER     MMPAR
       PARAMETER ( MMPAR = MVAR * MVAR )
@@ -585,7 +585,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       INTEGER N
       REAL P(MVAR)
@@ -618,7 +618,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       INTEGER N
       REAL P(MVAR)
@@ -651,7 +651,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       INTEGER N
       REAL P(MVAR)

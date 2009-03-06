@@ -19,7 +19,7 @@
 
       LOGICAL, INTENT (IN   ) :: Auto, TestOnlyForAuto
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       REAL              XOPT,       C,       FOPT
       COMMON / sacmn /  XOPT(MVAR), C(MVAR), FOPT
@@ -171,7 +171,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       REAL P(MVAR)
       INTEGER N
@@ -227,7 +227,7 @@
 ! History
 !     D. S. Sivia    9 Feb 1995  Initial release.
 !
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       REAL, INTENT (  OUT) :: TheChiSqd
 

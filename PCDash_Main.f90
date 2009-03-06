@@ -6,7 +6,6 @@
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
-      USE DFLIB
       USE ZMVAR
 
       IMPLICIT NONE
@@ -383,7 +382,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'GLBVAR.INC'
 
       INTEGER          NBIN, LBIN
@@ -404,8 +403,8 @@
         OPEN(UNIT=hFile,FILE=tFileName,ERR=999)
         IF ( FnWavelengthOK() .AND. Get_WriteWavelength2XYEFile() ) WRITE(hFile,'(F9.5)',ERR=999) ALambda
         DO I = 1, NBIN
-!          WRITE(hFile,'(F6.3,X,F11.3,X,F12.5)',ERR=999) XBIN(I), YOBIN(I), EBIN(I)
-          WRITE(hFile,'(F10.5,X,F11.3,X,F12.5)',ERR=999) XBIN(I), YOBIN(I), EBIN(I)
+!          WRITE(hFile,'(F6.3,1X,F11.3,1X,F12.5)',ERR=999) XBIN(I), YOBIN(I), EBIN(I)
+          WRITE(hFile,'(F10.5,1X,F11.3,1X,F12.5)',ERR=999) XBIN(I), YOBIN(I), EBIN(I)
         ENDDO
         CLOSE(hFile)
       ENDIF
@@ -560,7 +559,6 @@
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
-      USE DFLIB
       USE ZMVAR
 
       IMPLICIT NONE

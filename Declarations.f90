@@ -13,7 +13,7 @@
       
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       INTEGER         CurrentWizardWindow
       COMMON /Wizard/ CurrentWizardWindow

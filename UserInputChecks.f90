@@ -1,7 +1,7 @@
 !
 !*****************************************************************************
 !
-      LOGICAL FUNCTION FnWavelengthOK
+      LOGICAL FUNCTION FnWavelengthOK()
 !
 ! Checks if wavelength available and acceptable
 !
@@ -13,7 +13,7 @@
       IMPLICIT NONE
       
       INCLUDE 'GLBVAR.INC' ! Contains ALambda
-      INCLUDE 'lattice.inc' ! Contains wavelength
+      INCLUDE 'Lattice.inc' ! Contains wavelength
 
       FnWavelengthOK = ((ALambda .GT. 0.1) .AND. (ALambda .LT. 20.0))
 
@@ -21,7 +21,7 @@
 !
 !*****************************************************************************
 !
-      LOGICAL FUNCTION FnPatternOK
+      LOGICAL FUNCTION FnPatternOK()
 !
 ! Checks if diffraction pattern available and acceptable
 !
@@ -34,7 +34,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
@@ -98,7 +98,7 @@
 !
 !*****************************************************************************
 !
-      LOGICAL FUNCTION FnUnitCellOK
+      LOGICAL FUNCTION FnUnitCellOK()
 !
 ! Checks if all cell parameters available and acceptable
 !
@@ -109,7 +109,7 @@
 !
       IMPLICIT NONE
 
-      INCLUDE 'lattice.inc'
+      INCLUDE 'Lattice.inc'
 
       LOGICAL, EXTERNAL :: ValidCellAxisLength
       REAL,    EXTERNAL :: UnitCellVolume
@@ -132,7 +132,7 @@
 !
 !*****************************************************************************
 !
-      INTEGER FUNCTION proposed_crystal_system
+      INTEGER FUNCTION proposed_crystal_system()
 
       IMPLICIT NONE
 

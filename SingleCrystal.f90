@@ -123,7 +123,7 @@
       IMPLICIT NONE
 
       INCLUDE 'GLBVAR.INC'
-      INCLUDE 'lattice.inc'
+      INCLUDE 'Lattice.inc'
 
       INTEGER, EXTERNAL :: HKLFFileBrowse, HKLFFileOpen
       LOGICAL, EXTERNAL :: SaveProject
@@ -161,7 +161,7 @@
 !
 !*****************************************************************************
 !
-      INTEGER FUNCTION HKLFFileBrowse
+      INTEGER FUNCTION HKLFFileBrowse()
 !
 ! This routine lets the user browse a directory for an HKLF file.
 ! If a valid file has been selected, it will be opened automatically.
@@ -276,7 +276,7 @@
 
       CHARACTER*(*), INTENT (IN   ) :: TheFileName
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'GLBVAR.INC'
 
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
@@ -336,7 +336,8 @@
       OPEN(hFile, FILE=TheFileName, STATUS='OLD', ERR=998)
       iR = 1
       DO KK = 1, MFCSTO
-        READ(hFile, '(Q,A)', END=100, ERR=998) NLIN, LINE
+        READ(hFile, '(A)', END=100, ERR=998) LINE
+        NLIN = LEN_TRIM(LINE)
         IF (LEN_TRIM(LINE) .NE. 0) THEN
 !C SHELX .hkl files are terminated by a line containing h = k = l = 0 or h = k = l = 99
           READ(LINE(1:NLIN), *, END=998, ERR=998) (jHKL(I,iR),I=1,3)
@@ -575,7 +576,7 @@
       CHARACTER*6 PNAME
       CHARACTER*10 filnmr
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       REAL            STHMXX,    STHL, SINTH, COSTH, SSQRD, TWSNTH,    DSTAR2, TWOTHD
       COMMON /BRAGG / STHMXX(5), STHL, SINTH, COSTH, SSQRD, TWSNTH(5), DSTAR2, TWOTHD(5)

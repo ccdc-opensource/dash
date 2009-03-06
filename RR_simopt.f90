@@ -14,7 +14,7 @@
 
       REAL,    INTENT (  OUT) :: CHIVAL
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'Lattice.inc'
 
       INTEGER         KKOR
@@ -280,7 +280,7 @@
       NATOM = TotNumOfAtoms
 ! recalculate the preferred orientation correction factors.
 ! Fill Preferred Orientation part
-      IF (PrefParExists .AND. RR_ioptPO) CALL PO_PRECFC(RR_PO)
+      IF (PrefParExists .AND. RR_ioptPO .EQ. 1) CALL PO_PRECFC(RR_PO)
 ! AICALC(1:NumOfRef) now contains the structural part of the calculated intensities
 ! XICALC(1:NumOfRef) now contains the preferred orientation part of the calculated intensities
 ! If we are using preferred orientation: correct for it.
@@ -365,7 +365,7 @@
 !
       IMPLICIT NONE
 
-  !    INCLUDE 'PARAMS.INC'
+  !    INCLUDE 'params.inc'
 
       REAL, INTENT (  OUT) :: TheChiSqd
 

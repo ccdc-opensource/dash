@@ -548,7 +548,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'lattice.inc'  
+      INCLUDE 'Lattice.inc'  
 
       LOGICAL, EXTERNAL :: FnUnitCellOK
 
@@ -863,7 +863,7 @@
 !
 !*****************************************************************************
 !
-      INTEGER FUNCTION zmRebuild
+      INTEGER FUNCTION zmRebuild()
 !
 ! In case an atom has been deleted.
 !
@@ -1426,23 +1426,23 @@
 !  C      1.5152617  0  113.2370014  0 -179.8250018  0   54   51   48  3.0  1.0   58 C6 C7 C8 C9
       DO i = 1, natoms(iFrg)
         IF (i .EQ. 1) THEN
-          WRITE (tFileHandle,'(2X,A2,X,3(F13.7,2X,I1),3I5,2F7.3,I5,1X,A5)',ERR=999) ElSym(i, iFrg), &
+          WRITE (tFileHandle,'(2X,A2,1X,3(F13.7,2X,I1),3I5,2F7.3,I5,1X,A5)',ERR=999) ElSym(i, iFrg), &
                 blen(i, iFrg), ioptb(i, iFrg), alph(i, iFrg), iopta(i, iFrg), bet(i, iFrg), ioptt(i, iFrg), &
                 iz1(i, iFrg), iz2(i, iFrg), iz3(i, iFrg),   &
                 tiso(i, iFrg), occ(i, iFrg), izmoid(i, iFrg), OriginalLabel(i, iFrg)
         ELSE IF (i .EQ. 2) THEN
-          WRITE (tFileHandle,'(2X,A2,X,3(F13.7,2X,I1),3I5,2F7.3,I5,1X,A5,1X,A5)',ERR=999) ElSym(i, iFrg), &
+          WRITE (tFileHandle,'(2X,A2,1X,3(F13.7,2X,I1),3I5,2F7.3,I5,1X,A5,1X,A5)',ERR=999) ElSym(i, iFrg), &
                 blen(i, iFrg), ioptb(i, iFrg), alph(i, iFrg), iopta(i, iFrg), bet(i, iFrg), ioptt(i, iFrg), &
                 iz1(i, iFrg), iz2(i, iFrg), iz3(i, iFrg),   &
                 tiso(i, iFrg), occ(i, iFrg), izmoid(i, iFrg), OriginalLabel(i, iFrg), OriginalLabel(iz1(i, iFrg), iFrg)
         ELSE IF (i .EQ. 3) THEN
-          WRITE (tFileHandle,'(2X,A2,X,3(F13.7,2X,I1),3I5,2F7.3,I5,1X,A5,1X,A5,1X,A5)',ERR=999) ElSym(i, iFrg), &
+          WRITE (tFileHandle,'(2X,A2,1X,3(F13.7,2X,I1),3I5,2F7.3,I5,1X,A5,1X,A5,1X,A5)',ERR=999) ElSym(i, iFrg), &
                 blen(i, iFrg), ioptb(i, iFrg), alph(i, iFrg), iopta(i, iFrg), bet(i, iFrg), ioptt(i, iFrg), &
                 iz1(i, iFrg), iz2(i, iFrg), iz3(i, iFrg),   &
                 tiso(i, iFrg), occ(i, iFrg), izmoid(i, iFrg), OriginalLabel(i, iFrg), OriginalLabel(iz1(i, iFrg), iFrg), &
                 OriginalLabel(iz2(i, iFrg), iFrg)
         ELSE
-          WRITE (tFileHandle,'(2X,A2,X,3(F13.7,2X,I1),3I5,2F7.3,I5,1X,A5,1X,A5,1X,A5,1X,A5)',ERR=999) ElSym(i, iFrg), &
+          WRITE (tFileHandle,'(2X,A2,1X,3(F13.7,2X,I1),3I5,2F7.3,I5,1X,A5,1X,A5,1X,A5,1X,A5)',ERR=999) ElSym(i, iFrg), &
                 blen(i, iFrg), ioptb(i, iFrg), alph(i, iFrg), iopta(i, iFrg), bet(i, iFrg), ioptt(i, iFrg), &
                 iz1(i, iFrg), iz2(i, iFrg), iz3(i, iFrg),   &
                 tiso(i, iFrg), occ(i, iFrg), izmoid(i, iFrg), OriginalLabel(i, iFrg), OriginalLabel(iz1(i, iFrg), iFrg), &
@@ -1547,7 +1547,7 @@
 
       IMPLICIT NONE      
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       INTEGER         nvar, ns, nt, iseed1, iseed2
       COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
@@ -1620,7 +1620,7 @@
 
       IMPLICIT NONE      
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'SA_restrain.inc'
 
       REAL            X_init,       x_unique,       lb,       ub
@@ -2000,7 +2000,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       INTEGER,  INTENT (IN   ) :: iMinHits
 
@@ -2057,7 +2057,8 @@
           IF (iRow .LT. NVAR) THEN
             IF (.NOT. Confirm('Problem occurred while setting up MDB for the parameter at row '// &
                               row_str//'. '//CHAR(13)//CHAR(13)// &
-                              'Ignore it and continue to process other parameter(s)?')) & EXIT
+                              'Ignore it and continue to process other parameter(s)?')) &
+               EXIT
           ELSE
             ! last row
             CALL ErrorMessage('Problem occurred while setting up MDB for the parameter at row '// &
@@ -2089,7 +2090,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       INTEGER,  INTENT (IN   ) :: IFRow
       LOGICAL,  INTENT (IN   ) :: keepStat
@@ -2467,7 +2468,7 @@
       INTEGER, INTENT (IN   ) :: IFrow, UndoModalFlag
       REAL,    INTENT (IN   ) :: Xinitial
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       INTEGER         nvar, ns, nt, iseed1, iseed2
       COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
@@ -2587,7 +2588,7 @@
 
       IMPLICIT NONE 
            
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       INTEGER         nvar, ns, nt, iseed1, iseed2
       COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
@@ -2871,7 +2872,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       REAL            X_init,       x_unique,       lb,       ub
       COMMON /values/ X_init(MVAR), x_unique(MVAR), lb(MVAR), ub(MVAR)

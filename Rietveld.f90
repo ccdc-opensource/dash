@@ -1246,7 +1246,7 @@
       IMPLICIT NONE
 
 ! Writes out original and Rietveld refined crystal structure to pdb file for visual comparison
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       INTEGER           TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm
       COMMON  /ORDRATM/ TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm(1:MaxAtm_3)
@@ -1410,7 +1410,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'Lattice.inc'
 
@@ -1753,7 +1753,8 @@
       INTEGER, EXTERNAL :: XtalFileOpen, XtalFileBrowse 
       LOGICAL, EXTERNAL :: FnUnitCellOK, SDIFileOpen
       CHARACTER(MaxPathLength) SDIFile, XtalFile
-      INTEGER iStat, IV, iOpt, IErrCode
+      INTEGER iStat, IV, iOpt
+      LOGICAL IErrCode
 
       CALL PushActiveWindowID
       CALL SelectDASHDialog(IDD_SAW_Page6)

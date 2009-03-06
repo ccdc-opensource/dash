@@ -9,8 +9,8 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
-      INCLUDE 'REFLNS.INC'
+      INCLUDE 'params.inc'
+      INCLUDE 'Reflns.inc'
       INCLUDE 'statlog.inc'
 
       INTEGER          NBIN, LBIN

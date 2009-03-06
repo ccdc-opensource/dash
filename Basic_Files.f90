@@ -5,7 +5,7 @@
 !
 !*****************************************************************************
 ! 
-      INTEGER FUNCTION GetBFIOError
+      INTEGER FUNCTION GetBFIOError()
 
       IMPLICIT NONE
 
@@ -160,7 +160,7 @@
 
       END SUBROUTINE FileReadInteger
 
-      LOGICAL FUNCTION FileErrorOccurred
+      LOGICAL FUNCTION FileErrorOccurred()
 
       INTEGER     BFIOErrorCode
       COMMON /IO/ BFIOErrorCode

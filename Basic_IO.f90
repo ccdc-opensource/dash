@@ -5,7 +5,7 @@
 !U
 !U      IMPLICIT NONE
 !U
-!U      INCLUDE 'PARAMS.INC'
+!U      INCLUDE 'params.inc'
 !U
 !U      INTEGER         MATPNT
 !U      REAL                         BLSQ
@@ -271,7 +271,7 @@
 !
 !*****************************************************************************
 !
-      LOGICAL FUNCTION DealWithEvent
+      LOGICAL FUNCTION DealWithEvent()
 
       USE DRUID_HEADER
       USE VARIABLES
@@ -596,7 +596,7 @@
 !
 !*****************************************************************************
 !
-      LOGICAL FUNCTION IsEventWaiting
+      LOGICAL FUNCTION IsEventWaiting()
 !
 ! Reports if events are waiting to be handled. If not, program execution resumes.
 ! It tries to emulate _not_ removing the events from the queu by
@@ -674,7 +674,6 @@
       PARAMETER (MaxWinStack = 25)
 
       INTEGER WinStackPtr
-      DATA    WinStackPtr / MaxWinStack /
       INTEGER WinStack
 
       COMMON /COMWS/ WinStackPtr, WinStack(1:MaxWinStack)

@@ -10,7 +10,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'Lattice.inc'
 
       LOGICAL         IHMINLT0, IKMINLT0, ILMINLT0

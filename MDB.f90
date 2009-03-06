@@ -5,7 +5,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       CHARACTER*(*), INTENT (IN   ) :: Line
       INTEGER,       INTENT (IN   ) :: Item
@@ -34,7 +34,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       INTEGER, INTENT (IN   ) :: nBin, iBins(*), Item
 
@@ -103,7 +103,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       REAL,     INTENT (IN   ) :: RandValue, X, StepSize
       INTEGER,  INTENT (IN   ) :: Item
