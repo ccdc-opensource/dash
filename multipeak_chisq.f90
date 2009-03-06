@@ -5,7 +5,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       INTEGER, INTENT (IN   ) :: NPAR
       REAL,    INTENT (IN   ) :: P(MVAR)
@@ -40,7 +40,7 @@
       REAL              PKCONV
       COMMON /WWPRSAVZ/ PKCONV(2048,9)
 
-      INCLUDE 'REFLNS.INC'
+      INCLUDE 'Reflns.inc'
 
       REAL            ZARGK,         ZXDEL
       COMMON /REFLNZ/ ZARGK(MFCSTO), ZXDEL(MFCSTO)
@@ -172,7 +172,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       REAL, INTENT (IN   ) :: X         ! Position (in degrees 2 theta) at which to calculate YNORM
 
@@ -206,7 +206,7 @@
       REAL              PKCONV
       COMMON /WWPRSAVZ/ PKCONV(2048,9)
 
-      INCLUDE 'REFLNS.INC'
+      INCLUDE 'Reflns.inc'
 
       REAL            ZARGK,         ZXDEL
       COMMON /REFLNZ/ ZARGK(MFCSTO), ZXDEL(MFCSTO)
@@ -272,8 +272,8 @@
 
       INTEGER, INTENT (IN   ) :: MNS
 
-      INCLUDE 'PARAMS.INC'
-      INCLUDE 'REFLNS.INC'
+      INCLUDE 'params.inc'
+      INCLUDE 'Reflns.inc'
 
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB

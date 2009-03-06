@@ -90,7 +90,7 @@
       LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical, SetRRMethodRadioState
       LOGICAL tLogical
       INTEGER IFLAGS, IFTYPE, iOpt, IErrCode
-      CHARACTER*MaxPathLength tFileName
+      CHARACTER(MaxPathLength) tFileName
       CHARACTER*75  FILTER
 
       CALL PushActiveWindowID
@@ -272,7 +272,7 @@
 ! Enable/disable Rietveld method ratio buttons on IDD_SAW_Page6 or IDD_SAW_Page6a
 ! Return if the currently selected radio botton is disabled
 !
-      LOGICAL FUNCTION SetRRMethodRadioState
+      LOGICAL FUNCTION SetRRMethodRadioState()
 
       USE WINTERACTER
       USE DRUID_HEADER
@@ -465,7 +465,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC' 
+      INCLUDE 'params.inc' 
 
 !ep    need the common block to identify the number of rows in the grid          
       INTEGER         Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
@@ -559,7 +559,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'LATTICE.INC'
+      INCLUDE 'Lattice.inc'
 
       INTEGER, EXTERNAL :: SGNrMenu2Table
       LOGICAL, EXTERNAL :: Confirm, ValidCellAxisLength, NearlyEqual
@@ -705,7 +705,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'lattice.inc'
+      INCLUDE 'Lattice.inc'
 
       INTEGER irow, istatus
 
@@ -753,8 +753,8 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
-      INCLUDE 'lattice.inc'
+      INCLUDE 'params.inc'
+      INCLUDE 'Lattice.inc'
 
       INTEGER           NTPeak
       REAL              AllPkPosVal,         AllPkPosEsd

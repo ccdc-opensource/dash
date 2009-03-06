@@ -11,7 +11,7 @@
 
       LOGICAL, INTENT (IN   ) :: AbsorbHydrogens
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       REAL            FOB
       COMMON /FCSTOR/ FOB(MaxAtm_3,MFCSTO)
@@ -106,7 +106,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       REAL            FOB
       COMMON /FCSTOR/ FOB(MaxAtm_3,MFCSTO)

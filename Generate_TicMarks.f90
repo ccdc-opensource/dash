@@ -21,7 +21,7 @@
 !
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'GLBVAR.INC'
       INCLUDE 'Lattice.inc'
 
@@ -144,7 +144,7 @@
 !
 !*****************************************************************************
 !
-      LOGICAL FUNCTION Check_TicMark_Data
+      LOGICAL FUNCTION Check_TicMark_Data()
 
       IMPLICIT NONE
 

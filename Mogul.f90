@@ -201,7 +201,7 @@
       ! delete any output file remained from the provious run. 
       CALL IOSDeleteFile(MogulOutputFile)
       M = InfoError(1) ! Clear errors
-      CALL IOSCommand(MOGULEXE(1:I)//' -ins '//'"'//Script_file(1:LEN_TRIM(Script_file))//'"', ProcBlocked)
+      CALL IOSCommand(MOGULEXE(1:I)//' -ins '//'"'//TRIM(Script_file)//'"', ProcBlocked)
       IF (InfoError(1) .NE. 0) GOTO 999
       IF (kzmpar2(IFRow) .EQ. 3) THEN ! Modal Torsion so try to process
         Mogul = ProcessMogulOutput(MogulOutputFile, iFRow)
@@ -230,7 +230,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       CHARACTER(MaxPathLength), INTENT(IN   ) ::  MogulOutputFile
       INTEGER, INTENT (IN   ) :: iFRow
@@ -358,7 +358,7 @@
             Assigned = .TRUE.
           ENDIF
         ENDIF
-        IF ((HIndex2(1) .GT. HalfBins+1) .AND. (HIndex2(1) .LT. UpperBins) .AND. (Blank .EQ. .FALSE.)) THEN !second peak of trimodal
+        IF ((HIndex2(1) .GT. HalfBins+1) .AND. (HIndex2(1) .LT. UpperBins) .AND. (.NOT. Blank)) THEN !second peak of trimodal
           MogulText = 'Trimodal -30 to 30 degrees'
           ModalFlag(IFRow) = 3
           LB(IFRow) = -30.00

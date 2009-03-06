@@ -90,7 +90,7 @@
 
       CHARACTER*(*), INTENT (IN   ) :: TheFileName
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'Lattice.inc'
       INCLUDE 'GLBVAR.INC'
 

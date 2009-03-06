@@ -310,7 +310,7 @@
       INTEGER, EXTERNAL :: WriteEXPGUIPhaseFile
       LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'GLBVAR.INC'
 
       INTEGER          NBIN, LBIN
@@ -619,7 +619,7 @@
 
       GSASWriteAtom = .TRUE.
       ! Biso to Uiso
-      WRITE(hFile, '(A,3(X,F9.5),X,A,2(X,F6.3))', ERR=999) 'ATOM '//Label, (XYZ(I),I=1,3), &
+      WRITE(hFile, '(A,3(1X,F9.5),1X,A,2(1X,F6.3))', ERR=999) 'ATOM '//Label, (XYZ(I),I=1,3), &
             ElementStr(iElement), Occ, Biso*cB2U
       GSASWriteAtom = .FALSE.
   999 RETURN

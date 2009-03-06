@@ -16,7 +16,7 @@
 !
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       EXTERNAL PCXX, PFXX, MAGROU
       CHARACTER*6 PNAME

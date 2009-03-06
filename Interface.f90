@@ -268,7 +268,7 @@
 !
 !*****************************************************************************
 !
-      LOGICAL FUNCTION Get_ShowCumChiSqd
+      LOGICAL FUNCTION Get_ShowCumChiSqd()
 
 ! When .TRUE., the cumulative chi-sqd is plotted
 
@@ -288,7 +288,7 @@
 !
 !*****************************************************************************
 !
-      LOGICAL FUNCTION Get_DivideByEsd
+      LOGICAL FUNCTION Get_DivideByEsd()
 
 ! When .TRUE., the points of the difference curve are divided by their ESDs
 
@@ -308,7 +308,7 @@
 !
 !*****************************************************************************
 !
-      LOGICAL FUNCTION Get_OutputChi2vsMoves
+      LOGICAL FUNCTION Get_OutputChi2vsMoves()
 
 ! When .TRUE., the profile chi**2 versus moves graph is written out to a file
 
@@ -505,7 +505,7 @@
 !
 !*****************************************************************************
 !
-      LOGICAL FUNCTION Get_AutoAlign
+      LOGICAL FUNCTION Get_AutoAlign()
 
 ! When .TRUE., the molecules of each solution in a multi run are set to a default position/orientation
 
@@ -574,7 +574,7 @@
 !
 !*****************************************************************************
 !
-      LOGICAL FUNCTION SavePDB
+      LOGICAL FUNCTION SavePDB()
 
 ! When .TRUE., a file in .pdb format is written out for each SA solution
 
@@ -633,7 +633,7 @@
 !
 !*****************************************************************************
 !
-      LOGICAL FUNCTION Get_SavePRO
+      LOGICAL FUNCTION Get_SavePRO()
 
 ! When .TRUE., a file containing the calculated profile is saved for each SA run
 
@@ -690,7 +690,7 @@
 !
 !*****************************************************************************
 !
-      LOGICAL FUNCTION Get_SavePrjAtEnd
+      LOGICAL FUNCTION Get_SavePrjAtEnd()
 
 ! When .TRUE., a file containing the calculated profile is saved for each SA run
 
@@ -749,7 +749,7 @@
 !
 !*****************************************************************************
 !
-      LOGICAL FUNCTION Get_SaveParamAtEnd
+      LOGICAL FUNCTION Get_SaveParamAtEnd()
 
 ! When .TRUE., a file containing the calculated profile is saved for each SA run
 
@@ -806,7 +806,7 @@
 !
 !*****************************************************************************
 !
-      LOGICAL FUNCTION Get_ColourFlexibleTorsions
+      LOGICAL FUNCTION Get_ColourFlexibleTorsions()
 
 ! When .TRUE., flexible torsions are coloured when viewing a Z-matrix
 
@@ -826,7 +826,7 @@
 !
 !*****************************************************************************
 !
-      LOGICAL FUNCTION Get_WriteWavelength2XYEFile
+      LOGICAL FUNCTION Get_WriteWavelength2XYEFile()
 
 ! When .TRUE. (the default), the wavelength is automatically written to the first line of
 ! every .xye file that is written. This is the DASH default, but disagrees with .xye
@@ -848,7 +848,7 @@
 !
 !*****************************************************************************
 !
-      LOGICAL FUNCTION PlotObservedErrorBars
+      LOGICAL FUNCTION PlotObservedErrorBars()
 !
 ! This function retrieves the value of the 'plot error bars' checkbox in the plot options panel
 !
@@ -869,7 +869,7 @@
 
       END FUNCTION PlotObservedErrorBars
 
-      LOGICAL FUNCTION PlotDifferenceErrorBars
+      LOGICAL FUNCTION PlotDifferenceErrorBars()
 !
 ! This function retrieves the value of the 'plot difference error bars' checkbox in the plot options panel
 !
@@ -890,7 +890,7 @@
       END FUNCTION PlotDifferenceErrorBars
 
 
-      REAL FUNCTION PlotEsdMultiplier
+      REAL FUNCTION PlotEsdMultiplier()
 !
 ! This function retrieves the value of the 'plot error multiplier field' checkbox in the plot options panel
 !
@@ -910,7 +910,7 @@
 !
 !*****************************************************************************
 !
-      LOGICAL FUNCTION PlotBackground
+      LOGICAL FUNCTION PlotBackground()
 !
 ! This function retrieves the value of the 'plot background' checkbox in the plot options panel
 !
@@ -933,7 +933,7 @@
 !
 !*****************************************************************************
 !
-      LOGICAL FUNCTION ConnectPointsObs
+      LOGICAL FUNCTION ConnectPointsObs()
 
 ! .TRUE. = when drawing the observed profile, the data points are joined by lines
 
@@ -953,7 +953,7 @@
 !
 !*****************************************************************************
 !
-      LOGICAL FUNCTION PlotPeakFitDifferenceProfile
+      LOGICAL FUNCTION PlotPeakFitDifferenceProfile()
 
 ! .TRUE. = when fitting peaks, the difference profile is plotted.
 
@@ -973,7 +973,7 @@
 !
 !*****************************************************************************
 !
-      LOGICAL FUNCTION SaveCSSR
+      LOGICAL FUNCTION SaveCSSR()
 
 ! When .TRUE., a file in .cssr format is written out for each SA solution
 
@@ -1034,7 +1034,7 @@
 !
 !*****************************************************************************
 !
-      LOGICAL FUNCTION SaveCCL
+      LOGICAL FUNCTION SaveCCL()
 
 ! When .TRUE., a file in .ccl format is written out for each SA solution
 
@@ -1092,7 +1092,7 @@
 !
 !*****************************************************************************
 !
-      LOGICAL FUNCTION SaveCIF
+      LOGICAL FUNCTION SaveCIF()
 
 ! When .TRUE., a file in .cif format is written out for each SA solution
 
@@ -1150,7 +1150,7 @@
 !
 !*****************************************************************************
 !
-      LOGICAL FUNCTION SaveRES
+      LOGICAL FUNCTION SaveRES()
 
 ! When .TRUE., a file in .res format is written out for each SA solution
 
@@ -1381,7 +1381,7 @@
 
       REAL, INTENT (IN   ) :: TheWaveLength
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'GLBVAR.INC'
 
       INTEGER                BackupNOBS
@@ -1501,7 +1501,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       REAL              XPF_Range
       LOGICAL                                       RangeFitYN
@@ -1775,7 +1775,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'lattice.inc'
+      INCLUDE 'Lattice.inc'
 
       LOGICAL, EXTERNAL :: FnUnitCellOK
 
@@ -1883,7 +1883,7 @@
 
       INCLUDE 'Lattice.inc'
 
-! JvdS MaxSPGR is set to 530 in 'lattice.inc'
+! JvdS MaxSPGR is set to 530 in 'Lattice.inc'
 ! Not necessary any more: with 'crystal system = unknown' eliminated,
 ! the number of possible space groups is always a subset determined by the
 ! crystal system. It's only a local variable, and it's safer this way, so just leave it for now.
@@ -2214,7 +2214,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       REAL              XPF_Range
       LOGICAL                                       RangeFitYN
@@ -2268,7 +2268,7 @@
       
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       REAL              XPF_Range
       LOGICAL                                       RangeFitYN

@@ -8,7 +8,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'GLBVAR.INC'
 
       REAL              XPF_Range
@@ -85,7 +85,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'POLY_COLOURS.INC'
+      INCLUDE 'Poly_Colours.inc'
 
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
@@ -122,8 +122,8 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
-      INCLUDE 'POLY_COLOURS.INC'
+      INCLUDE 'params.inc'
+      INCLUDE 'Poly_Colours.inc'
 
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
@@ -162,7 +162,7 @@
 
       USE WINTERACTER
 
-      INCLUDE 'POLY_COLOURS.INC'
+      INCLUDE 'Poly_Colours.inc'
 
       REAL            XPG1, XPG2, YPG1, YPG2
       COMMON /PLTINI/ XPG1, XPG2, YPG1, YPG2
@@ -204,7 +204,7 @@
      
       IMPLICIT NONE
 
-      INCLUDE 'POLY_COLOURS.INC'
+      INCLUDE 'Poly_Colours.inc'
 
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
@@ -248,8 +248,8 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
-      INCLUDE 'POLY_COLOURS.INC'
+      INCLUDE 'params.inc'
+      INCLUDE 'Poly_Colours.inc'
 
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
@@ -272,9 +272,9 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'GLBVAR.INC'
-      INCLUDE 'POLY_COLOURS.INC'
+      INCLUDE 'Poly_Colours.inc'
 
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
@@ -343,9 +343,9 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'GLBVAR.INC'
-      INCLUDE 'POLY_COLOURS.INC'
+      INCLUDE 'Poly_Colours.inc'
 
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
@@ -466,9 +466,9 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'GLBVAR.INC'
-      INCLUDE 'POLY_COLOURS.INC'
+      INCLUDE 'Poly_Colours.inc'
 
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
@@ -622,8 +622,8 @@
   !C
   !C    IMPLICIT NONE
   !C
-  !C    INCLUDE 'PARAMS.INC'
-  !C    INCLUDE 'POLY_COLOURS.INC'
+  !C    INCLUDE 'params.inc'
+  !C    INCLUDE 'Poly_Colours.inc'
   !C
   !C    REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
   !C                     XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &

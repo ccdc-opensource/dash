@@ -39,7 +39,7 @@
       WRITE(tFileHandle,'(A)',ERR=999) "  Date = "//DateStr(1:tLen)
       CALL SelectDASHDialog(IDD_SAW_Page1)
       CALL DASHWDialogGetString(IDF_SA_Project_Name,tSDIFile)
-      WRITE(tFileHandle,'("  SDI file = ",A)',ERR=999) tSDIFile(1:LEN_TRIM(tSDIFile))
+      WRITE(tFileHandle,'("  SDI file = ",A)',ERR=999) TRIM(tSDIFile)
 ! Profile range (including maximum resolution), wavelength, unit cell parameters, zero point
       CALL SelectDASHDialog(IDD_SA_Modal_input2)
       kk = 0
@@ -125,10 +125,10 @@
           MaxMovesStr(ilen-7:ilen+3) = MaxMovesStr(ilen-8:ilen+2)
           MaxMovesStr(ilen-8:ilen-8) = ','
         ENDIF
-        WRITE(tFileHandle,'("  Maximum number of moves per run = ",A)',ERR=999) MaxMovesStr(1:LEN_TRIM(MaxMovesStr))
+        WRITE(tFileHandle,'("  Maximum number of moves per run = ",A)',ERR=999) TRIM(MaxMovesStr)
         CALL DASHWDialogGetReal(IDF_SA_ChiTest,R)
-        WRITE(tFileHandle,'("  A run will stop when the profile chi² is less than ",   &
-                F6.2," · ",F7.3," = ",F8.4)',ERR=999) R, PAWLEYCHISQ, R*PAWLEYCHISQ
+        WRITE(tFileHandle,123,ERR=999) R, PAWLEYCHISQ, R*PAWLEYCHISQ
+123     FORMAT('  A run will stop when the profile chi² is less than ',F6.2,' · ',F7.3,' = ',F8.4)
       ENDIF
       CLOSE(tFileHandle)
       CALL PopActiveWindowID
@@ -166,7 +166,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'Lattice.inc'
 
       INTEGER, INTENT(IN) :: HydrogenTreatment

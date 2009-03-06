@@ -10,7 +10,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'GLBVAR.INC'
 
       LOGICAL           LOG_HYDROGENS
@@ -149,7 +149,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       INTEGER                  OFBN_Len
       CHARACTER(MaxPathLength)           OutputFilesBaseName
@@ -342,7 +342,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       INTEGER         nvar, NS, NT, iSeed1, iSeed2
       COMMON /sapars/ nvar, NS, NT, iSeed1, iSeed2

@@ -35,7 +35,7 @@
       EXTERNAL PCXX, PFXX, MAGROU, CALROU
       CHARACTER*10 filnmr
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
@@ -124,7 +124,7 @@
       LOGICAL         RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
       COMMON /REFIPR/ RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
 
-      INCLUDE 'REFLNS.INC'
+      INCLUDE 'Reflns.inc'
 
       INTEGER         NSOURC, JSOURC, KSOURC, NDASOU,    METHOD
       INTEGER         NPFSOU
@@ -479,7 +479,7 @@
 !A i.e. whether this reflection is near enough to this intensity to contribute
 !A to it.
 !
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       PARAMETER (NW=4)
       CHARACTER*4 WDCN03(NW)
@@ -560,7 +560,7 @@
       CHARACTER*4 PWD
       LOGICAL         RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
       COMMON /REFIPR/ RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
-      INCLUDE 'REFLNS.INC'
+      INCLUDE 'Reflns.inc'
 
       INTEGER         NSOURC, JSOURC, KSOURC, NDASOU,    METHOD
       INTEGER         NPFSOU
@@ -1059,7 +1059,7 @@
 !X   For use with PFCN03 constant wavelength data with finite detector height
 !C 19B
 !H
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       LOGICAL NEAR90
       COMPLEX CFFT, DFFT, DDT, CFF
@@ -1104,7 +1104,7 @@
       REAL            ZARGK,         ZXDEL
       COMMON /REFLNZ/ ZARGK(MFCSTO), ZXDEL(MFCSTO)
 
-      INCLUDE 'REFLNS.INC'
+      INCLUDE 'Reflns.inc'
 
       INTEGER         NSOURC, JSOURC, KSOURC, NDASOU,    METHOD
       INTEGER         NPFSOU

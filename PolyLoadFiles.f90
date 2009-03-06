@@ -5,7 +5,7 @@
 !
 !*****************************************************************************
 !
-      INTEGER FUNCTION DiffractionFileBrowse
+      INTEGER FUNCTION DiffractionFileBrowse()
 !
 ! This routine lets the user browse a directory for a diffraction file.
 ! If a valid file has been selected, it will be opened automatically.
@@ -128,9 +128,9 @@
 
       CHARACTER*(*), INTENT (INOUT) :: TheFileName
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'GLBVAR.INC'
-      INCLUDE 'lattice.inc'
+      INCLUDE 'Lattice.inc'
       INCLUDE 'statlog.inc'
 
       INTEGER          NOBS
@@ -319,7 +319,7 @@
       CHARACTER*(*), INTENT (IN   ) :: TheFileName
       LOGICAL,       INTENT (  OUT) :: ESDsFilled
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'GLBVAR.INC'
 
       INTEGER          NOBS
@@ -328,7 +328,7 @@
 
       INTEGER, EXTERNAL :: GetNumOfColumns
       REAL, EXTERNAL :: FnWavelengthOfMenuOption
-      LOGICAL, EXTERNAL :: StrFind
+      INTEGER, EXTERNAL :: StrFind
       CHARACTER*255 tString ! String containing last line read from file
       CHARACTER*255 tSubString, Cline
       INTEGER       tLen, NumOfBins, NumOfBinsFile
@@ -582,7 +582,7 @@
       CHARACTER*(*), INTENT (IN   ) :: TheFileName
       LOGICAL,       INTENT (  OUT) :: ESDsFilled
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'GLBVAR.INC'
 
       INTEGER          NOBS
@@ -732,7 +732,7 @@
       CHARACTER*(*), INTENT (IN   ) :: TheFileName
       LOGICAL,       INTENT (  OUT) :: ESDsFilled
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'GLBVAR.INC'
 
       INTEGER          NOBS
@@ -865,7 +865,7 @@
       CHARACTER*(*), INTENT (IN   ) :: TheFileName
       LOGICAL,       INTENT (  OUT) :: ESDsFilled
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'GLBVAR.INC'
 
       INTEGER          NOBS
@@ -1024,7 +1024,7 @@
       CHARACTER*(*), INTENT (IN   ) :: TheFileName
       LOGICAL,       INTENT (  OUT) :: ESDsFilled
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'GLBVAR.INC'
 
       INTEGER          NOBS
@@ -1145,7 +1145,7 @@
       CHARACTER*(*), INTENT (IN   ) :: TheFileName
       LOGICAL,       INTENT (  OUT) :: ESDsFilled
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'GLBVAR.INC'
 
       INTEGER          NOBS
@@ -1386,9 +1386,9 @@
 ! (This should be in the documentation!)
 ! As a result, the ESD must always be either read in or calculated per line.
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'GLBVAR.INC'
-      INCLUDE 'lattice.inc'
+      INCLUDE 'Lattice.inc'
 
       INTEGER          NOBS
       REAL                         XOBS,       YOBS,       EOBS
@@ -1698,7 +1698,7 @@
       CHARACTER*(*), INTENT (IN   ) :: TheFileName
       LOGICAL,       INTENT (  OUT) :: ESDsFilled
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'GLBVAR.INC'
 
       INTEGER          NOBS
@@ -1897,7 +1897,7 @@
       CHARACTER*(*), INTENT (IN   ) :: TheFileName
       LOGICAL,       INTENT (  OUT) :: ESDsFilled
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'GLBVAR.INC'
 
       INTEGER          NOBS
@@ -2185,9 +2185,9 @@
       CHARACTER*(*), INTENT (IN   ) :: TheFileName
       LOGICAL,       INTENT (  OUT) :: ESDsFilled
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'GLBVAR.INC'
-      INCLUDE 'lattice.inc'
+      INCLUDE 'Lattice.inc'
 
       INTEGER          NOBS
       REAL                         XOBS,       YOBS,       EOBS
@@ -2301,9 +2301,9 @@
       CHARACTER*(*), INTENT (IN   ) :: TheFileName
       LOGICAL,       INTENT (  OUT) :: ESDsFilled
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'GLBVAR.INC'
-      INCLUDE 'lattice.inc'
+      INCLUDE 'Lattice.inc'
 
       INTEGER          NOBS
       REAL                         XOBS,       YOBS,       EOBS
@@ -2472,7 +2472,7 @@
       REAL, INTENT (INOUT) :: TheMin2Theta
       REAL, INTENT (INOUT) :: TheMax2Theta
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       INTEGER          NOBS
       REAL                         XOBS,       YOBS,       EOBS
@@ -2518,7 +2518,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
@@ -2586,7 +2586,7 @@
 !
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'statlog.inc'
 
       INTEGER          NOBS

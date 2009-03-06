@@ -14,7 +14,7 @@
       REAL,    INTENT (  OUT) :: CHIVAL
       INTEGER, INTENT (IN   ) :: CurrentParameter
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'Lattice.inc'
 
       REAL            X_init,       x_unique,       lb,       ub
@@ -350,7 +350,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       INTEGER         NATOM
       REAL                   Xato

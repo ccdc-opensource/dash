@@ -6,7 +6,7 @@
 !
       REAL FUNCTION FFCALC_001(IR)                  ! P 1
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
       REAL C3F, S3F, XCC, XSC, XCS, XSS, CCC, CSS, SCS, SSC, SCC, CSC, CCS, SSS
 
@@ -41,7 +41,7 @@
 !
       REAL FUNCTION FFCALC_002(IR)                  ! P -1
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
       REAL C3F, S3F, CCC, CSS, SCS, SSC
 
@@ -66,7 +66,7 @@
 !
       REAL FUNCTION FFCALC_039(IR)                  ! P 1 21 1
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
       AFCAL = 0.0
       BFCAL = 0.0
@@ -96,7 +96,7 @@
 !
       REAL FUNCTION FFCALC_040(IR)                  ! C 1 2 1
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
       AFCAL = 0.0
       BFCAL = 0.0
@@ -117,7 +117,7 @@
 !
       REAL FUNCTION FFCALC_044(IR)                  ! P 1 c 1
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
       AFCAL = 0.0
       BFCAL = 0.0
@@ -147,7 +147,7 @@
 !
       REAL FUNCTION FFCALC_045(IR)                  ! P 1 n 1
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
       AFCAL = 0.0
       BFCAL = 0.0
@@ -177,7 +177,7 @@
 !
       REAL FUNCTION FFCALC_046(IR)                  ! P 1 a 1
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
       AFCAL = 0.0
       BFCAL = 0.0
@@ -207,7 +207,7 @@
 !
       REAL FUNCTION FFCALC_050(IR)                  ! C 1 c 1
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
       AFCAL = 0.0
       BFCAL = 0.0
@@ -237,7 +237,7 @@
 !
       REAL FUNCTION FFCALC_052(IR)                  ! I 1 a 1
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
       AFCAL = 0.0
       BFCAL = 0.0
@@ -267,7 +267,7 @@
 !
       REAL FUNCTION FFCALC_057(IR)                  ! P 1 21/m 1
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
       AFCAL = 0.0
       IH = iHKL(1,IR)
@@ -292,7 +292,7 @@
 !
       REAL FUNCTION FFCALC_058(IR)                  ! C 1 2/m 1
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
       AFCAL = 0.0
       IH = iHKL(1,IR)
@@ -310,7 +310,7 @@
 !
       REAL FUNCTION FFCALC_061(IR)                  ! P 1 2/c 1
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
       AFCAL = 0.0
       IH = iHKL(1,IR)
@@ -335,7 +335,7 @@
 !
       REAL FUNCTION FFCALC_062(IR)                  ! P 1 2/n 1
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
       AFCAL = 0.0
       IH = iHKL(1,IR)
@@ -360,7 +360,7 @@
 !
       REAL FUNCTION FFCALC_063(IR)                  ! P 1 2/a 1
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
       AFCAL = 0.0
       IH = iHKL(1,IR)
@@ -385,7 +385,7 @@
 !
       REAL FUNCTION FFCALC_064(IR)                  ! P 1 21/c 1
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
       AFCAL = 0.0
       IH = iHKL(1,IR)
@@ -410,7 +410,7 @@
 !
       REAL FUNCTION FFCALC_065(IR)                  ! P 1 21/n 1
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
       AFCAL = 0.0
       IH = iHKL(1,IR)
@@ -435,7 +435,7 @@
 !
       REAL FUNCTION FFCALC_066(IR)                  ! P 1 21/a 1
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
       AFCAL = 0.0
       IH = iHKL(1,IR)
@@ -460,7 +460,7 @@
 !
       REAL FUNCTION FFCALC_067(IR)                  ! C 1 2/c 1
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
       AFCAL = 0.0
       IH = iHKL(1,IR)
@@ -485,7 +485,7 @@
 !
       REAL FUNCTION FFCALC_069(IR)                  ! I 1 2/a 1
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
       AFCAL = 0.0
       IH = iHKL(1,IR)
@@ -510,7 +510,7 @@
 !
       REAL FUNCTION FFCALC_081(IR)                  ! P 1 1 b
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
       AFCAL = 0.0
       BFCAL = 0.0
@@ -540,7 +540,7 @@
 !
       REAL FUNCTION FFCALC_112(IR)                  ! P 21 21 2
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
       AFCAL = 0.0
       BFCAL = 0.0
@@ -566,7 +566,7 @@
 !
       REAL FUNCTION FFCALC_115(IR)                  ! P 21 21 21
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
       AFCAL = 0.0
       BFCAL = 0.0
@@ -602,7 +602,7 @@
 !
       REAL FUNCTION FFCALC_116(IR)                  ! C 2 2 21
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
       AFCAL = 0.0
       BFCAL = 0.0
@@ -628,7 +628,7 @@
 !
       REAL FUNCTION FFCALC_143(IR)                  ! P c a 21
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
       AFCAL = 0.0
       BFCAL = 0.0
@@ -664,7 +664,7 @@
 !
       REAL FUNCTION FFCALC_164(IR)                  ! P n a 21
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
       AFCAL = 0.0
       BFCAL = 0.0
@@ -700,7 +700,7 @@
 !
       REAL FUNCTION FFCALC_176(IR)                  ! C m c 21
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
       AFCAL = 0.0
       BFCAL = 0.0
@@ -726,7 +726,7 @@
 !
       REAL FUNCTION FFCALC_212(IR)                  ! F d d 2
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
 ! Note the use here of a prefactor of '2' for logrefs of 1 and 3
 ! to take into account the double weighting of these SF expression
@@ -782,7 +782,7 @@
 !
       REAL FUNCTION FFCALC_266(IR)                  ! P c c n
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
       AFCAL = 0.0
       IH = iHKL(1,IR)
@@ -813,7 +813,7 @@
 !
       REAL FUNCTION FFCALC_269(IR)                  ! P b c m
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
       AFCAL = 0.0
       IH = iHKL(1,IR)
@@ -844,7 +844,7 @@
 !
       REAL FUNCTION FFCALC_284(IR)                  ! P b c n
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
       AFCAL = 0.0
       IH = iHKL(1,IR)
@@ -875,7 +875,7 @@
 !
       REAL FUNCTION FFCALC_290(IR)                  ! P b c a
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
       AFCAL = 0.0
       IH = iHKL(1,IR)
@@ -906,7 +906,7 @@
 !
       REAL FUNCTION FFCALC_292(IR)                  ! P n m a
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
       AFCAL = 0.0
       IH = iHKL(1,IR)
@@ -937,7 +937,7 @@
 !
       REAL FUNCTION FFCALC_298(IR)                  ! C m c m
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
       AFCAL = 0.0
       IH = iHKL(1,IR)
@@ -960,7 +960,7 @@
 !
       REAL FUNCTION FFCALC_304(IR)                  ! C m c a
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
       AFCAL = 0.0
       IH = iHKL(1,IR)
@@ -983,7 +983,7 @@
 !
       REAL FUNCTION FFCALC_356(IR)                  ! I-4
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
       AFCAL = 0.0
       BFCAL = 0.0
@@ -1010,7 +1010,7 @@
 !
       REAL FUNCTION FFCALC_360(IR)
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
 ! Structure factor calculations for space group P 4/n (origin choice 2, inversion at origin)
       AFCAL = 0.0
@@ -1058,7 +1058,7 @@
 !
       REAL FUNCTION FFCALC_362(IR)
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
 ! Structure factor calculations for space group P 42/n (origin choice 2, inversion at origin)
       AFCAL = 0.0
@@ -1142,7 +1142,7 @@
 !
       REAL FUNCTION FFCALC_365(IR)
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
 ! Structure factor calculations for space group I 41/a (origin choice 2)
       AFCAL = 0.0
@@ -1226,7 +1226,7 @@
 !
       REAL FUNCTION FFCALC_369(IR)                  ! P 41 21 2
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
       AFCAL = 0.0
       BFCAL = 0.0
@@ -1294,7 +1294,7 @@
 !
       REAL FUNCTION FFCALC_391(IR)                  ! P -4 21 c
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
       AFCAL = 0.0
       BFCAL = 0.0
@@ -1328,7 +1328,7 @@
 !
       REAL FUNCTION FFCALC_430(IR)                  ! P 3
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
       AFCAL = 0.0
       BFCAL = 0.0
@@ -1358,7 +1358,7 @@
 !
       REAL FUNCTION FFCALC_431(IR)                  ! P 31
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
       AFCAL = 0.0
       BFCAL = 0.0
@@ -1385,7 +1385,7 @@
 !
       REAL FUNCTION FFCALC_432(IR)                  ! P 32
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
       AFCAL = 0.0
       BFCAL = 0.0
@@ -1412,7 +1412,7 @@
 !
       REAL FUNCTION FFCALC_433(IR)                  ! R 3, hexagonal axes
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
       AFCAL = 0.0
       BFCAL = 0.0
@@ -1442,7 +1442,7 @@
 !
       REAL FUNCTION FFCALC_434(IR)                  ! P -3
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
       AFCAL = 0.0
       IH = iHKL(1,IR)
@@ -1470,7 +1470,7 @@
 !
       REAL FUNCTION FFCALC_435(IR)                  ! R -3, hexagonal axes
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
       AFCAL = 0.0
       IH = iHKL(1,IR)
@@ -1498,7 +1498,7 @@
 !
       REAL FUNCTION FFCALC_449(IR)
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
 ! Structure factor calculations for space group P-31m
       AFCAL = 0.0
@@ -1537,7 +1537,7 @@
 !
       REAL FUNCTION FFCALC_451(IR)
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
 ! Structure factor calculations for space group P-3m1
       AFCAL = 0.0
@@ -1576,7 +1576,7 @@
 !
       REAL FUNCTION FFCALC_462(IR)                  ! P 6
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
       AFCAL = 0.0
       BFCAL = 0.0
@@ -1602,7 +1602,7 @@
 !
       REAL FUNCTION FFCALC_468(IR)                  ! P -6
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
       AFCAL = 0.0
       BFCAL = 0.0
@@ -1631,7 +1631,7 @@
 !
       REAL FUNCTION FFCALC_469(IR)
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
 ! Structure factor calculations for space group P6/m
       AFCAL = 0.0
@@ -1655,7 +1655,7 @@
 !
       REAL FUNCTION FFCALC_471(IR)
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
 ! Structure factor calculations for space group P622
       AFCAL = 0.0
@@ -1688,7 +1688,7 @@
 !
       REAL FUNCTION FFCALC_481(IR)
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
 ! Structure factor calculations for space group P-6m2
       AFCAL = 0.0
@@ -1728,7 +1728,7 @@
 !
       REAL FUNCTION FFCALC_483(IR)                  ! P -6 2 m
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
       AFCAL = 0.0
       BFCAL = 0.0
@@ -1767,7 +1767,7 @@
 !
       REAL FUNCTION FFCALC_485(IR)
 
-      INCLUDE 'SGinc\FFCALCTOP.inc'
+      INCLUDE 'SGinc/ffcalctop.inc'
 
 ! Structure factor calculations for space group P6/mmm
       AFCAL = 0.0

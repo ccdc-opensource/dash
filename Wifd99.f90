@@ -182,7 +182,7 @@
 !
       DIMENSION ALSQ(MATSZ)
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       PARAMETER (IREFSM=2000)
       COMMON /HCVCMN/ LCV, ICORL(15,IREFSM), ICLUMP(IREFSM)
@@ -239,7 +239,7 @@
       LOGICAL         RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
       COMMON /REFIPR/ RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
 
-      INCLUDE 'REFLNS.INC'
+      INCLUDE 'Reflns.inc'
       COMMON /SCRACH/ MESSAG, NAMFIL
       CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
       EQUIVALENCE (ICARD,MESSAG)
@@ -316,7 +316,7 @@
 
       USE REFVAR
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       INTEGER IB(2001)
       REAL HESSY(50,50), COVARY(50,50)
@@ -329,7 +329,7 @@
       LOGICAL                                                                          PHMAG
       COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
 
-      INCLUDE 'REFLNS.INC'
+      INCLUDE 'Reflns.inc'
 
       PARAMETER (IREFSM=2000)
 
@@ -486,7 +486,7 @@
 !
       SUBROUTINE XXLUDCMP(A,N,NP,INDX,D)
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       PARAMETER (TINY=1.0E-20)
       DIMENSION A(NP,NP), INDX(N), VV(MVAR)
@@ -554,8 +554,8 @@
       SUBROUTINE XDELPR
 ! Calculates the value of XPKDEL for each reflection
 
-      INCLUDE 'PARAMS.INC'
-      INCLUDE 'REFLNS.INC'
+      INCLUDE 'params.inc'
+      INCLUDE 'Reflns.inc'
 
       REAL            ZARGK,         ZXDEL
       COMMON /REFLNZ/ ZARGK(MFCSTO), ZXDEL(MFCSTO)
@@ -593,7 +593,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       REAL            ARGI, YNORM, PKFNSP
       INTEGER                                       KPFNSP

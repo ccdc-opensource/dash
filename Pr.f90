@@ -167,7 +167,7 @@
 !H Like ADJUST, but special to deal with family 4, genus 2
 !A On entry PAR is the parameter to be updated
 !
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       COMMON /F4PARS/ NGEN4(9,5), F4VAL(3,MF4PAR), F4PAR(3,MF4PAR),     &
      &                KF4PAR(3,MF4PAR), F4PESD(3,MF4PAR), KOM6
@@ -204,7 +204,7 @@
 !O Puts this printing in lines for everything except family 2 parameters,
 !O    and in clumps per atom for family 2
 !
-      INCLUDE "PARAMS.INC"
+      INCLUDE "params.inc"
       
       EXTERNAL PCXX, PFXX, MAGSHF
       LOGICAL SHFCEL, HEAD, NPROP
@@ -588,7 +588,7 @@
 ! IF IBACK .GT. 0 THEN BACKGROUND REFINEMENT IS REQUIRED
 !
 !
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
@@ -823,7 +823,7 @@
       LOGICAL TESTOV
       COMPLEX FCALC
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       DIMENSION DERIVA(MaxVVar), CDERS(6), DERIV4(5)
 
@@ -937,7 +937,7 @@
       EQUIVALENCE (MODER,MODERR(1))
       LOGICAL         RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
       COMMON /REFIPR/ RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
-      INCLUDE 'REFLNS.INC'
+      INCLUDE 'Reflns.inc'
 
       INTEGER         NSOURC, JSOURC, KSOURC, NDASOU,    METHOD
       INTEGER         NPFSOU
@@ -1169,7 +1169,7 @@
 !
       EXTERNAL PCXX, PFXX
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       LOGICAL CONT, EXCLD
       DIMENSION TEMP(6)
@@ -1217,7 +1217,7 @@
 
       COMMON /PRSTAT/ SMYC, SMYD, SMYO, SMIO, SMID, SMWYOS, IZCT, P5,   &
      &                IOP1, IOP2, KMI(9), KMA(9)
-      INCLUDE 'REFLNS.INC'
+      INCLUDE 'Reflns.inc'
 
       INTEGER         NSOURC, JSOURC, KSOURC, NDASOU,    METHOD
       INTEGER         NPFSOU
@@ -1343,7 +1343,7 @@
 !O Writes the original matrix to a file whose name is requested interactively,
 !O and whose default extension is .IHM.
 !
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       
       DIMENSION ALSQ(MATSZ)
       DIMENSION A(MaxBVar,MaxBVar), D(MaxBVar), E(MaxBVar)
@@ -1503,7 +1503,7 @@
 !H Multiple entry routine to deal with all aspects of extinction corrections
 !H  for profile refinement
 !
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       
       REAL            STHMXX,    STHL, SINTH, COSTH, SSQRD, TWSNTH,    DSTAR2, TWOTHD
       COMMON /BRAGG / STHMXX(5), STHL, SINTH, COSTH, SSQRD, TWSNTH(5), DSTAR2, TWOTHD(5)
@@ -1604,7 +1604,7 @@
 !C 19B
 !H Multiple entry subroutine for CAIL, SAPS operations
 !
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       EXTERNAL PCXX, PFXX
       DIMENSION KK1(2), AM(2), BM(2), IH(3), SUMPKN(5)
@@ -1668,7 +1668,7 @@
       EQUIVALENCE (MODER,MODERR(1))
       LOGICAL         RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
       COMMON /REFIPR/ RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
-      INCLUDE 'REFLNS.INC'
+      INCLUDE 'Reflns.inc'
       COMMON /SLAKDA/ NSLAK(4), SLKSWD(4), SLAKWT(4), CHISQD(4), ISLKTP,&
      &                NSKTOT, KOM24
       CHARACTER*10 CONTYP(5)
@@ -2002,7 +2002,7 @@
 !
       EXTERNAL PCXX
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       DIMENSION ALSQ(MATSZ)
       DIMENSION IH(3), ADIAG(MaxBVar), ICOV(30)
@@ -2071,7 +2071,7 @@
       EQUIVALENCE (MODER,MODERR(1))
       LOGICAL         RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
       COMMON /REFIPR/ RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
-      INCLUDE 'REFLNS.INC'
+      INCLUDE 'Reflns.inc'
       COMMON /SCRACH/ MESSAG, NAMFIL
       CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
       EQUIVALENCE (ICARD,MESSAG)
@@ -2270,7 +2270,7 @@
 !
       EXTERNAL PCXX, PFXX
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       LOGICAL ENDIP
       DIMENSION INOBS(10), NN(10), ISCR(2)
@@ -2328,7 +2328,7 @@
       LOGICAL         RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
       COMMON /REFIPR/ RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
       
-      INCLUDE 'REFLNS.INC'
+      INCLUDE 'Reflns.inc'
       COMMON /SCRACH/ MESSAG, NAMFIL
       CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
       EQUIVALENCE (ICARD,MESSAG)
@@ -2737,7 +2737,7 @@
 !CD If called from PICTIC, interprets only the 5 cards:
 !CD    RTYP, PKCN, ZERO WVLN, THE2
 !
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       EXTERNAL PCXX, PFXX
       CHARACTER*2 INEX(2)
@@ -2985,7 +2985,7 @@
       COMPLEX FCALC, FCAL
       EXTERNAL PCXX, PFXX
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       DIMENSION IH(3), H(3), TEMREF(3,ITMREF), IORDER(ITMREF),          &
      &          TEMMUL(ITMREF), ARG(ITMREF), TF4P(6,ITMREF), TEMP(6),   &
@@ -3058,7 +3058,7 @@
       EQUIVALENCE (MODER,MODERR(1))
       LOGICAL         RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
       COMMON /REFIPR/ RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
-      INCLUDE 'REFLNS.INC'
+      INCLUDE 'Reflns.inc'
 
       REAL            ZARGK,         ZXDEL
       COMMON /REFLNZ/ ZARGK(MFCSTO), ZXDEL(MFCSTO)
@@ -3443,7 +3443,7 @@
 !D Sets CYC1 for "this is cycle 1" (CYC1 is thus also .TRUE. if this is
 !D the pre-cycle for SAPS or APES.)
 !
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       COMMON /CONSTR/ JCONST, JROWPT(301), JCMAT(200), AMOUNT(200), NEXTJ
       COMMON /F4PARS/ NGEN4(9,5), F4VAL(3,MF4PAR), F4PAR(3,MF4PAR),     &
@@ -3492,7 +3492,7 @@
       EQUIVALENCE (MODER,MODERR(1))
       LOGICAL         RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
       COMMON /REFIPR/ RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
-      INCLUDE 'REFLNS.INC'
+      INCLUDE 'Reflns.inc'
 
       INTEGER         NSOURC, JSOURC, KSOURC, NDASOU,    METHOD
       INTEGER         NPFSOU
@@ -3633,7 +3633,7 @@
 !D Sets up the packing of IFAM, IGEN, ISPC, PHASE, SOURCE  into one integer
 !D Sets up the permanent fix, vary and constraint lists
 !
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       EXTERNAL PFXX, PCXX
       EXTERNAL F2PARS
       EXTERNAL PRPARS
@@ -3846,7 +3846,7 @@
 !
       EXTERNAL PCXX, PFXX, MAGSHF
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       CHARACTER*4 WORD, CHANGE(13)
       INTEGER         ICRYDA, NTOTAL,    NYZ, NTOTL, INREA,       ICDN,       IERR, IO10
@@ -3887,7 +3887,7 @@
       EQUIVALENCE (MODER,MODERR(1))
       LOGICAL         RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
       COMMON /REFIPR/ RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
-      INCLUDE 'REFLNS.INC'
+      INCLUDE 'Reflns.inc'
       COMMON /SCRACH/ MESSAG, NAMFIL
       CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
       EQUIVALENCE (ICARD,MESSAG)
@@ -4173,7 +4173,7 @@
 !D      conventional observations and calculated functions;  makes basic
 !D      variable derivatives, gets weights, and adds totals in to LSQ matrix.
 !
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       LOGICAL PRNCYC
       DIMENSION ALSQ(MATSZ)
@@ -4339,7 +4339,7 @@
 !N Used to be entries 1,3,4 of PFXX
 !
 !
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       CHARACTER*4 WORD
       INTEGER         ICRYDA, NTOTAL,    NYZ, NTOTL, INREA,       ICDN,       IERR, IO10
@@ -4607,7 +4607,7 @@
 !A           N is the required phase number.
 !
 !
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       COMMON /ATNAM / ATNAME(MaxAtm_3), ATNA(MaxAtm_3,9)
       CHARACTER*4 ATNA, ATNAME
@@ -4711,7 +4711,7 @@
       DIMENSION KOMM17(1)
       EQUIVALENCE (KOMM17(1),NATOM)
       COMMON /POSNS2/ NATO(9)
-!O      INCLUDE 'REFLNS.INC'
+!O      INCLUDE 'Reflns.inc'
 !O      DIMENSION KOMM23(1)
 !O      EQUIVALENCE (KOMM23(1),rHKL(1,1))
       COMMON /SATELL/ PROP(3), KPROP(3), KSTAB(24), NKSTAR, IPROP,      &
@@ -4899,8 +4899,8 @@
 ! ORIENTATION CORRECTION
 ! FOR SINGLE FRAME TIME OF FLIGHT LSQ ("TOF").
 !
-      INCLUDE 'PARAMS.INC'
-      INCLUDE 'REFLNS.INC'
+      INCLUDE 'params.inc'
+      INCLUDE 'Reflns.inc'
       
       DIMENSION REFHT(3,48), PHASES(48)
       REAL            STHMXX,    STHL, SINTH, COSTH, SSQRD, TWSNTH,    DSTAR2, TWOTHD
@@ -5241,8 +5241,8 @@
 !A   IRFAC= 11,12,13 as for 1,2,3 but for multiphase applications
 !
 !
-      INCLUDE 'PARAMS.INC'
-      INCLUDE 'REFLNS.INC'
+      INCLUDE 'params.inc'
+      INCLUDE 'Reflns.inc'
 
       EXTERNAL PCXX
       COMPLEX FCALC
@@ -5738,7 +5738,7 @@
 !D Sets up the COMM0N /PRBLEM with NFAM, NGENPS, NSPCPS, LF1SP, LF3SP etc
 !D then call LSETPR to set up packing of parameter names, etc
 !
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       EXTERNAL PFXX, PCXX, MAGSET
       COMMON /F4PARS/ NGEN4(9,5), F4VAL(3,MF4PAR), F4PAR(3,MF4PAR),     &
@@ -5905,7 +5905,7 @@
 !
       EXTERNAL PCXX, PFXX
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       REAL            STHMXX,    STHL, SINTH, COSTH, SSQRD, TWSNTH,    DSTAR2, TWOTHD
       COMMON /BRAGG / STHMXX(5), STHL, SINTH, COSTH, SSQRD, TWSNTH(5), DSTAR2, TWOTHD(5)
@@ -6104,7 +6104,7 @@
 !
       EXTERNAL PCXX, PFXX
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       REAL            STHMXX,    STHL, SINTH, COSTH, SSQRD, TWSNTH,    DSTAR2, TWOTHD
       COMMON /BRAGG / STHMXX(5), STHL, SINTH, COSTH, SSQRD, TWSNTH(5), DSTAR2, TWOTHD(5)
@@ -6227,7 +6227,7 @@
 !H   monochromator for constant wavelength X Ray Profile Refinement
 !
 !
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       REAL            STHMXX,    STHL, SINTH, COSTH, SSQRD, TWSNTH,    DSTAR2, TWOTHD
       COMMON /BRAGG / STHMXX(5), STHL, SINTH, COSTH, SSQRD, TWSNTH(5), DSTAR2, TWOTHD(5)
@@ -6353,7 +6353,7 @@
 !N need the distinction, a function name MAGxxx is used as an argument.  But
 !N this is called from VARMAK, and at present it is easier done this way.
 !
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       REAL            DERIVB
       INTEGER                          LVARB

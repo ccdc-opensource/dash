@@ -13,7 +13,7 @@
       COMMON /BATEXE/ in_batch
 
       INTEGER NumbLicencePath
-      CHARACTER*(MaxPathLength) LicencePaths(3)
+      CHARACTER(MaxPathLength) LicencePaths(3)
       COMMON /LICENCELOC/ NumbLicencePath, LicencePaths
 
       CHARACTER*2 Exp
@@ -82,7 +82,7 @@
       LOGICAL, INTENT(IN   ) :: TillValid
 
       INTEGER NumbLicencePath
-      CHARACTER*(MaxPathLength) LicencePaths(3)
+      CHARACTER(MaxPathLength) LicencePaths(3)
       COMMON /LICENCELOC/ NumbLicencePath, LicencePaths
 
       LOGICAL exists
@@ -145,7 +145,7 @@
       LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
       LOGICAL     INLOOP
       INTEGER     ICode
-      CHARACTER*MaxPathLength ClString
+      CHARACTER(MaxPathLength) ClString
       TYPE (License_Info) Info
 
       INLOOP = .TRUE.
@@ -248,7 +248,7 @@
       CALL WSelectFile(fstr, iFlags, fname_2, "Please enter a filename", iDummy)
       IF (LEN_TRIM(fname_2) .LE. 0 .OR. fname_2 .EQ. AllUsersProfileDirectory) RETURN
       OPEN(UNIT = Iun, FILE=TRIM(fname_2), STATUS='unknown', ERR=99)
-      Sn = Get_DiskSerialNumber("C:\\"C)
+      Sn = Get_DiskSerialNumber("C:\\"//CHAR(0))
       WRITE(Iun,'(A)',ERR=100) 'This file is provided to submit requests for '//ProgramVersion//' licences.'
       WRITE(Iun,'(A)',ERR=100) 'A DASH evaluation licence will allow you to run DASH on any PC.'
       WRITE(Iun,'(A)',ERR=100) 'A site licence will allow you to install DASH on any PC on your own site.'
@@ -455,9 +455,9 @@
       INTEGER a, b, c, d
       INTEGER n 
       INTEGER sum
-      INTEGER :: delta = 16#9E3779B9
+      INTEGER :: delta = Z'9E3779B9'
 
-      sum = 16#C6EF3720
+      sum = Z'C6EF3720'
       n = 32
       y = v(1)
       z = v(2)
@@ -497,7 +497,7 @@
       READ(LString,'(2Z8,Z4)',ERR = 99) v(1), v(2), checksum
       cs = IEOR(v(1),v(2))
 ! ### Version dependent lines
-      cs = IEOR(cs,16#BBCB)
+      cs = IEOR(cs,Z'BBCB')
 ! Check the checksum
       IF (tCheckSum .NE. checksum) THEN
 ! If the checksum is invalid, then that's the end of our checks.
@@ -519,7 +519,7 @@
 ! For node-locked licences check the serial id. Site-Wide licences just encode a serial id for our reference
 ! so if we catch any non-authorized users using the key, we know where it came from. Perhaps we may want to make
 ! the user key in this site code on installation for checking purposes.
-        IF (Info%SerialNumber .NE. Get_DiskSerialNumber("C:\\"C)) Info%Valid = -4
+        IF (Info%SerialNumber .NE. Get_DiskSerialNumber("C:\\"//CHAR(0))) Info%Valid = -4
       ENDIF
       RETURN
    99 Info%Valid = -2
@@ -538,7 +538,7 @@
       INTEGER y,  z
       INTEGER a, b, c, d
       INTEGER n, sum
-      INTEGER :: delta = 16#9E3779B9
+      INTEGER :: delta = Z'9E3779B9'
 
       n = 32
       y = v(1)
@@ -622,16 +622,18 @@
       ! This is necessary because otherwise the site-licence file would be copyable
       ! and work on every machine.
       IF (Info%LicenceType .EQ. SiteKey) THEN
-        v(1) = Get_DiskSerialNumber("C:\\"C)
+        v(1) = Get_DiskSerialNumber("C:\\"//CHAR(0))
         v(2) = NodeKey*100000000 + Info%ExpiryDate
         CALL encipher(v, w)
         checksum = IEOR(w(1), w(2))
 ! ### Version dependent lines
         IF ( ProgramVersion(6:6) .EQ. '3' ) THEN
           IF ( ProgramVersion(8:8) .EQ. '0' ) THEN ! DASH 3.0
-            VersionDependentMangler = 16#CCDC
+            VersionDependentMangler = Z'CCDC'
           ELSE IF ( ProgramVersion(8:8) .EQ. '1' ) THEN ! DASH 3.1
-            VersionDependentMangler = 16#BBCB
+            VersionDependentMangler = Z'BBCB'
+          ELSE IF ( ProgramVersion(8:8) .EQ. '2' ) THEN ! DASH 3.2 temp
+            VersionDependentMangler = Z'BBCB'
           ENDIF
         ENDIF
         checksum = IEOR(checksum, VersionDependentMangler)

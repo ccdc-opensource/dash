@@ -49,7 +49,7 @@
 !D If SAPS and KNOW points to a reflection for which SIGS  is
 !D being refined, uses value in F4PAR(2 instead of calculated value.
 !
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
@@ -105,7 +105,7 @@
       LOGICAL         RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
       COMMON /REFIPR/ RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
 
-      INCLUDE 'REFLNS.INC'
+      INCLUDE 'Reflns.inc'
 
       INTEGER         NSOURC, JSOURC, KSOURC, NDASOU,    METHOD
       INTEGER         NPFSOU
@@ -157,7 +157,7 @@
 !D being refined, uses value in F4PAR(2) instead of calculated value.
 !
 !
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
@@ -212,7 +212,7 @@
       EQUIVALENCE (MODER,MODERR(1))
       LOGICAL         RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
       COMMON /REFIPR/ RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
-      INCLUDE 'REFLNS.INC'
+      INCLUDE 'Reflns.inc'
 
       INTEGER         NSOURC, JSOURC, KSOURC, NDASOU,    METHOD
       INTEGER         NPFSOU
@@ -282,7 +282,7 @@
 !A N=7: (Not used yet) set up to use PFXX(7)
 !P For entries 2,5, WLGTH must hold lambda, and DSTAR(KNOW) d*
 !
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       REAL            STHMXX,    STHL, SINTH, COSTH, SSQRD, TWSNTH,    DSTAR2, TWOTHD
       COMMON /BRAGG / STHMXX(5), STHL, SINTH, COSTH, SSQRD, TWSNTH(5), DSTAR2, TWOTHD(5)
@@ -317,7 +317,7 @@
       COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
                       NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
       COMMON /PRZERO/ ZEROSP(6,9,5), KZROSP(6,9,5), DKDZER(6), NZERSP(9,5)
-      INCLUDE 'REFLNS.INC'
+      INCLUDE 'Reflns.inc'
 
       INTEGER         NSOURC, JSOURC, KSOURC, NDASOU,    METHOD
       INTEGER         NPFSOU
@@ -368,7 +368,7 @@
 !P Entries 2,5 and 7 require DSTAR(KNOW)=d*
 !P Entry 6 requires ARGK=minimum tof
 !
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       
       REAL            STHMXX,    STHL, SINTH, COSTH, SSQRD, TWSNTH,    DSTAR2, TWOTHD
       COMMON /BRAGG / STHMXX(5), STHL, SINTH, COSTH, SSQRD, TWSNTH(5), DSTAR2, TWOTHD(5)
@@ -396,7 +396,7 @@
       COMMON /PRPKCN/ ARGK, PKCNSP(6,9,5), KPCNSP(6,9,5), DTDPCN(6), DTDWL, &
                       NPKCSP(9,5), ARGMIN(5), ARGMAX(5), ARGSTP(5), PCON
       COMMON /PRZERO/ ZEROSP(6,9,5), KZROSP(6,9,5), DKDZER(6), NZERSP(9,5)
-      INCLUDE 'REFLNS.INC'
+      INCLUDE 'Reflns.inc'
 
       INTEGER         NSOURC, JSOURC, KSOURC, NDASOU,    METHOD
       INTEGER         NPFSOU
@@ -466,7 +466,7 @@
 !A N=7: SAPS entry to obey FDXXXX to set up a value(s) for PKFNVA
 !
 !
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       COMMON /F4PARS/ NGEN4(9,5), F4VAL(3,MF4PAR), F4PAR(3,MF4PAR),     &
      &                KF4PAR(3,MF4PAR), F4PESD(3,MF4PAR), KOM6
@@ -516,7 +516,7 @@
 
       COMMON /PWORDS/ PWD(10,9,5)
       CHARACTER*4 PWD
-      INCLUDE 'REFLNS.INC'
+      INCLUDE 'Reflns.inc'
 
       INTEGER         NSOURC, JSOURC, KSOURC, NDASOU,    METHOD
       INTEGER         NPFSOU

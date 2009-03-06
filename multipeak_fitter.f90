@@ -5,7 +5,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       REAL              XPF_Range
       LOGICAL                                       RangeFitYN
@@ -76,7 +76,7 @@
 
       INTEGER, INTENT (  OUT) :: N
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       REAL            ZARGK,         ZXDEL
       COMMON /REFLNZ/ ZARGK(MFCSTO), ZXDEL(MFCSTO)
@@ -116,7 +116,7 @@
                       CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,             &
                       NBASF4(MPRPKF,2,9), L4END(9)
 
-      INCLUDE 'REFLNS.INC'
+      INCLUDE 'Reflns.inc'
 
       INTEGER         NSOURC, JSOURC, KSOURC, NDASOU,    METHOD
       INTEGER         NPFSOU
@@ -232,7 +232,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       INTEGER, INTENT (IN   ) :: N
       REAL,    INTENT (  OUT) :: V(MVAR), D(MVAR)
@@ -391,7 +391,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       REAL, INTENT (INOUT) :: VARVAL(MVAR), VARESD(MVAR)
 

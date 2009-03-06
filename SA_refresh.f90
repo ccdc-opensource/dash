@@ -9,7 +9,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       INTEGER              iMyExit 
       LOGICAL                       NewOptimumFound, WasMinimised, TestEarlyTermFlag

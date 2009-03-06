@@ -109,7 +109,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
@@ -261,7 +261,7 @@
 !
       SUBROUTINE Get_IPMaxMin
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
@@ -306,7 +306,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'Poly_Colours.inc'
 
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
@@ -479,7 +479,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'Poly_Colours.inc'
 
       INTEGER          NBIN, LBIN
@@ -635,7 +635,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'Poly_Colours.inc'
 
       INTEGER          NBIN, LBIN
@@ -838,7 +838,7 @@
 
       REAL, INTENT (IN   ) :: xCur, yCur ! Mouse cursor position in PgUnits
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
@@ -889,7 +889,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       REAL              XPF_Range
       LOGICAL                                       RangeFitYN
@@ -999,7 +999,7 @@
 !
 !*****************************************************************************
 !
-      LOGICAL FUNCTION WeCanDoAPawleyRefinement
+      LOGICAL FUNCTION WeCanDoAPawleyRefinement()
 
       USE DRUID_HEADER
 
@@ -1057,7 +1057,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       INTEGER           NTPeak
       REAL              AllPkPosVal,         AllPkPosEsd

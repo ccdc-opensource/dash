@@ -10,7 +10,7 @@
 
       INTEGER, INTENT (IN   ) :: iPar
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
@@ -221,7 +221,7 @@
       INTEGER, INTENT (IN   ) :: iPar
       REAL,    INTENT (IN   ) :: random_number
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       INTEGER                ModalFlag,       ModalCase,       RowNumber, iRadio
       REAL                                                                        iX, iUB, iLB  
@@ -274,7 +274,7 @@
 !C      INTEGER, INTENT (IN   ) :: IFrow
 !C      REAL,    INTENT (IN   ) :: Xinitial
 !C
-!C      INCLUDE 'PARAMS.INC'
+!C      INCLUDE 'params.inc'
 !C
 !C      INTEGER         nvar, ns, nt, iseed1, iseed2
 !C      COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
@@ -391,7 +391,7 @@
 !C
 !C      IMPLICIT NONE 
 !C           
-!C      INCLUDE 'PARAMS.INC'
+!C      INCLUDE 'params.inc'
 !C
 !C      INTEGER         nvar, ns, nt, iseed1, iseed2
 !C      COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
@@ -600,7 +600,7 @@
       INTEGER, INTENT (IN   ) :: iPar
       REAL,    INTENT (INOUT) :: angle
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       INTEGER         nbounds
       REAL                             mm_bounds

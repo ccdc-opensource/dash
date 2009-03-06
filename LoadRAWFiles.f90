@@ -180,7 +180,7 @@
       REAL,          INTENT (  OUT) :: The2ThetaStep(*)
       REAL,          INTENT (  OUT) :: TheStepTime(*)
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'GLBVAR.INC'
 
       INTEGER          NOBS
@@ -204,6 +204,7 @@
       INTEGER*4   NumOfDataRanges  ! 1 data range = 1 powder pattern
       INTEGER*4   Offset, CurrDataRange
       INTEGER*2   SizeOfHeader
+      INTEGER*2, PARAMETER :: Four = 4
       CHARACTER*85 tString
       REAL StepTime
 
@@ -359,13 +360,13 @@
 ! Now we can start reading the raw data. The complete header can consist of any number
 ! of bytes, and we can only read per four. The data is in REAL*4 format. This may require some
 ! shifting of the bytes read in. It is actually possible that the last datapoint cannot be read.
-            IF (MOD(SizeOfHeader,4) .NE. 0) THEN
+            IF (MOD(SizeOfHeader,Four) .NE. 0) THEN
               NumOfBins = NumOfBins - 1
 
               OffSet = Offset + 1 + (SizeOfHeader / 4)
 ! Due to the way integer division in FORTRAN works, 
 ! the fractional part of SizeOfHeader / 4 is discarded
-              Shift = MOD(SizeOfHeader,4)
+              Shift = MOD(SizeOfHeader,Four)
               READ(hFile,REC=Offset,ERR=999) I4
               DO I = 1, NumOfBins
                 READ(hFile,REC=Offset+I,ERR=999) I4_2
@@ -428,7 +429,7 @@
       REAL,          INTENT (IN   ) :: Smallest2ThetaStep
       REAL,          INTENT (IN   ) :: SmallestStepTime
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'GLBVAR.INC'
 
       INTEGER          NOBS
@@ -456,6 +457,7 @@
       INTEGER*4   NumOfDataRanges  ! 1 data range = 1 powder pattern
       INTEGER*4   Offset, CurrDataRange
       INTEGER*2   SizeOfHeader
+      INTEGER*2, PARAMETER :: Four = 4
       REAL        StepTime, Last2Theta
       LOGICAL     IsFirstRange
       INTEGER     NumOfRangesToBeLoaded
@@ -705,12 +707,12 @@
 ! Now we can start reading the raw data. The complete header can consist of any number
 ! of bytes, and we can only read per four. The data is in REAL*4 format. This may require some
 ! shifting of the bytes read in. It is actually possible that the last datapoint cannot be read.
-            IF (MOD(SizeOfHeader,4) .NE. 0) THEN
+            IF (MOD(SizeOfHeader,Four) .NE. 0) THEN
               NumOfBins = NumOfBins - 1
               OffSet = Offset + 1 + (SizeOfHeader / 4)
 ! Due to the way integer division in FORTRAN works, 
 ! the fractional part of SizeOfHeader / 4 is discarded
-              Shift = MOD(SizeOfHeader,4)
+              Shift = MOD(SizeOfHeader,Four)
               READ(hFile,REC=Offset,ERR=999) I4
               DO I = 1, NumOfBins
                 READ(hFile,REC=Offset+I,ERR=999) I4_2
@@ -952,7 +954,7 @@
       CHARACTER*(*), INTENT (IN   ) :: TheFileName
       INTEGER,       INTENT (IN   ) :: irange
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       INTEGER          NOBS
       REAL                         XOBS,       YOBS,       EOBS
@@ -1392,7 +1394,7 @@
         IF (RangeInfo%DataForm .EQ. SCF_SHORT) THEN
           DO i = 1, n
             j = j + 1
-            YOBS(j) = factor * FLOAT(work_I2(i))
+            YOBS(j) = factor * FLOAT(INT(work_I2(i)))
           ENDDO
         ELSE
           DO i = 1, n

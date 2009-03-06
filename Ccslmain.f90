@@ -315,7 +315,7 @@
 !N any whose KKs are ALL encompassed by KK1(1), and delete them.  It is used
 !N to clear out family 4 each cycle for CAILS type refinement
 !
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       LOGICAL KSAME, KWHOLE, KWIPE
       DIMENSION KK1(NPAR), AM(NPAR)
@@ -2084,7 +2084,7 @@
 !N ALSQ and MATSZ are passed through the whole of the LSQ system as arguments,
 !N enabling MATSZ to be set and ALSQ to be dimensioned in MAIN programs.
 !
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       DIMENSION ALSQ(MATSZ)
 
@@ -2525,7 +2525,7 @@
       ENDIF
       WRITE (LPT,3000) NBOUND, (MESS(I:I),I=1,L)
       IF (NACT.EQ.0) CALL BMBOUT
- 3001 FORMAT (/' ',I6,X,80A1)
+ 3001 FORMAT (/' ',I6,1X,80A1)
  3000 FORMAT (/' ERROR ** there is an upper limit of',I6,' on number of ',80A1)
 
       END SUBROUTINE ERRCHK
@@ -4036,7 +4036,7 @@
 !D unpacked for future reference.
 !N Also entries ADDFIX, ADDVAR, FVKPAK
 !
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       LOGICAL FX, FIX, KWHOLE
       CHARACTER*4 FV(2), NAM1, NAM2
@@ -4601,7 +4601,7 @@
 !P Slack constraints must have been set up in /SLKGEO/ via GEOMIN
 !P Parameters and variables must be set up via PARSSF
 !
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       
       LOGICAL ONCARD
       CHARACTER*4 NAME
@@ -5088,7 +5088,7 @@
 !D and adds totals in to LSQ matrix.
 !O Prints obs and calc list if requested on I card.
 !
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       
       CHARACTER*5 F1
       CHARACTER*20 F2, F4, F5, F7
@@ -7111,7 +7111,7 @@
 !D such would not be true of FCALC, the similar routine which does not cater
 !D for LSQ
 !
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       
       COMPLEX SUM1, TERM, FORM, HR, FORMFA
       LOGICAL TESTOV, LATABS
@@ -7541,7 +7541,7 @@
 !D Fills in array CELESD(6,6,2) for the variance-covariances of the
 !D quadratic products in both spaces, and CELLSD(6,6) for a,b,etc.
 !
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       
       DIMENSION ALSQ(MATSZ)
       COMMON /CELFIX/ IPTCEL(6), AMCELL(6), NCELF, NCELG, NCELS, KOM3
@@ -7659,7 +7659,7 @@
 !A The matrix ALSQ is dimensioned everywhere except in MAIN programs as
 !A ALSQ(MATSZ), and handed through as a routine argument.
 !
-      INCLUDE "PARAMS.INC"
+      INCLUDE "params.inc"
 
       CHARACTER*4 IPNAM1(2), IPNAM2(2), IUPPER(MaxBVar), LOWER(MaxBVar)
       DIMENSION ALSQ(MATSZ), ICORR(MaxBVar)
@@ -7767,7 +7767,7 @@
 !
 !N It is intended to replace it by a QR inversion routine.
 !
-      INCLUDE "PARAMS.INC"
+      INCLUDE "params.inc"
 
       CHARACTER*4 BS, VR
       LOGICAL TESTOV, OVER
@@ -7901,7 +7901,7 @@
 !A The matrix ALSQ is dimensioned everywhere except in MAIN programs as
 !A ALSQ(MATSZ).
 !
-      INCLUDE "PARAMS.INC"
+      INCLUDE "params.inc"
       
       DIMENSION ALSQ(MATSZ)
 
@@ -7970,7 +7970,7 @@
 !N Eventually MATINV will modify BLSQ to give shifts, but for now we must
 !N form them separately.
 !
-      INCLUDE "PARAMS.INC"
+      INCLUDE "params.inc"
 
       CHARACTER*4 BS, VR
       DIMENSION ALSQ(MATSZ), SHIFTS(MaxBVar)
@@ -8053,7 +8053,7 @@
 !P          SQRTWT holds the square root of the weight
 !P          SIMUL is TRUE if this is only a simulation cycle
 !
-      INCLUDE "PARAMS.INC"
+      INCLUDE "params.inc"
 
       DIMENSION ALSQ(MATSZ)
 
@@ -9374,7 +9374,7 @@
 !D A large, +ve value for the species type indicates only 1 name, not 2
 !D Picks up names via PRIWRD
 !
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       
       CHARACTER*4 IPNAM1, IPNAM2
       LOGICAL ONENAM
@@ -10158,7 +10158,7 @@
 !O Then lists the strict constraints.
 !O Any phases and sources are indicated by *P and *S
 !
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       
       CHARACTER*1 IJOIN(8)
       CHARACTER*4 IPR1(8), IPR2(8), NAM1, NAM2, NOLD
@@ -10945,7 +10945,7 @@
 !
 !I Reads in L FIX and L VARY cards.
 !
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       CHARACTER*4 NFV(2)
       LOGICAL FX
@@ -11911,8 +11911,8 @@
 !
       DIMENSION DPROP(3)
 
-      INCLUDE 'PARAMS.INC'
-      INCLUDE 'REFLNS.INC'
+      INCLUDE 'params.inc'
+      INCLUDE 'Reflns.inc'
 
       DO KNOW = 1, MAXK
         IF (ISMAG(KNOW).EQ.0) GOTO 1
@@ -11944,7 +11944,7 @@
 !D a vector DERIVB in /DERBAS/, of LVARB derivatives of the same calculated
 !D function wrt basic variables.
 !
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       
       COMMON /CONSTR/ JCONST, JROWPT(301), JCMAT(200), AMOUNT(200), NEXTJ
 
@@ -12208,7 +12208,7 @@
 !
 !O For entries 3,5 and 6 prints R factors on unit LPT.
 !
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       
       LOGICAL TESTOV
 
@@ -13085,7 +13085,7 @@
 !D                in basic variables,
 !D          ESD is set to the square root of the sum of squares of their esds.
 !
-      INCLUDE "PARAMS.INC"
+      INCLUDE "params.inc"
       
       COMMON /CONSTR/ JCONST, JROWPT(301), JCMAT(200), AMOUNT(200), NEXTJ
 
@@ -15343,7 +15343,7 @@
       LOGICAL DEFALT
       EXTERNAL DEFALT, GETPAR, VARSXX
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       LOGICAL FOUND, KSAME, FX
       DIMENSION KKCOL(500), KBVCOL(500), A(500,MaxConstraints), KPRVR(2000)

@@ -16,7 +16,7 @@
       IMPLICIT NONE
 
 !   The common blocks below contain the info required for .pro file
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD

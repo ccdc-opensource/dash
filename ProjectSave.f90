@@ -2,7 +2,7 @@
 !
 !*****************************************************************************
 !
-      INTEGER FUNCTION PrjSaveAs
+      INTEGER FUNCTION PrjSaveAs()
 !
 ! RETURNS 0 for success
 !
@@ -174,9 +174,9 @@
       INTEGER,       INTENT (IN   ) :: ReadOrWrite
       LOGICAL, INTENT (IN   )       :: ForceOldVersion
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'GLBVAR.INC'
-      INCLUDE 'lattice.inc'
+      INCLUDE 'Lattice.inc'
 
       INTEGER                BackupNOBS
       REAL                               BackupXOBS,       BackupYOBS,       BackupEOBS
@@ -462,7 +462,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       INTEGER         Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
       REAL                                                           ChiMult
@@ -559,7 +559,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       INTEGER         IHCOV
       COMMON /CORHES/ IHCOV(30,MaxRef)
@@ -866,7 +866,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       INTEGER         nvar, ns, nt, iseed1, iseed2
       COMMON /sapars/ nvar, ns, nt, iseed1, iseed2

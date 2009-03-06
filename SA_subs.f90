@@ -15,7 +15,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'Lattice.inc'
 
       REAL              XOPT,       C,       FOPT
@@ -655,7 +655,7 @@
 !
 !*****************************************************************************
 !
-      REAL FUNCTION RANMAR
+      REAL FUNCTION RANMAR()
 
       IMPLICIT NONE
 
@@ -736,7 +736,7 @@
 !
 !*****************************************************************************
 !
-      REAL FUNCTION RANMAR_2
+      REAL FUNCTION RANMAR_2()
 
       IMPLICIT NONE
 
@@ -851,7 +851,7 @@
    
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC' 
+      INCLUDE 'params.inc' 
 
       INTEGER         nvar, NS, NT, iSeed1, iSeed2
       COMMON /sapars/ nvar, NS, NT, iSeed1, iSeed2
@@ -955,7 +955,7 @@
       INTEGER, INTENT (IN   ) :: Nmoves
       LOGICAL, INTENT (IN   ) :: TestLocalMin
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       INTEGER         Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
       REAL                                                           ChiMult
@@ -1015,7 +1015,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       INTEGER, INTENT (INOUT) :: nvar
 
@@ -1087,7 +1087,7 @@
 !
 !*****************************************************************************
 !
-      CHARACTER*20 FUNCTION GetSeed1SuffixString
+      CHARACTER*20 FUNCTION GetSeed1SuffixString()
 
       IMPLICIT NONE
 

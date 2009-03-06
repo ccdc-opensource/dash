@@ -437,7 +437,7 @@
       INTEGER, EXTERNAL :: WriteRIETANPhaseInfo
       LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'GLBVAR.INC'
 
       INTEGER          NBIN, LBIN
@@ -531,14 +531,14 @@
 !        WRITE(chFileTmp, '(A,F10.6,A)', ERR=993) '* ', ALambda, ' Exported by DASH'
 !        WRITE(chFileTmp, *, ERR=993) NBIN, XBIN(1), XBIN(2) - XBIN(1)
         WRITE(chFileTmp, '(A)', ERR=993) 'GENERAL$'
-        WRITE(chFileTmp, '(I)', ERR=993) NBIN
+        WRITE(chFileTmp, *, ERR=993) NBIN
         yMax = 0.0
         DO I = 1, NBIN
           Y = YOBIN(I)
 ! Rietan format seems not accept zero or negative, as it needs to work out ESD from intensity
           IF ( SetMinY ) Y = MAX(Y, 1.0) ! Y = SIGN(MAX(ABS(Y), 1.0), Y)
 !          WRITE(chFileTmp, *, ERR=993) Y
-          WRITE(chFileTmp, '(F10.5,X,1PG15.7E2 )', ERR=993) XBIN(I), Y
+          WRITE(chFileTmp, '(F10.5,1X,1PG15.7E2 )', ERR=993) XBIN(I), Y
           yMax = MAX(yMax, Y)
         ENDDO
       ENDIF
@@ -617,9 +617,9 @@
       ENDIF
       ! RIETAN instruction file: copy/fill template file
       IF ( Rietan_FP ) THEN
-        tFileName = TRIM(InstallationDirectory)//'rietanfp.tem'
+        tFileName = TRIM(InstallationDirectory)//'RIETANFP.tem'
       ELSE
-        tFileName = TRIM(InstallationDirectory)//'rietan2000.tem'
+        tFileName = TRIM(InstallationDirectory)//'RIETAN2000.tem'
       ENDIF
       OPEN(UNIT=chFileTmp,FILE=TRIM(tFileName),STATUS='old',ERR=997)
       tFileName = FileNameBase(1:iBaseLen)//'.ins'
@@ -701,7 +701,7 @@
         CASE ('ILP1')
           WRITE(tLine, '(A,I3)', ERR=998) 'ILP1 = ', PO_Direction(3)
         CASE ('ATOMS')
-          IF ( WriteRIETANPhaseInfo(FileNameBase, chFileIns) ) GOTO 998
+          IF ( WriteRIETANPhaseInfo(FileNameBase, chFileIns) .NE. 0 ) GOTO 998
           CYCLE
         CASE DEFAULT
           CYCLE
@@ -1118,7 +1118,7 @@
         READ(tLine(5:), *, Err=997) a1, a2, value, std
         n = n + 1
         WRITE(chFileFfe,'(I6,4X,2(A,I'//w//'),A/)', ERR=998) n,' (', a1,',    0) (',a2,',    0)'
-        WRITE(chFileInsW,'(I6,2(X,F8.4))', Err=996) n, value, std
+        WRITE(chFileInsW,'(I6,2(1X,F8.4))', Err=996) n, value, std
       END DO
       WRITE(chFileFfe,'(//A)') ' BOND ANGLE IN DEGREES.  CENTRAL ATOM IS VERTEX'
       REWIND(chFilePha, Err=997)
@@ -1129,7 +1129,7 @@
         n = n + 1
         WRITE(chFileFfe,'(I6,4X,3(A,I'//w//'),A/)', ERR=998) n,' (', a1,',    0) (',a2, &
                          ',    0) (', a3,',    0)'
-        WRITE(chFileInsW,'(I6,2(X,F8.2))', Err=996) n, value, std
+        WRITE(chFileInsW,'(I6,2(1X,F8.2))', Err=996) n, value, std
       END DO
       CLOSE(chFileFfe)
       CLOSE(chFilePha)
@@ -1214,7 +1214,7 @@
       ! GSAS planar group only takes upto 12 atoms
       WRITE(hFile, '(A$)', ERR=999) 'PLAN '
       DO I = 1, MIN(12, iNumbAtom)
-        WRITE(hFile, '(I3,X$)', ERR=999) iAtoms(I)
+        WRITE(hFile, '(I3,1X$)', ERR=999) iAtoms(I)
       ENDDO
       ! width
       WRITE(hFile, '(A)', ERR=999) ' 0.0'

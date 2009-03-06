@@ -14,7 +14,7 @@
       REAL, INTENT (  OUT) :: FWHM ! Full Width at Half Maximum
       REAL, INTENT (  OUT) :: IntBreadth ! Integral breadth
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       REAL            LEFT_BOUND, RIGHT_BOUND, TMAX, TOP2, ERRY
       COMMON /PARAMS/ LEFT_BOUND, RIGHT_BOUND, TMAX, TOP2, ERRY

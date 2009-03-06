@@ -12,7 +12,7 @@
       INTEGER N, NUP, NDOWN, ntotmov
       REAL dxvav(*),xvsig(*),flav(*)
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       REAL              XOPT,       C,       FOPT
       COMMON / sacmn /  XOPT(MVAR), C(MVAR), FOPT

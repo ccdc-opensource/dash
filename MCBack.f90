@@ -9,7 +9,7 @@
       LOGICAL, INTENT (IN   ) :: UseMc, UseSmooth
       INTEGER, INTENT (IN   ) :: SmoothWindow
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'Lattice.inc'
 
       INTEGER          NBIN, LBIN
@@ -94,7 +94,7 @@
       LOGICAL, INTENT (IN   ) :: UseMc, UseSmooth
       INTEGER, INTENT (IN   ) :: SmoothWindow
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
@@ -267,7 +267,7 @@
       DO i = 1, ndat
         j0 = MIN(nkn-1,jfs(i)-jf0)
         j1 = j0 + 1
-        w = e(i)**-2
+        w = e(i)**(-2)
         b(i) = (x(i)-xkk(j0)) / xdel(j0)
         a(i) = 1.0-b(i)
         ab = -a(i)*b(i)/6.0

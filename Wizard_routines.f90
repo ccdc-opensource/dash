@@ -188,7 +188,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'GLBVAR.INC'
 
       REAL              XPF_Range
@@ -347,7 +347,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       INTEGER          NOBS
       REAL                         XOBS,       YOBS,       EOBS
@@ -396,7 +396,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       INTEGER, EXTERNAL :: DiffractionFileBrowse, DiffractionFileOpen
       LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical, FnPatternOK
@@ -470,7 +470,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
@@ -500,7 +500,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
@@ -562,7 +562,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'GLBVAR.INC'
 
       INTEGER          NBIN, LBIN
@@ -711,7 +711,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       INTEGER                BackupNOBS
       REAL                               BackupXOBS,       BackupYOBS,       BackupEOBS
@@ -819,7 +819,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'lattice.inc'
+      INCLUDE 'Lattice.inc'
 
       LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
       INTEGER tInt1, tInt2, tInt3
@@ -851,7 +851,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       REAL             XPMIN,     XPMAX,     YPMIN,     YPMAX,       &
                        XPGMIN,    XPGMAX,    YPGMIN,    YPGMAX,      &
@@ -1147,9 +1147,9 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'GLBVAR.INC'
-      INCLUDE 'lattice.inc'
+      INCLUDE 'Lattice.inc'
 
       INTEGER           NTPeak
       REAL              AllPkPosVal,         AllPkPosEsd
@@ -1400,9 +1400,9 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'GLBVAR.INC'
-      INCLUDE 'lattice.inc'
+      INCLUDE 'Lattice.inc'
 
       INTEGER           NTPeak
       REAL              AllPkPosVal,         AllPkPosEsd
@@ -1887,7 +1887,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'lattice.inc'
+      INCLUDE 'Lattice.inc'
 
       INTEGER iRow, iStatus, iHandle
       CHARACTER(MaxPathLength) :: tFileName
@@ -2164,9 +2164,9 @@
 
       INTEGER, INTENT (IN   ) :: Ngrid
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'GLBVAR.INC'
-      INCLUDE 'lattice.inc'
+      INCLUDE 'Lattice.inc'
 
       INTEGER           NTPeak
       REAL              AllPkPosVal,         AllPkPosEsd
@@ -2194,7 +2194,7 @@
       WRITE(hFile, '(A)' ,ERR=997) '!    2-Theta    Intensity'
       DO I = 1, NTPeak
         iOrd = iOrdTem(i)
-        WRITE(hFile,'(F12.5,X,F12.2)',ERR=997) AllPkPosVal(iOrd), AllPkAreaVal(iOrd)
+        WRITE(hFile,'(F12.5,1X,F12.2)',ERR=997) AllPkPosVal(iOrd), AllPkAreaVal(iOrd)
       ENDDO
       CLOSE(hFile)
       IF (LEN_TRIM(McMailleEXE) .EQ. 0) GOTO 998

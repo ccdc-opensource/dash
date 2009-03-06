@@ -8,7 +8,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'Lattice.inc'
 
       INTEGER     MMPAR
@@ -230,12 +230,12 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       REAL P(MVAR)
 
       INCLUDE 'GLBVAR.INC' ! Contains ALambda
-      INCLUDE 'lattice.inc'
+      INCLUDE 'Lattice.inc'
 
       INTEGER         NVAL
       REAL                  XVAL,       YVAL,       ZVAL,       EVAL

@@ -172,7 +172,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'GLBVAR.INC'
 
       INTEGER          NOBS
@@ -281,7 +281,7 @@
 
       IMPLICIT NONE
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
       INCLUDE 'GLBVAR.INC'
 
       INTEGER          NOBS
@@ -549,7 +549,7 @@
       INTEGER i
 
       SPWriteAtom = .TRUE.
-      WRITE(hFile, '(A,3(X,F9.5),2(X,F6.3))', ERR=999) 'SITE '//Label, (XYZ(i),i=1,3), Occ, Biso
+      WRITE(hFile, '(A,3(1X,F9.5),2(1X,F6.3))', ERR=999) 'SITE '//Label, (XYZ(i),i=1,3), Occ, Biso
       SPWriteAtom = .FALSE.
   999 RETURN
       ! No operation, only prevent compiler complians unused varibles
@@ -763,7 +763,7 @@
 
       REAL, INTENT (IN   ) :: max_diff
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       INTEGER          NBIN, LBIN
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD

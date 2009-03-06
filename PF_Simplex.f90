@@ -25,7 +25,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       REAL X(N), DX(N), COVAR(N,N)
       INTEGER N
@@ -417,7 +417,7 @@
 !
       SUBROUTINE LUDCMP(A,N,NP,INDX,D)
 
-      INCLUDE 'PARAMS.INC'
+      INCLUDE 'params.inc'
 
       PARAMETER (TINY=1.0E-20)
       DIMENSION A(NP,NP), INDX(N), VV(MVAR)
