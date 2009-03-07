@@ -1926,7 +1926,6 @@
 
       INCLUDE 'SA_restrain.inc'
 
-      INTEGER, EXTERNAL :: AtomLabel2Seq
       LOGICAL, EXTERNAL :: Confirm
       CHARACTER*20, EXTERNAL :: Integer2String
       
