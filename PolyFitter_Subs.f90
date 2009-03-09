@@ -698,7 +698,7 @@
       CALL IPgUnitsFromGrUnits(EventInfo%GX,EventInfo%GY,xCur(2),yCur(2))
       CALL DetermineCurrentPeakFitRange(XCur(2), yCur(2))
       SELECT CASE (EventInfo%VALUE1)
-        CASE (KeyDeleteUnder)
+        CASE (KeyDeleteUnder,KeyDelete)
 ! Delete the nearest peak fitting range but ask first ...
           IF (NumPeakFitRange .EQ. 0) THEN
             CALL InfoMessage('No peak fitting ranges to delete.')
