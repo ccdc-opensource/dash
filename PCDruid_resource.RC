@@ -3941,7 +3941,7 @@ END
 IDF_Width_Equations             BITMAP DISCARDABLE "res\\WidthEquations.bmp"
 IDF_PW_Logo1                    BITMAP DISCARDABLE "res\\PolyFitterWizard.bmp"
 IDF_WelcomeWizard               BITMAP DISCARDABLE "res\\WizardWelcome.bmp"
-ID_TOOLBAR1                     BITMAP DISCARDABLE "res\\toolbar1.bmp"
+ID_TOOLBAR1                     BITMAP DISCARDABLE "res\\TOOLBAR1.BMP"
 IDB_zmBrowse1                   BITMAP DISCARDABLE "res\\OpenFile.bmp"
 IDB_zmBrowse2                   BITMAP DISCARDABLE "res\\OpenFile.bmp"
 IDB_zmBrowse3                   BITMAP DISCARDABLE "res\\OpenFile.bmp"
