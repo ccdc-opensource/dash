@@ -446,6 +446,9 @@
       CALL IOsDirChange(TRIM(ManualDir))      
       d=WinExec('cmd /c "TOC.html" 'C,SW_HIDE)
       CALL IOsDirChange(TRIM(WorkingDir))
+#else
+      CALL IOsCommand(TRIM(InstallationDirectory)//'nss.sh file://'// &
+                      TRIM(ManualDir)//DIRSPACER//'TOC.html')
 #endif
 
       END SUBROUTINE LaunchHelp
