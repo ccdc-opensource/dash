@@ -145,8 +145,8 @@
  10   line = ''
       READ(iHandle, '(A)', END=100, ERR=999) line
       nl = LEN_TRIM(line)
-      CALL ILowerCase(line(1:nl))
       CALL INextString(line, KeyChar)
+      CALL ILowerCase(KeyChar)
       SELECT CASE (KeyChar(1:3))
         CASE ('cel')                                ! Cell parameters
           DO I = 1, 6
