@@ -382,7 +382,8 @@
 
      ENDDO  ! End of loop through origins
 
-     bestorigin = MINLOC(obestdistance, MASK=obestdistance.gt.0) !Row of Origin containing correct origin
+    ! bestorigin = MINLOC(obestdistance, MASK=obestdistance.gt.0) !Row of Origin containing correct origin
+     bestorigin = MINLOC(obestdistance(:NumberOfOrigins), MASK=obestdistance.gt.0) !Row of Origin containing correct origin
      ActualOrigin = INT(Origin(BestOrigin(1),4)) ! origin number referred to by CASE statements
          
      DO j = 1,3
