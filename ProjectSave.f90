@@ -241,15 +241,16 @@
 
       PrjReadWriteImpl = .TRUE.
  
-      OPEN(UNIT=hPrjFile,FILE=ThePrjFile,ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',ERR=999)
+      OPEN(UNIT=hPrjFile,FILE=ThePrjFile,ACCESS='DIRECT',RECL=cRECLMult,FORM='UNFORMATTED',ERR=999)
       iPrjRecNr = 1
 ! Read / Write the header
       tString = ProgramVersion//' project file'
       CALL FileRWString(hPrjFile, iPrjRecNr, RW, tString)
+      IF ( BFIOErrorCode .EQ. 1 ) GOTO 999
       ! If read, store program version for later reference
       IF (RW .EQ. cRead) THEN
         ! Convert version string to real, include patch level
-        READ (tString(6:8),*) VerFig
+        READ (tString(6:8),*, ERR=999) VerFig
         IF ( tString(9:9) .EQ. " " ) THEN
           Version = tString(1:8)
         ELSE

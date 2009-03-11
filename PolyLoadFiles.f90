@@ -1181,7 +1181,7 @@
       Anode         = 'Xx'
       hFile = 10
 ! Open the file as direct access (i.e. non-sequential) unformatted with a record length of 1 (=4 bytes)
-      OPEN(UNIT=hFile,FILE=TheFileName,ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',STATUS='OLD',ERR=999)
+      OPEN(UNIT=hFile,FILE=TheFileName,ACCESS='DIRECT',RECL=cRECLMult,FORM='UNFORMATTED',STATUS='OLD',ERR=999)
       READ(hFile,REC=1,ERR=999) C4
       Version = C4(1:2)
       IF ((Version .NE. 'V5') .AND. (Version .NE. 'D3') .AND. (Version .NE. 'V3')) THEN

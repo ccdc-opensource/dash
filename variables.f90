@@ -34,6 +34,16 @@
 #else
       CHARACTER(1), PARAMETER :: DIRSPACER = '/' ! Unix spacer
 #endif
+! FORTRAN standard 1997:
+! For direct access, for unformatted input/output, the RECL is measured in 
+! processor-dependent units.
+#ifdef __G95__
+! G95 (version 0.92): RECL is expressed in bytes
+      INTEGER, PARAMETER :: cRECLMult = 4
+#else
+! Intel/DEC: RECL is expressed in 4-byte units (longwords)
+      INTEGER, PARAMETER :: cRECLMult = 1
+#endif
 
       CHARACTER(MaxPathLength) :: VIEWEXE
       CHARACTER(20)            :: VIEWARG

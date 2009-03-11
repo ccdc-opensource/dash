@@ -46,7 +46,7 @@
       Load_raw_File = 1
       hFile = 10
 ! Open the file as direct access (i.e. non-sequential) unformatted with a record length of 1 (=4 bytes)
-      OPEN(UNIT=hFile,FILE=TheFileName,ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',STATUS='OLD',ERR=999)
+      OPEN(UNIT=hFile,FILE=TheFileName,ACCESS='DIRECT',RECL=cRECLMult,FORM='UNFORMATTED',STATUS='OLD',ERR=999)
 ! Check if true RAW file, and which type
       READ(UNIT=hFile,REC=1,ERR=999) C4
       CLOSE(hFile)
@@ -212,7 +212,7 @@
       TwoThetaStep  = 0.0
       hFile = 10
 ! Open the file as direct access (i.e. non-sequential) unformatted with a record length of 1 (=4 bytes)
-      OPEN(UNIT=hFile,FILE=TheFileName,ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',STATUS='OLD',ERR=999)
+      OPEN(UNIT=hFile,FILE=TheFileName,ACCESS='DIRECT',RECL=cRECLMult,FORM='UNFORMATTED',STATUS='OLD',ERR=999)
 ! First check the version, which follows from the fourth byte in the file. Bytes 1-3 are: RAW
 ! "RAW " = version 1. The oldest version, requested by Bruker not the be supported any more.
 ! "RAW2" = version 2.
@@ -470,7 +470,7 @@
       tNOBS1 = 0
       hFile = 10
 ! Open the file as direct access (i.e. non-sequential) unformatted with a record length of 1 (=4 bytes)
-      OPEN(hFile,FILE=TheFileName,ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',STATUS='OLD',ERR=999)
+      OPEN(hFile,FILE=TheFileName,ACCESS='DIRECT',RECL=cRECLMult,FORM='UNFORMATTED',STATUS='OLD',ERR=999)
 ! First check the version, which follows from the fourth byte in the file. Bytes 1-3 are: RAW
 ! "RAW " = version 1. The oldest version, requested by Bruker not the be supported any more.
 ! "RAW2" = version 2.
@@ -899,7 +899,7 @@
       tNumOfRanges = 0
 ! Open the file as direct access (i.e. non-sequential) unformatted with a record length of 128 (=512 bytes)
       hFile = 11
-      OPEN(UNIT=hFile,FILE=TheFileName,ACCESS='DIRECT',RECL=128,FORM='UNFORMATTED',STATUS='OLD',ERR=999)
+      OPEN(UNIT=hFile,FILE=TheFileName,ACCESS='DIRECT',RECL=128*cRECLMult,FORM='UNFORMATTED',STATUS='OLD',ERR=999)
       READ(hFile,REC=1,ERR=999) Header
       IF (Header%NTotal .EQ. 0) THEN
         CALL ErrorMessage('File contains no data.')
@@ -1365,7 +1365,7 @@
       Load_rawSTOE_File = 1
 ! Open the file as direct access (i.e. non-sequential) unformatted with a record length of 128 (=512 bytes)
       tFileHandle = 11
-      OPEN(UNIT=tFileHandle,FILE=TheFileName,ACCESS='DIRECT',RECL=128,FORM='UNFORMATTED',STATUS='OLD',ERR=999)
+      OPEN(UNIT=tFileHandle,FILE=TheFileName,ACCESS='DIRECT',RECL=128*cRECLMult,FORM='UNFORMATTED',STATUS='OLD',ERR=999)
       READ(UNIT=tFileHandle,REC=1,ERR=999) Header
       IF (Header%NTotal .EQ. 0) THEN
         CALL ErrorMessage('File contains no data.')

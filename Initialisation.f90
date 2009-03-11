@@ -806,7 +806,7 @@
       hFile = 10
       tFileName = TRIM(AppDataDirectory)//'D3.cfg'
 ! Open the file as direct access (i.e. non-sequential) unformatted with a record length of 1 (=4 bytes)
-      OPEN(UNIT=hFile,FILE=tFileName,ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',ERR=999)
+      OPEN(UNIT=hFile,FILE=tFileName,ACCESS='DIRECT',RECL=cRECLMult,FORM='UNFORMATTED',ERR=999)
       RecNr = 1
 ! Write a header
       CALL FileWriteString(hFile, RecNr, ProgramVersion//' configuration file')
@@ -1061,7 +1061,7 @@
       IF (.NOT. FExists) RETURN
       hFile = 10
 ! Open the file as direct access (i.e. non-sequential) unformatted with a record length of 1 (=4 bytes)
-      OPEN(UNIT=hFile,FILE=tFileName,ACCESS='DIRECT',RECL=1,FORM='UNFORMATTED',ERR=999)
+      OPEN(UNIT=hFile,FILE=tFileName,ACCESS='DIRECT',RECL=cRECLMult,FORM='UNFORMATTED',ERR=999)
       RecNr = 1
 ! Read the header
       CALL FileReadString(hFile,RecNr,tString) ! E.g. 'DASH 2.1.1 configuration file'
