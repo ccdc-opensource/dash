@@ -1404,19 +1404,21 @@
           IF (Confirm('For ease of use, DASH now interprets a single number on the first line of an .xye file as a wavelength.'//CHAR(13)// &
                       'The file you are using does not contain a wavelength yet.'//CHAR(13)// &
                       'Would you like to write the wavelength you have just entered to the file'//CHAR(13)// &
-                      FNAME(1:LEN_TRIM(FNAME))//' ?')) THEN
-            tFileHandle = 10
+                      TRIM(FNAME)//' ?')) THEN
+! Note: unit 10 is used when called from ReadConfigurationFile(). Changed to 107.
+!            tFileHandle = 10
+            tFileHandle = 107
             OPEN(UNIT=tFileHandle,FILE=FNAME(1:LEN_TRIM(FNAME)),ERR=999)
             WRITE(tFileHandle,'(F9.5)',ERR=999) TheWaveLength
             DO I = 1, BackupNOBS
-              WRITE(tFileHandle,'(F6.3,X,F11.3,X,F12.5)',ERR=999) BackupXOBS(I), BackupYOBS(I), BackupEOBS(I)
+              WRITE(tFileHandle,'(F6.3,1X,F11.3,1X,F12.5)',ERR=999) BackupXOBS(I), BackupYOBS(I), BackupEOBS(I)
             ENDDO
+            GOTO 10
+  999       CALL ErrorMessage('Error accessing file '//FNAME(1:LEN_TRIM(FNAME)))
+   10       CLOSE(tFileHandle)
           ENDIF
         ENDIF
       ENDIF
-      GOTO 10
-  999 CALL ErrorMessage('Error accessing file '//FNAME(1:LEN_TRIM(FNAME)))
-   10 CLOSE(tFileHandle)
       NoWavelengthInXYE = .FALSE.
       IF ( NearlyEqual(TheWaveLength,ALambda) ) RETURN
       ALambda = TheWaveLength
