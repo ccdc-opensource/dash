@@ -1084,7 +1084,7 @@
 
 ! Extract the information from the dialog
       iFlags = SaveDialog  + PromptOn + AppendExt
-      FILTER = 'All files (*.*)|*.*|DICVOL files (*.dat)|*.dat|'
+      FILTER = ALL_FILES_FILTER//'DICVOL files (*.dat)|*.dat|'
       tFileName = ' '
       IFTYPE = 2
       hFile = 117

@@ -32,12 +32,12 @@
 
       iFlags = LoadDialog + DirChange + PromptOn
 ! It seems that Winteracter cannot cope with strings of this length (> 255 bytes)
-!      FILTER = 'All files (*.*)|*.*|'//&
+!      FILTER = ALL_FILES_FILTER//&
 !               'All powder diffraction files|*.raw;*.rd;*.sd;*.udf;*.uxd;*.xye|'//&
 !               'Bruker powder diffraction files (*.raw, *.uxd)|*.raw;*.uxd|'//&
 !               'DASH powder diffraction files (*.xye)|*.xye|'//&
 !               'Philips powder diffraction files (*.rd, *.sd, *.udf)|*.rd;*.sd;*.udf|'
-      FILTER = 'All files (*.*)|*.*|'//&
+      FILTER = ALL_FILES_FILTER//&
                'All powder diffraction files|*.asc;*.cpi;*.mdi;*.pod;*.raw;*.rd;*.sd;*.txt;*.udf;*.uxd;*.xye;*.x01|'//&
                'DASH powder diffraction files (*.xye)|*.xye|'
 ! IFTYPE specifies which of the file types in the list is the default
