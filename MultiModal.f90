@@ -198,7 +198,11 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE AdjustSamplingForOtherRanges(angle, new_interval, iPar, random_number)
+! Commented out!
+! As this sub is not called, but the extra ModalCase array added to
+! COMMON /ModalTorsions/ makes it inconsistent to others.
+!
+!      SUBROUTINE AdjustSamplingForOtherRanges(angle, new_interval, iPar, random_number)
 ! index is index into multi modal properties COMMON block for this variable
 
 ! This routine takes a trial value and randomly changes
@@ -214,51 +218,51 @@
 
 ! This SUBROUTINE gets a bit confused about where the original angle was supposed to be in, I think...
 
-      IMPLICIT NONE
-
-      REAL,    INTENT (INOUT) :: angle
-      INTEGER, INTENT (  OUT) :: new_interval
-      INTEGER, INTENT (IN   ) :: iPar
-      REAL,    INTENT (IN   ) :: random_number
-
-      INCLUDE 'params.inc'
-
-      INTEGER                ModalFlag,       ModalCase,       RowNumber, iRadio
-      REAL                                                                        iX, iUB, iLB  
-      COMMON /ModalTorsions/ ModalFlag(mvar), ModalCase(mvar), RowNumber, iRadio, iX, iUB, iLB
-
-      INTEGER       ninterval,             curr_interval
-      REAL                                                        ratios
-      COMMON /TEST/ ninterval(1:3,1:MVAR), curr_interval(1:MVAR), ratios(1:3,1:MVAR)
-
-
-      ! NOTE: this routine assumes that "angle" is in the first interval,
-      ! regardless of the current interval for this parameter
-      new_interval = 1
-      SELECT CASE ( ModalCase(iPar) )
-        CASE (1) ! Bimodal inversion
-          IF (random_number .GT. ratios(1, iPar)/(ratios(1, iPar)+ratios(2, iPar))) THEN
-            angle = angle + 180.0
-            new_interval = 2
-          ENDIF
-        CASE (2) ! Bimodal mirror
-          IF (random_number .GT. ratios(1, iPar)/(ratios(1, iPar)+ratios(2, iPar))) THEN
-            angle = -angle
-            new_interval = 2
-          ENDIF
-        CASE (3) ! Trimodal
-          IF (random_number .GT. ratios(1, iPar)/(ratios(1, iPar)+ratios(2, iPar)+ratios(3, iPar))) THEN
-            angle = angle + 120.0
-            new_interval = new_interval + 1
-          ENDIF
-          IF (random_number .GT. (ratios(1, iPar)+ratios(2, iPar))/(ratios(1, iPar)+ratios(2, iPar)+ratios(3, iPar))) THEN
-            angle = angle + 120.0
-            new_interval = new_interval + 1
-          ENDIF
-      END SELECT
-      CALL Normalise(angle)
-
-      END SUBROUTINE AdjustSamplingForOtherRanges
+!      IMPLICIT NONE
+!
+!      REAL,    INTENT (INOUT) :: angle
+!      INTEGER, INTENT (  OUT) :: new_interval
+!      INTEGER, INTENT (IN   ) :: iPar
+!      REAL,    INTENT (IN   ) :: random_number
+!
+!      INCLUDE 'params.inc'
+!
+!      INTEGER                ModalFlag,       ModalCase,       RowNumber, iRadio
+!      REAL                                                                        iX, iUB, iLB  
+!      COMMON /ModalTorsions/ ModalFlag(mvar), ModalCase(mvar), RowNumber, iRadio, iX, iUB, iLB
+!
+!      INTEGER       ninterval,             curr_interval
+!      REAL                                                        ratios
+!      COMMON /TEST/ ninterval(1:3,1:MVAR), curr_interval(1:MVAR), ratios(1:3,1:MVAR)
+!
+!
+!      ! NOTE: this routine assumes that "angle" is in the first interval,
+!      ! regardless of the current interval for this parameter
+!      new_interval = 1
+!      SELECT CASE ( ModalCase(iPar) )
+!        CASE (1) ! Bimodal inversion
+!          IF (random_number .GT. ratios(1, iPar)/(ratios(1, iPar)+ratios(2, iPar))) THEN
+!            angle = angle + 180.0
+!            new_interval = 2
+!          ENDIF
+!        CASE (2) ! Bimodal mirror
+!          IF (random_number .GT. ratios(1, iPar)/(ratios(1, iPar)+ratios(2, iPar))) THEN
+!            angle = -angle
+!            new_interval = 2
+!          ENDIF
+!        CASE (3) ! Trimodal
+!          IF (random_number .GT. ratios(1, iPar)/(ratios(1, iPar)+ratios(2, iPar)+ratios(3, iPar))) THEN
+!            angle = angle + 120.0
+!            new_interval = new_interval + 1
+!          ENDIF
+!          IF (random_number .GT. (ratios(1, iPar)+ratios(2, iPar))/(ratios(1, iPar)+ratios(2, iPar)+ratios(3, iPar))) THEN
+!            angle = angle + 120.0
+!            new_interval = new_interval + 1
+!          ENDIF
+!      END SELECT
+!      CALL Normalise(angle)
+!
+!      END SUBROUTINE AdjustSamplingForOtherRanges
 !
 !*****************************************************************************
 !
