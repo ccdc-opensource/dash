@@ -184,7 +184,7 @@
 
       HKLFFileBrowse = 1
       IFLAGS = LoadDialog + DirChange + PromptOn + AppendExt
-      FILTER = 'All files (*.*)|*.*|'//&
+      FILTER = ALL_FILES_FILTER//&
                'SHELX .hkl files (*.hkl)|*.hkl|'
       tFileName = ' '
 ! IFTYPE specifies which of the file types in the list is the default

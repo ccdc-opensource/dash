@@ -242,7 +242,7 @@
       CHARACTER*255 fname_2
 
       IFlags = SaveDialog + DirChange + AppendExt
-      fstr = 'Text files|*.txt|All files|*.*|'
+      fstr = 'Text files|*.txt|'//ALL_FILES_FILTER
       fname_2 = AllUsersProfileDirectory
       Idummy = 1
       CALL WSelectFile(fstr, iFlags, fname_2, "Please enter a filename", iDummy)

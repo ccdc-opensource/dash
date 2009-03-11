@@ -24,7 +24,7 @@
       CHARACTER(LEN=MaxPathLength) tFileName
 
       IFLAGS = LoadDialog + DirChange + PromptOn + AppendExt
-      FILTER = 'All files (*.*)|*.*|'//&
+      FILTER = ALL_FILES_FILTER//&
                'Crystal structure files|*.cif;*.pdb;*.mol2;*.ml2;*.mol;*.mdl;*.res;*.cssr|'
       tFileName = ' '
 ! IFTYPE specifies which of the file types in the list is the default
@@ -276,7 +276,7 @@
       CHARACTER(LEN=MaxPathLength) tFileName
 
       IFLAGS = LoadDialog + DirChange + PromptOn + AppendExt
-      FILTER = 'All files (*.*)|*.*|'//&
+      FILTER = ALL_FILES_FILTER//&
                'Crystal structure files|*.cif;*.pdb;*.mol2;*.ml2;*.mol;*.mdl;*.ins;*.res;*.cssr|'
       tFileName = ' '
 ! IFTYPE specifies which of the file types in the list is the default

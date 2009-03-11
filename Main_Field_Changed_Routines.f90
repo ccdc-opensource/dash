@@ -89,9 +89,8 @@
 
       LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical, SetRRMethodRadioState
       LOGICAL tLogical
-      INTEGER IFLAGS, IFTYPE, iOpt, IErrCode
+      INTEGER iOpt, IErrCode
       CHARACTER(MaxPathLength) tFileName
-      CHARACTER*75  FILTER
 
       CALL PushActiveWindowID
       CALL SelectDASHDialog(IDD_Configuration)
@@ -156,93 +155,44 @@
                 CALL WDialogFieldState(IDF_ColourBySolution, Enabled)
               ENDIF
             CASE (IDBBROWSE)
-              IFLAGS = LoadDialog + PromptOn
-              FILTER = 'All files (*.*)|*.*|'//&
-                       'All executables (*.exe)|*.exe|'
-! IFTYPE specifies which of the file types in the list is the default
-              IFTYPE = 2
               tFileName = ViewExe
-              CALL WSelectFile(FILTER, IFLAGS, tFileName, 'Select Viewer', IFTYPE)
-! Did the user press cancel?
-              IF ( WInfoDialog(ExitButtonCommon) .EQ. CommonOK ) THEN
+              IF ( SelectOneFile(tFileName, 'Select Viewer') ) THEN
                 VIEWEXE = tFileName
                 CALL WDialogPutString(IDF_ViewExe, VIEWEXE)
               ENDIF
             CASE (IDBBROWSE2)
-              IFLAGS = LoadDialog + PromptOn
-              FILTER = 'All files (*.*)|*.*|'//&
-                       'All executables (*.exe)|*.exe|'
-! IFTYPE specifies which of the file types in the list is the default
-              IFTYPE = 2
               tFileName = MOGULEXE
-              CALL WSelectFile(FILTER, IFLAGS, tFileName, 'Select Mogul Executable', IFTYPE)
-! Did the user press cancel?
-              IF ( WInfoDialog(ExitButtonCommon) .EQ. CommonOK ) THEN
+              IF ( SelectOneFile(tFileName, 'Select Mogul Executable') ) THEN
                 MOGULEXE = tFileName
                 CALL WDialogPutString(IDF_MogulExe, MOGULEXE)
               ENDIF
             CASE (IDBBROWSE3)
-              IFLAGS = LoadDialog + PromptOn
-              FILTER = 'All files (*.*)|*.*|'//&
-                       'All executables (*.exe)|*.exe|'
-! IFTYPE specifies which of the file types in the list is the default
-              IFTYPE = 2
               tFileName = DICVOLEXE
-              CALL WSelectFile(FILTER, IFLAGS, tFileName, 'Select DICVOL04 or later Executable', IFTYPE)
-! Did the user press cancel?
-              IF ( WInfoDialog(ExitButtonCommon) .EQ. CommonOK ) THEN
+              IF ( SelectOneFile(tFileName, 'Select DICVOL04 or later Executable') ) THEN
                 DICVOLEXE = tFileName
                 CALL WDialogPutString(IDF_DICVOLExe, DICVOLEXE)
               ENDIF
             CASE (IDBBROWSE4)
-              IFLAGS = LoadDialog + PromptOn
-              FILTER = 'All files (*.*)|*.*|'//&
-                       'All executables (*.exe)|*.exe|'
-! IFTYPE specifies which of the file types in the list is the default
-              IFTYPE = 2
               tFileName = TOPASEXE
-              CALL WSelectFile(FILTER, IFLAGS, tFileName, 'Select TOPAS Executable', IFTYPE)
-! Did the user press cancel?
-              IF ( WInfoDialog(ExitButtonCommon) .EQ. CommonOK ) THEN
+              IF ( SelectOneFile(tFileName, 'Select TOPAS Executable') ) THEN
                 TOPASEXE = tFileName
                 CALL WDialogPutString(IDF_TOPASExe, TOPASEXE)
               ENDIF
             CASE (IDBBROWSE5)
-              IFLAGS = LoadDialog + PromptOn
-              FILTER = 'All files (*.*)|*.*|'//&
-                       'All executables (*.exe)|*.exe|'
-! IFTYPE specifies which of the file types in the list is the default
-              IFTYPE = 2
               tFileName = EXPGUIEXE
-              CALL WSelectFile(FILTER, IFLAGS, tFileName, 'Select EXPGUI Tcl Executable', IFTYPE)
-! Did the user press cancel?
-              IF ( WInfoDialog(ExitButtonCommon) .EQ. CommonOK ) THEN
+              IF ( SelectOneFile(tFileName, 'Select EXPGUI Tcl Executable') ) THEN
                 EXPGUIEXE = tFileName
                 CALL WDialogPutString(IDF_EXPGUIExe, EXPGUIEXE)
               ENDIF
             CASE (IDBBROWSE6)
-              IFLAGS = LoadDialog + PromptOn
-              FILTER = 'All files (*.*)|*.*|'//&
-                       'All executables (*.exe)|*.exe|'
-! IFTYPE specifies which of the file types in the list is the default
-              IFTYPE = 2
               tFileName = RIETANEXE
-              CALL WSelectFile(FILTER, IFLAGS, tFileName, 'Select RIETAN Executable', IFTYPE)
-! Did the user press cancel?
-              IF ( WInfoDialog(ExitButtonCommon) .EQ. CommonOK ) THEN
+              IF ( SelectOneFile(tFileName, 'Select RIETAN Executable') ) THEN
                 RIETANEXE = tFileName
                 CALL WDialogPutString(IDF_RIETANExe, RIETANEXE)
               ENDIF
             CASE (IDBBROWSE7)
-              IFLAGS = LoadDialog + PromptOn
-              FILTER = 'All files (*.*)|*.*|'//&
-                       'All executables (*.exe)|*.exe|'
-! IFTYPE specifies which of the file types in the list is the default
-              IFTYPE = 2
               tFileName = McMailleEXE
-              CALL WSelectFile(FILTER, IFLAGS, tFileName, 'Select McMaille Executable', IFTYPE)
-! Did the user press cancel?
-              IF ( WInfoDialog(ExitButtonCommon) .EQ. CommonOK ) THEN
+              IF ( SelectOneFile(tFileName, 'Select McMaille Executable') ) THEN
                 McMailleEXE = tFileName
                 CALL WDialogPutString(IDF_McMailleExe, McMailleEXE)
               ENDIF
@@ -264,6 +214,31 @@
           END SELECT
       END SELECT
       CALL PopActiveWindowID
+
+      CONTAINS
+
+      LOGICAL FUNCTION SelectOneFile(FileName, Title)
+
+      CHARACTER*(*),    INTENT (IN   ) :: Title
+      CHARACTER*(*),    INTENT (INOUT) :: FileName
+
+      INTEGER IFLAGS, IFTYPE
+      CHARACTER*75  FILTER
+
+      IFLAGS = LoadDialog + PromptOn
+! IFTYPE specifies which of the file types in the list is the default
+#ifdef _WIN32
+      FILTER = ALL_FILES_FILTER//'All executables (*.exe)|*.exe|'
+      IFTYPE = 2
+#else
+      FILTER = ALL_FILES_FILTER
+      IFTYPE = 1
+#endif
+      CALL WSelectFile(FILTER, IFLAGS, FileName, Title, IFTYPE)
+! Did the user press cancel?
+      SelectOneFile = WInfoDialog(ExitButtonCommon) .EQ. CommonOK
+
+      END FUNCTION SelectOneFile
 
       END SUBROUTINE DealWithConfiguration
 !

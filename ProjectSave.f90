@@ -50,7 +50,7 @@
       CHARACTER(LEN=MaxPathLength) tFileName
 
       iFlags = LoadDialog + DirChange + PromptOn + AppendExt
-      FILTER = 'All files (*.*)|*.*|'//&
+      FILTER = ALL_FILES_FILTER//&
                'DASH project files (*.dash)|*.dash|'//&
                'DASH 3.0 project files (*.dash30)|*.dash30|'
       tFileName = ''

@@ -20,7 +20,7 @@
       LOGICAL Dummy
 
       IFLAGS = LoadDialog + DirChange + PromptOn + AppendExt
-      FILTER = 'All files (*.*)|*.*|'//&
+      FILTER = ALL_FILES_FILTER//&
                'DASH Pawley files (*.sdi)|*.sdi|'
       tFileName = ' '
 ! IFTYPE specifies which of the file types in the list is the default

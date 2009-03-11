@@ -173,11 +173,12 @@
               iFrg = iFrg + first_zm_in_win - 1
               IF (iFrg .GT. nFrag) iFrg = nFrag + 1
               iFlags = LoadDialog + PromptOn + DirChange + AppendExt
-              FilterStr = "All files (*.*)|*.*|"//&
+              FilterStr = ALL_FILES_FILTER//&
                           "Z-matrix and molecular model files|*.zmatrix;*.cif;*.pdb;*.mol2;*.ml2;*.mol;*.mdl;*.res;*.cssr;*.xyz|"//&
                           "Z-matrix files (*.zmatrix)|*.zmatrix|"//&
                           "Molecular model files|*.cif;*.pdb;*.mol2;*.ml2;*.mol;*.mdl;*.res;*.cssr;*.xyz|"
               iSelection = 2
+              tFileName = ''
               CALL WSelectFile(FilterStr, iFlags, tFileName, 'Load Z-matrix file', iSelection)
 ! Did the user press cancel?
               IF (WInfoDialog(ExitButtonCommon) .NE. CommonOK) GOTO 999
@@ -1689,7 +1690,7 @@
                 CALL ParseRawInput(I)
               ENDDO
               IF (DRestrNumb .GT. 0) &
-                CALL WDialogPutCheckBoxLogical(IDF_SA_Dist_Rest, Checked)
+                CALL WDialogPutCheckBox(IDF_SA_Dist_Rest, Checked)
               IF (DASHWDialogGetCheckBoxLogical(IDF_SA_Dist_Rest)) THEN
                 CALL ShowWizardWindowSADistRestraints
               ELSE

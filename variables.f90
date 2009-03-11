@@ -31,9 +31,12 @@
 
 #ifdef _WIN32
       CHARACTER(1), PARAMETER :: DIRSPACER= '\' ! Windows spacer
+      CHARACTER(20), PARAMETER :: ALL_FILES_FILTER ='All files (*.*)|*.*|'
 #else
       CHARACTER(1), PARAMETER :: DIRSPACER = '/' ! Unix spacer
+      CHARACTER(16), PARAMETER :: ALL_FILES_FILTER ='All files (*)|*|'
 #endif
+
 ! FORTRAN standard 1997:
 ! For direct access, for unformatted input/output, the RECL is measured in 
 ! processor-dependent units.
