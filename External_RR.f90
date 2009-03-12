@@ -528,8 +528,8 @@
       IF ( PutAtoms(hSP_in_file, SPWriteAtom) ) GOTO 999
       CLOSE(hSP_in_file)
       ! Run the special positions program
-      CALL IOSCommand(TRIM(InstallationDirectory)//'special_positions.exe '// &
-        '"special_positions.in"', ProcSilent+ProcBlocked)
+      CALL IOSCommand(TRIM(InstallationDirectory)//'special_positions'//CCDC_EXE_EXT// &
+        ' "special_positions.in"', ProcSilent+ProcBlocked)
       PutAtomsForSpecailPosition = .FALSE.
 
   999 RETURN

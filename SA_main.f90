@@ -642,14 +642,14 @@
         IF (tInputFile(I:I) .EQ. DIRSPACER) iStart = I + 1
       ENDDO
       CALL WCursorShape(CurHourGlass)
-      CALL IOSCommand(TRIM(InstallationDirectory)//'zmconv.exe '// &
+      CALL IOSCommand('"'//TRIM(InstallationDirectory)//'zmconv'//CCDC_EXE_EXT//'" '// &
         TRIM(fmt)//' "'//tInputFile(iStart:iLen)//'"'//TRIM(tExtraArg), &
         ProcSilent+ProcBlocked)
       iStat = InfoError(1) 
       CALL WCursorShape(CurCrossHair)
       IF (iStat .EQ. ErrOSCommand) THEN
 ! An error occurred
-        CALL ErrorMessage("Error occurred when running zmconv.exe.")
+        CALL ErrorMessage("Error occurred when running zmconv"//CCDC_EXE_EXT//".")
         GOTO 200
       ENDIF
       RunZmConv = .TRUE.
