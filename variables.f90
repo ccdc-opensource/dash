@@ -30,10 +30,12 @@
       CHARACTER(MaxPathLength) ::  PathToLicenseFile
 
 #ifdef _WIN32
-      CHARACTER(1), PARAMETER :: DIRSPACER= '\' ! Windows spacer
+      CHARACTER(1),  PARAMETER :: DIRSPACER= '\' ! Windows spacer
+      CHARACTER(4),  PARAMETER :: CCDC_EXE_EXT ='.exe'
       CHARACTER(20), PARAMETER :: ALL_FILES_FILTER ='All files (*.*)|*.*|'
 #else
-      CHARACTER(1), PARAMETER :: DIRSPACER = '/' ! Unix spacer
+      CHARACTER(1),  PARAMETER :: DIRSPACER = '/' ! Unix spacer
+      CHARACTER(2),  PARAMETER :: CCDC_EXE_EXT ='.x'
       CHARACTER(16), PARAMETER :: ALL_FILES_FILTER ='All files (*)|*|'
 #endif
 

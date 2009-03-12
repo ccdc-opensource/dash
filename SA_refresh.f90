@@ -101,16 +101,17 @@
         CALL PopActiveWindowID
       ENDIF
       IF (tBuiltInMercury) THEN
-        tExeStr = TRIM(InstallationDirectory)//'Mercury\dash_mercury.exe'
-        tArgStr = ' -lf "'//TRIM(PathToLicenseFile)//'" -load-all-files'
+        tExeStr = TRIM(InstallationDirectory)//'Mercury'//DIRSPACER//'dash_mercury'//CCDC_EXE_EXT
+        tArgStr = '-lf "'//TRIM(PathToLicenseFile)//'" -load-all-files'
         IF (tUseClient) tArgStr = TRIM(tArgStr)//' -client'
       ELSE
         tExeStr = ViewExe
-        tArgStr = ' '//ViewArg
+        tArgStr = ViewArg
       ENDIF
       I = LEN_TRIM(tExeStr)
       IF (I .EQ. 0) THEN
-        CALL ErrorMessage('DASH could not launch the viewer. No viewer executable is currently specified.'//CHAR(13)//&
+        CALL ErrorMessage('DASH could not launch the viewer. '// &
+                          'No viewer executable is currently specified.'//CHAR(13)//&
                           'This can be changed in the Configuration... window'//CHAR(13)//&
                           'under Options in the menu bar.')
         RETURN
@@ -118,13 +119,14 @@
       INQUIRE(FILE = tExeStr(1:I),EXIST=exists)
       IF (.NOT. exists) GOTO 999
       M = InfoError(1) ! Clear errors
-      CALL IOSCommand(tExeStr(1:I)//TRIM(tArgStr)//' "'//TRIM(TheFileName)//'"')
+      CALL IOSCommand('"'//tExeStr(1:I)//'" '//TRIM(tArgStr)//' "'//TRIM(TheFileName)//'"')
       IF (InfoError(1) .NE. 0) GOTO 999
       RETURN
   999 IF (tBuiltInMercury) THEN
         tArgStr = 'DASH could not find or launch the built in Mercury: '//CHAR(13)//tExeStr(1:I)
       ELSE
-        tArgStr = 'DASH could not find or launch the viewer. The viewer executable is currently configured'//CHAR(13)//&
+        tArgStr = 'DASH could not find or launch the viewer. '// &
+                  'The viewer executable is currently configured'//CHAR(13)//&
                   'to launch the program '//tExeStr(1:I)//CHAR(13)//&
                   'This can be changed in the Configuration... window'//CHAR(13)//&
                   'under Options in the menu bar.'
