@@ -53,12 +53,18 @@
         ENDIF
       CASE ( FOR_GSAS )
         CALL DASHWDialogGetInteger(IDF_BKG_TERM_GSAS, NumOfBkgTerm)
-        ext_RR_input_file_name = TRIM(OutputFilesBaseName)//'.exp'
-        FILTER = 'GSAS exp file (*.exp)|*.exp|'
-        CALL WSelectFile(FILTER, iFlags, ext_RR_input_file_name, 'Save GSAS exp file')
+        CALL SplitPath(OutputFilesBaseName, tDirName, tFileName)
+        ! GSAS programs always capitalise filename, even on Linux.
+        ! This leaves us with no choice rather than using it from beginning.
+        CALL IUpperCase(tFileName)
+        ext_RR_input_file_name = TRIM(tDirName)//TRIM(tFileName)//'.EXP'
+        FILTER = 'GSAS EXP file (*.EXP)|*.EXP;*.exp|'
+        CALL WSelectFile(FILTER, iFlags, ext_RR_input_file_name, 'Save GSAS EXP file')
         IF ((WinfoDialog(4) .EQ. CommonOk) .AND. (LEN_TRIM(ext_RR_input_file_name) .NE. 0)) THEN
           CALL SplitPath(ext_RR_input_file_name, tDirName, tFileName)
           IF ( scan(TRIM(tFileName), ' ') .NE. 0 ) GOTO 999
+          CALL IUpperCase(tFileName)
+          ext_RR_input_file_name = TRIM(tDirName)//tFileName
           CALL SelectDASHDialog(IDD_SAW_Page7_GSAS)
           CALL UpdateGSASCheckBoxes()
           CALL WDialogPutInteger(IDF_NCYCL, 3)

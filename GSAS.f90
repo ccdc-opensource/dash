@@ -87,6 +87,7 @@
 !
       INTEGER FUNCTION CheckEXPGUIExe (ExpguiExe, ScriptName, fg_EXPGUI)
 
+      USE WINTERACTER
       USE VARIABLES
 
       IMPLICIT NONE
@@ -117,6 +118,9 @@
       L = LEN_TRIM(tDirName)
       IF ( fg_EXPGUI ) THEN
         ScriptName = tDirName(:L)//'expgui'
+        ! Note: in Linux, EXPGUI puts tcl84+ at one directory up than Windows version.
+        IF (IOsDirExists(ScriptName)) &
+          ScriptName = tDirName(:L)//'expgui'//DIRSPACER//'expgui'
         INQUIRE(FILE=ScriptName, EXIST=exists)
         IF ( exists ) GOTO 10
         CALL ErrorMessage('DASH could not launch EXPGUI. Make sure it is installed.')
@@ -326,6 +330,7 @@
       CHARACTER (40) tInstName, tExtension
       INTEGER tIRadSelection
       CHARACTER (80) tLine
+      CHARACTER(2), PARAMETER :: GSAS_LINE_END = CHAR(13)//CHAR(10)
       INTEGER iNRec, i1, i2, j, iPola, iRad
       REAL Lambda1, Lambda2, Pola, UVW(3), LXY(2), YScale, YEsdScale, YMax, StepWidth
       REAL, PARAMETER :: cZero = 0.0, cKRatio = 0.5
@@ -369,15 +374,15 @@
       OPEN(UNIT=chFileRaw,FILE=tFileName(1:tLen),STATUS='unknown',ERR=999)
       ! GSAS Raw file: assume CONS and ESD
       WRITE(tLine, '(F10.6,5X,A)', ERR=999) ALambda, 'Exported by DASH'
-      WRITE(chFileRaw, '(A80)', ERR=999) tLine
-!      tFileName = TRIM(tFileNameRoot)//'.ins'
+      WRITE(chFileRaw, '(A80,A2$)', ERR=999) tLine, GSAS_LINE_END
+!      tFileName = TRIM(tFileNameRoot)//'.INS'
 !      WRITE(tLine, '(A20,A)', ERR=999) 'Instrument parameter', ' '//TRIM(tFileName)
-!      WRITE(chFileRaw, '(A80)', ERR=999) tLine
+!      WRITE(chFileRaw, '(A80,A2$)', ERR=999) tLine, GSAS_LINE_END
       iNRec = NBIN / 5
       IF ( MOD(NBIN,5) .NE. 0 ) iNRec = iNRec + 1
       WRITE(tLine, '(A,2(I6,1X),A,1X,2(F10.4,1X),A)', ERR=999) 'BANK 1 ', NBIN, iNRec, 'CONS', &
             XBIN(1) * 100.0,StepWidth * 100.0,'0.0 0.0 ESD'
-      WRITE(chFileRaw, '(A80)', ERR=999) tLine
+      WRITE(chFileRaw, '(A80,A2$)', ERR=999) tLine, GSAS_LINE_END
       ! Scale YOBIN, EBIN to fit F8.2, allowing negative values
       YMax = 0.0
       YScale = 1.0
@@ -395,7 +400,7 @@
         i2 = i1 + 4
         IF ( i2 .GT. NBIN ) i2 = NBIN
         WRITE(tLine, '(10F8.2)', ERR=999) (YOBIN(J) * YScale, EBIN(J) * YEsdScale, J = i1, i2)
-        WRITE(chFileRaw, '(A80)', ERR=999) tLine
+        WRITE(chFileRaw, '(A80,A2$)', ERR=999) tLine, GSAS_LINE_END
         i1 = i2 + 1
       ENDDO
       CLOSE(chFileRaw)
@@ -483,34 +488,34 @@
       ENDIF
       OPEN(UNIT=chFileIns,FILE=tFileName(1:tLen),STATUS='unknown',ERR=998)
       WRITE(tLine, '(12X,60I1)', ERR=998) ((mod(I,10), I=1,10), J=1,6)
-      WRITE(chFileIns, '(A80)', ERR=998) tLine
+      WRITE(chFileIns, '(A80,A2$)', ERR=998) tLine, GSAS_LINE_END
       WRITE(tLine, '(A,A5)', ERR=998) 'INS   BANK  ','   1'
-      WRITE(chFileIns, '(A80)', ERR=998) tLine
+      WRITE(chFileIns, '(A80,A2$)', ERR=998) tLine, GSAS_LINE_END
       WRITE(tLine, '(A,2X,A4)', ERR=998) 'INS   HTYPE ','PXCR'    ! for xray only
-      WRITE(chFileIns, '(A80)', ERR=998) tLine
+      WRITE(chFileIns, '(A80,A2$)', ERR=998) tLine, GSAS_LINE_END
       WRITE(tLine, '(A,3F10.4, 9X,1H0,F10.3,I5,F10.3)', ERR=998) 'INS  1 ICONS', Lambda1, &
                                                        Lambda2, cZero, POLA, IPOLA, cKRatio
-      WRITE(chFileIns, '(A80)', ERR=998) tLine
+      WRITE(chFileIns, '(A80,A2$)', ERR=998) tLine, GSAS_LINE_END
       WRITE(tLine, '(A,I5)', ERR=998) 'INS  1 IRAD ', IRAD
-      WRITE(chFileIns, '(A80)', ERR=998) tLine
+      WRITE(chFileIns, '(A80,A2$)', ERR=998) tLine, GSAS_LINE_END
       WRITE(tLine, '(A,2X,A)', ERR=998) 'INS  1I HEAD', 'Exported by DASH'
-      WRITE(chFileIns, '(A80)', ERR=998) tLine
+      WRITE(chFileIns, '(A80,A2$)', ERR=998) tLine, GSAS_LINE_END
       WRITE(tLine, '(A,A5,3A10)', ERR=998) 'INS  1I ITYP', '0', '0.0000', '180.0000', '1'
-      WRITE(chFileIns, '(A80)', ERR=998) tLine
+      WRITE(chFileIns, '(A80,A2$)', ERR=998) tLine, GSAS_LINE_END
       WRITE(tLine, '(A,2X,A)', ERR=998) 'INS  1INAME ', tInstName
-      WRITE(chFileIns, '(A80)', ERR=998) tLine
+      WRITE(chFileIns, '(A80,A2$)', ERR=998) tLine, GSAS_LINE_END
       WRITE(tLine, '(A,2A5,A10)', ERR=998) 'INS  1PRCF1 ', '2', '6', '0.01000'
-      WRITE(chFileIns, '(A80)', ERR=998) tLine
+      WRITE(chFileIns, '(A80,A2$)', ERR=998) tLine, GSAS_LINE_END
       WRITE(tLine, '(A,4E15.6E3)', ERR=998) 'INS  1PRCF11', UVW(1:3), LXY(1)
-      WRITE(chFileIns, '(A80)', ERR=998) tLine
+      WRITE(chFileIns, '(A80,A2$)', ERR=998) tLine, GSAS_LINE_END
       WRITE(tLine, '(A,E15.6E3,A15)', ERR=998) 'INS  1PRCF12', LXY(2), '0.000000E+000'
-      WRITE(chFileIns, '(A80)', ERR=998) tLine
+      WRITE(chFileIns, '(A80,A2$)', ERR=998) tLine, GSAS_LINE_END
 !      DO I = 2, 4
 !        WRITE(tLine, '(A,I1,4A15)', ERR=998) 'INS  1PRCF1', I, ('0.000000E+000', J=1,4)
-!        WRITE(chFileIns, '(A80)', ERR=998) tLine
+!        WRITE(chFileIns, '(A80,A2$)', ERR=998) tLine, GSAS_LINE_END
 !      ENDDO
 !      WRITE(tLine, '(A,4A15)', ERR=998) 'INS  1PRCF13', ('0.000000E+000', I=1,2)
-!      WRITE(chFileIns, '(A80)', ERR=998) tLine
+!      WRITE(chFileIns, '(A80,A2$)', ERR=998) tLine, GSAS_LINE_END
       CLOSE(chFileIns)
 
   100 WriteGSASFiles = WriteEXPGUIPhaseFile(FileNameBase)

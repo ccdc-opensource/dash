@@ -346,18 +346,18 @@ proc run_pawley {uvw "h 1" "p 1"} {
 	setexp { EXPR NPHAS} 10 [expr ($p - 1)*5+4] 2
 	hapinfo $h $p extmeth set 2
 	incr expgui(changed)
-	runGSASwEXP {POWPREF GENLES}
+	runGSASwEXP {powpref genles}
 #	histinfo $h ddamp set 5
 	histinfo $h zref set 1
 	incr expgui(changed)
-	runGSASwEXP GENLES
+	runGSASwEXP genles
 	histinfo $h zref set 0
 	if {$uvw >=0} {
 		#hapinfo $h $p pdamp set 5
 		foreach i {1 2 3 7 4 5} {
 			hapinfo $h $p pref$i set 1
 			incr expgui(changed)
-			runGSASwEXP GENLES
+			runGSASwEXP genles
 			hapinfo $h $p pref$i set 0
 		}
 	}
@@ -460,11 +460,15 @@ set wishshell [info nameofexecutable]
 set liveplot(hst) $hist
 set liveplot(legend) 1
 
+if ![llength [array name env GSASBACKSPACE]] {
+    set env(GSASBACKSPACE) 0
+}
+
 wm geometry . =1x1+0+0
 wm iconify .
 
 if [expr $argc < 2] {
-	error_quit "Expecting arguments: base_name option [ncycle]"
+	error_quit "Expecting arguments: base_name option \[ncycle\]"
 }
 set optstr [lindex $argv 1]
 #if {[catch {expr $optstr < 0}] || [expr $optstr < 0]}
@@ -540,7 +544,11 @@ if {[lsearch $optlist initial] >= 0} {
 	expinfo cycles set $ncycle
 	run_pawley [lsearch $optlist profile] $hist $phase
 
-	catch {liveplot [file dirname [info nameofexecutable]]}
+	set lpdir [file dirname [info nameofexecutable]]
+	if ![file exists [file join $lpdir liveplot]] {
+	    set lpdir [file join $lpdir expgui]
+	}
+	catch {liveplot $lpdir}
 	after 1000
 	
 	# add atom list from pha file
@@ -559,7 +567,14 @@ if {[lsearch $optlist initial] >= 0} {
 	# constraint
 	constrinfo atom set 1 [list [list $hist ALL UISO 1.0]]
 	
-	add_cif_rec $hist $env(USERNAME)
+	if [llength [array name env USERNAME]] {
+		set username $env(USERNAME)
+	} elseif [llength [array name env USER]] {
+		set username $env(USER)
+	} else {
+		set username ""
+	}
+	add_cif_rec $hist $username
 	incr expgui(changed)
 	if {[llength $optlist] == 1 || [lsearch $optlist profile] >= 0} {
 		savearchiveexp
@@ -595,10 +610,10 @@ set_atom_flags $optlist $phase
 # LS
 expinfo cycles set $ncycle
 exp_set_factr $basename.fct
-set cmds {POWPREF GENLES}
+set cmds {powpref genles}
 if {[lsearch $optlist cif] >= 0} {
 	# output CIF
-	lappend cmds DISAGL GSAS2CIF
+	lappend cmds disagl gsas2cif
 }
 incr expgui(changed)
 # no bother to load exp again
