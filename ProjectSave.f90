@@ -688,6 +688,9 @@
       DO iFrg = 1, nFrag
         CALL FileRWString (hPrjFile, iPrjRecNr, RW, frag_file(iFrg))
         IF ( FileErrorOccurred() ) RETURN
+! The path may come from a file created in other machine or platform!
+        IF ( RW .EQ. cRead ) &
+          CALL StripPathIfInvalid(frag_file(iFrg))
 
         CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, izmpar(iFrg))
         IF ( FileErrorOccurred() ) RETURN

@@ -164,23 +164,28 @@
  10   line = ' '
       READ(iHandle,'(A)',END=100,ERR=999) line
       nl = LEN_TRIM(line)
-      CALL ILowerCase(line(:nl))
       CALL INextString(line,keychar)
+      CALL ILowerCase(keychar)
       SELECT CASE (KeyChar(1:3))
         CASE ('tic')
           DashTicFile = line(ILocateChar(line):)
           TicExists = .TRUE.
+          CALL StripPathIfInvalid(DashTicFile)
         CASE ('hcv')
           DashHcvFile = line(ILocateChar(line):)
           HcvExists = .TRUE.
+          CALL StripPathIfInvalid(DashHcvFile)
         CASE ('pik')
           DashPikFile = line(ILocateChar(line):)
           PikExists = .TRUE.
+          CALL StripPathIfInvalid(DashPikFile)
         CASE ('raw')
           DashRawFile = line(ILocateChar(line):)
+          CALL StripPathIfInvalid(DashRawFile)
         CASE ('dsl')
           DashDslFile = line(ILocateChar(line):)
           DslExists = .TRUE.
+          CALL StripPathIfInvalid(DashDslFile)
         CASE ('cel') ! Cell parameters
           DO I = 1, 6
             CALL INextReal(line,CellPar(i))
@@ -302,7 +307,7 @@
       OPEN (UNIT=hFile, FILE=TheFileName, STATUS='OLD', ERR=999)
 ! Loop over all records
       DO WHILE ( .TRUE. )
- 10     READ(hFile,'(A)',END=100,ERR=999) line
+        READ(hFile,'(A)',END=100,ERR=999) line
         nl = LEN_TRIM(line)
         CALL ILowerCase(line(:nl))
         CALL INextString(line,keychar)

@@ -449,3 +449,43 @@
 !
 !*****************************************************************************
 ! 
+      SUBROUTINE StripPathIfInvalid(FileName)
+!
+! This routine first locates the rightmost forward or backward slash, which splitting
+! FileName into path and filename. If a non-empty path does not exist, strips it
+! from FileName to force it in current directory. Otherwise, does nothing.
+      USE WINTERACTER
+
+      IMPLICIT NONE
+
+      CHARACTER*(*), INTENT (INOUT) :: FileName
+
+      LOGICAL, EXTERNAL :: Confirm
+      LOGICAL, SAVE :: Warn
+      DATA Warn/.TRUE./
+      INTEGER iPos
+
+      iPos = SCAN(FileName, '/\', BACK=.TRUE.)
+      IF (iPos .LE. 0) & ! no path
+        RETURN
+
+      IF (IOsDirExists(FileName(:iPos))) & ! valid path
+        RETURN
+
+      IF (Warn) &
+        Warn = Confirm('The path to file:'//CHAR(13)//CHAR(13)// &
+                     TRIM(FileName)//CHAR(13)//CHAR(13)// &
+                     'does not exist or is invalid, so is stripped.'//CHAR(13)// &
+                     'The current directory will be used by default.'//CHAR(13)//CHAR(13)// &
+                     'Display this kind warning again next time?')
+      ! strip path
+      IF (iPos .GE. LEN(FileName)) THEN
+        FileName = ''
+      ELSE
+        FileName = FileName(iPos+1:)
+      ENDIF
+ 
+      END SUBROUTINE StripPathIfInvalid
+!
+!*****************************************************************************
+! 
