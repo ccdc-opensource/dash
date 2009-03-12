@@ -16,7 +16,7 @@
       CHARACTER(3)                                            SA_RunNumberStr
       COMMON /basnam/          OFBN_Len, OutputFilesBaseName, SA_RunNumberStr
 
-      LOGICAL, EXTERNAL :: CheckTOPASFileName, DASHWDialogGetCheckBoxLogical
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
       INTEGER, EXTERNAL :: WriteTOPASFilePawley, WriteGSASFiles, Launch_GSAS
       INTEGER, EXTERNAL :: WriteRIETANFiles, Launch_RIETAN
       CHARACTER(LEN=45) :: FILTER
