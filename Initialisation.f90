@@ -20,6 +20,8 @@
       tProcess = 0 ! this program
 #ifdef _WIN32
       IDummy = GetModuleFileName(tProcess, tString, LOC(tSize))
+#else
+      CALL GetArg(0, tString)
 #endif
       
 ! tString should now contain the full path to DASH.exe irrespective of the way
@@ -33,6 +35,7 @@
       CALL IOsDirName(InstallationDirectory)
       InstallationDirectory = TRIM(InstallationDirectory)//DIRSPACER
 
+#ifdef _WIN32
       ! Operating system version number (e.g. 400=4.00)
       IF ( InfoOpSystem(OSVersion) .LT. 600 ) THEN
         CALL IOsVariable('ALLUSERSPROFILE', AllUsersProfileDirectory)
@@ -40,13 +43,20 @@
 ! Vista  'C:\Users\Public\'
         CALL IOsVariable('PUBLIC', AllUsersProfileDirectory)
       ENDIF
+#else
+      AllUsersProfileDirectory = ''
+#endif
       IF ( LEN_TRIM(AllUsersProfileDirectory) .GT. 0 ) THEN
         AllUsersProfileDirectory = TRIM(AllUsersProfileDirectory)//DIRSPACER
       ELSE
         AllUsersProfileDirectory = StartUpDirectory
       ENDIF
 
+#ifdef _WIN32
       CALL IOsVariable('APPDATA', AppDataDirectory)
+#else
+      CALL IOsVariable('HOME', AppDataDirectory)
+#endif
       IF ( LEN_TRIM(AppDataDirectory) .GT. 0 ) THEN
         AppDataDirectory = TRIM(AppDataDirectory)//DIRSPACER
       ELSE

@@ -19,10 +19,15 @@
       CHARACTER*2 Exp
       TYPE (License_Info) Info
       
-      LicencePaths(1) = TRIM(AllUsersProfileDirectory)//'DashLicense.dat'
-      LicencePaths(2) = TRIM(InstallationDirectory)//'License.dat'
-      LicencePaths(3) = TRIM(StartUpDirectory)//'DashLicense.dat'
-      NumbLicencePath = 3
+      NumbLicencePath = 0
+      IF (AllUsersProfileDirectory .NE. StartUpDirectory) THEN
+        NumbLicencePath = NumbLicencePath + 1
+        LicencePaths(NumbLicencePath) = TRIM(AllUsersProfileDirectory)//'DashLicense.dat'
+      ENDIF
+      NumbLicencePath = NumbLicencePath + 1
+      LicencePaths(NumbLicencePath) = TRIM(InstallationDirectory)//'License.dat'
+      NumbLicencePath = NumbLicencePath + 1
+      LicencePaths(NumbLicencePath) = TRIM(StartUpDirectory)//'DashLicense.dat'
       PathToLicenseFile = ''
 
       IF ( in_batch ) THEN
