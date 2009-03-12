@@ -397,7 +397,10 @@
 
       USE WINTERACTER
 
+#ifndef __G95__
       INCLUDE 'for_iosdef.for'
+#endif
+      CHARACTER*20, EXTERNAL :: Integer2String
 
       INTEGER       ErrorStatus
       CHARACTER*(*) FileName
@@ -405,14 +408,20 @@
 
       lenstr = LEN_TRIM(FileName)
       SELECT CASE(ErrorStatus)
+! Unfortunately, the system errnos are not listed by G95.
+#ifndef __G95__
         CASE (FOR$IOS_FILNOTFOU) 
           CALL ErrorMessage("The file "//CHAR(13)//FileName(1:lenstr)//CHAR(13)//" does not exist.")
         CASE (FOR$IOS_OPEFAI)
           CALL ErrorMessage("The file "//CHAR(13)//FileName(1:lenstr)//CHAR(13)//" could not be opened.")
         CASE (FOR$IOS_PERACCFIL)
           CALL ErrorMessage("You do not have permission to access the file "//FileName(1:lenstr))
+#endif
         CASE DEFAULT
-          CALL ErrorMessage("The file "//CHAR(13)//FileName(1:lenstr)//CHAR(13)//"was not read successfully.")
+          CALL ErrorMessage("The file "//CHAR(13)// &
+                            FileName(1:lenstr)//CHAR(13)// &
+                            "was not read successfully."//CHAR(13)// &
+                            "Error code: "//TRIM(Integer2String(ErrorStatus)))
       END SELECT
 
       END SUBROUTINE FileErrorPopup
