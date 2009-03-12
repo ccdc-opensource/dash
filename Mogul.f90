@@ -129,6 +129,7 @@
       INTEGER tLength, olength
       INTEGER, PARAMETER :: hFile = 240
 
+      WriteMogulScript = .FALSE.
       CALL IOsDirName(CurrentDirectory)
       tLength = LEN_TRIM(MogulMol2)
       Script_file = MogulMol2(1:tLength-10)//'script.qf'
