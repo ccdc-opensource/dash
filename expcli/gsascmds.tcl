@@ -1,4 +1,4 @@
-# $Id: gsascmds.tcl,v 1.63 2006/03/29 03:52:11 toby Exp toby $
+# $Id: gsascmds.tcl,v 1.2 2007/08/31 12:06:14 dong Exp $
 #------------------------------------------------------------------------------
 # display routines
 #------------------------------------------------------------------------------
@@ -2629,11 +2629,12 @@ if {$tcl_platform(platform) == "windows" && $tcl_platform(os) == "Windows 95"} {
 	}
 	#
 	#if $wait {
-	    append command "\; echo -n Press Enter to continue \; read x"
+	#   append command "\; echo -n Press Enter to continue \; read x"
 	#}
 	if {$wait && $expgui(autoiconify)} {wm iconify .}
 	catch {eval exec xterm $termopts -title [list $title] \
-		-e /bin/sh -c [list $command] $suffix} errmsg
+             -e [file join $expgui(scriptdir) gsastcl.sh] \
+            [list $command] $suffix} errmsg
 	if $expgui(debug) {puts "xterm result = $errmsg"}
 	if {$wait} {
 	    if {$expgui(autoiconify)} {wm deiconify .}

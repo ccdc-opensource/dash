@@ -1,4 +1,4 @@
-# $Id: export_cif.tcl,v 1.1 2004/09/08 14:08:22 toby Exp toby $
+# $Id: export_cif.tcl,v 1.2 2007/10/01 13:55:01 dong Exp $
 # set local variables that define the proc to execute and the menu label
 set label "coords-only CIF"
 set action exp2cif
@@ -56,6 +56,7 @@ proc exp2cif {"alt 0"} {
 
 	puts $fp "loop_\n  _atom_site_label\n _atom_site_type_symbol"
 	puts $fp " _atom_site_fract_x\n _atom_site_fract_y\n _atom_site_fract_z"
+    puts $fp " _atom_site_thermal_displace_type"
 	puts $fp " _atom_site_B_iso_or_equiv\n _atom_site_occupancy"
 
 	foreach atom $expmap(atomlist_$phase) {
@@ -68,7 +69,7 @@ proc exp2cif {"alt 0"} {
 	    foreach var {x y z frac} {
 		set $var  [format %.5f [$cmd $phase $atom $var]]
 	    }
-	    puts $fp "$label $elem $x $y $z $Biso $frac"
+	    puts $fp "$label $elem $x $y $z Biso $Biso $frac"
 	}
 	close $fp
     } errmsg] {

@@ -642,7 +642,7 @@
                                'and renamed as the same base name.'//CHAR(13)//&
                                'Note: only BANK 1 will be used in the refinement.')
                    tFileName = GSASINS
-                   FILTER = 'GSAS ins file (*.ins)|*.ins|'
+                   FILTER = 'GSAS ins file (*.ins)|*.ins;*.INS|'
                    iFlags = LoadDialog + AppendExt + PromptOn
                    CALL WSelectFile(FILTER, iFlags, tFileName, 'Select a GSAS ins file')
                    IF ((WinfoDialog(4) .EQ. CommonOk) .AND. (LEN_TRIM(tFileName) .NE. 0)) &
