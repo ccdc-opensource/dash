@@ -78,7 +78,7 @@
         Dirname = ' '
         CALL WSelectDir(IFlags,Dirname,"Select working directory for DASH...")
         IF (LEN_TRIM(Dirname) .EQ. 0) THEN
-          CALL WindowClose
+          CALL WindowCloseWrap
           STOP
         ENDIF
 ! Open the file
@@ -331,7 +331,7 @@
       GOTO 10
  100  IF (I .NE. MaxSPGR) THEN
         CALL ErrorMessage('Number of space groups in space-group file has changed.')
-        CALL WindowClose
+        CALL WindowCloseWrap
         STOP
       ENDIF
       CLOSE(110)
@@ -347,7 +347,7 @@
                           //'SpaceGroupSymbols.dat'//CHAR(13)// &
                           "in the installation directory"//CHAR(13)//&
                           TRIM(InstallationDirectory))              
-      CALL WindowClose
+      CALL WindowCloseWrap
       STOP
 
       END SUBROUTINE PolyFitterInitialise
@@ -658,94 +658,99 @@
       KolBack           = Win_RGB(164, 211, 105)
 
       CALL ReadConfigurationFile
-      CALL IGrPaletteRGB(KolNumPGWindow,KolPGWindow%IRed,&
-                                        KolPGWindow%IGreen,&
-                                        KolPGWindow%IBlue)
-      CALL IGrPaletteRGB(KolNumMain,KolMain%IRed,&
-                                    KolMain%IGreen,&
-                                    KolMain%IBlue)
-      CALL IGrPaletteRGB(KolNumObs,KolObs%IRed,&
-                                   KolObs%IGreen,&
-                                   KolObs%IBlue)
-      CALL IGrPaletteRGB(KolNumCal,KolCal%IRed,&
-                                   KolCal%IGreen,&
-                                   KolCal%IBlue)
-      CALL IGrPaletteRGB(KolNumDif,KolDif%IRed,&
-                                   KolDif%IGreen,&
-                                   KolDif%IBlue)
-      CALL IGrPaletteRGB(KolNumMTic,KolMTic%IRed,&
-                                    KolMTic%IGreen,&
-                                    KolMTic%IBlue)
-      CALL IGrPaletteRGB(KolNumCTic,KolCTic%IRed,&
-                                    KolCTic%IGreen,&
-                                    KolCTic%IBlue)
-      CALL IGrPaletteRGB(KolNumPanelVLite,KolPanelVLite%IRed,&
-                                          KolPanelVLite%IGreen,&
-                                          KolPanelVLite%IBlue)
-      CALL IGrPaletteRGB(KolNumPanelLite,KolPanelLite%IRed,&
-                                         KolPanelLite%IGreen,&
-                                         KolPanelLite%IBlue)
-      CALL IGrPaletteRGB(KolNumPanelDark,KolPanelDark%IRed,&
-                                         KolPanelDark%IGreen,&
-                                         KolPanelDark%IBlue)
-      CALL IGrPaletteRGB(KolNumPanelVDark,KolPanelVDark%IRed,&
-                                          KolPanelVDark%IGreen,&
-                                          KolPanelVDark%IBlue)
-      CALL IGrPaletteRGB(KolNumPanelOuter,KolPanelOuter%IRed,&
-                                          KolPanelOuter%IGreen,&
-                                          KolPanelOuter%IBlue)
-      CALL IGrPaletteRGB(KolNumRectSelect,KolRectSelect%IRed,&
-                                          KolRectSelect%IGreen,&
-                                          KolRectSelect%IBlue)
-      CALL IGrPaletteRGB(KolNumLargeCrossHair,KolLargeCrossHair%IRed,&
-                                              KolLargeCrossHair%IGreen,&
-                                              KolLargeCrossHair%IBlue)
-      CALL IGrPaletteRGB(KolNumPeakFit,KolPeakFit%IRed,&
-                                       KolPeakFit%IGreen,&
-                                       KolPeakFit%IBlue)
-      CALL IGrPaletteRGB(KolNumPeakPos,KolPeakPos%IRed,&
-                                       KolPeakPos%IGreen,&
-                                       KolPeakPos%IBlue)
-      CALL IGrPaletteRGB(KolNumBack,   KolBack%IRed,&
-                                       KolBack%IGreen,&
-                                       KolBack%IBlue)
-! Initialise bitmap 'Temperature1.bmp'
-! Rather than loading it from file, it is now calculated.
-      CALL WBitMapCreate(bmIHANDLE, iWidth, iHeight)
-      DO J = 1, iHeight
-        DO I = 1, iWidth
-! Red
-          SELECT CASE (I)
-            CASE (  1: 53)
-              iRed   = NINT( 0.0015 * ((FLOAT(I-  0))**3) - 0.1796 * ((FLOAT(I-  0))**2) + 1.3012 * (FLOAT(I-  0)) + 228.37)
-            CASE ( 54:278)
-              iRed   = IDNINT( -0.0000168D00 * ((DBLE(I- 53))**3) + 0.0001469D00 * ((DBLE(I- 53))**2) + 1.8535D00 * (DBLE(I- 53)) + 8.5478D00)
-            CASE (279:300)
-              iRed   =                                   242
-          END SELECT
-! Green
-          SELECT CASE (I)
-            CASE (  1: 52)
-              iGreen = NINT( 0.0015 * ((FLOAT(I-  0))**3) - 0.1796 * ((FLOAT(I-  0))**2) + 1.3012 * (FLOAT(I-  0)) + 228.37)
-            CASE ( 53:245)
-              iGreen =                                    18
-            CASE (246:300)
-              iGreen = NINT(-0.0015 * ((FLOAT(I-245))**3) + 0.0662 * ((FLOAT(I-245))**2) + 5.1575 * (FLOAT(I-245)) + 12.951)
-          END SELECT
-! Blue
-          SELECT CASE (I)
-            CASE (  1: 53)
-              iBlue  = NINT( 0.0008772 * ((FLOAT(I-  0))**3) - 0.072826 * ((FLOAT(I-  0))**2) + 0.42372 * (FLOAT(I-  0)) + 252.365)
-            CASE ( 54:248)
-              iBlue  = IDNINT( 0.0000232D00 * ((DBLE(I- 53))**3) - 0.010817D00 * ((DBLE(I- 53))**2) + 0.23341D00 * (DBLE(I- 53)) + 197.682D00)
-            CASE (249:300)
-              iBlue  = NINT(-0.0004 * ((FLOAT(I-248))**3) + 0.013  * ((FLOAT(I-248))**2) + 1.5058 * (FLOAT(I-248)) + 0.4329)
-          END SELECT
-          iRGBvalue = (iBlue*256*256) + (iGreen*256) + iRed
-          tData(I,J) = iRGBvalue
-        ENDDO    
-      ENDDO              
-      CALL WBitMapGetData(bmIHANDLE, tData)
+      ! Only need to initialise colour and bitmap for gui mode
+      IF (.NOT. in_batch) THEN
+
+        CALL IGrPaletteRGB(KolNumPGWindow,KolPGWindow%IRed,&
+                                          KolPGWindow%IGreen,&
+                                          KolPGWindow%IBlue)
+        CALL IGrPaletteRGB(KolNumMain,KolMain%IRed,&
+                                      KolMain%IGreen,&
+                                      KolMain%IBlue)
+        CALL IGrPaletteRGB(KolNumObs,KolObs%IRed,&
+                                     KolObs%IGreen,&
+                                     KolObs%IBlue)
+        CALL IGrPaletteRGB(KolNumCal,KolCal%IRed,&
+                                     KolCal%IGreen,&
+                                     KolCal%IBlue)
+        CALL IGrPaletteRGB(KolNumDif,KolDif%IRed,&
+                                     KolDif%IGreen,&
+                                     KolDif%IBlue)
+        CALL IGrPaletteRGB(KolNumMTic,KolMTic%IRed,&
+                                      KolMTic%IGreen,&
+                                      KolMTic%IBlue)
+        CALL IGrPaletteRGB(KolNumCTic,KolCTic%IRed,&
+                                      KolCTic%IGreen,&
+                                      KolCTic%IBlue)
+        CALL IGrPaletteRGB(KolNumPanelVLite,KolPanelVLite%IRed,&
+                                            KolPanelVLite%IGreen,&
+                                            KolPanelVLite%IBlue)
+        CALL IGrPaletteRGB(KolNumPanelLite,KolPanelLite%IRed,&
+                                           KolPanelLite%IGreen,&
+                                           KolPanelLite%IBlue)
+        CALL IGrPaletteRGB(KolNumPanelDark,KolPanelDark%IRed,&
+                                           KolPanelDark%IGreen,&
+                                           KolPanelDark%IBlue)
+        CALL IGrPaletteRGB(KolNumPanelVDark,KolPanelVDark%IRed,&
+                                            KolPanelVDark%IGreen,&
+                                            KolPanelVDark%IBlue)
+        CALL IGrPaletteRGB(KolNumPanelOuter,KolPanelOuter%IRed,&
+                                            KolPanelOuter%IGreen,&
+                                            KolPanelOuter%IBlue)
+        CALL IGrPaletteRGB(KolNumRectSelect,KolRectSelect%IRed,&
+                                            KolRectSelect%IGreen,&
+                                            KolRectSelect%IBlue)
+        CALL IGrPaletteRGB(KolNumLargeCrossHair,KolLargeCrossHair%IRed,&
+                                                KolLargeCrossHair%IGreen,&
+                                                KolLargeCrossHair%IBlue)
+        CALL IGrPaletteRGB(KolNumPeakFit,KolPeakFit%IRed,&
+                                         KolPeakFit%IGreen,&
+                                         KolPeakFit%IBlue)
+        CALL IGrPaletteRGB(KolNumPeakPos,KolPeakPos%IRed,&
+                                         KolPeakPos%IGreen,&
+                                         KolPeakPos%IBlue)
+        CALL IGrPaletteRGB(KolNumBack,   KolBack%IRed,&
+                                         KolBack%IGreen,&
+                                         KolBack%IBlue)
+  ! Initialise bitmap 'Temperature1.bmp'
+  ! Rather than loading it from file, it is now calculated.
+        CALL WBitMapCreate(bmIHANDLE, iWidth, iHeight)
+        DO J = 1, iHeight
+          DO I = 1, iWidth
+  ! Red
+            SELECT CASE (I)
+              CASE (  1: 53)
+                iRed   = NINT( 0.0015 * ((FLOAT(I-  0))**3) - 0.1796 * ((FLOAT(I-  0))**2) + 1.3012 * (FLOAT(I-  0)) + 228.37)
+              CASE ( 54:278)
+                iRed   = IDNINT( -0.0000168D00 * ((DBLE(I- 53))**3) + 0.0001469D00 * ((DBLE(I- 53))**2) + 1.8535D00 * (DBLE(I- 53)) + 8.5478D00)
+              CASE (279:300)
+                iRed   =                                   242
+            END SELECT
+  ! Green
+            SELECT CASE (I)
+              CASE (  1: 52)
+                iGreen = NINT( 0.0015 * ((FLOAT(I-  0))**3) - 0.1796 * ((FLOAT(I-  0))**2) + 1.3012 * (FLOAT(I-  0)) + 228.37)
+              CASE ( 53:245)
+                iGreen =                                    18
+              CASE (246:300)
+                iGreen = NINT(-0.0015 * ((FLOAT(I-245))**3) + 0.0662 * ((FLOAT(I-245))**2) + 5.1575 * (FLOAT(I-245)) + 12.951)
+            END SELECT
+  ! Blue
+            SELECT CASE (I)
+              CASE (  1: 53)
+                iBlue  = NINT( 0.0008772 * ((FLOAT(I-  0))**3) - 0.072826 * ((FLOAT(I-  0))**2) + 0.42372 * (FLOAT(I-  0)) + 252.365)
+              CASE ( 54:248)
+                iBlue  = IDNINT( 0.0000232D00 * ((DBLE(I- 53))**3) - 0.010817D00 * ((DBLE(I- 53))**2) + 0.23341D00 * (DBLE(I- 53)) + 197.682D00)
+              CASE (249:300)
+                iBlue  = NINT(-0.0004 * ((FLOAT(I-248))**3) + 0.013  * ((FLOAT(I-248))**2) + 1.5058 * (FLOAT(I-248)) + 0.4329)
+            END SELECT
+            iRGBvalue = (iBlue*256*256) + (iGreen*256) + iRed
+            tData(I,J) = iRGBvalue
+          ENDDO    
+        ENDDO              
+        CALL WBitMapGetData(bmIHANDLE, tData)
+
+      ENDIF ! in_batch
 
       END SUBROUTINE InitialiseVariables
 !

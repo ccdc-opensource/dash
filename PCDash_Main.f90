@@ -515,6 +515,26 @@
 !
 !*****************************************************************************
 !
+      SUBROUTINE WindowCloseWrap
+
+      IMPLICIT NONE
+
+      INTEGER MAX_DIALOG_IDENTIFIERS
+      PARAMETER ( MAX_DIALOG_IDENTIFIERS = 5000 )
+      INTEGER DIALOG_STATE(MAX_DIALOG_IDENTIFIERS)
+      LOGICAL ROOT_OPEN
+      COMMON / DASH_DIALOG_STATE / DIALOG_STATE, ROOT_OPEN
+
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+      IF ( .NOT. IN_BATCH .OR. ROOT_OPEN ) &
+        CALL WindowClose
+
+      END SUBROUTINE WindowCloseWrap
+!
+!*****************************************************************************
+!
       SUBROUTINE DoExit
 
       IMPLICIT NONE
@@ -524,7 +544,7 @@
       CLOSE(UNIT=12, STATUS='DELETE', IOSTAT=ISTAT)
       CLOSE(UNIT=6, STATUS='DELETE', IOSTAT=ISTAT)  ! dash.out
       CALL DeleteTempFiles
-      CALL WindowClose
+      CALL WindowCloseWrap
       STOP
 
       END SUBROUTINE DoExit
@@ -603,3 +623,4 @@
       CALL MergeDASHFiles(tDirName, tFileName);
 
       END SUBROUTINE
+
