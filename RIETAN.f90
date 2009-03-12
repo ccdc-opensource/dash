@@ -458,6 +458,7 @@
       CHARACTER (40) tExtension, tKeyWord
       INTEGER tIRadSelection, iRad
       CHARACTER (80) tLine
+      CHARACTER(2), PARAMETER :: GSAS_LINE_END = CHAR(13)//CHAR(10)
       REAL Pola, yMax, Y, r12, YScale, YEsdScale, StepWidth, tmpY(5), tmpE(5)
       INTEGER NumOfAtmPerElm(1:MaxElm), iFrg, spg_set, nBeam
       LOGICAL YScaled, SetMinY
@@ -489,12 +490,12 @@
           StepWidth = (XBIN(NBIN) - XBIN(1)) / (NBIN - 1)
         ENDIF
         WRITE(tLine, '(F10.6,5X,A)', ERR=993) ALambda, 'Exported by DASH'
-        WRITE(chFileTmp, '(A80)', ERR=993) tLine
+        WRITE(chFileTmp, '(A80,A2$)', ERR=993) tLine, GSAS_LINE_END
         iNRec = NBIN / 5
         IF ( MOD(NBIN,5) .NE. 0 ) iNRec = iNRec + 1
         WRITE(tLine, '(A,2(I6,1X),A,1X,2(F10.4,1X),A)', ERR=993) 'BANK 1 ', NBIN, iNRec, 'CONS', &
               XBIN(1) * 100.0,StepWidth * 100.0,'0.0 0.0 ESD'
-        WRITE(chFileTmp, '(A80)', ERR=993) tLine
+        WRITE(chFileTmp, '(A80,A2$)', ERR=993) tLine, GSAS_LINE_END
         ! Scale YOBIN, EBIN to fit F8.2, allowing negative values
         YScale = 1.0
         YScaled = .FALSE.
@@ -518,7 +519,7 @@
           IF ( J .GT. 1 ) THEN
             i2 = J - 1
             WRITE(tLine, '(10F8.2)', ERR=993) (tmpY(J), tmpE(J), J = 1, i2)
-            WRITE(chFileTmp, '(A80)', ERR=993) tLine
+            WRITE(chFileTmp, '(A80,A2$)', ERR=993) tLine, GSAS_LINE_END
           ENDIF
         ENDDO
         IF ( YScaled ) CALL DebugErrorMessage('Intensity is rescaled to fit GSAS ESD format')
