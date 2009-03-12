@@ -1,6 +1,14 @@
 !
 !*****************************************************************************
 !
+#ifdef __G95__
+#define C_STR_CONSTANT(s)  s//CHAR(0)
+#else
+#define C_STR_CONSTANT(s)  s ## C
+#endif
+!
+!*****************************************************************************
+!
       SUBROUTINE CheckLicence
 
       USE WINTERACTER
@@ -253,7 +261,7 @@
       CALL WSelectFile(fstr, iFlags, fname_2, "Please enter a filename", iDummy)
       IF (LEN_TRIM(fname_2) .LE. 0 .OR. fname_2 .EQ. AllUsersProfileDirectory) RETURN
       OPEN(UNIT = Iun, FILE=TRIM(fname_2), STATUS='unknown', ERR=99)
-      Sn = Get_DiskSerialNumber("C:\\"//CHAR(0))
+      Sn = Get_DiskSerialNumber(C_STR_CONSTANT("C:\\"))
       WRITE(Iun,'(A)',ERR=100) 'This file is provided to submit requests for '//ProgramVersion//' licences.'
       WRITE(Iun,'(A)',ERR=100) 'A DASH evaluation licence will allow you to run DASH on any PC.'
       WRITE(Iun,'(A)',ERR=100) 'A site licence will allow you to install DASH on any PC on your own site.'
@@ -302,6 +310,8 @@
 
 #ifdef _WIN32
       USE DFWIN
+#else
+      USE ISO_C_BINDING
 #endif
 
       IMPLICIT NONE
@@ -330,6 +340,12 @@
                            NULL,                             &
                            lpszSystemName,                   &
                            nSystemNameSize)
+#else
+      INTERFACE
+        INTEGER FUNCTION GetHostID() BIND(C, NAME='gethostid')
+        END FUNCTION GetHostID
+      END INTERFACE
+      lpszSerialNumber = GetHostID()
 #endif
       Get_DiskSerialNumber = IEOR(lpszSerialNumber,Mangler)
 
@@ -528,7 +544,7 @@
 ! For node-locked licences check the serial id. Site-Wide licences just encode a serial id for our reference
 ! so if we catch any non-authorized users using the key, we know where it came from. Perhaps we may want to make
 ! the user key in this site code on installation for checking purposes.
-        IF (Info%SerialNumber .NE. Get_DiskSerialNumber("C:\\"//CHAR(0))) Info%Valid = -4
+        IF (Info%SerialNumber .NE. Get_DiskSerialNumber(C_STR_CONSTANT("C:\\"))) Info%Valid = -4
       ENDIF
       RETURN
    99 Info%Valid = -2
@@ -589,7 +605,6 @@
       INTEGER v(2), w(2)
       INTEGER*2 CheckSum
       INTEGER*2 VersionDependentMangler
-      INTEGER dummy
       INTEGER I, iLicenseFileIndex, tLen
       INTEGER, PARAMETER :: hFile = 10
      
@@ -631,7 +646,7 @@
       ! This is necessary because otherwise the site-licence file would be copyable
       ! and work on every machine.
       IF (Info%LicenceType .EQ. SiteKey) THEN
-        v(1) = Get_DiskSerialNumber("C:\\"//CHAR(0))
+        v(1) = Get_DiskSerialNumber(C_STR_CONSTANT("C:\\"))
         v(2) = NodeKey*100000000 + Info%ExpiryDate
         CALL encipher(v, w)
         checksum = IEOR(w(1), w(2))
@@ -641,7 +656,8 @@
             VersionDependentMangler = Z'CCDC'
           ELSE IF ( ProgramVersion(8:8) .EQ. '1' ) THEN ! DASH 3.1
             VersionDependentMangler = Z'BBCB'
-          ELSE IF ( ProgramVersion(8:8) .EQ. '2' ) THEN ! DASH 3.2 temp
+          ELSE IF ( ProgramVersion(8:8) .EQ. '2' ) THEN ! DASH 3.2
+! temp: share with 3.1
             VersionDependentMangler = Z'BBCB'
           ENDIF
         ENDIF
