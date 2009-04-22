@@ -11,7 +11,7 @@
 
 DBGFLG        = -g -DONTBUG -Wall
 OPTFLG        = -O3 # -Wuninitialized
-ifeq ($(Release), Y)
+ifeq ($(findstring release, $(QTDIR)), release)
 	VERFLAG	= $(OPTFLG)
 else
 	VERFLAG	= $(DBGFLG)
