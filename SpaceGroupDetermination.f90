@@ -6,33 +6,34 @@
       
       IMPLICIT NONE
 
-      INTEGER LatBrav
+      INTEGER LatBrav, errcode
       CHARACTER(MaxPathLength) :: CurrentDirectory
+      CHARACTER(MaxPathLength), PARAMETER :: ExtSymEXE = 'ExtinctionSymbol'//CCDC_EXE_EXT
       INTEGER IHANDLE
       REAL PawleyChiSqd
       REAL Correction
       LOGICAL Exists
 
-      INQUIRE(FILE=InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//DIRSPACER//'ExtinctionSymbol.exe',EXIST=exists)
+      INQUIRE(FILE=TRIM(InstallationDirectory)//DIRSPACER//ExtSymEXE,EXIST=exists)
       IF (.NOT. exists) GOTO 777
 
       CALL IosDirName(CurrentDirectory)
 
 ! Write parameter_input file to working directory
-      OPEN(220,FILE=CurrentDirectory(1:LEN_TRIM(CurrentDirectory))//DIRSPACER//'parameter_input.asc',STATUS='UNKNOWN', ERR = 999)
+      OPEN(220,FILE=TRIM(CurrentDirectory)//DIRSPACER//'parameter_input.asc',STATUS='UNKNOWN', ERR = 999)
       WRITE(220,*)
       WRITE(220,'("Below simply specify the input data file name and the Laue class of the data.")')
       WRITE(220,*)
       WRITE(220,*)
       WRITE(220,'("INPUT DATA FILE:")')
-      WRITE(220,'(A)') (CurrentDirectory(1:LEN_TRIM(CurrentDirectory))//DIRSPACER//'polyp.hkl')
+      WRITE(220,'(A)') (TRIM(CurrentDirectory)//DIRSPACER//'polyp.hkl')
       WRITE(220,*)
       WRITE(220,'("LAUE CLASS:")')
       SELECT CASE(LatBrav)
          CASE(1)
            CALL ErrorMessage('Triclinic--Space Group Determination program not applicable')
            CLOSE(220)
-           CALL IosDeleteFile(CurrentDirectory(1:LEN_TRIM(CurrentDirectory))//DIRSPACER//'parameter_input.asc')
+           CALL IosDeleteFile(TRIM(CurrentDirectory)//DIRSPACER//'parameter_input.asc')
           RETURN
          CASE(2)
            WRITE(220,'("a")')
@@ -74,7 +75,7 @@
      ENDIF
 
 ! Write ADVANCED.ASC to working directory
-      OPEN(220,FILE=CurrentDirectory(1:LEN_TRIM(CurrentDirectory))//DIRSPACER//'ADVANCED.asc',STATUS='UNKNOWN', ERR = 999)
+      OPEN(220,FILE=TRIM(CurrentDirectory)//DIRSPACER//'advanced.asc',STATUS='UNKNOWN', ERR = 999)
       WRITE(220,*)
       WRITE(220,'("The parameters below can be used to affect the execution time of the program (with a ")')
       WRITE(220,'("corresponding effect on the accuracy of the calculated numbers) and to possibly modify ")')
@@ -98,20 +99,28 @@
       CLOSE(220)
 
 ! Check parameter file exists
-     INQUIRE(FILE=CurrentDirectory(1:LEN_TRIM(CurrentDirectory))//DIRSPACER//'parameter_input.asc',EXIST=exists)
+     INQUIRE(FILE=TRIM(CurrentDirectory)//DIRSPACER//'parameter_input.asc',EXIST=exists)
      IF (.NOT. exists) GOTO 999
 ! Check ADVANCED.ASC exists.... 
-     INQUIRE(FILE=CurrentDirectory(1:LEN_TRIM(CurrentDirectory))//DIRSPACER//'ADVANCED.asc',EXIST=exists)
+     INQUIRE(FILE=TRIM(CurrentDirectory)//DIRSPACER//'advanced.asc',EXIST=exists)
      IF (.NOT. exists) GOTO 999
 ! Before calling the executable in the DASH installation directory.
-     CALL IOsCommand(InstallationDirectory(1:LEN_TRIM(InstallationDirectory))//'ExtinctionSymbol.exe',2)
-     IF (InfoError(1) .EQ. ErrOsCommand) GOTO 888 ! error ocurred 
-
-     INQUIRE(FILE=CurrentDirectory(1:LEN_TRIM(CurrentDirectory))//DIRSPACER//'table.asc',EXIST=exists)
+     CALL IosDeleteFile(TRIM(CurrentDirectory)//DIRSPACER//'table.asc')
+     errcode = InfoError(1) 
+     CALL IOsCommand(TRIM(InstallationDirectory)//ExtSymEXE,2)
+     errcode = InfoError(1) 
+#ifdef _WIN32
+     IF (errcode .EQ. ErrOsCommand) GOTO 888 ! error ocurred 
+#else
+     ! ExtSymEXE always returns non-zero. This makes an ErrOsCommand returned by
+     ! IOsCommand(), but only on Linux.
+     IF (errcode .EQ. ErrOsCommand .AND. .FALSE.) GOTO 888 ! error ocurred 
+#endif
+     INQUIRE(FILE=TRIM(CurrentDirectory)//DIRSPACER//'table.asc',EXIST=exists)
      IF (.NOT. exists) GOTO 999
      
      CALL WindowOpenChild(IHANDLE)
-     CALL WEditFile(CurrentDirectory(1:LEN_TRIM(CurrentDirectory))//DIRSPACER//'table.asc',Modeless,0,FileMustExist,4)
+     CALL WEditFile(TRIM(CurrentDirectory)//DIRSPACER//'table.asc',Modeless,0,FileMustExist,4)
 ! This editor window is not view only.  The three consequences outlined by JvdS for the SAParameter
 ! window apply:
 ! 1. The file can be edited. The user can add a title, for instance.
@@ -123,7 +132,7 @@
      CALL SetChildWinAutoClose(IHANDLE)
 ! Deletes the Default parameter file.  Try to keep this hidden from user?  Means that they
 ! won't be able to change the parameters     
-!     CALL IosDeleteFile(CurrentDirectory(1:LEN_TRIM(CurrentDirectory))//DIRSPACER//'ADVANCED.asc')
+!     CALL IosDeleteFile(TRIM(CurrentDirectory)//DIRSPACER//'advanced.asc')
 
      RETURN
 
@@ -150,16 +159,16 @@
      IF (Confirm('Would you like to remove files generated'//CHAR(13)// &
           'during space group determination?')) THEN
        CALL IosDirName(CurrentDirectory)
-       CALL IosDeleteFile(CurrentDirectory(1:LEN_TRIM(CurrentDirectory))//DIRSPACER//'ADVANCED.asc')
-       CALL IosDeleteFile(CurrentDirectory(1:LEN_TRIM(CurrentDirectory))//DIRSPACER//'table.asc')
-       CALL IosDeleteFile(CurrentDirectory(1:LEN_TRIM(CurrentDirectory))//DIRSPACER//'parameter_input.asc')
-       INQUIRE(FILE=CurrentDirectory(1:LEN_TRIM(CurrentDirectory))//DIRSPACER//'peak_ignored.asc',EXIST=exists)
+       CALL IosDeleteFile(TRIM(CurrentDirectory)//DIRSPACER//'advanced.asc')
+       CALL IosDeleteFile(TRIM(CurrentDirectory)//DIRSPACER//'table.asc')
+       CALL IosDeleteFile(TRIM(CurrentDirectory)//DIRSPACER//'parameter_input.asc')
+       INQUIRE(FILE=TRIM(CurrentDirectory)//DIRSPACER//'peak_ignored.asc',EXIST=exists)
        IF (exists) THEN
-         CALL IosDeleteFile(CurrentDirectory(1:LEN_TRIM(CurrentDirectory))//DIRSPACER//'peak_ignored.asc')
+         CALL IosDeleteFile(TRIM(CurrentDirectory)//DIRSPACER//'peak_ignored.asc')
        ENDIF
-       INQUIRE(FILE=CurrentDirectory(1:LEN_TRIM(CurrentDirectory))//DIRSPACER//'uncorrelated_peaks.asc',EXIST=exists)
+       INQUIRE(FILE=TRIM(CurrentDirectory)//DIRSPACER//'uncorrelated_peaks.asc',EXIST=exists)
        IF (exists) THEN
-         CALL IosDeleteFile(CurrentDirectory(1:LEN_TRIM(CurrentDirectory))//DIRSPACER//'uncorrelated_peaks.asc')
+         CALL IosDeleteFile(TRIM(CurrentDirectory)//DIRSPACER//'uncorrelated_peaks.asc')
        ENDIF
      ELSE
        RETURN
