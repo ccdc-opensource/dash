@@ -1,10 +1,10 @@
-     1        P 1            P 1              PAN$P1A000                   1    0    
+     1        P 1            P 1              PAN$P1A000                   0    0    
      2        P -1          -P 1              PAC$I1A000                   0    3 hx   hy   hz   
-     3:a      P 2 1 1        P 2x             PMN$P2A000                   1    3 r    hy   hz
-     4:a      P 21 1 1       P 2xa            PMN$P2A600                   1    3 r    hy   hz
-     5:a1     B 2 1 1        B 2x             BMN$P2A000                   1    2 r    hy
-     5:a2     C 2 1 1        C 2x             CMN$P2A000                   1    2 r    hz
-     5:a3     I 2 1 1        I 2x             IMN$P2A000                   1    2 r    hx
+     3:a      P 2 1 1        P 2x             PMN$P2A000                   0    3 r    hy   hz
+     4:a      P 21 1 1       P 2xa            PMN$P2A600                   0    3 r    hy   hz
+     5:a1     B 2 1 1        B 2x             BMN$P2A000                   0    2 r    hy
+     5:a2     C 2 1 1        C 2x             CMN$P2A000                   0    2 r    hz
+     5:a3     I 2 1 1        I 2x             IMN$P2A000                   0    2 r    hx
      6:a      P m 1 1        P -2x            PMN$I2A000                   1    3 s    t    hx
      7:a1     P b 1 1        P -2xb           PMN$I2A060                   1    3 s    t    hx
      7:a2     P n 1 1        P -2xbc          PMN$I2A066                   1    3 s    t    hx
@@ -35,11 +35,11 @@
     15:-a1    C 2/c 1 1     -C 2xc            CMC$I1A000$P2A006            0    2 hx   hy   ?
     15:-a2    B 2/n 1 1     -B 2xbc           BMC$I1A000$P2A066            0    2 hx   hz   ?
     15:-a3    I 2/b 1 1     -I 2xb            IMC$I1A000$P2A060            0    2 hx   hy   ?
-     3:b      P 1 2 1        P 2y             PMN$P2B000                   1    3 s    hx   hz
-     4:b      P 1 21 1       P 2yb            PMN$P2B060                   1    3 s    hx   hz
-     5:b1     C 1 2 1        C 2y             CMN$P2B000                   1    2 s    hz
-     5:b2     A 1 2 1        A 2y             AMN$P2B000                   1    2 s    hx
-     5:b3     I 1 2 1        I 2y             IMN$P2B000                   1    2 s    hx
+     3:b      P 1 2 1        P 2y             PMN$P2B000                   0    3 s    hx   hz
+     4:b      P 1 21 1       P 2yb            PMN$P2B060                   0    3 s    hx   hz
+     5:b1     C 1 2 1        C 2y             CMN$P2B000                   0    2 s    hz
+     5:b2     A 1 2 1        A 2y             AMN$P2B000                   0    2 s    hx
+     5:b3     I 1 2 1        I 2y             IMN$P2B000                   0    2 s    hx
      6:b      P 1 m 1        P -2y            PMN$I2B000                   1    3 r    t    hy
      7:b1     P 1 c 1        P -2yc           PMN$I2B006                   1    3 r    t    hy
      7:b2     P 1 n 1        P -2yac          PMN$I2B606                   1    3 r    t    hy
@@ -70,11 +70,11 @@
     15:-b1    A 1 2/a 1     -A 2ya            AMC$I1A000$P2B600            0    2 hx   hy   ?
     15:-b2    C 1 2/n 1     -C 2ybc           CMC$I1A000$P2B606            0    2 hx   hz   ?
     15:-b3    I 1 2/c 1     -I 2yc            IMC$I1A000$P2B006            0    2 hx   hy   ?
-     3:c      P 1 1 2        P 2              PMN$P2C000                   1    3 t    hx   hy
-     4:c      P 1 1 21       P 2c             PMN$P2C006                   1    3 t    hx   hy
-     5:c1     A 1 1 2        A 2              AMN$P2C000                   1    2 t    hx
-     5:c2     B 1 1 2        B 2              BMN$P2C000                   1    2 t    hy
-     5:c3     I 1 1 2        I 2              IMN$P2C000                   1    2 t    hx
+     3:c      P 1 1 2        P 2              PMN$P2C000                   0    3 t    hx   hy
+     4:c      P 1 1 21       P 2c             PMN$P2C006                   0    3 t    hx   hy
+     5:c1     A 1 1 2        A 2              AMN$P2C000                   0    2 t    hx
+     5:c2     B 1 1 2        B 2              BMN$P2C000                   0    2 t    hy
+     5:c3     I 1 1 2        I 2              IMN$P2C000                   0    2 t    hx
      6:c      P 1 1 m        P -2             PMN$I2C000                   1    3 r    s    hz
      7:c1     P 1 1 a        P -2a            PMN$I2C600                   1    3 r    s    hz
      7:c2     P 1 1 n        P -2ab           PMN$I2C660                   1    3 r    s    hz
@@ -105,23 +105,23 @@
     15:-c1    B 1 1 2/b     -B 2b             BMC$I1A000$P2C060            0    2 hx   hy    ?
     15:-c2    A 1 1 2/n     -A 2ac            AMC$I1A000$P2C660            0    2 hx   hy    ?
     15:-c3    I 1 1 2/a     -I 2a             IMC$I1A000$P2C600            0    2 hx   hy    ?
-    16        P 2 2 2        P 2 2            PON$P2C000$P2A000            1    3 hx   hy   hz
-    17        P 2 2 21       P 2c 2           PON$P2C006$P2A000            1    3 hx   hy   hz
-    17:cab    P 21 2 2       P 2a 2a          PON$P2C600$P2A600            1    3 hx   hy   hz
-    17:bca    P 2 21 2       P 2 2b           PON$P2C000$P2A060            1    3 hx   hy   hz
-    18        P 21 21 2      P 2 2ab          PON$P2C000$P2A660            1    3 hx   hy   hz
-    18:cab    P 2 21 21      P 2bc 2          PON$P2C066$P2A000            1    3 hx   hy   hz
-    18:bca    P 21 2 21      P 2ac 2ac        PON$P2C606$P2A606            1    3 hx   hy   hz
-    19        P 21 21 21     P 2ac 2ab        PON$P2C606$P2A660            1    3 hx   hy   hz
-    20        C 2 2 21       C 2c 2           CON$P2C006$P2A000            1    2 hx   hz
-    20:cab    A 21 2 2       A 2a 2a          AON$P2C600$P2A600            1    2 hx   hy  
-    20:bca    B 2 21 2       B 2 2b           BON$P2C000$P2A060            1    2 hy   hz  
-    21        C 2 2 2        C 2 2            CON$P2C000$P2A000            1    2 hx   hz
-    21:cab    A 2 2 2        A 2 2            AON$P2C000$P2A000            1    2 hx   hy  
-    21:bca    B 2 2 2        B 2 2            BON$P2C000$P2A000            1    2 hy   hz  
-    22        F 2 2 2        F 2 2            FON$P2C000$P2A000            1    1 qqq
-    23        I 2 2 2        I 2 2            ION$P2C000$P2A000            1    2 hx   hy
-    24        I 21 21 21     I 2b 2c          ION$P2C060$P2A006            1    2 hx   hy
+    16        P 2 2 2        P 2 2            PON$P2C000$P2A000            0    3 hx   hy   hz
+    17        P 2 2 21       P 2c 2           PON$P2C006$P2A000            0    3 hx   hy   hz
+    17:cab    P 21 2 2       P 2a 2a          PON$P2C600$P2A600            0    3 hx   hy   hz
+    17:bca    P 2 21 2       P 2 2b           PON$P2C000$P2A060            0    3 hx   hy   hz
+    18        P 21 21 2      P 2 2ab          PON$P2C000$P2A660            0    3 hx   hy   hz
+    18:cab    P 2 21 21      P 2bc 2          PON$P2C066$P2A000            0    3 hx   hy   hz
+    18:bca    P 21 2 21      P 2ac 2ac        PON$P2C606$P2A606            0    3 hx   hy   hz
+    19        P 21 21 21     P 2ac 2ab        PON$P2C606$P2A660            0    3 hx   hy   hz
+    20        C 2 2 21       C 2c 2           CON$P2C006$P2A000            0    2 hx   hz
+    20:cab    A 21 2 2       A 2a 2a          AON$P2C600$P2A600            0    2 hx   hy  
+    20:bca    B 2 21 2       B 2 2b           BON$P2C000$P2A060            0    2 hy   hz  
+    21        C 2 2 2        C 2 2            CON$P2C000$P2A000            0    2 hx   hz
+    21:cab    A 2 2 2        A 2 2            AON$P2C000$P2A000            0    2 hx   hy  
+    21:bca    B 2 2 2        B 2 2            BON$P2C000$P2A000            0    2 hy   hz  
+    22        F 2 2 2        F 2 2            FON$P2C000$P2A000            0    1 qqq
+    23        I 2 2 2        I 2 2            ION$P2C000$P2A000            0    2 hx   hy
+    24        I 21 21 21     I 2b 2c          ION$P2C060$P2A006            0    2 hx   hy
     25        P m m 2        P 2 -2           PON$P2C000$I2A000            1    3 t    hx   hy
     25:cab    P 2 m m        P -2 2           PON$I2C000$P2A000            1    3 r    hy   hz  
     25:bca    P m 2 m        P -2 -2          PON$I2C000$I2A000            1    3 s    hx   hz  
@@ -346,11 +346,11 @@
     74:-cba   I c m m       -I 2 2b           IOC$I1A000$P2C000$P2A060     0    2 hy   hz
     74:bca    I m c m       -I 2 2a           IOC$I1A000$P2C000$P2A600     0    2 hx   hz
     74:a-cb   I m a m       -I 2c 2           IOC$I1A000$P2C006$P2A000     0    2 hx   hz
-    75        P 4            P 4              PTN$P4C000                   1    2 t    hxhy
+    75        P 4            P 4              PTN$P4C000                   0    2 t    hxhy
     76        P 41           P 4w             PTN$P4C003                   0    2 t    hxhy
-    77        P 42           P 4c             PTN$P4C006                   1    2 t    hxhy
+    77        P 42           P 4c             PTN$P4C006                   0    2 t    hxhy
     78        P 43           P 4cw            PTN$P4C009                   0    2 t    hxhy
-    79        I 4            I 4              ITN$P4C000                   1    1 t
+    79        I 4            I 4              ITN$P4C000                   0    1 t
     80        I 41           I 4bw            ITN$P4C063                   0    1 t    inversion at (1/4,0,0) not taken into account
     81        P -4           P -4             PTN$I4C000                   1    2 hxhy hz
     82        I -4           I -4             ITN$I4C000                   1    1 hxqz 
@@ -363,15 +363,15 @@
     87        I 4/m         -I 4              ITC$I1A000$P4C000            0    1 hz
     88:1      I 41/a:1       I 4bw -1bw       ITC$I1A063$P4C063            0    1 hz
     88:2      I 41/a:2      -I 4ad            ITC$I1A000$P4C933            0    1 hz
-    89        P 4 2 2        P 4 2            PTN$P4C000$P2A000            1    2 hxhy hz
-    90        P 4 21 2       P 4ab 2ab        PTN$P4C660$P2A660            1    2 hxhy hz
+    89        P 4 2 2        P 4 2            PTN$P4C000$P2A000            0    2 hxhy hz
+    90        P 4 21 2       P 4ab 2ab        PTN$P4C660$P2A660            0    2 hxhy hz
     91        P 41 2 2       P 4w 2c          PTN$P4C003$P2A006            0    2 hxhy hz
     92        P 41 21 2      P 4abw 2nw       PTN$P4C663$P2A669            0    2 hxhy hz
-    93        P 42 2 2       P 4c 2           PTN$P4C006$P2A000            1    2 hxhy hz
-    94        P 42 21 2      P 4n 2n          PTN$P4C666$P2A666            1    2 hxhy hz
+    93        P 42 2 2       P 4c 2           PTN$P4C006$P2A000            0    2 hxhy hz
+    94        P 42 21 2      P 4n 2n          PTN$P4C666$P2A666            0    2 hxhy hz
     95        P 43 2 2       P 4cw 2c         PTN$P4C009$P2A006            0    2 hxhy hz
     96        P 43 21 2      P 4nw 2abw       PTN$P4C669$P2A663            0    2 hxhy hz
-    97        I 4 2 2        I 4 2            ITN$P4C000$P2A000            1    1 hz
+    97        I 4 2 2        I 4 2            ITN$P4C000$P2A000            0    1 hz
     98        I 41 2 2       I 4bw 2bw        ITN$P4C063$P2A063            0    1 hz   inversion at (1/4,0,1/8) not taken into account
     99        P 4 m m        P 4 -2           PTN$P4C000$I2A000            1    2 t    hxhy
    100        P 4 b m        P 4 -2ab         PTN$P4C000$I2A660            1    2 t    hxhy
@@ -427,19 +427,19 @@
    141:2      I 41/a m d:2  -I 4bd 2          ITC$I1A000$P4C393$P2A000     0    1 hz
    142:1      I 41/a c d:1   I 4bw 2aw -1bw   ITC$I1A063$P4C063$P2A069	   0    1 hz
    142:2      I 41/a c d:2  -I 4bd 2c         ITC$I1A000$P4C393$P2A006     0    1 hz
-   143        P 3            P 3              PRN$P3C000                   1    2 t    txty
+   143        P 3            P 3              PRN$P3C000                   0    2 t    txty
    144        P 31           P 31             PRN$P3C004                   0    2 t    txty
    145        P 32           P 32             PRN$P3C008                   0    2 t    txty
-   146:H      R 3:H          R 3              RRN$P3C000                   1    1 t
+   146:H      R 3:H          R 3              RRN$P3C000                   0    1 t
    147        P -3          -P 3              PRC$I3C000                   0    1 hz
    148:H      R -3:H        -R 3              RRC$I3C000                   0    1 hz
-   149        P 3 1 2        P 3 2            PRN$P3C000$P2G000            1    2 txty hz
-   150        P 3 2 1        P 3 2"           PRN$P3C000$P2F000            1    1 hz
+   149        P 3 1 2        P 3 2            PRN$P3C000$P2G000            0    2 txty hz
+   150        P 3 2 1        P 3 2"           PRN$P3C000$P2F000            0    1 hz
    151        P 31 1 2       P 31 2c (0 0 1)  PRN$P3C004$P2G000            0    2 txty hz
    152        P 31 2 1       P 31 2"          PRN$P3C004$P2F008            0    1 hz
    153        P 32 1 2       P 32 2c (0 0 -1) PRN$P3C008$P2G000            0    2 txty hz
    154        P 32 2 1       P 32 2"          PRN$P3C008$P2F004            0    1 hz
-   155:H      R 32:H         R 3 2"           RRN$P3C000$P2F000            1    1 hz
+   155:H      R 32:H         R 3 2"           RRN$P3C000$P2F000            0    1 hz
    156        P 3 m 1        P 3 -2"          PRN$P3C000$I2F000            1    2 t    txty 
    157        P 3 1 m        P 3 -2           PRN$P3C000$I2G000            1    1 t
    158        P 3 c 1        P 3 -2"c         PRN$P3C000$I2F006            1    1 txty
@@ -459,21 +459,21 @@
    161:R      R 3 c:R        P 3* -2n         PRN$P3Q000$I2E666            1    1 r    r,r,r in Internationaltables?
    166:R      R -3 m:R      -P 3* 2           PRC$I3Q000$P2E000            0    1 hhh
    167:R      R -3 c:R      -P 3* 2n          PRC$I3Q000$P2E666            0    1 hhh
-   168        P 6            P 6              PHN$P6C000                   1    1 t
+   168        P 6            P 6              PHN$P6C000                   0    1 t
    169        P 61           P 61             PHN$P6C002                   0    1 t
    170        P 65           P 65             PHN$P6C005                   0    1 t
    171        P 62           P 62             PHN$P6C004                   0    1 t
    172        P 64           P 64             PHN$P6C008                   0    1 t
-   173        P 63           P 6c             PHN$P6C006                   1    1 t
+   173        P 63           P 6c             PHN$P6C006                   0    1 t
    174        P -6           P -6             PHN$I6C000                   1    2 txty hz
    175        P 6/m         -P 6              PHC$I1A000$P6C000            0    1 hz
    176        P 63/m        -P 6c             PHC$I1A000$P6C006            0    1 hz
-   177        P 6 2 2        P 6 2            PHN$P6C000$P2F000            1    1 hz
+   177        P 6 2 2        P 6 2            PHN$P6C000$P2F000            0    1 hz
    178        P 61 2 2       P 61 2 (0 0 -1)  PHN$P6C002$P2F000            0    1 hz
    179        P 65 2 2       P 65 2 (0 0 1)   PHN$P6C005$P2F000            0    1 hz
    180        P 62 2 2       P 62 2c (0 0 1)  PHN$P6C004$P2F000            0    1 hz
    181        P 64 2 2       P 64 2c (0 0 -1) PHN$P6C008$P2F000            0    1 hz
-   182        P 63 2 2       P 6c 2c          PHN$P6C006$P2F000            1    1 hz
+   182        P 63 2 2       P 6c 2c          PHN$P6C006$P2F000            0    1 hz
    183        P 6 m m        P 6 -2           PHN$P6C000$I2F000            1    1 t
    184        P 6 c c        P 6 -2c          PHN$P6C000$I2F006            1    1 t
    185        P 63 c m       P 6c -2          PHN$P6C006$I2F006            1    1 t
@@ -487,10 +487,10 @@
    193        P 63/m c m    -P 6c 2           PHC$I1A000$P6C006$P2F006     0    1 hz
    194        P 63/m m c    -P 6c 2c          PHC$I1A000$P6C006$P2F000     0    1 hz
    195        P 2 3          P 2 2 3          PCN$P3Q000$P2C000$P2A000     0    1 hhh
-   196        F 2 3          F 2 2 3          FCN$P3Q000$P2C000$P2A000     1    1 qqq
-   197        I 2 3          I 2 2 3          ICN$P3Q000$P2C000$P2A000     1    0
-   198        P 21 3         P 2ac 2ab 3      PCN$P3Q000$P2C606$P2A660     1    1 hhh
-   199        I 21 3         I 2b 2c 3        ICN$P3Q000$P2C606$P2A660     1    0
+   196        F 2 3          F 2 2 3          FCN$P3Q000$P2C000$P2A000     0    1 qqq
+   197        I 2 3          I 2 2 3          ICN$P3Q000$P2C000$P2A000     0    0
+   198        P 21 3         P 2ac 2ab 3      PCN$P3Q000$P2C606$P2A660     0    1 hhh
+   199        I 21 3         I 2b 2c 3        ICN$P3Q000$P2C606$P2A660     0    0
    200        P m -3        -P 2 2 3          PCC$I3Q000$P2C000$P2A000     1    1 hhh
    201:1      P n -3:1       P 2 2 3 -1n      PCC$I3Q666$P2C000$P2A000     0    1 hhh
    201:2      P n -3:2      -P 2ab 2bc 3      PCC$I3Q000$P2C660$P2A066     0    1 hhh
@@ -501,12 +501,12 @@
    205        P a -3        -P 2ac 2ab 3      PCC$I3Q000$P2C606$P2A660     0    1 hhh
    206        I a -3        -I 2b 2c 3        ICC$I3Q000$P2C606$P2A660     0    0
    207        P 4 3 2        P 4 2 3          PCN$P3Q000$P4C000$P2D000     0    1 hhh
-   208        P 42 3 2       P 4n 2 3         PCN$P3Q000$P4C666$P2D666     1    1 hhh
-   209        F 4 3 2        F 4 2 3          FCN$P3Q000$P4C000$P2D000     1    1 hhh
-   210        F 41 3 2       F 4d 2 3         FCN$P3Q000$P4C993$P2D939     1    1 hhh  inversion at (1/8, 1/8, 1/8) not taken into account
+   208        P 42 3 2       P 4n 2 3         PCN$P3Q000$P4C666$P2D666     0    1 hhh
+   209        F 4 3 2        F 4 2 3          FCN$P3Q000$P4C000$P2D000     0    1 hhh
+   210        F 41 3 2       F 4d 2 3         FCN$P3Q000$P4C993$P2D939     0    1 hhh  inversion at (1/8, 1/8, 1/8) not taken into account
    211        I 4 3 2        I 4 2 3          ICN$P3Q000$P4C000$P2D000     0    0
    212        P 43 3 2       P 4acd 2ab 3     PCN$P3Q000$P4C939$P2D399     0    1 hhh
-   213        P 41 3 2       P 4bd 2ab 3      PCN$P3Q000$P4C393$P2D933     1    1 hhh
+   213        P 41 3 2       P 4bd 2ab 3      PCN$P3Q000$P4C393$P2D933     0    1 hhh
    214        I 41 3 2       I 4bd 2c 3       ICN$P3Q000$P4C393$P2D933     0    0
    215        P -4 3 m       P -4 2 3         PCN$P3Q000$I4C000$I2D000     0    1 hhh
    216        F -4 3 m       F -4 2 3         FCN$P3Q000$I4C000$I2D000     1    1 qqq
