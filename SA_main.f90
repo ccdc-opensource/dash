@@ -601,9 +601,9 @@
       RunZmConv = .FALSE. ! Initialise to error
 
       IF (CellOnly) THEN
-        tExtraArg = ' cell_only'
+        tExtraArg = ' -cell_only'
       ELSE IF (IsConfiguredToSortH()) THEN
-        tExtraArg = ' sort_H'
+        tExtraArg = ' -sort_hydrogens'
       ELSE
         tExtraArg = ''
       ENDIF
