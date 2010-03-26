@@ -65,6 +65,7 @@ REM Make Documentation areas
     MKDIR %OUTPUTDIR%\Documentation
     MKDIR %OUTPUTDIR%\Documentation\manual
     MKDIR %OUTPUTDIR%\Documentation\manual\output
+    MKDIR "%OUTPUTDIR%\Documentation\Extinction Symbol Documents"
     MKDIR %OUTPUTDIR%\Documentation\Tutorial1\
     MKDIR "%OUTPUTDIR%\Documentation\Tutorial1\Data files"
     MKDIR %OUTPUTDIR%\Documentation\Tutorial2\
@@ -104,6 +105,12 @@ REM copy tutorial files
     %CVSCMD% %EXPORTSPEC% -d "%OUTPUTDIR%\Documentation\Tutorial6\Data files"    "dash/Tutorial_6-atoms.mol2"
     %CVSCMD% %EXPORTSPEC% -d "%OUTPUTDIR%\Documentation\Tutorial6\Data files"    "dash/Tutorial_6-frags.mol2"
 
+REM Copy Extinction Symbol Docs
+    %CVSCMD% %EXPORTSPEC% -d "%OUTPUTDIR%\Documentation\Extinction Symbol Documents" "dash/Extinction Symbol Documents/Advanced.asc"
+    %CVSCMD% %EXPORTSPEC% -d "%OUTPUTDIR%\Documentation\Extinction Symbol Documents" "dash/Extinction Symbol Documents/Dopmmm.hkl"
+    %CVSCMD% %EXPORTSPEC% -d "%OUTPUTDIR%\Documentation\Extinction Symbol Documents" "dash/Extinction Symbol Documents/ESMANUAL for DASH.DOC"
+    %CVSCMD% %EXPORTSPEC% -d "%OUTPUTDIR%\Documentation\Extinction Symbol Documents" "dash/Extinction Symbol Documents/parameter_input.asc"
+    
     
 REM =================================================================================
 REM Copy files from doc_rep/dash
