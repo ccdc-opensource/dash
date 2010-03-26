@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 9.00
-# Visual Studio 2005
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
 Project("{6989167D-11E4-40FE-8C1A-2192A86A7E90}") = "PCDash", "PCDash.vfproj", "{560D96EF-4396-4648-A160-524BB3320FFC}"
 EndProject
 Global
