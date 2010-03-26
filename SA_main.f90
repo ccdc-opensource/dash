@@ -594,8 +594,12 @@
       INTEGER, EXTERNAL :: CSSR2Mol2
       INTEGER iLen, iPos
       CHARACTER*8 ExtensionStr, fmt
-      CHARACTER*10 tExtraArg
+      CHARACTER*20 tExtraArg
+      CHARACTER*80 errMessage;
       CHARACTER(MaxPathLength) tInputFile ! to resolve call by reference/value ambiguity
+
+
+
       INTEGER iStat, iStart, I
 
       RunZmConv = .FALSE. ! Initialise to error
@@ -651,14 +655,16 @@
         IF (tInputFile(I:I) .EQ. DIRSPACER) iStart = I + 1
       ENDDO
       CALL WCursorShape(CurHourGlass)
-      CALL IOSCommand('"'//TRIM(InstallationDirectory)//'zmconv'//CCDC_EXE_EXT//'" '// &
-        TRIM(fmt)//' "'//tInputFile(iStart:iLen)//'"'//TRIM(tExtraArg), &
-        ProcSilent+ProcBlocked)
-      iStat = InfoError(1) 
+      CALL IOSCommand('"'//TRIM(InstallationDirectory)//DIRSPACER//'zmconv'//DIRSPACER// &
+        'makezmatrix'//CCDC_EXE_EXT//'" '// &
+        TRIM(fmt)//' "'//tInputFile(iStart:iLen)//'"'//TRIM(tExtraArg), ProcSilent+ProcBlocked)
+      iStat = WInfoError(1)
       CALL WCursorShape(CurCrossHair)
       IF (iStat .EQ. ErrOSCommand) THEN
 ! An error occurred
-        CALL ErrorMessage("Error occurred when running zmconv"//CCDC_EXE_EXT//".")
+        iStat =  WInfoError(3)
+        CALL WInfoErrorMessage(iStat,errMessage,2)
+        CALL ErrorMessage("Error occurred when running makezmatrix"//CCDC_EXE_EXT//" - "//errMessage(1:LEN(errMessage)))
         GOTO 200
       ENDIF
       RunZmConv = .TRUE.
