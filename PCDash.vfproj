@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<VisualStudioProject ProjectCreator="Intel Fortran" Keyword="Win32 Application - Converted from CVF" Version="9.10" ProjectIdGuid="{560D96EF-4396-4648-A160-524BB3320FFC}">
+<VisualStudioProject ProjectCreator="Intel Fortran" Keyword="Win32 Application - Converted from CVF" Version="11.0" ProjectIdGuid="{560D96EF-4396-4648-A160-524BB3320FFC}">
 	<Platforms>
 		<Platform Name="Win32"/></Platforms>
 	<Configurations>
