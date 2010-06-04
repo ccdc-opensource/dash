@@ -175,7 +175,7 @@
 ! These variables have to do with the peak fit ranges as selected by the user
 !
 ! MAX_NPFR (= 50) = MAXimum Number of Peak Fit Ranges
-! MAX_NPPR (= MPeak = 10) = MAXimum Number of Peaks per Peak Fit Range
+! MAX_NPPR (= MPeak = 20) = MAXimum Number of Peaks per Peak Fit Range
 ! XPF_Range(1,i)  = start of hatched area
 ! XPF_Range(2,i)  = end   of hatched area
 ! RangeFitYN      = has this range been fitted Yes / No

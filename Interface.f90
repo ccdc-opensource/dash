@@ -2239,15 +2239,19 @@
                         PF_FWHM(MAX_NPFR),          PF_IntBreadth(MAX_NPFR)
 
       INTEGER tCurrentRange
+      LOGICAL Redraw
 
       CALL WCursorShape(CurHourGlass)
+      Redraw = .FALSE.
       DO tCurrentRange = 1, NumPeakFitRange
         IF (.NOT. RangeFitYN(tCurrentRange)) THEN
           CurrentRange = tCurrentRange
           CALL MultiPeak_Fitter
-          CALL Profile_Plot
+          Redraw = .TRUE.
         ENDIF
       ENDDO
+      IF ( Redraw ) CALL Profile_Plot
+      
       CALL WCursorShape(CurCrossHair)
 ! Grey out 'Fit Peaks' button on toolbar
       CALL UpdatePeaksButtonsStates
@@ -2305,6 +2309,547 @@
       ENDIF
       
       END SUBROUTINE CheckIfPeaksFitted
+      
+
+      SUBROUTINE AutoFitPeaks
+      CALL MarkPeaks(.FALSE.)
+      END SUBROUTINE AutoFitPeaks
+      
+      SUBROUTINE AutoFitPeaksForPawley
+      CALL MarkPeaks(.TRUE.)
+      END SUBROUTINE AutoFitPeaksForPawley   
+         
+      SUBROUTINE MarkPeaks(ForPawley)
+
+      IMPLICIT NONE
+
+      INCLUDE 'params.inc'
+      INCLUDE 'GLBVAR.INC'
+      
+      LOGICAL, INTENT(IN) :: ForPawley
+      
+      INTEGER          NBIN, LBIN
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS), AVGESD      
+      
+      REAL                PeakFindPos
+      INTEGER                                           nPeaksFound
+      COMMON / PEAKFIND / PeakFindPos(1:MaxPeaksFound), nPeaksFound
+      INTEGER PeakFindBin(1:MaxPeaksFound)
+      
+      LOGICAL, EXTERNAL :: IsShoulder, IsHighPoint
+      INTEGER I, J, IWIDTH, NCO
+      REAL OBSARR(MOBS), INTEG(MOBS), SUMARR, SUMARR2
+      INTEGER WIDTH,MUL,DIV, TargetRanges, CurrentPeak
+      
+      REAL              XPF_Range
+      LOGICAL                                       RangeFitYN
+      INTEGER           IPF_Lo,                     IPF_Hi
+      INTEGER           NumPeakFitRange,            CurrentRange
+      INTEGER           IPF_Range
+      INTEGER           NumInPFR
+      REAL              XPF_Pos,                    YPF_Pos
+      INTEGER           IPF_RPt
+      REAL              XPeakFit,                   YPeakFit
+      REAL              PF_FWHM,                    PF_IntBreadth
+      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),      RangeFitYN(MAX_NPFR),        &
+                        IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
+                        NumPeakFitRange,            CurrentRange,                &
+                        IPF_Range(MAX_NPFR),                                     &
+                        NumInPFR(MAX_NPFR),                                      & 
+                        XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
+                        IPF_RPt(MAX_NPFR),                                       &
+                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT),         &
+                        PF_FWHM(MAX_NPFR),          PF_IntBreadth(MAX_NPFR)      
+      
+! Attempt to find peak positions automatically
+
+       WIDTH = 3
+      
+       SUMARR = 0.0
+       NCO = 0
+       DO I = 1,NBIN
+          OBSARR(I) = 0.0
+          DIV = 0
+          DO J = -WIDTH,0
+              IF ( I + J .GT. 0 ) THEN
+                  MUL = (WIDTH+J+1)
+                  OBSARR(I) = OBSARR(I) + ( MUL * YOBIN(I+J) )
+                  DIV = DIV + MUL
+              ENDIF
+          ENDDO
+          DO J = 1,WIDTH
+              IF ( I + J .LE. NBIN ) THEN
+                  MUL = (WIDTH-J+1)
+                  OBSARR(I) = OBSARR(I) + ( MUL * YOBIN(I+J) )
+                  DIV = DIV + MUL
+              ENDIF
+          ENDDO
+          OBSARR(I) = OBSARR(I)/DIV
+          
+          IF ( OBSARR(I) .GT. 0 ) THEN
+              SUMARR = SUMARR + OBSARR(I)
+              NCO = NCO + 1
+          ENDIF
+       
+       ENDDO 
+       SUMARR = SUMARR / NCO
+       
+       SUMARR2 = 0.0
+       NCO = 0
+       DO I = 1,NBIN
+          IF ( OBSARR(I) .LT. SUMARR .AND. OBSARR(I) .GT. 0.0 ) THEN
+             SUMARR2 = SUMARR2 + OBSARR(I)       
+             NCO = NCO + 1
+          ENDIF
+       ENDDO
+       
+       SUMARR2 = SUMARR2 / NCO
+
+       SUMARR = 0.0
+       NCO = 0
+       DO I = 1,NBIN
+          IF ( OBSARR(I) .LT. SUMARR2 .AND. OBSARR(I) .GT. 0.0 ) THEN
+             SUMARR = SUMARR + OBSARR(I)       
+             NCO = NCO + 1
+          ENDIF
+       ENDDO
+       
+       SUMARR = SUMARR / NCO
+       
+       nPeaksFound = 0
+       
+
+       DO I = 1,NBIN
+         IF ( nPeaksFound .LT. MaxPeaksFound .AND. OBSARR(I) .GT. SUMARR*8.0 ) THEN
+            IF ( IsHighPoint(I,OBSARR,NBIN,4) ) THEN
+                nPeaksFound = nPeaksFound + 1
+                PeakFindPos(nPeaksFound) = XBIN(I)
+                PeakFindBin(nPeaksFound) = I        
+            ENDIF
+         ENDIF
+       END DO
+   
+       NumPeakFitRange = 1
+       IF (  ForPawley ) THEN
+           TargetRanges = nPeaksFound
+       ELSE
+           TargetRanges = 20       
+       ENDIF
+       
+       NumPeakFitRange = 0
+
+       DO I = 1, MIN(TargetRanges,nPeaksFound)       
+           CALL AddPeak( PeakFindBin(I), ForPawley )
+       END DO
+
+       call profile_plot
+       call FitPeaks
+      
+      END SUBROUTINE MarkPeaks
+            
+
+      SUBROUTINE AddPeak(IBINV, ForPawley)
+
+      USE REFVAR
+      
+      IMPLICIT NONE
+
+      INCLUDE 'params.inc'
+      INCLUDE 'GLBVAR.INC'
+      
+      INTEGER, INTENT(IN) :: IBINV
+      LOGICAL, INTENT(IN) :: ForPawley
+      
+      INTEGER          NBIN, LBIN
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS), AVGESD      
+      
+      REAL                PeakFindPos
+      INTEGER                                           nPeaksFound
+      COMMON / PEAKFIND / PeakFindPos(1:MaxPeaksFound), nPeaksFound
+      INTEGER PeakFindBin(1:MaxPeaksFound)
+      
+      INTEGER, EXTERNAL :: FindPeakStart, FindPeakEnd
+      INTEGER I, J, IWIDTH, COUNT
+      REAL PeakStart, PeakEnd
+      
+      REAL              XPF_Range
+      LOGICAL                                       RangeFitYN
+      INTEGER           IPF_Lo,                     IPF_Hi
+      INTEGER           NumPeakFitRange,            CurrentRange
+      INTEGER           IPF_Range
+      INTEGER           NumInPFR
+      REAL              XPF_Pos,                    YPF_Pos
+      INTEGER           IPF_RPt
+      REAL              XPeakFit,                   YPeakFit
+      REAL              PF_FWHM,                    PF_IntBreadth
+      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),      RangeFitYN(MAX_NPFR),        &
+                        IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
+                        NumPeakFitRange,            CurrentRange,                &
+                        IPF_Range(MAX_NPFR),                                     &
+                        NumInPFR(MAX_NPFR),                                      & 
+                        XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
+                        IPF_RPt(MAX_NPFR),                                       &
+                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT),         &
+                        PF_FWHM(MAX_NPFR),          PF_IntBreadth(MAX_NPFR)      
+      
+       IF ( NumPeakFitRange .NE. 0 .AND. IPF_Lo(NumPeakFitRange) .EQ. FindPeakStart(IBINV,NBIN,YOBIN,XBIN,EBIN) ) THEN
+          CALL AddPeakToCurrentRange(IBINV)
+       ELSE
+          CALL AddNewPeakRange(IBINV)
+          IF ( ForPawley ) THEN
+              ! If we are pawley fitting, we only want to add peaks that are only associated with a single reflection
+              PeakStart = XBIN(FindPeakStart(IBINV,NBIN,YOBIN,XBIN,EBIN))
+              PeakEnd = XBIN(FindPeakEnd(IBINV,NBIN,YOBIN,XBIN,EBIN))
+              
+              COUNT = 0
+              IF ( NumOfRef .GT. 0 ) THEN
+                DO I = 1, NumOfRef
+                  IF ( PeakStart .LT. RefArgK(I) .AND. PeakEnd .GT. RefArgK(I) ) COUNT = COUNT + 1
+                ENDDO
+              ENDIF
+              
+              IF ( YOBIN(IBINV) .LT. 6.0 * EBIN(IBINV) .OR. COUNT .NE. 1 .OR. NumInPFR( NumPeakFitRange ) .GT. 1 ) THEN
+                  NumInPFR( NumPeakFitRange ) = 0
+                  NumPeakFitRange = NumPeakFitRange - 1
+              ENDIF
+          ENDIF
+       ENDIF
+      END SUBROUTINE AddPeak
+
+      
+      SUBROUTINE AddNewPeakRange(IBINV)
+
+
+      IMPLICIT NONE
+
+      INCLUDE 'params.inc'
+      INCLUDE 'GLBVAR.INC'
+      
+      INTEGER, INTENT(IN) :: IBINV
+      
+      INTEGER          NBIN, LBIN
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS), AVGESD      
+      
+      REAL                PeakFindPos
+      INTEGER                                           nPeaksFound
+      COMMON / PEAKFIND / PeakFindPos(1:MaxPeaksFound), nPeaksFound
+      INTEGER PeakFindBin(1:MaxPeaksFound)
+      
+      LOGICAL, EXTERNAL :: IsShoulder, IsHighPoint
+      INTEGER, EXTERNAL :: FindPeakStart,FindPeakEnd
+      INTEGER I, J, IWIDTH
+      
+      REAL              XPF_Range
+      LOGICAL                                       RangeFitYN
+      INTEGER           IPF_Lo,                     IPF_Hi
+      INTEGER           NumPeakFitRange,            CurrentRange
+      INTEGER           IPF_Range
+      INTEGER           NumInPFR
+      REAL              XPF_Pos,                    YPF_Pos
+      INTEGER           IPF_RPt
+      REAL              XPeakFit,                   YPeakFit
+      REAL              PF_FWHM,                    PF_IntBreadth
+      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),      RangeFitYN(MAX_NPFR),        &
+                        IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
+                        NumPeakFitRange,            CurrentRange,                &
+                        IPF_Range(MAX_NPFR),                                     &
+                        NumInPFR(MAX_NPFR),                                      & 
+                        XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
+                        IPF_RPt(MAX_NPFR),                                       &
+                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT),         &
+                        PF_FWHM(MAX_NPFR),          PF_IntBreadth(MAX_NPFR)      
+      
+       NumPeakFitRange = NumPeakFitRange + 1
+       IPF_Lo(NumPeakFitRange) = FindPeakStart(IBINV,NBIN,YOBIN,XBIN,EBIN)
+       IPF_Hi(NumPeakFitRange) = FindPeakEnd(IBINV,NBIN,YOBIN,XBIN,EBIN)
+       XPF_Range(1,NumPeakFitRange) = XBIN(IPF_Lo(NumPeakFitRange))
+       XPF_Range(2,NumPeakFitRange) = XBIN(IPF_Hi(NumPeakFitRange)) 
+       NumInPFR( NumPeakFitRange ) = 1   
+       XPF_Pos(1,NumPeakFitRange) = XBIN(IBINV)
+       YPF_Pos(1,NumPeakFitRange) = YOBIN(IBINV)
+       RangeFitYN(1) = .FALSE.
+       IPF_Range(NumPeakFitRange) = 1 + IPF_Hi(NumPeakFitRange) - IPF_Lo(NumPeakFitRange)
+      
+      END SUBROUTINE AddNewPeakRange
+
+      SUBROUTINE AddPeakToCurrentRange(IBINV)
+
+
+      IMPLICIT NONE
+
+      INCLUDE 'params.inc'
+      INCLUDE 'GLBVAR.INC'
+      
+      INTEGER, INTENT(IN) :: IBINV
+      
+      INTEGER          NBIN, LBIN
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS), AVGESD      
+      
+      REAL                PeakFindPos
+      INTEGER                                           nPeaksFound
+      COMMON / PEAKFIND / PeakFindPos(1:MaxPeaksFound), nPeaksFound
+      INTEGER PeakFindBin(1:MaxPeaksFound)
+      
+      INTEGER I, J, IWIDTH
+      
+      REAL              XPF_Range
+      LOGICAL                                       RangeFitYN
+      INTEGER           IPF_Lo,                     IPF_Hi
+      INTEGER           NumPeakFitRange,            CurrentRange
+      INTEGER           IPF_Range
+      INTEGER           NumInPFR
+      REAL              XPF_Pos,                    YPF_Pos
+      INTEGER           IPF_RPt
+      REAL              XPeakFit,                   YPeakFit
+      REAL              PF_FWHM,                    PF_IntBreadth
+      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),      RangeFitYN(MAX_NPFR),        &
+                        IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
+                        NumPeakFitRange,            CurrentRange,                &
+                        IPF_Range(MAX_NPFR),                                     &
+                        NumInPFR(MAX_NPFR),                                      & 
+                        XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
+                        IPF_RPt(MAX_NPFR),                                       &
+                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT),         &
+                        PF_FWHM(MAX_NPFR),          PF_IntBreadth(MAX_NPFR)      
+      
+
+
+       NumInPFR( NumPeakFitRange ) = NumInPFR( NumPeakFitRange ) + 1
+       XPF_Pos(NumInPFR( NumPeakFitRange ),NumPeakFitRange) = XBIN(IBINV)
+       YPF_Pos(NumInPFR( NumPeakFitRange ),NumPeakFitRange) = YOBIN(IBINV)
+      
+      END SUBROUTINE AddPeakToCurrentRange
+      
+      
+      SUBROUTINE IntegrateIntensity(INTEG, OBSARR,Width)
+
+      IMPLICIT NONE
+
+      INCLUDE 'params.inc'
+      INCLUDE 'GLBVAR.INC'
+      
+      INTEGER, INTENT(IN) :: Width
+      
+      INTEGER          NBIN, LBIN
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS), AVGESD      
+      
+      REAL OBSARR(MOBS), INTEG(MOBS)
+      
+      INTEGER I, J, Count
+      
+      REAL              XPF_Range
+      LOGICAL                                       RangeFitYN
+      INTEGER           IPF_Lo,                     IPF_Hi
+      INTEGER           NumPeakFitRange,            CurrentRange
+      INTEGER           IPF_Range
+      INTEGER           NumInPFR
+      REAL              XPF_Pos,                    YPF_Pos
+      INTEGER           IPF_RPt
+      REAL              XPeakFit,                   YPeakFit
+      REAL              PF_FWHM,                    PF_IntBreadth
+      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),      RangeFitYN(MAX_NPFR),        &
+                        IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
+                        NumPeakFitRange,            CurrentRange,                &
+                        IPF_Range(MAX_NPFR),                                     &
+                        NumInPFR(MAX_NPFR),                                      & 
+                        XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
+                        IPF_RPt(MAX_NPFR),                                       &
+                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT),         &
+                        PF_FWHM(MAX_NPFR),          PF_IntBreadth(MAX_NPFR)      
+      
+      DO I = 1,NBIN
+      COUNT = 0
+      DO J = I-WIDTH, I+WIDTH
+      IF ( J .GT. 0 .AND. J .LE. NBIN ) THEN
+          INTEG(I) = INTEG(I) + OBSARR(J)
+          COUNT = COUNT + 1
+      ENDIF
+      ENDDO
+      INTEG(I) = INTEG(I) / COUNT
+      ENDDO
+      
+      
+      END SUBROUTINE
+      
+      INTEGER FUNCTION FindPeakStart(StartPoint, NBIN, OBS, XBIN, EBIN)
+      
+      IMPLICIT NONE
+ 
+      
+      INCLUDE 'params.inc'
+      INCLUDE 'GLBVAR.INC'
+      
+      REAL, INTENT(IN) :: OBS(MOBS), XBIN(MOBS), EBIN(MOBS)
+ 
+      INTEGER, INTENT(IN) :: StartPoint, NBIN
+            
+
+      FindPeakStart = StartPoint
+      DO WHILE ( FindPeakStart .GT. 1 )
+        IF ( OBS(FindPeakStart) .LT. EBIN(FindPeakStart) * 1.5 ) GOTO 100
+        FindPeakStart = FindPeakStart - 1
+      END DO
+ 
+ 100  CONTINUE
+      
+      END  FUNCTION FindPeakStart
+
+      INTEGER FUNCTION FindPeakEnd(StartPoint, NBIN, OBS, XBIN, EBIN)
+      
+      IMPLICIT NONE
+ 
+      
+      INCLUDE 'params.inc'
+      INCLUDE 'GLBVAR.INC'
+      
+      REAL, INTENT(IN) :: OBS(MOBS), XBIN(MOBS), EBIN(MOBS)
+ 
+      INTEGER, INTENT(IN) :: NBIN, StartPoint
+            
+
+      FindPeakEnd = StartPoint
+      DO WHILE ( FindPeakEnd .LT. NBIN )
+        IF ( OBS(FindPeakEnd) .LT. EBIN(FindPeakEnd) * 1.5 ) GOTO 110
+        FindPeakEnd = FindPeakEnd + 1
+      END DO
+ 
+ 110  CONTINUE
+
+      END  FUNCTION FindPeakEnd
+
+      
+      LOGICAL FUNCTION IsHighPoint(TT,OBSARR,ARRSIZ, WIDTH)
+      IMPLICIT NONE
+
+      INCLUDE 'params.inc'
+      INCLUDE 'GLBVAR.INC'
+      
+      INTEGER ARRSIZ
+      REAL OBSARR(*)
+      
+      INTEGER, INTENT(IN) :: TT
+      INTEGER, INTENT(IN) :: WIDTH
+      REAL RC,RL,RR,LINT,RINT, MINT
+      INTEGER I
+      
+      IsHighPoint = .FALSE.
+      IF ( TT-WIDTH .LE. 1 .OR. TT+WIDTH .GE. ARRSIZ ) THEN
+        RETURN
+      ENDIF
+
+      
+      RL  = OBSARR(TT - 1)
+      RC  = OBSARR(TT) 
+      RR  = OBSARR(TT + 1)
+      
+      
+      
+      IsHighPoint = ( (RC.GE.RL) .AND. (RC.GE.RR) )
+      
+      IF ( IsHighPoint ) THEN
+
+          LINT = 0.0
+          DO I = TT-WIDTH,TT
+            LINT = LINT + OBSARR(I)
+          ENDDO
+          LINT = LINT / (WIDTH+1)
+          
+          RINT = 0.0
+          DO I = TT,TT+WIDTH
+            RINT = RINT + OBSARR(I)
+          ENDDO
+          RINT = RINT / (WIDTH+1)
+
+          MINT = 0.0
+          DO I = TT-(WIDTH/2),TT+(WIDTH/2)
+            MINT = MINT + OBSARR(I)
+          ENDDO
+          MINT = MINT / (WIDTH+1)
+          
+          IsHighPoint = ( MINT .GT. RINT .AND. MINT .GT. LINT )
+      ENDIF
+     
+      END FUNCTION IsHighPoint
+      
+      LOGICAL FUNCTION IsShoulder(TT,WIDTH)
+
+      INCLUDE 'params.inc'
+      INCLUDE 'GLBVAR.INC'
+            
+      INTEGER, INTENT(IN) :: TT,WIDTH
+      INTEGER MINTT,MAXTT
+      REAL DELTA
+
+      INTEGER          NBIN, LBIN
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS), AVGESD         
+      IsShoulder = .FALSE.
+      
+      IF ( TT .EQ. NBIN ) RETURN
+      
+      MINTT = TT - WIDTH
+      
+      IF ( MINTT .LT. 1 ) RETURN
+     
+      CALL FitLine(ALOWER,BLOWER,MINTT,TT)
+      CALL FitLine(AUPPER,BUPPER,MINTT+1,TT+1)
+      
+ 
+      DELTA = 2.0 * ( ALOWER - AUPPER ) / ABS( ALOWER + AUPPER )
+
+   
+      IsShoulder = ( ( ALOWER .GT. 0.0 .AND. AUPPER .GT. 0.0 .AND. DELTA .GT. 0.2 ) .OR. &
+                     ( ALOWER .LT. 0.0 .AND. AUPPER .LT. 0.0 .AND. DELTA .GT. 0.2 ) )
+      
+      END FUNCTION IsShoulder
+      
+
+      SUBROUTINE FitLine(A,B,MINTT,MAXTT)
+      
+      IMPLICIT NONE
+
+      INCLUDE 'params.inc'
+      INCLUDE 'GLBVAR.INC'
+      
+      INTEGER          NBIN, LBIN
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS), AVGESD         
+            
+      INTEGER,INTENT(IN) :: MINTT,MAXTT
+      REAL, INTENT(OUT) :: A,B
+      REAL SUMX,SUMXX,SUMXY,SUMY, D,X,Y
+      INTEGER NRNG, I
+      
+      SUMX = 0.0
+      SUMY = 0.0
+      SUMXY = 0.0
+      SUMXX = 0.0
+      NRNG = MAXTT - MINTT + 1
+      
+      DO I = MINTT,MAXTT+1
+         
+         X = I - MINTT + 1
+         Y = YOBIN(I) - YBBIN(I)
+         
+         SUMX  = SUMX  + X
+         SUMXX = SUMXX + (X*X)
+         SUMY  = SUMY  + Y
+         SUMXY = SUMXY + (Y*X)
+      END DO
+
+      D = (SUMXX*NRNG) - (SUMX*SUMX) 
+      
+      B = ((SUMY*SUMXX) - (SUMX*SUMXY))/D
+      A = ((SUMXY*NRNG) - (SUMX*SUMY)) /D
+      
+
+      END SUBROUTINE FitLine
+      
 !
 !*****************************************************************************
 !

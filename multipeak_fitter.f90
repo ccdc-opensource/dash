@@ -28,7 +28,7 @@
                         PF_FWHM(MAX_NPFR),          PF_IntBreadth(MAX_NPFR)
       
       INTEGER     MPeak
-      PARAMETER ( MPeak = 10 )
+      PARAMETER ( MPeak = 20 )
 
       INTEGER         NPEAK
       REAL                   AREA,        XPOS       , P2
@@ -132,7 +132,7 @@
       COMMON /PHASE / NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI(9), SCALEP(9), KSCALP(9), PHMAG(9)
 
       INTEGER     MPeak
-      PARAMETER ( MPeak = 10 )
+      PARAMETER ( MPeak = 20 )
 
       INTEGER         NPEAK
       REAL                   AREA,        XPOS       , P2
@@ -246,7 +246,7 @@
       COMMON /ZSTORE/ NPTS, ZARGI(MOBS), ZOBS(MOBS), ZDOBS(MOBS), ZWT(MOBS), ICODEZ(MOBS), KOBZ(MOBS)
 
       INTEGER     MPeak
-      PARAMETER ( MPeak = 10 )
+      PARAMETER ( MPeak = 20 )
 
       INTEGER         NPEAK
       REAL                   AREA,        XPOS       , P2

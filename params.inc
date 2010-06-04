@@ -28,7 +28,7 @@
 ! Maximum dimension of KNIPT
 
       INTEGER     MAX_NPFR,      MAX_NPPR,      MAX_FITPT,         MPkDes
-      PARAMETER ( MAX_NPFR = 50, MAX_NPPR = 10, MAX_FITPT = 10000, MPkDes = 6 )
+      PARAMETER ( MAX_NPFR = 50, MAX_NPPR = 20, MAX_FITPT = 10000, MPkDes = 6 )
 ! For common block PEAKFIT2
 
       INTEGER     ITMREF
@@ -39,8 +39,8 @@
       PARAMETER ( MTPeak = 100 )
 ! For use in common block ALLPEAKS
 
-   !   INTEGER     MaxPeaksFound
-   !   PARAMETER ( MaxPeaksFound = 50 )
+      INTEGER     MaxPeaksFound
+      PARAMETER ( MaxPeaksFound = 500 )
 ! The maximum number of peaks that the peak-finding algorithm will find
 
       INTEGER     MaxNumChildWin

@@ -8,7 +8,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 27/Jan/2009 15:19:21
+// Modified : 04/Jun/2010 15:00:28
 //
 ///////////////////////////////////////////////////
 //
@@ -748,6 +748,7 @@
 #define IDF_ClearDistRest                1583
 #define IDF_SA_Dist_Rest                 1584
 #define IDC_Sort_H_Down                  1585
+#define IDF_AutoSelectPeaks              1571
 
 ///////////////////////////////////////////////////
 //
@@ -1642,12 +1643,12 @@ FONT    8, "MS Sans Serif"
 CAPTION "Acquiring a licence"
 BEGIN
     CONTROL "&OK",IDOK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,   38,  120,   38,   14
-    CONTROL "Enter Licence Key:",IDF_License_Key,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   12,   54,   94,    14
+    CONTROL "Enter Licence Key:",IDF_License_Key,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   12,   54,   94,   14
     CONTROL "",IDF_License_String,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT,  120,   52,  132,   14
     CONTROL "E&xit",ID_Licensing_Exit,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   95,  120,   40,   14
     CONTROL "Generate &Request",ID_Licence_Request,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  156,  120,   74,   14
-    CONTROL "Site Code",IDF_License_SiteCodeLabel,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | SS_LEFT,   12,   94,   94,    14
-    CONTROL "&Site Licence",IDF_License_Site,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   12,   74,   94,    14
+    CONTROL "Site Code",IDF_License_SiteCodeLabel,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | SS_LEFT,   12,   94,   94,   14
+    CONTROL "&Site Licence",IDF_License_Site,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   12,   74,   94,   14
     CONTROL "",IDF_License_SiteCode,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  120,   92,  132,   12
     CONTROL "You need to enter a valid licence for DASH to run on this machine. To do this, either enter your licence key in the box provided or create a licence request form and e-mail it to admin@ccdc.cam.ac.uk",IDF_STRING2,"EDIT",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_MULTILINE | ES_READONLY,   16,   11,  238,   29
 END
@@ -1974,23 +1975,24 @@ BEGIN
 ,0
 END
 
-IDD_PW_Page7 DIALOG 0, 0,  375,  170
+IDD_PW_Page7 DIALOG 0, 0,  364,  185
 STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
 CAPTION "DASH Wizard : Indexing Step 1: Peak Picking"
 BEGIN
-    CONTROL "",IDF_PW_Logo1,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   10,   15,   70,  140,WS_EX_DLGMODALFRAME
-    CONTROL "< &Back",IDBACK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  100,  150,   40,   14
-    CONTROL "&Next >",IDNEXT,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  140,  150,   40,   14
-    CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  150,   40,   14
-    CONTROL "&Index pattern",IDF_RADIO1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  143,   92,  130,   14
-    CONTROL "External &DICVOL (04 or later)",IDF_RADIO2,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  143,  106,  130,   14
-    CONTROL "Stand-alone &McMaille",IDF_RADIO3,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  143,  120,  130,   14
-    CONTROL "&Enter known unit-cell parameters",IDF_RADIO4,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  143,  134,  130,   14
+    CONTROL "",IDF_PW_Logo1,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   10,   15,   70,  156,WS_EX_DLGMODALFRAME
+    CONTROL "< &Back",IDBACK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  107,  160,   40,   14
+    CONTROL "&Next >",IDNEXT,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  147,  160,   40,   14
+    CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  187,  160,   40,   14
+    CONTROL "&Index pattern",IDF_RADIO1,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  106,   94,  130,   14
+    CONTROL "External &DICVOL (04 or later)",IDF_RADIO2,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  106,  108,  130,   14
+    CONTROL "Stand-alone &McMaille",IDF_RADIO3,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  106,  122,  130,   14
+    CONTROL "&Enter known unit-cell parameters",IDF_RADIO4,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTORADIOBUTTON | BS_TEXT,  106,  137,  130,   14
     CONTROL "The next step is indexing the pattern.",IDF_LABEL5,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  107,   17,  238,   10
-    CONTROL "Alternatively, if the unit-cell parameters are already known, they can be entered directly.",IDF_LABEL6,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  107,   56,  238,   19
-    CONTROL "Select the first 20 peaks in the diffraction pattern using the mouse, then press 'Next >' to index the pattern with DICVOL;  or launch a stand-alone McMaille and  enter found unit-cell  parameters by hand.",IDF_LABEL7,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  107,   29,  238,   24
-    CONTROL "Hint:  To enable the options for external programs, they must be entered in the 'Configuration' dialogue.",IDF_LABEL4,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  107,   76,  238,   16
+    CONTROL "Alternatively, if the unit-cell parameters are already known, they can be entered directly.",IDF_LABEL6,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  107,   54,  238,   19
+    CONTROL "Select the first 20 peaks in the diffraction pattern using the mouse, then press 'Next >' to index the pattern with DICVOL;  or launch a stand-alone McMaille and  enter found unit-cell  parameters by hand.",IDF_LABEL7,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  107,   28,  237,   24
+    CONTROL "Hint:  To enable the options for external programs, they must be entered in the 'Configuration' dialogue.",IDF_LABEL4,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  107,   75,  238,   16
+    CONTROL "Auto Select Peaks",IDF_AutoSelectPeaks,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  245,   97,   86,   14
 END
 
 IDD_PW_Page7 RCDATA
@@ -2168,7 +2170,8 @@ BEGIN
     CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  150,   40,   14
     CONTROL "It is recommended that you clear the peak fit ranges selected for indexing by pressing the 'Clear Peaks' button.",IDF_LABEL4,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  110,   35,  240,   20
     CONTROL "Peak shape parameters can be viewed selecting 'View' | 'Peak Widths' from the menu. When you are happy with the peaks you have selected, press 'Next >' to run the Pawley refinement.",IDF_LABEL8,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  110,  107,  240,   27
-    CONTROL "Clear &Peaks",IDF_ClearPeakFitRanges,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  206,   61,   50,   14
+    CONTROL "Clear &Peaks",IDF_ClearPeakFitRanges,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  111,   61,   50,   14
+    CONTROL "&Select Suitable Peaks",IDF_AutoSelectPeaks,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  174,   62,   78,   14
 END
 
 IDD_LicenceAgreement DIALOG 0, 0,  298,  281
@@ -4039,4 +4042,4 @@ END
 //*WI* FILENAME    PCDruid_Resource.F90
 //*WI* FMODNAME    Druid_Header
 //*WI* LASTTYPE        2
-//*WI* LASTRES        30
+//*WI* LASTRES        36

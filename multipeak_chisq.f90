@@ -62,7 +62,7 @@
       COMMON /ZSTOR2/ MN, MN2
 
       INTEGER     MPeak
-      PARAMETER ( MPeak = 10 )
+      PARAMETER ( MPeak = 20 )
 
       INTEGER         NPEAK
       REAL                   AREA,        XPOS       , P2
@@ -225,7 +225,7 @@
       COMMON /ZSTOR2/ MN, MN2
 
       INTEGER     MPeak
-      PARAMETER ( MPeak = 10 )
+      PARAMETER ( MPeak = 20 )
 
       INTEGER         NPEAK
       REAL                   AREA,        XPOS       , P2
