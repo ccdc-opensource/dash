@@ -1,4 +1,4 @@
-! Winteracter resource identifiers. Created : 27/Jan/2009 15:19:21
+! Winteracter resource identifiers. Created : 04/Jun/2010 15:00:28
 !
       MODULE Druid_Header
       IMPLICIT NONE
@@ -726,4 +726,5 @@
       INTEGER, PARAMETER :: IDF_ClearDistRest               =  1583
       INTEGER, PARAMETER :: IDF_SA_Dist_Rest                =  1584
       INTEGER, PARAMETER :: IDC_Sort_H_Down                 =  1585
+      INTEGER, PARAMETER :: IDF_AutoSelectPeaks             =  1571
       END MODULE Druid_Header

@@ -433,9 +433,9 @@
       INTEGER                    ChiHandle
       COMMON /ChiSqdWindowsUsed/ ChiHandle
 
-  !    REAL                PeakFindPos
-  !    INTEGER                                           nPeaksFound
-  !    COMMON / PEAKFIND / PeakFindPos(1:MaxPeaksFound), nPeaksFound
+      REAL                PeakFindPos
+      INTEGER                                           nPeaksFound
+      COMMON / PEAKFIND / PeakFindPos(1:MaxPeaksFound), nPeaksFound
 
       INTEGER         Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
       REAL                                                           ChiMult
@@ -619,6 +619,7 @@
         CALL WMenuSetState(ID_Remove_Background, ItemEnabled, WintOff)
       ENDIF
 
+      nPeaksFound = 0
       SlimValue = 1.0
       ScalFac   = 0.01
       BackRef   = .TRUE.
