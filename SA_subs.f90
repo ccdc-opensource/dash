@@ -528,6 +528,10 @@
 ! We will use the energy fluctuation to reduce the temperature
       T = T/(1.0+(RT*T)/(3.0*FPSD))
 
+! Rounding can cause this
+      IF ( iMyExit.EQ.0 .AND. T .LE. 0.000001 ) THEN
+          iMyExit = 4 ! Start next 
+      ENDIF
    !   IF (MOD(Curr_SA_Iteration,5) .EQ. 0) CALL LocalMinimise(.TRUE.)
 
    !   CALL LocalMinimise(.TRUE.)
