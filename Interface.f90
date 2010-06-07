@@ -258,8 +258,8 @@
         CALL Set_Wavelength(WavelengthOf('Cu'))
       ENDIF
 ! Calculate minimum d-spacing for the given wavelength
-      IF (ThedSpacing .LT. TwoTheta2dSpacing(89.9999)) THEN
-        dSpacing2TwoTheta = 90.0
+      IF (ThedSpacing .LT. TwoTheta2dSpacing(179.9999)) THEN
+        dSpacing2TwoTheta = 180.0
       ELSE
         dSpacing2TwoTheta = 2 * Radians2Degrees(ASIN(ALambda/(2*ThedSpacing)))
       ENDIF

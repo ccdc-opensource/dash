@@ -680,7 +680,7 @@
         CALL DASHWDialogGetReal(IDF_Max2Theta, tMax)
       ELSE
 ! If the user doesn't want to truncate the data, just restore the old values
-        tMax = 90.0
+        tMax = 180.0
       ENDIF
       CALL TruncateData(tMin, tMax)
 ! Now check if we have reasonable data left. If not, don't allow pressing 'Next >'
@@ -737,7 +737,7 @@
               IF ( .NOT. FnPatternOK()) THEN
                 CALL ErrorMessage('Invalid profile range.')
                 tMin = 0.0
-                tMax = 90.0
+                tMax = 180.0
                 CALL TruncateData(tMin,tMax)
               ELSE
                 CALL WizardWindowShow(IDD_PW_Page6)
@@ -757,7 +757,7 @@
               IF (.NOT. FnPatternOK()) THEN
                 CALL ErrorMessage('Invalid profile range.')
                 tMin = 0.0
-                tMax = 90.0
+                tMax = 180.0
                 CALL TruncateData(tMin,tMax)
               ENDIF
               CALL Profile_Plot
