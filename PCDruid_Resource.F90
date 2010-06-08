@@ -1,4 +1,4 @@
-! Winteracter resource identifiers. Created : 04/Jun/2010 15:00:28
+! Winteracter resource identifiers. Created : 08/Jun/2010 12:13:59
 !
       MODULE Druid_Header
       IMPLICIT NONE

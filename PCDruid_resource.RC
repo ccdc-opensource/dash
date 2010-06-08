@@ -8,7 +8,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 04/Jun/2010 15:00:28
+// Modified : 08/Jun/2010 12:13:59
 //
 ///////////////////////////////////////////////////
 //
@@ -1721,7 +1721,7 @@ BEGIN
 " 1222 1 \n"
 "[Ranges] \n"
 " 1205     0.10000E-003      1000.0      \n"
-" 1223      0.0000           90.000      \n"
+" 1223      0.0000           180.00      \n"
 " 1209      0.0000           90.000      \n"
 "[Formats] \n"
 ,0
@@ -4042,4 +4042,4 @@ END
 //*WI* FILENAME    PCDruid_Resource.F90
 //*WI* FMODNAME    Druid_Header
 //*WI* LASTTYPE        2
-//*WI* LASTRES        36
+//*WI* LASTRES        25
