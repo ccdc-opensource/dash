@@ -935,7 +935,6 @@
         CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, DRestrLens(I))
         CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, DRestrWidths(I))
         CALL FileRWReal   (hPrjFile, iPrjRecNr, RW, DRestrWeights(I))
-        CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, DRestrSpringOpts(I))
         IF ( FileErrorOccurred() ) EXIT
       ENDDO
       

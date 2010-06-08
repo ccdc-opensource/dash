@@ -526,7 +526,7 @@
 ! Avoid using atom label: as "relabel" may change internal labels, but those in zmatrics remain unchanged
           WRITE(iHandle,'(A,1X,2(I2,1X,I3,1X),2(F8.4,1X),F8.2,1X,I1)',ERR=999) 'DIST_RESTRAINT', &
                   (fragID(j), atomSeq(j), j=1, 2), &
-                  DRestrLens(I), DRestrWidths(I), DRestrWeights(I), DRestrSpringOpts(I)
+                  DRestrLens(I), DRestrWidths(I), DRestrWeights(I)
         ENDDO
       ENDIF
 !C Need limits for all parameters. Since these are by index, we need to write all of them out

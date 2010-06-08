@@ -4,9 +4,9 @@
       INTEGER, PARAMETER :: MaxSADRestr = 5
 !     Max number of bond restraints for SA
 
-      REAL                SpringWeight, SASpringPenalty, SANonSpringPenalty
-      COMMON /SA_Penalty/ SpringWeight, SASpringPenalty, SANonSpringPenalty
+      REAL                SpringWeight, SAPenalty
+      COMMON /SA_Penalty/ SpringWeight, SAPenalty
 
-      INTEGER            DRestrNumb, DRestrAtomIDs(2,MaxSADRestr), DRestrSpringOpts(MaxSADRestr) 
+      INTEGER            DRestrNumb, DRestrAtomIDs(2,MaxSADRestr)
       REAL			         DRestrLens(MaxSADRestr), DRestrWidths(MaxSADRestr), DRestrWeights(MaxSADRestr)
-      COMMON /SA_DRestr/ DRestrNumb, DRestrAtomIDs, DRestrLens, DRestrWidths, DRestrWeights, DRestrSpringOpts
+      COMMON /SA_DRestr/ DRestrNumb, DRestrAtomIDs, DRestrLens, DRestrWidths, DRestrWeights
