@@ -8,7 +8,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 08/Jun/2010 12:13:59
+// Modified : 08/Jun/2010 12:28:59
 //
 ///////////////////////////////////////////////////
 //
@@ -3817,7 +3817,7 @@ BEGIN
     CONTROL "&Next >",IDNEXT,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  140,  150,   40,   14
     CONTROL "< &Back",IDBACK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  100,  150,   40,   14
     CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  150,   40,   14
-    CONTROL "",IDF_SA_Dist_Rest_Grid,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS | GS_ROWLABELS,  104,   20,  260,   76
+    CONTROL "",IDF_SA_Dist_Rest_Grid,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS | GS_ROWLABELS,  103,   20,  251,   76
     CONTROL "SA distance restranits",IDF_SA_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  104,    5,  122,   11
     CONTROL "Clear table",IDF_ClearDistRest,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  324,   97,   40,   14
     CONTROL "Only the distance between the original atoms is restrained, those involving symmetry related atoms are ignored..",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  104,  112,  260,   16
@@ -3828,7 +3828,7 @@ IDD_SA_Dist_Rest RCDATA
 BEGIN
 "[Ranges] \n"
 "[Grids] \n"
-" 1582     6    100   172 \n"
+" 1582     5    100   172 \n"
 "   20 \n"
 "[Formats] \n"
 ,0
@@ -3843,13 +3843,11 @@ BEGIN
     CONTROL "Distance(Å)",ISS8,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,    0,    0,   45,   14
     CONTROL "Width(Å)",ISS6,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,    0,    0,   40,   14
     CONTROL "Weight",ISS5,"REALEDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,    0,    0,   35,   14
-    CONTROL "S",ISS7,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_LEFTTEXT | BS_TEXT,    0,    0,   10,   14
 END
 
 IDD_TEMPLATE018 RCDATA
 BEGIN
 "[Checks] \n"
-" 1093 0 \n"
 "[Menus] \n"
 " 1021     1     1 \n"
 "Frag:Atom1 \n"
@@ -3858,8 +3856,9 @@ BEGIN
 "[Ranges] \n"
 " 1094      0.0000          0.34028E+039 \n"
 " 1070      0.0000          0.34028E+039 \n"
-" 1069      0.0000          0.34028E+039 \n"
+" 1069      1.0000           1000.0      \n"
 "[Formats] \n"
+" 1069 (f8.2) \n"
 ,0
 END
 
@@ -4042,4 +4041,4 @@ END
 //*WI* FILENAME    PCDruid_Resource.F90
 //*WI* FMODNAME    Druid_Header
 //*WI* LASTTYPE        2
-//*WI* LASTRES        25
+//*WI* LASTRES        82

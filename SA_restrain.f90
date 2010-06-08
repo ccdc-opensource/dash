@@ -29,9 +29,9 @@
       
       ParseSADistRestraint = .FALSE.
       IF (DRestrNumb .GE. MaxSADRestr) GOTO 200
-      ! frag1, atom1, frag2, atom2, dist, width, weight, spring_flag (0=no,1=yes)
+      ! frag1, atom1, frag2, atom2, dist, width, weight
       READ(line, *, END=200, ERR=200) (frags(I), atms(I), I=1, 2), &
-                                      dist, width, rweight, sflag
+                                      dist, width, rweight
       ! Check bounds
       IF (rweight .LT. 0.0 .OR. dist .LT. 0.0 .OR. width .LT. 0.0) GOTO 200
       DO I = 1, 2
@@ -48,7 +48,6 @@
       DRestrWeights(DRestrNumb) = rweight
       DRestrLens(DRestrNumb) = dist
       DRestrWidths(DRestrNumb) = width
-      DRestrSpringOpts(DRestrNumb) = sflag
       ParseSADistRestraint = .TRUE.
   200 CONTINUE
       RETURN
@@ -138,14 +137,8 @@
       
       DO I = 1, DRestrNumb
         CALL CalculateDistance(DRestrAtomIDs(1,I), DRestrAtomIDs(2,I), D)
-        delta = ABS(D - DRestrLens(I))
-        IF (delta .GT. DRestrWidths(I)) THEN
-          IF (DRestrSpringOpts(I) .NE. 0) THEN
-            SASpringPenalty = SASpringPenalty + DRestrWeights(I) * delta
-          ELSE
-            SANonSpringPenalty = SANonSpringPenalty + DRestrWeights(I) * delta
-          ENDIF
-        ENDIF
+        delta = MAX(0.0, ABS(D - DRestrLens(I)) - DRestrWidths(I))
+        SAPenalty = SAPenalty + DRestrWeights(I) * delta * delta
       ENDDO
       RETURN
    

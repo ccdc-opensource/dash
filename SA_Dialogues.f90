@@ -1903,11 +1903,6 @@
         CALL WGridPutCellReal(IDF_SA_Dist_Rest_Grid, 3, IFRow, DRestrLens(IFRow), '(F12.5)')
         CALL WGridPutCellReal(IDF_SA_Dist_Rest_Grid, 4, IFRow, DRestrWidths(IFRow), '(F12.5)')
         CALL WGridPutCellReal(IDF_SA_Dist_Rest_Grid, 5, IFRow, DRestrWeights(IFRow), '(F12.5)')
-        IF (DRestrSpringOpts(IFRow) .NE. 0) THEN
-          CALL WGridPutCellCheckBox(IDF_SA_Dist_Rest_Grid, 6, IFRow, Enabled)
-        ELSE
-          CALL WGridPutCellCheckBox(IDF_SA_Dist_Rest_Grid, 6, IFRow, Disabled)
-        ENDIF
       ENDDO
       CALL WizardWindowShow(IDD_SA_Dist_Rest)
       CALL PopActiveWindowID
@@ -1958,7 +1953,6 @@
                 CALL DASHWGridGetCellReal(IDF_SA_Dist_Rest_Grid, 3, IFRow, DRestrLens(n))
                 CALL DASHWGridGetCellReal(IDF_SA_Dist_Rest_Grid, 4, IFRow, DRestrWidths(n))
                 CALL DASHWGridGetCellReal(IDF_SA_Dist_Rest_Grid, 5, IFRow, DRestrWeights(n))
-                CALL DASHWGridGetCellCheckBox(IDF_SA_Dist_Rest_Grid, 6, IFRow, DRestrSpringOpts(n))
                 IF (InfoError(1) .EQ. 0 .AND. DRestrAtomIDs(1,n) .GT. 0 &
                                         .AND. DRestrAtomIDs(2,n) .GT. 0 ) THEN
                   CALL WGridLabelRow(IDF_SA_Dist_Rest_Grid, IFRow, TRIM(Integer2String(n)))

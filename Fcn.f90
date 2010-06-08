@@ -18,15 +18,14 @@
 ! If only e.g. the preferred orientation has changed, there is no need to 
 ! recalculate all the fractional co-ordinates
       IF (CurrentParameter .LE. NStPar) THEN
-        SASpringPenalty = 0.0
-        SANonSpringPenalty = 0.0
+        SAPenalty = 0.0
         CALL makefrac(X)
       ENDIF
       CALL valchi(H,CurrentParameter)
       
       IF ( IncPenalty .AND. DRestrNumb .GT. 0 ) THEN
         CALL AddPenalty()
-        H = H + SpringWeight * SASpringPenalty + SANonSpringPenalty
+        H = H + SpringWeight * SAPenalty
       ENDIF
 
       END SUBROUTINE FCN
