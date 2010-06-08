@@ -260,7 +260,7 @@
       ! Next line is wrong for single crystal, which should use the intensity chi-sqrd
       ProgressIndicator = 1.0 -( (CHIPROBEST - (ChiMult*PAWLEYCHISQ)) / (InitialProChiSqrd - (ChiMult*PAWLEYCHISQ)))
       !CALL SetSpringWeight( ProgressIndicator )
-      CALL SetSpringWeight( float(ntotmov) / float(nmpert*nt) )
+      CALL SetSpringWeight( float(ntotmov) / float(MaxMoves) )
       NUP = 0
       NDOWN = 0
       DO II = 1, nvar
