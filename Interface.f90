@@ -2337,9 +2337,11 @@
       COMMON / PEAKFIND / PeakFindPos(1:MaxPeaksFound), nPeaksFound
       INTEGER PeakFindBin(1:MaxPeaksFound)
       
+      INTEGER PeaksAllowed
+      
       LOGICAL, EXTERNAL :: IsShoulder, IsHighPoint
       INTEGER I, J, IWIDTH, NCO
-      REAL OBSARR(MOBS), INTEG(MOBS), SUMARR, SUMARR2
+      REAL OBSARR(MOBS), INTEG(MOBS), SUMARR, SUMARR2, DEL, TTWIDTH
       INTEGER WIDTH,MUL,DIV, TargetRanges, CurrentPeak
       
       REAL              XPF_Range
@@ -2362,30 +2364,48 @@
                         XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT),         &
                         PF_FWHM(MAX_NPFR),          PF_IntBreadth(MAX_NPFR)      
       
+      LOGICAL UseSmoothing
+      
 ! Attempt to find peak positions automatically
 
-       WIDTH = 3
-      
+       UseSmoothing = .TRUE.
+       
+       TTWIDTH = 0.012
+  
+       DEL = XBIN(2) - XBIN(1)
+       WIDTH = NINT(TTWIDTH/DEL)
+ 
+       IF ( WIDTH .LT. 1 ) THEN
+           WIDTH = 1
+           UseSmoothing = .FALSE.
+       ENDIF
+       
        SUMARR = 0.0
        NCO = 0
+       
+       
        DO I = 1,NBIN
-          OBSARR(I) = 0.0
-          DIV = 0
-          DO J = -WIDTH,0
-              IF ( I + J .GT. 0 ) THEN
-                  MUL = (WIDTH+J+1)
-                  OBSARR(I) = OBSARR(I) + ( MUL * YOBIN(I+J) )
-                  DIV = DIV + MUL
-              ENDIF
-          ENDDO
-          DO J = 1,WIDTH
-              IF ( I + J .LE. NBIN ) THEN
-                  MUL = (WIDTH-J+1)
-                  OBSARR(I) = OBSARR(I) + ( MUL * YOBIN(I+J) )
-                  DIV = DIV + MUL
-              ENDIF
-          ENDDO
-          OBSARR(I) = OBSARR(I)/DIV
+          IF ( UseSmoothing ) THEN
+             OBSARR(I) = 0.0
+              DIV = 0
+              DO J = -WIDTH,0
+                  IF ( I + J .GT. 0 ) THEN
+                      MUL = (WIDTH+J+1)
+                      OBSARR(I) = OBSARR(I) + ( MUL * YOBIN(I+J) )
+                      DIV = DIV + MUL
+                  ENDIF
+              ENDDO
+              DO J = 1,WIDTH
+                  IF ( I + J .LE. NBIN ) THEN
+                      MUL = (WIDTH-J+1)
+                      OBSARR(I) = OBSARR(I) + ( MUL * YOBIN(I+J) )
+                      DIV = DIV + MUL
+                  ENDIF
+              ENDDO
+              OBSARR(I) = OBSARR(I)/DIV
+          ELSE
+              OBSARR(I) = YOBIN(I)
+          ENDIF
           
           IF ( OBSARR(I) .GT. 0 ) THEN
               SUMARR = SUMARR + OBSARR(I)
@@ -2418,11 +2438,10 @@
        SUMARR = SUMARR / NCO
        
        nPeaksFound = 0
-       
 
        DO I = 1,NBIN
          IF ( nPeaksFound .LT. MaxPeaksFound .AND. OBSARR(I) .GT. SUMARR*8.0 ) THEN
-            IF ( IsHighPoint(I,OBSARR,NBIN,4) ) THEN
+            IF ( IsHighPoint(I,OBSARR,NBIN,WIDTH) ) THEN
                 nPeaksFound = nPeaksFound + 1
                 PeakFindPos(nPeaksFound) = XBIN(I)
                 PeakFindBin(nPeaksFound) = I        
@@ -2430,7 +2449,6 @@
          ENDIF
        END DO
    
-       NumPeakFitRange = 1
        IF (  ForPawley ) THEN
            TargetRanges = nPeaksFound
        ELSE
@@ -2439,9 +2457,22 @@
        
        NumPeakFitRange = 0
 
+       PeaksAllowed = 1
        DO I = 1, MIN(TargetRanges,nPeaksFound)       
-           CALL AddPeak( PeakFindBin(I), ForPawley )
+           CALL AddPeak( PeakFindBin(I), ForPawley, PeaksAllowed, PeaksAllowed )
        END DO
+
+       IF ( ForPawley ) THEN
+
+          DO WHILE ( NumPeakFitRange .LE. 4 .AND. PeaksAllowed .LT. 3)
+              PeaksAllowed = PeaksAllowed + 1
+              NumPeakFitRange = 0
+              DO I = 1, MIN(TargetRanges,nPeaksFound)       
+                 CALL AddPeak( PeakFindBin(I), ForPawley, PeaksAllowed, PeaksAllowed )
+              END DO
+          END DO
+          
+       ENDIF
 
        call profile_plot
        call FitPeaks
@@ -2449,7 +2480,7 @@
       END SUBROUTINE MarkPeaks
             
 
-      SUBROUTINE AddPeak(IBINV, ForPawley)
+      SUBROUTINE AddPeak(IBINV, ForPawley, MaxRealRef, MaxLocatedPeaks)
 
       USE REFVAR
       
@@ -2458,7 +2489,10 @@
       INCLUDE 'params.inc'
       INCLUDE 'GLBVAR.INC'
       
-      INTEGER, INTENT(IN) :: IBINV
+      ! MaxRealRef and MaxLocatedPeaks only used if ForPawley is true: Minimum number of indexed reflections permissible in
+      ! the range for Pawley Fitting
+      
+      INTEGER, INTENT(IN) :: IBINV, MaxRealRef, MaxLocatedPeaks
       LOGICAL, INTENT(IN) :: ForPawley
       
       INTEGER          NBIN, LBIN
@@ -2510,7 +2544,10 @@
                 ENDDO
               ENDIF
               
-              IF ( YOBIN(IBINV) .LT. 6.0 * EBIN(IBINV) .OR. COUNT .NE. 1 .OR. NumInPFR( NumPeakFitRange ) .GT. 1 ) THEN
+              IF ( YOBIN(IBINV) .LT. 6.0 * EBIN(IBINV) & 
+              .OR. COUNT .EQ. 0 &
+              .OR. COUNT .GT. MaxRealRef &
+              .OR. NumInPFR( NumPeakFitRange ) .GT. MaxLocatedPeaks ) THEN
                   NumInPFR( NumPeakFitRange ) = 0
                   NumPeakFitRange = NumPeakFitRange - 1
               ENDIF
@@ -2735,8 +2772,8 @@
       INTEGER, INTENT(IN) :: TT
       INTEGER, INTENT(IN) :: WIDTH
       REAL RC,RL,RR,LINT,RINT, MINT
-      INTEGER I
-      
+      INTEGER I,LOCALWIDTH
+      LOCALWIDTH = WIDTH
       IsHighPoint = .FALSE.
       IF ( TT-WIDTH .LE. 1 .OR. TT+WIDTH .GE. ARRSIZ ) THEN
         RETURN
@@ -2747,29 +2784,29 @@
       RC  = OBSARR(TT) 
       RR  = OBSARR(TT + 1)
       
-      
+      IF ( MOD(LOCALWIDTH,2) .EQ. 1 ) LOCALWIDTH = LOCALWIDTH + 1
       
       IsHighPoint = ( (RC.GE.RL) .AND. (RC.GE.RR) )
       
-      IF ( IsHighPoint ) THEN
+      IF ( IsHighPoint .AND. WIDTH .GT. 1 ) THEN
 
           LINT = 0.0
-          DO I = TT-WIDTH,TT
+          DO I = TT-LOCALWIDTH,TT
             LINT = LINT + OBSARR(I)
           ENDDO
-          LINT = LINT / (WIDTH+1)
+          LINT = LINT / (LOCALWIDTH+1)
           
           RINT = 0.0
-          DO I = TT,TT+WIDTH
+          DO I = TT,TT+LOCALWIDTH
             RINT = RINT + OBSARR(I)
           ENDDO
-          RINT = RINT / (WIDTH+1)
+          RINT = RINT / (LOCALWIDTH+1)
 
           MINT = 0.0
-          DO I = TT-(WIDTH/2),TT+(WIDTH/2)
+          DO I = TT-(LOCALWIDTH/2),TT+(LOCALWIDTH/2)
             MINT = MINT + OBSARR(I)
           ENDDO
-          MINT = MINT / (WIDTH+1)
+          MINT = MINT / (LOCALWIDTH+1)
           
           IsHighPoint = ( MINT .GT. RINT .AND. MINT .GT. LINT )
       ENDIF
