@@ -259,7 +259,8 @@
       Curr_SA_Iteration = Curr_SA_Iteration + 1
       ! Next line is wrong for single crystal, which should use the intensity chi-sqrd
       ProgressIndicator = 1.0 -( (CHIPROBEST - (ChiMult*PAWLEYCHISQ)) / (InitialProChiSqrd - (ChiMult*PAWLEYCHISQ)))
-      CALL SetSpringWeight( ProgressIndicator )
+      !CALL SetSpringWeight( ProgressIndicator )
+      CALL SetSpringWeight( float(ntotmov) / float(nmpert*nt) )
       NUP = 0
       NDOWN = 0
       DO II = 1, nvar
