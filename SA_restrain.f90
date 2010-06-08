@@ -134,7 +134,7 @@
       
       REAL delta, D
       INTEGER I
-      
+      SAPenalty = 0.0
       DO I = 1, DRestrNumb
         CALL CalculateDistance(DRestrAtomIDs(1,I), DRestrAtomIDs(2,I), D)
         delta = MAX(0.0, ABS(D - DRestrLens(I)) - DRestrWidths(I))

@@ -18,7 +18,6 @@
 ! If only e.g. the preferred orientation has changed, there is no need to 
 ! recalculate all the fractional co-ordinates
       IF (CurrentParameter .LE. NStPar) THEN
-        SAPenalty = 0.0
         CALL makefrac(X)
       ENDIF
       CALL valchi(H,CurrentParameter)
