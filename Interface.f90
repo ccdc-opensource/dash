@@ -2570,7 +2570,7 @@
        NumInPFR( NumPeakFitRange ) = 1   
        XPF_Pos(1,NumPeakFitRange) = XBIN(IBINV)
        YPF_Pos(1,NumPeakFitRange) = YOBIN(IBINV)
-       RangeFitYN(1) = .FALSE.
+       RangeFitYN(NumPeakFitRange) = .FALSE.
        IPF_Range(NumPeakFitRange) = 1 + IPF_Hi(NumPeakFitRange) - IPF_Lo(NumPeakFitRange)
       
       END SUBROUTINE AddNewPeakRange
