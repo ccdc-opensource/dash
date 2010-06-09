@@ -1928,7 +1928,7 @@
       CHARACTER*20, EXTERNAL :: Integer2String
       
       INTEGER IFRow, NROW, n, iOpt, iAtomSeqs(2), iFragIDs(2), nErr
-
+      REAL tmp
       CALL PushActiveWindowID
       CALL SelectDASHDialog(IDD_SA_Dist_Rest)
       SELECT CASE (EventType)
@@ -1981,6 +1981,17 @@
                           //CHAR(13)//CHAR(13)//'Continue?')) &
                 CALL ClearSADistRestraintsGrid
           END SELECT
+        CASE (FieldChanged)
+              DO IFRow = 1, WInfoGrid(IDF_SA_Dist_Rest_Grid, GridRowsMax)
+                CALL WGridGetCellMenu(IDF_SA_Dist_Rest_Grid, 1, IFRow, iOpt)
+                IF (iOpt - 1 .LE. 0 ) CYCLE    
+                CALL WGridGetCellMenu(IDF_SA_Dist_Rest_Grid, 2, IFRow, iOpt)
+                IF (iOpt - 1 .LE. 0 ) CYCLE 
+                
+                CALL DASHWGridGetCellReal(IDF_SA_Dist_Rest_Grid, 5, IFRow, tmp)
+                IF ( tmp .LE. 0.0 ) &
+                   CALL WGridPutCellReal(IDF_SA_Dist_Rest_Grid, 5, IFRow, 100.0, '(f5.1)')
+              ENDDO      
       END SELECT
       CALL PopActiveWindowID
 
