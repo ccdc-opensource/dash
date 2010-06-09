@@ -1689,13 +1689,14 @@
                 CALL DASHWGridGetCellReal(IDF_parameter_grid_modal, 3, I, UB(I))
                 CALL ParseRawInput(I)
               ENDDO
-              IF (DRestrNumb .GT. 0) &
-                CALL WDialogPutCheckBox(IDF_SA_Dist_Rest, Checked)
-              IF (DASHWDialogGetCheckBoxLogical(IDF_SA_Dist_Rest)) THEN
-                CALL ShowWizardWindowSADistRestraints
-              ELSE
+              
+!              IF (DRestrNumb .GT. 0) THEN
+!                CALL ShowWizardWindowSADistRestraints
+!              ELSE
                 CALL ShowWithWizardWindowSASettings
-              ENDIF
+!              ENDIF
+            CASE(IDF_SetRestraints)
+                CALL ShowSADistRestraints
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizardPastPawley
             CASE (IDF_SetupMDB)
@@ -1878,7 +1879,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE ShowWizardWindowSADistRestraints
+      SUBROUTINE ShowSADistRestraints
 
       USE WINTERACTER
       USE DRUID_HEADER
@@ -1892,7 +1893,7 @@
 
       INTEGER IFRow
 
-      CALL PushActiveWindowID
+ !     CALL PushActiveWindowID
       CALL SelectDASHDialog(IDD_SA_Dist_Rest)
       CALL WGridRows(IDF_SA_Dist_Rest_Grid, MaxSADRestr)
       CALL ClearSADistRestraintsGrid
@@ -1904,10 +1905,11 @@
         CALL WGridPutCellReal(IDF_SA_Dist_Rest_Grid, 4, IFRow, DRestrWidths(IFRow), '(F12.5)')
         CALL WGridPutCellReal(IDF_SA_Dist_Rest_Grid, 5, IFRow, DRestrWeights(IFRow), '(F12.5)')
       ENDDO
-      CALL WizardWindowShow(IDD_SA_Dist_Rest)
-      CALL PopActiveWindowID
+      
+      CALL WDialogShow(-1, -1, 0, SemiModeLess)
+!      CALL PopActiveWindowID
 
-      END SUBROUTINE ShowWizardWindowSADistRestraints
+      END SUBROUTINE ShowSADistRestraints
 !
 !*****************************************************************************
 !
@@ -1934,7 +1936,7 @@
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
               CALL WizardWindowShow(IDD_SA_Modal_input2)
-            CASE (IDNext)
+            CASE (IDSAVE)
               nErr = 0
               n = 1
               NROW = WInfoGrid(IDF_SA_Dist_Rest_Grid, GridRowsMax)
@@ -1968,12 +1970,12 @@
               ENDDO
               DRestrNumb = n - 1
               IF (nErr .EQ. 0) THEN
-                CALL ShowWithWizardWindowSASettings
+                CALL WDialogHide
               ELSE
                 CALL ErrorMessage('Problem occurred when processing the row(s) in red.')
               ENDIF
             CASE (IDCANCEL, IDCLOSE)
-              CALL EndWizardPastPawley
+               CALL WDialogHide
             CASE (IDF_ClearDistRest)
               IF (Confirm('This will erase all distance restraints in the table.' &
                           //CHAR(13)//CHAR(13)//'Continue?')) &
@@ -2192,12 +2194,12 @@
           SELECT CASE (EventInfo%VALUE1)
             CASE (IDBACK)
 ! Go back to the 2nd window
-              CALL SelectDASHDialog(IDD_SA_Modal_input2)
-              IF (DASHWDialogGetCheckBoxLogical(IDF_SA_Dist_Rest)) THEN
-                CALL WizardWindowShow(IDD_SA_Dist_Rest)
-              ELSE
+!              CALL SelectDASHDialog(IDD_SA_Modal_input2)
+!              IF (DASHWDialogGetCheckBoxLogical(IDF_SA_Dist_Rest)) THEN
+!                CALL WizardWindowShow(IDD_SA_Dist_Rest)
+!              ELSE
                 CALL WizardWindowShow(IDD_SA_Modal_input2)
-              ENDIF
+!              ENDIF
             CASE (IDNEXT)
               CALL DASHWDialogGetReal(IDF_MaxMoves1, MaxMoves1)
               CALL DASHWDialogGetInteger(IDF_MaxMoves2, MaxMoves2)
