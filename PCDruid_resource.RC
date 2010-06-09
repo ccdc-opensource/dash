@@ -8,7 +8,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 09/Jun/2010 09:27:27
+// Modified : 09/Jun/2010 12:12:23
 //
 ///////////////////////////////////////////////////
 //
@@ -2400,7 +2400,7 @@ BEGIN
     CONTROL "Sa&ve",IDBSAVE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   49,  276,   42,   14
     CONTROL "Re-or&der",IDB_ReOrder,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,    6,  255,   42,   14
     CONTROL "&Rotations...",IDB_Rotations,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  100,  255,   50,   14
-    CONTROL "Following any editing to atomic properties, before commit (by clicking 'OK') the changes to the in-memory copy, it is recommended to 'Save' or 'Save As...' to a Z-matrix file. Because the file may need to be read again, e.g. in a batch mode SA run.",IDF_LABEL5,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,    6,  294,  236,   34
+    CONTROL "Before committing edits to the ""in-memory"" copy of the zmatrix (by clicking 'OK') it is recommended to Save (or Save As) the zmatrix file, particularly if the edited version is intended to be used again.",IDF_LABEL5,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,    6,  294,  236,   34
 END
 
 IDD_zmEdit RCDATA
@@ -4038,4 +4038,4 @@ END
 //*WI* FILENAME    PCDruid_Resource.F90
 //*WI* FMODNAME    Druid_Header
 //*WI* LASTTYPE        2
-//*WI* LASTRES        82
+//*WI* LASTRES        42
