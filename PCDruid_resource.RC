@@ -8,7 +8,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 09/Jun/2010 12:12:23
+// Modified : 09/Jun/2010 12:29:29
 //
 ///////////////////////////////////////////////////
 //
@@ -2849,7 +2849,7 @@ BEGIN
     CONTROL "&Set MDB",IDF_SetupMDB,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  174,  118,   40,   12
     CONTROL "10",IDF_MDBMinHit,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  133,  118,   35,   12
     CONTROL "Min. hits:",IDF_LABEL3,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_RIGHT,   99,  120,   28,    8
-    CONTROL "Set Fragment Restraints",IDF_SetRestraints,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   92,  138,  126,   14
+    CONTROL "Set &Fragment Restraints",IDF_SetRestraints,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   92,  138,  126,   14
 END
 
 IDD_SA_Modal_input2 RCDATA
@@ -4038,4 +4038,4 @@ END
 //*WI* FILENAME    PCDruid_Resource.F90
 //*WI* FMODNAME    Druid_Header
 //*WI* LASTTYPE        2
-//*WI* LASTRES        42
+//*WI* LASTRES        55
