@@ -34,6 +34,9 @@
       CALL IOsDirChange(InstallationDirectory)
       CALL IOsDirName(InstallationDirectory)
       InstallationDirectory = TRIM(InstallationDirectory)//DIRSPACER
+      DocumentationRoot = TRIM(InstallationDirectory)//"Documentation"//DIRSPACER
+      DocumentationHTMLdirectory =  TRIM(DocumentationRoot)//"manual"//DIRSPACER//"output"//DIRSPACER &
+                                   //"portable_html"//DIRSPACER
 
 #ifdef _WIN32
       ! Operating system version number (e.g. 400=4.00)
@@ -588,7 +591,7 @@
       CALL Set_SaveCSSR(.FALSE.)
       CALL Set_SavePDB(.FALSE.)
       CALL Set_OutputChi2vsMoves(.FALSE. )
-      CALL Set_SavePrjAtEnd(.FALSE.)
+      CALL Set_SavePrjAtEnd(.TRUE.)
       CALL Set_SaveParamAtEnd(.FALSE.)
 
 

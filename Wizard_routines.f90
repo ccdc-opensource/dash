@@ -2107,11 +2107,11 @@
               CALL EndWizard
             CASE (IDF_ClearPeakFitRanges)
               IF (Confirm('Do you wish to delete all peak fit ranges?')) CALL Clear_PeakFitRanges
-            CASE (IDF_AutoSelectPeaks)
-                IF (Confirm('Do you wish to attempt to select suitable peaks?')) THEN
-                    CALL Clear_PeakFitRanges
-                    CALL AutoFitPeaksForPawley
-                ENDIF
+!            CASE (IDF_AutoSelectPeaks)
+!                IF (Confirm('Do you wish to attempt to select suitable peaks?')) THEN
+!                    CALL Clear_PeakFitRanges
+!                    CALL AutoFitPeaksForPawley
+!                ENDIF
           END SELECT
       END SELECT
       CALL PopActiveWindowID

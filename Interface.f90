@@ -158,7 +158,12 @@
       IMPLICIT NONE
 
       CHARACTER*(*), INTENT (IN   ) :: filename
+      
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
 
+      IF ( in_batch ) return
+      
       CALL PushActiveWindowID
       CALL SelectDASHDialog(IDD_SAW_Page1)
       CALL WDialogPutString(IDF_SA_Project_Name, filename)
@@ -2365,6 +2370,8 @@
                         PF_FWHM(MAX_NPFR),          PF_IntBreadth(MAX_NPFR)      
       
       LOGICAL UseSmoothing
+      REAL STEPSIZE, SF
+      INTEGER ACTUALWIDTH
       
 ! Attempt to find peak positions automatically
 
@@ -2372,42 +2379,44 @@
        
        TTWIDTH = 0.012
   
-       DEL = XBIN(2) - XBIN(1)
-       WIDTH = NINT(TTWIDTH/DEL)
+       STEPSIZE = XBIN(2) - XBIN(1)
+       WIDTH = 20
  
-       IF ( WIDTH .LT. 1 ) THEN
-           WIDTH = 1
-           UseSmoothing = .FALSE.
-       ENDIF
+!       IF ( WIDTH .LT. 1 ) THEN
+!           WIDTH = 1
+!           UseSmoothing = .FALSE.
+!       ENDIF
        
        SUMARR = 0.0
        NCO = 0
+       ACTUALWIDTH = 0
        
+       SF = 1.0/TTWIDTH
        
        DO I = 1,NBIN
           IF ( UseSmoothing ) THEN
-             OBSARR(I) = 0.0
+              OBSARR(I) = 0.0
               DIV = 0
-              DO J = -WIDTH,0
-                  IF ( I + J .GT. 0 ) THEN
-                      MUL = (WIDTH+J+1)
-                      OBSARR(I) = OBSARR(I) + ( MUL * YOBIN(I+J) )
-                      DIV = DIV + MUL
-                  ENDIF
+              DO J = I-WIDTH,I+WIDTH
+                 IF ( J .GT. 0 .AND. J .LT. NBIN ) THEN
+                    IF ( (1.0 - SF*ABS(J-I)*STEPSIZE ) .GT. 0.0 ) THEN
+                       OBSARR(I) = OBSARR(I) + YOBIN(J) 
+                       DIV = DIV + 1
+                       IF ( I.EQ. WIDTH+1 ) ACTUALWIDTH = ACTUALWIDTH + 1
+                    ENDIF
+                 ENDIF
               ENDDO
-              DO J = 1,WIDTH
-                  IF ( I + J .LE. NBIN ) THEN
-                      MUL = (WIDTH-J+1)
-                      OBSARR(I) = OBSARR(I) + ( MUL * YOBIN(I+J) )
-                      DIV = DIV + MUL
-                  ENDIF
-              ENDDO
-              OBSARR(I) = OBSARR(I)/DIV
+              
+              IF ( DIV .GT. 0 ) THEN
+                  OBSARR(I) = OBSARR(I)/DIV
+              ELSE
+                  OBSARR(I) = YOBIN(I)
+              ENDIF
           ELSE
               OBSARR(I) = YOBIN(I)
           ENDIF
           
-          IF ( OBSARR(I) .GT. 0 ) THEN
+          IF ( OBSARR(I) .GT. 0.0 ) THEN
               SUMARR = SUMARR + OBSARR(I)
               NCO = NCO + 1
           ENDIF
@@ -2441,10 +2450,22 @@
 
        DO I = 1,NBIN
          IF ( nPeaksFound .LT. MaxPeaksFound .AND. OBSARR(I) .GT. SUMARR*8.0 ) THEN
-            IF ( IsHighPoint(I,OBSARR,NBIN,WIDTH) ) THEN
-                nPeaksFound = nPeaksFound + 1
-                PeakFindPos(nPeaksFound) = XBIN(I)
-                PeakFindBin(nPeaksFound) = I        
+            IF ( IsHighPoint(I,OBSARR,NBIN,ACTUALWIDTH) ) THEN
+                ! Merge peaks that are close in 2-theta by picking the most intense of the set
+                ! Hack in here - only ever pick one low angle peak. Peak broadening and background
+                ! often means any low angle peak gets interpreted as multiple    
+                IF ( nPeaksFound .EQ. 0 ) THEN
+                    nPeaksFound = nPeaksFound + 1            
+                    PeakFindPos(nPeaksFound) = XBIN(I)
+                    PeakFindBin(nPeaksFound) = I
+                ELSE IF ( XBIN(I) .GT. 5.0 .AND. (XBIN(I) - PeakFindPos(nPeaksFound)) .GT. MIN( STEPSIZE*4.0, TTWIDTH*5.0 ) ) THEN
+                    nPeaksFound = nPeaksFound + 1
+                    PeakFindPos(nPeaksFound) = XBIN(I)
+                    PeakFindBin(nPeaksFound) = I
+                ELSE IF ( YOBIN(I) .GT. YOBIN(PeakFindBin(nPeaksFound)) ) THEN
+                    PeakFindPos(nPeaksFound) = XBIN(I)
+                    PeakFindBin(nPeaksFound) = I                 
+                ENDIF   
             ENDIF
          ENDIF
        END DO
@@ -2474,6 +2495,7 @@
           
        ENDIF
 
+       
        call profile_plot
        call FitPeaks
       
@@ -2528,32 +2550,91 @@
                         XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT),         &
                         PF_FWHM(MAX_NPFR),          PF_IntBreadth(MAX_NPFR)      
       
-       IF ( NumPeakFitRange .NE. 0 .AND. IPF_Lo(NumPeakFitRange) .EQ. FindPeakStart(IBINV,NBIN,YOBIN,XBIN,EBIN) ) THEN
-          CALL AddPeakToCurrentRange(IBINV)
-       ELSE
-          CALL AddNewPeakRange(IBINV)
+       IF ( NumPeakFitRange .EQ. 0 ) THEN
           IF ( ForPawley ) THEN
-              ! If we are pawley fitting, we only want to add peaks that are only associated with a single reflection
-              PeakStart = XBIN(FindPeakStart(IBINV,NBIN,YOBIN,XBIN,EBIN))
-              PeakEnd = XBIN(FindPeakEnd(IBINV,NBIN,YOBIN,XBIN,EBIN))
-              
-              COUNT = 0
-              IF ( NumOfRef .GT. 0 ) THEN
-                DO I = 1, NumOfRef
-                  IF ( PeakStart .LT. RefArgK(I) .AND. PeakEnd .GT. RefArgK(I) ) COUNT = COUNT + 1
-                ENDDO
-              ENDIF
-              
-              IF ( YOBIN(IBINV) .LT. 6.0 * EBIN(IBINV) & 
-              .OR. COUNT .EQ. 0 &
-              .OR. COUNT .GT. MaxRealRef &
-              .OR. NumInPFR( NumPeakFitRange ) .GT. MaxLocatedPeaks ) THEN
-                  NumInPFR( NumPeakFitRange ) = 0
-                  NumPeakFitRange = NumPeakFitRange - 1
-              ENDIF
+              CALL AddNewPeakRangeForPawley(IBINV, MaxRealRef, MaxLocatedPeaks)
+          ELSE
+              CALL AddNewPeakRange(IBINV)
           ENDIF
+       ELSE IF ( IPF_Lo(NumPeakFitRange) .NE. FindPeakStart(IBINV,NBIN,YOBIN,XBIN,EBIN) ) THEN
+          IF ( ForPawley ) THEN
+              CALL AddNewPeakRangeForPawley(IBINV, MaxRealRef, MaxLocatedPeaks)
+          ELSE
+              CALL AddNewPeakRange(IBINV)
+          ENDIF
+       ELSE
+          CALL AddPeakToCurrentRange(IBINV)
        ENDIF
       END SUBROUTINE AddPeak
+
+      
+      SUBROUTINE AddNewPeakRangeForPawley(IBINV, MaxRealRef, MaxLocatedPeaks)
+
+      USE REFVAR
+      
+      IMPLICIT NONE
+
+      INCLUDE 'params.inc'
+      INCLUDE 'GLBVAR.INC'
+      
+      ! MaxRealRef and MaxLocatedPeaks only used if ForPawley is true: Minimum number of indexed reflections permissible in
+      ! the range for Pawley Fitting
+      
+      INTEGER, INTENT(IN) :: IBINV, MaxRealRef, MaxLocatedPeaks
+  
+      INTEGER          NBIN, LBIN
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS), AVGESD      
+      
+      REAL                PeakFindPos
+      INTEGER                                           nPeaksFound
+      COMMON / PEAKFIND / PeakFindPos(1:MaxPeaksFound), nPeaksFound
+      INTEGER PeakFindBin(1:MaxPeaksFound)
+      
+      INTEGER, EXTERNAL :: FindPeakStart, FindPeakEnd
+      INTEGER I, J, IWIDTH, COUNT
+      REAL PeakStart, PeakEnd
+      
+      REAL              XPF_Range
+      LOGICAL                                       RangeFitYN
+      INTEGER           IPF_Lo,                     IPF_Hi
+      INTEGER           NumPeakFitRange,            CurrentRange
+      INTEGER           IPF_Range
+      INTEGER           NumInPFR
+      REAL              XPF_Pos,                    YPF_Pos
+      INTEGER           IPF_RPt
+      REAL              XPeakFit,                   YPeakFit
+      REAL              PF_FWHM,                    PF_IntBreadth
+      COMMON /PEAKFIT1/ XPF_Range(2,MAX_NPFR),      RangeFitYN(MAX_NPFR),        &
+                        IPF_Lo(MAX_NPFR),           IPF_Hi(MAX_NPFR),            &
+                        NumPeakFitRange,            CurrentRange,                &
+                        IPF_Range(MAX_NPFR),                                     &
+                        NumInPFR(MAX_NPFR),                                      & 
+                        XPF_Pos(MAX_NPPR,MAX_NPFR), YPF_Pos(MAX_NPPR,MAX_NPFR),  &
+                        IPF_RPt(MAX_NPFR),                                       &
+                        XPeakFit(MAX_FITPT),        YPeakFit(MAX_FITPT),         &
+                        PF_FWHM(MAX_NPFR),          PF_IntBreadth(MAX_NPFR)      
+      
+      CALL AddNewPeakRange(IBINV)
+      ! If we are pawley fitting, we only want to add peaks that are only associated with a single reflection
+      PeakStart = XBIN(FindPeakStart(IBINV,NBIN,YOBIN,XBIN,EBIN))
+      PeakEnd = XBIN(FindPeakEnd(IBINV,NBIN,YOBIN,XBIN,EBIN))
+      
+      COUNT = 0
+      IF ( NumOfRef .GT. 0 ) THEN
+        DO I = 1, NumOfRef
+          IF ( PeakStart .LT. RefArgK(I) .AND. PeakEnd .GT. RefArgK(I) ) COUNT = COUNT + 1
+        ENDDO
+      ENDIF
+      
+      IF ( YOBIN(IBINV) .LT. 6.0 * EBIN(IBINV) & 
+      .OR. COUNT .EQ. 0 &
+      .OR. COUNT .GT. MaxRealRef &
+      .OR. NumInPFR( NumPeakFitRange ) .GT. MaxLocatedPeaks ) THEN
+          NumInPFR( NumPeakFitRange ) = 0
+          NumPeakFitRange = NumPeakFitRange - 1
+      ENDIF
+      END SUBROUTINE AddNewPeakRangeForPawley
 
       
       SUBROUTINE AddNewPeakRange(IBINV)
@@ -2808,7 +2889,7 @@
           ENDDO
           MINT = MINT / (LOCALWIDTH+1)
           
-          IsHighPoint = ( MINT .GT. RINT .AND. MINT .GT. LINT )
+          IsHighPoint = ( MINT .GE. RINT .AND. MINT .GE. LINT )
       ENDIF
      
       END FUNCTION IsHighPoint
@@ -3117,3 +3198,491 @@
       CALL WGridGetCellString(IFIELD,ICOL,IROW,CVALUE)
       
       END SUBROUTINE
+      
+      SUBROUTINE Upload_SAParameters
+      
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      INCLUDE 'Lattice.inc'
+
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+      
+      LOGICAL         AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign
+      INTEGER                                                                    HydrogenTreatment
+      COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign, HydrogenTreatment
+
+      REAL            T0, RT
+      COMMON /saparl/ T0, RT
+
+      INTEGER         nvar, ns, nt, iseed1, iseed2
+      COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
+
+      INTEGER         Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves
+      REAL                                                           ChiMult
+      COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult      
+      
+      INTEGER tInt
+      REAL tReal
+
+      IF ( IN_BATCH ) RETURN
+      
+      CALL Upload_N1(NS)
+      CALL Upload_N2(NT)
+      CALL Upload_T0(T0)
+      CALL Upload_CoolingRate(RT)
+      CALL Upload_Seed1(iseed1)
+      CALL Upload_Seed2(iseed2)
+      CALL Upload_MaxRuns(MaxRuns)
+      CALL Upload_MaxMoves(MaxMoves)
+      CALL Upload_Multiplier(ChiMult)
+      CALL Upload_AutoAlign(LAlign)
+      CALL Upload_AutoLocalMinimise(AutoMinimise)
+      CALL Upload_UseCCOM(UseCCoM)
+      CALL Upload_UseHAutoMin(UseHAutoMin)
+      END SUBROUTINE Upload_SAParameters
+ 
+      SUBROUTINE Upload_N1(TheValue)
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+      
+      INTEGER, INTENT(IN) :: TheValue
+      
+      CALL Upload_Integer_SA_input3(IDF_SA_NS,TheValue)
+      
+      END SUBROUTINE Upload_N1
+
+      SUBROUTINE Upload_N2(TheValue)
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+      
+      INTEGER, INTENT(IN) :: TheValue
+      
+      CALL Upload_Integer_SA_input3(IDF_SA_NT,TheValue)
+      
+      END SUBROUTINE Upload_N2
+
+      SUBROUTINE Upload_MaxRuns(TheValue)
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+      
+      INTEGER, INTENT(IN) :: TheValue
+      
+      CALL Upload_Integer_SA_input3(IDF_SA_MaxRepeats,TheValue)
+      
+      END SUBROUTINE Upload_MaxRuns
+
+      SUBROUTINE Upload_Seed1(TheValue)
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+      
+      INTEGER, INTENT(IN) :: TheValue
+      
+      CALL Upload_Integer_SA_input3(IDF_SA_RandomSeed1,TheValue)
+      
+      END SUBROUTINE Upload_Seed1
+
+      SUBROUTINE Upload_Seed2(TheValue)
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+      
+      INTEGER, INTENT(IN) :: TheValue
+      
+      CALL Upload_Integer_SA_input3(IDF_SA_RandomSeed2,TheValue)
+      
+      END SUBROUTINE Upload_Seed2
+
+      SUBROUTINE Upload_MaxMoves(TheValue)
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      REAL, INTENT(IN) :: TheValue
+            
+      REAL tReal
+      INTEGER tInt
+      
+      CALL NMoves2RealInt(TheValue, tReal, tInt)
+      
+      CALL Upload_Real_SA_input3(IDF_MaxMoves1,tReal)
+      CALL Upload_Integer_SA_input3(IDF_MaxMoves2,tInt)
+      
+      END SUBROUTINE Upload_MaxMoves
+      
+      SUBROUTINE Upload_T0(TheValue)
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+      
+      REAL, INTENT(IN) :: TheValue
+      
+      CALL Upload_Real_SA_input3(IDF_SA_T0,TheValue)
+      
+      END SUBROUTINE Upload_T0
+      
+      SUBROUTINE Upload_CoolingRate(TheValue)
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+      
+      REAL, INTENT(IN) :: TheValue
+      
+      CALL Upload_Real_SA_input3(IDF_SA_Tredrate,TheValue)
+      
+      END SUBROUTINE Upload_CoolingRate
+      
+      
+      SUBROUTINE Upload_Multiplier(TheValue)
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+      
+      REAL, INTENT(IN) :: TheValue
+      
+      CALL Upload_Real_SA_input3(IDF_SA_ChiTest,TheValue)
+      
+      END SUBROUTINE Upload_Multiplier
+      
+        
+      SUBROUTINE Upload_Integer_SA_input3(TheField,TheValue)
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      INCLUDE 'Lattice.inc'
+
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+      
+      INTEGER,  INTENT (IN   ) :: TheField, TheValue
+
+      IF ( IN_BATCH ) RETURN
+
+      CALL PushActiveWindowID
+      CALL SelectDASHDialog(IDD_SA_input3_2)
+      CALL WDialogPutInteger(TheField,TheValue)
+      CALL PopActiveWindowID
+
+      END SUBROUTINE Upload_Integer_SA_input3
+
+      SUBROUTINE Upload_Real_SA_input3(TheField,TheValue)
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      INCLUDE 'Lattice.inc'
+
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+      
+      INTEGER,  INTENT (IN   ) :: TheField
+      REAL,     INTENT (IN   ) :: TheValue
+
+      IF ( IN_BATCH ) RETURN
+ 
+      CALL PushActiveWindowID
+      CALL SelectDASHDialog(IDD_SA_input3_2)
+      CALL WDialogPutReal(TheField,TheValue)
+      CALL PopActiveWindowID
+
+      END SUBROUTINE Upload_Real_SA_input3
+
+      SUBROUTINE Upload_AutoAlign(TheValue)
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+      
+      LOGICAL, INTENT(IN) :: TheValue
+      
+      CALL Upload_SA_input4_checkbox(IDF_Align,TheValue)
+      
+      END SUBROUTINE Upload_AutoAlign
+
+      SUBROUTINE Upload_AutoLocalMinimise(TheValue)
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+      
+      LOGICAL, INTENT(IN) :: TheValue
+      
+      CALL Upload_SA_input4_checkbox(IDF_AutoLocalOptimise,TheValue)
+      
+      END SUBROUTINE Upload_AutoLocalMinimise
+      
+      SUBROUTINE Upload_UseCCOM(TheValue)
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+      
+      LOGICAL, INTENT(IN) :: TheValue
+      
+      CALL Upload_SA_input4_checkbox(IDF_CrystallographicCoM,TheValue)
+      
+      END SUBROUTINE Upload_UseCCOM
+      
+      SUBROUTINE Upload_UseHAutoMin(TheValue)
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+      
+      LOGICAL, INTENT(IN) :: TheValue
+      
+      CALL Upload_SA_input4_checkbox(UseHAutoMin,TheValue)
+      
+      END SUBROUTINE Upload_UseHAutoMin      
+      
+      SUBROUTINE Upload_SA_input4_checkbox(TheField,TheValue)
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      INCLUDE 'Lattice.inc'
+
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+      INTEGER, INTENT (IN) :: TheField
+      LOGICAL, INTENT (IN) :: TheValue
+
+      IF ( IN_BATCH ) RETURN
+      
+      CALL PushActiveWindowID
+      CALL SelectDASHDialog(IDD_SA_input4)
+      CALL WDialogPutCheckBoxLogical(TheField,TheValue)
+      CALL PopActiveWindowID
+
+      END SUBROUTINE Upload_SA_input4_checkbox
+
+ 
+      
+      SUBROUTINE DASHWCursorShape(TheShape)
+      
+      USE WINTERACTER
+      
+      INTEGER TheShape
+      
+      
+      CALL WCursorShape(TheShape)
+      
+      END SUBROUTINE DASHWCursorShape
+      
+
+      SUBROUTINE DetectPeaks()
+      
+      IMPLICIT NONE
+      
+
+      INCLUDE 'params.inc'
+      INCLUDE 'GLBVAR.INC'      
+      
+      INTEGER          NBIN, LBIN
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS), AVGESD      
+      
+      REAL                PeakFindPos
+      INTEGER                                           nPeaksFound
+      COMMON / PEAKFIND / PeakFindPos(1:MaxPeaksFound), nPeaksFound
+      INTEGER PeakFindBin(1:MaxPeaksFound)
+      INTEGER POSSIBLEPEAK(MOBS)
+      INTEGER VAL(MOBS)      
+      INTEGER, EXTERNAL :: MatchToPeak
+      INTEGER WIDTH,I,J,COUNT
+      POSSIBLEPEAK = 0
+      
+      
+      DO WIDTH= 4,20,2
+         CALL CreateArchetypicalProfiles(WIDTH)
+
+         DO I = 1,NBIN-WIDTH
+             VAL(I) = MatchToPeak(I,WIDTH)
+         ENDDO
+         
+         DO I = WIDTH,NBIN-WIDTH
+             COUNT = 0
+             IF ( YOBIN(I) .GT. 3.0 * EBIN(I) ) THEN
+                 IF ( VAL(I-2).EQ. 4 ) COUNT = COUNT + 1
+                 IF ( VAL(I-1).EQ. 4 ) COUNT = COUNT + 1
+                 IF ( VAL(I+2).EQ. 2 ) COUNT = COUNT + 1
+                 IF ( VAL(I+1).EQ. 2 ) COUNT = COUNT + 1
+                 IF ( VAL(I)  .EQ. 3 ) COUNT = COUNT + 1
+             ENDIF
+             POSSIBLEPEAK(I) = POSSIBLEPEAK(I) + COUNT
+         ENDDO
+      ENDDO      
+      
+      WIDTH = 3
+      nPeaksFound = 0
+           
+      DO I = WIDTH+1,NBIN-WIDTH
+
+         IF ( nPeaksFound .LT. MaxPeaksFound .AND. POSSIBLEPEAK(I).GT. 5 ) THEN
+            IF ( nPeaksFound .GT. 0 ) THEN
+                IF ( I - PeakFindBin(nPeaksFound) .LT. WIDTH ) THEN
+                    IF ( YOBIN(I) .GT. YOBIN(PeakFindBin(nPeaksFound)) ) THEN
+                        PeakFindPos(nPeaksFound) = XBIN(I)
+                        PeakFindBin(nPeaksFound) = I                    
+                    ENDIF
+                ELSE
+                    nPeaksFound = nPeaksFound + 1
+                    PeakFindPos(nPeaksFound) = XBIN(I)
+                    PeakFindBin(nPeaksFound) = I  
+                ENDIF
+            ELSE
+                nPeaksFound = 1
+                PeakFindPos(nPeaksFound) = XBIN(I)
+                PeakFindBin(nPeaksFound) = I  
+            ENDIF
+         ENDIF 
+      ENDDO
+      
+      END SUBROUTINE DetectPeaks
+      
+      
+      SUBROUTINE CreateArchetypicalProfiles(WIDTH)
+      
+      IMPLICIT NONE
+      
+
+      INCLUDE 'params.inc'
+      INCLUDE 'GLBVAR.INC'           
+      
+      INTEGER, INTENT(IN) :: WIDTH
+      INTEGER, PARAMETER :: MXPRF = 20
+      REAL FLAT,LEFTBIAS,SYMMETRIC,RIGHTBIAS, CSUM
+      COMMON / ARPROF / FLAT(MXPRF),LEFTBIAS(MXPRF),SYMMETRIC(MXPRF),RIGHTBIAS(MXPRF),CSUM
+      INTEGER I
+      
+      CSUM = 0.0
+      DO I = 1,WIDTH
+         LEFTBIAS(I) = 1.0*I
+         RIGHTBIAS(I) = 1.0*(WIDTH-I)
+         CSUM = CSUM + 1.0*I
+      END DO
+      
+      DO I = 1,WIDTH
+         RIGHTBIAS(I) =  RIGHTBIAS(I) / CSUM
+         LEFTBIAS(I) =  LEFTBIAS(I) / CSUM
+      ENDDO      
+
+      DO I = 1,WIDTH
+         FLAT(I) = 1.0
+      ENDDO
+      
+      CSUM = 0.0
+      DO I = 1,WIDTH
+         IF ( FLOAT(I) > FLOAT(WIDTH)/2 ) THEN
+            SYMMETRIC(I) = 1.0*(WIDTH-I)
+         ELSE
+            SYMMETRIC(I) = 1.0*I
+         ENDIF
+         CSUM = CSUM + SYMMETRIC(I)
+      END DO
+      
+      DO I = 1,WIDTH
+         SYMMETRIC(I) = SYMMETRIC(I) / CSUM
+      END DO
+
+      END SUBROUTINE CreateArchetypicalProfiles
+      
+      INTEGER FUNCTION MatchToPeak(START,WIDTH)
+      
+      IMPLICIT NONE
+      
+
+      INCLUDE 'params.inc'
+      INCLUDE 'GLBVAR.INC'           
+      
+      INTEGER,INTENT(IN) :: START,WIDTH
+      
+      INTEGER          NBIN, LBIN
+      REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
+      COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS), AVGESD    
+      
+      INTEGER, PARAMETER :: MXPRF = 20
+      REAL FLAT,LEFTBIAS,SYMMETRIC,RIGHTBIAS, CSUM
+      COMMON / ARPROF / FLAT(MXPRF),LEFTBIAS(MXPRF),SYMMETRIC(MXPRF),RIGHTBIAS(MXPRF),CSUM
+       
+      INTEGER I
+      REAL CHI1,CHI2,CHI3,CHI4,DEL,SUM
+      REAL NRMY(MXPRF)
+      
+      CHI1 = 0.0
+      CHI2 = 0.0
+      CHI3 = 0.0
+      CHI4 = 0.0
+      SUM = 0.0
+      DO I = START, START+WIDTH
+          SUM = SUM + YOBIN(I)
+      END DO
+      
+      
+      DO I = START, START+WIDTH
+          NRMY(I) = YOBIN(I)/SUM
+      END DO
+      
+      
+      DO I = START, START+WIDTH
+         DEL = FLAT(I) - NRMY(I)
+         CHI1 = CHI1 + DEL*DEL/FLAT(I)
+         DEL = LEFTBIAS(I) - NRMY(I)
+         CHI2 = CHI2 + DEL*DEL/LEFTBIAS(I)
+         DEL = SYMMETRIC(I) - NRMY(I)
+         CHI3 = CHI3 + DEL*DEL/SYMMETRIC(I)
+         DEL = RIGHTBIAS(I) - NRMY(I)
+         CHI4 = CHI4 + DEL*DEL/RIGHTBIAS(I)
+      ENDDO
+      
+      MatchToPeak = 1
+      IF ( CHI2 .LT. CHI1 ) MatchToPeak = 2
+      IF ( CHI3 .LT. CHI2 ) MatchToPeak = 3
+      IF ( CHI4 .LT. CHI3 ) MatchToPeak = 4
+      
+      END FUNCTION MatchToPeak 
+      
+      SUBROUTINE SetTmpSaveFileName(tTmpSaveName)
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+           
+      IMPLICIT NONE
+            
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+      INTEGER                  OFBN_Len
+      CHARACTER(MaxPathLength)           OutputFilesBaseName
+      CHARACTER(3)                                            SA_RunNumberStr
+      COMMON /basnam/          OFBN_Len, OutputFilesBaseName, SA_RunNumberStr
+      CHARACTER*20, EXTERNAL :: GetSeed1SuffixString
+      
+      CHARACTER(MaxPathLength) tTmpSaveName
+      
+      IF ( IN_BATCH ) THEN
+        tTmpSaveName = TRIM(OutputFilesBaseName)//TRIM(GetSeed1SuffixString())//'Tmp.dash'
+      ELSE
+           CALL PushActiveWindowID
+           CALL SelectDASHDialog(IDD_SA_input4)
+           CALL WDialogGetString(IDF_TmpFileName,tTmpSaveName)
+           IF (LEN(tTmpSaveName) .Eq. 0 ) THEN
+                tTmpSaveName = TRIM(OutputFilesBaseName)//TRIM(GetSeed1SuffixString())//'Tmp.dash'
+           ENDIF
+           CALL PopActiveWindowID
+      END IF
+      
+      END SUBROUTINE SetTmpSaveFileName
