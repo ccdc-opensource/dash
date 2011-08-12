@@ -28,18 +28,21 @@ if exist %OUTPUTDIR% goto outputdir_ok
     if not exist %OUTPUTDIR% goto nooutputdir
 
 :outputdir_ok
-
-    SET DASH_EXE=dash\Release\dash.exe
+    SET DASH_EXE=%cd%\dash\Release\DASH.exe
 
 if not exist %DASH_EXE% goto noexe
 
-    SET ZMCONV_EXE=makezmatrix\Release\makezmatrix.exe
+REM For now, take these from the HEAD branch
 
-if not exist %ZMCONV_EXE% goto noexe
+SET ZMCONV_EXE=D:\builds\DASH_3_2_BRANCH\makezmatrix\Release\makezmatrix.exe
+SET ZMCONV_ROOT_DIR=D:\builds\DASH_3_2_BRANCH
 
-    SET MERCURY_EXE=mercury\mercury_quick_build\Release\mercury_quick_build.exe
+SET SPECIAL_POSN_EXE=D:\builds\DASH_3_2_BRANCH\utilities\special_positions\release\special_positions.exe
+SET SPECIAL_POSN_ROOT_DIR=D:\builds\DASH_3_2_BRANCH
 
-if not exist %ZMCONV_EXE% goto noexe
+SET MERCURY_EXE=D:\builds\CSDS_NOV_2009_BRANCH\mercury\mercury_quick_build\Release\mercury_quick_build.exe
+SET MERCURY_ROOT_DIR=D:\builds\CSDS_NOV_2009_BRANCH
+
 REM =================================================================================
 REM Copy files from dash_rep/dash
 
@@ -48,7 +51,7 @@ REM Copy files from dash_rep/dash
     SET EXPORTSPEC=-r %CVSTAG%
 
     %CVSCMD% %EXPORTSPEC% -d %OUTPUTDIR%                          "dash/ExtinctionSymbol.exe"
-    %CVSCMD% %EXPORTSPEC% -d %OUTPUTDIR%                          "dash/special_positions.exe"
+!    %CVSCMD% %EXPORTSPEC% -d %OUTPUTDIR%                          "dash/special_positions.exe"
     %CVSCMD% %EXPORTSPEC% -d %OUTPUTDIR%                          "dash/SpaceGroupSymbols.dat"
     %CVSCMD% %EXPORTSPEC% -d %OUTPUTDIR%                          "dash/TOPAS.inc"
     %CVSCMD% %EXPORTSPEC% -d %OUTPUTDIR%                          "dash/RIETAN.cmd"
@@ -129,16 +132,55 @@ REM == TODO: Extinction Symbol Docs ==
 REM =================================================================================
 REM Copy files from makezmatrix
 
+set THIS_BUILD_DIRECTORY=%BUILD_DIRECTORY%
+
+if not exist %ZMCONV_EXE% goto nozmconv
+
+    set WD=%cd%
+    cd %ZMCONV_ROOT_DIR%
     call copy_qt_exe.bat %ZMCONV_EXE% %OUTPUTDIR%\zmconv
+REM  put the special positions exe in the same place as 
+REM  ZMCONV to use same distributed libraries
+    COPY %SPECIAL_POSN_EXE% %OUTPUTDIR%\zmconv 
+    cd %WD%
+    set BUILD_DIRECTORY=%THIS_BUILD_DIRECTORY%
+    goto start_mercury
+:nozmconv    
+    echo Could not locate the zmconv executable %ZMCONV_EXE%
+    echo distribution will be incomplete
     
+:start_mercury
+
+if not exist %MERCURY_EXE% goto nomercury
+    set WD=%cd%
+    cd %MERCURY_ROOT_DIR%
     call copy_qt_exe.bat %MERCURY_EXE% %OUTPUTDIR%\Mercury
+    cd %WD%
+    set BUILD_DIRECTORY=%THIS_BUILD_DIRECTORY%
+    goto start_dash
+
+:nomercury
+    echo Could not locate the mercury executable %MERCURY_EXE%
+    echo distribution will be incomplete
     
-    
-    
+:start_dash    
     copy %DASH_EXE% %OUTPUTDIR%
+    
+
+	  REM /q doesn't list names of each file copied
+    REM /y over-writes any existing files
+    REM /k preserves modification dates 
+    set XCOPY_ARGS=/Q /Y /K
+    
+    REM Copy the Intel fortran DLLs
+    
+    REM TODO:	Hremove need for ugly hard coded path!!!
+    set INTEL_DLL_FOLDER="C:\Program Files\Intel\Compiler\11.1\046\bin\ia32"
+    XCOPY %XCOPY_ARGS% %INTEL_DLL_FOLDER%\lib*.dll %OUTPUTDIR%
+    
+:start_mercury    
 
     set CURRENT_DIRECTORY=%cd%
-    
     cd %OUTPUTDIR%\Mercury
     RENAME mercury_quick_build.exe dash_mercury.exe
     
@@ -153,7 +195,7 @@ REM Copy files from makezmatrix
     goto out
 
 :noexe
-    echo Could not locate the dash executable %DASH_EXE%
+    echo Could not locate the dash executable %DASH_EXE% from %cd%
     goto out
 
 :usage

@@ -554,8 +554,8 @@
                       CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,             &
                       NBASF4(MPRPKF,2,9), L4END(9)
 
-      COMMON /PRSAVZ/ PKCONV(512,9)
-      COMMON /PRKNOT/ ARGKNT(50), PKKNOT(512,9,50)
+      COMMON /PRSAVZ/ PKCONV(1024,9)
+      COMMON /PRKNOT/ ARGKNT(50), PKKNOT(1024,9,50)
       COMMON /PWORDS/ PWD(10,9,5)
       CHARACTER*4 PWD
       LOGICAL         RIET, CAIL, SAPS, APES, RAPS, TOF, CN, LX, SR, ED, PRECYC, TIC
@@ -618,7 +618,7 @@
     1 CALL VOCAB(WDCN03,IWCN03,NW)
       GOTO 100
 ! PROFILE REFINEMENT STAGE:
-    2 MN = 512
+    2 MN = 1024
       MN2 = MN/2
       CALL DebugErrorMessage('In buggy code')
 ! Peak positions may have changed - check and re-sort if necessary
@@ -789,7 +789,7 @@
 !
 ! PROFILE REFINEMENT STAGE with KNOTS:
 !
-    3 MN = 512
+    3 MN = 1024
       MN2 = MN/2
 ! Peak positions may have changed - check and re-sort if necessary
       DO IR = 1, MAXK
@@ -976,7 +976,7 @@
           CALL GMZER(DYNDVQ,1,NPKGEN(JPHASE,JSOURC))
           DO I = 1, 3
             III = IARGI + I - 2
-            IF (III.LE.512 .AND. III.GT.0) THEN
+            IF (III.LE.1024 .AND. III.GT.0) THEN
               PKTEM = PKCONV(III,1)
               YNORM = YNORM + C3FN(I)*PKTEM
               DYNDKQ = DYNDKQ - C3DN(I)*PKTEM
@@ -985,7 +985,7 @@
                 DYNDVQ(NPKD) = DYNDVQ(NPKD) + C3FN(I)*PKCONV(III,NPKD1)
               ENDDO
             ELSE
-              CALL DebugErrorMessage('(III.LE.512 .AND. III.GT.0) in forty.f90, III = '//Integer2String(III))
+              CALL DebugErrorMessage('(III.LE.1024 .AND. III.GT.0) in forty.f90, III = '//Integer2String(III))
             ENDIF
           ENDDO
 ! NOW CHECK IF YNORM IS ZERO BEFORE EVALUATING QUOTIENT DERIVATIVES
@@ -1099,7 +1099,7 @@
                       CYC1, NOPKRF, TOLR(2,5), NFFT, AKNOTS,             &
                       NBASF4(MPRPKF,2,9), L4END(9)
 
-      COMMON /PRSAVZ/ PKCONV(512,9)
+      COMMON /PRSAVZ/ PKCONV(1024,9)
 
       REAL            ZARGK,         ZXDEL
       COMMON /REFLNZ/ ZARGK(MFCSTO), ZXDEL(MFCSTO)
@@ -1113,8 +1113,8 @@
       COMMON /SOURCE/ NSOURC, JSOURC, KSOURC, NDASOU(5), METHOD(9),     &
                       NPFSOU(9,5), SCALES(5), KSCALS(5), NPCSOU(9,5)
 
-      DIMENSION CFFT(8), DFFT(8), DDT(8), FR(512,8), FI(512,8),         &
-     &          DR(512,8), DI(512,8), FRT(512), FIT(512)
+      DIMENSION CFFT(8), DFFT(8), DDT(8), FR(1024,8), FI(1024,8),         &
+     &          DR(1024,8), DI(1024,8), FRT(1024), FIT(1024)
 
       LOGICAL         PFNVAR
       COMMON /PFNINF/ PFNVAR(8,9,5)

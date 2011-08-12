@@ -542,6 +542,32 @@
       ENDIF
 
       END SUBROUTINE UpdateZmatrixSelection
+
+      SUBROUTINE UpdateConstraintsAndRestraints
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+      USE ZMVAR
+      USE ATMVAR
+
+      IMPLICIT NONE
+
+      INTEGER iRow,I
+      
+      INTEGER         nvar, ns, nt, iseed1, iseed2
+      COMMON /sapars/ nvar, ns, nt, iseed1, iseed2      
+
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+      
+      IF ( in_batch ) return
+      
+      DO iRow = 1, NVAR
+         IF (kzmpar2(iRow) .NE. 3) CYCLE
+         CALL RefreshTorsionRow(iRow,.FALSE.)
+      ENDDO
+      END SUBROUTINE UpdateConstraintsAndRestraints
+     
 !
 !*****************************************************************************
 !

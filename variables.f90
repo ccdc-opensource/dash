@@ -24,6 +24,8 @@
       DATA FNAME / ' ' /     ! Current filename
 
       CHARACTER(MaxPathLength) ::  InstallationDirectory
+      CHARACTER(MaxPathLength) ::  DocumentationHTMLdirectory
+      CHARACTER(MaxPathLength) ::  DocumentationRoot
       CHARACTER(MaxPathLength) ::  StartUpDirectory
       CHARACTER(MaxPathLength) ::  AllUsersProfileDirectory
       CHARACTER(MaxPathLength) ::  AppDataDirectory

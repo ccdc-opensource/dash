@@ -88,7 +88,7 @@
       INTEGER :: kamax, kamin, kbmax, kbmin, kdmax, kdmin
       REAL :: amax, dd1, dd2
       REAL :: fwolff
-      INTEGER, DIMENSION(50,50,8) :: ih, ik
+      INTEGER, DIMENSION(50,100,8) :: ih, ik
       INTEGER, DIMENSION(50,100,8) :: il
       INTEGER, DIMENSION(50,8) :: irj
       INTEGER :: nposs, nt

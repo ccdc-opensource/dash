@@ -138,7 +138,7 @@
           CASE ('DASH   ')
             CALL PrjFileOpen(ArgString)
           CASE ('DBF   ')
-            CALL BatchMode(ArgString)
+            CALL BatchMode(ArgString, .TRUE.)
           CASE ('ZMATRIX')
             iFrg = 1
             frag_file(iFrg) = ArgString
@@ -432,23 +432,19 @@
       IMPLICIT NONE
 
       CHARACTER(MaxPathLength) WorkingDir
-      CHARACTER(MaxPathLength) ManualDir
 
       INTEGER d
 
       CALL IOsDirName(WorkingDir)
 
-      ManualDir = TRIM(InstallationDirectory)//&
-                  'Documentation'//DIRSPACER//&
-                  'manual'//DIRSPACER//'portable_html'
      
 #ifdef _WIN32
-      CALL IOsDirChange(TRIM(ManualDir))      
-      d=WinExec('cmd /c "TOC.html" 'C,SW_HIDE)
+      CALL IOsDirChange(TRIM(DocumentationHTMLdirectory))      
+      d=WinExec('cmd /c "dash.1.1.html" 'C,SW_HIDE)
       CALL IOsDirChange(TRIM(WorkingDir))
 #else
       CALL IOsCommand(TRIM(InstallationDirectory)//'nss.sh file://'// &
-                      TRIM(ManualDir)//DIRSPACER//'TOC.html')
+                      TRIM(DocumentationHTMLdirectory)//DIRSPACER//'dash.1.1.html')
 #endif
 
       END SUBROUTINE LaunchHelp

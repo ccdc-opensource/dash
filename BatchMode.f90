@@ -1,7 +1,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE BatchMode(ArgString)
+      SUBROUTINE BatchMode(ArgString, start_it)
 
       USE WINTERACTER
       USE ZMVAR
@@ -11,10 +11,12 @@
       IMPLICIT NONE
 
       CHARACTER*(*), INTENT (IN   ) :: ArgString
-
+      LOGICAL, INTENT (IN) :: start_it
+      
       INCLUDE 'params.inc'
       INCLUDE 'SA_restrain.inc'
 
+      
       LOGICAL         in_batch
       COMMON /BATEXE/ in_batch
 
@@ -39,7 +41,7 @@
       REAL                                                                          iX, iUB, iLB  
       COMMON /ModalTorsions/ ModalFlag(mvar), RowNumber, iRadio, iX, iUB, iLB
 
-      LOGICAL, EXTERNAL :: SDIFileLoad, ParseDistribution, ParseSADistRestraint
+      LOGICAL, EXTERNAL :: SDIFileLoad, SDIFileOpen, ParseDistribution, ParseSADistRestraint
       INTEGER, EXTERNAL :: Read_One_zm
 
       INTEGER, PARAMETER :: hFile = 63
@@ -55,6 +57,18 @@
       tSdiIn = .FALSE.
       tZmIn  = .FALSE.
       CALL InitSADistRestraint
+      
+      
+      CALL Set_SaveParamAtEnd(.FALSE.)
+      CALL Set_OutputChi2vsMoves(.FALSE.)
+      CALL Set_SaveCIF(.FALSE.)
+      CALL Set_SavePDB(.FALSE.)
+      CALL Set_SavePRO(.FALSE.)
+      CALL Set_SaveCCL(.FALSE.)
+      CALL Set_SaveCSSR(.FALSE.)
+      CALL Set_SaveRES(.FALSE.)
+      
+      CALL Set_SavePrjAtEnd(.FALSE.)    
       OPEN (UNIT=hFile, FILE=ArgString, STATUS='OLD', ERR=998)
 ! Loop over all records
       DO WHILE ( .TRUE. )
@@ -72,7 +86,11 @@
         line = line(iP:) ! Skip leading white spaces
         SELECT CASE(keyword)
           CASE ('SDI') ! The .sdi file, containing wavelength, pattern, space group etc. etc.
-            IF ( .NOT. SDIFileLoad(line)) GOTO 999
+            IF ( .not. in_batch ) THEN
+               IF ( .NOT. SDIFileOpen(line)) GOTO 999 ! In non-batch mode GUI has to be updated too
+            ELSE
+               IF ( .NOT. SDIFileLoad(line)) GOTO 999
+            ENDIF
             tSdiIn = .TRUE.
           CASE ('OUT') ! The output file, must have extension .dash
             PrjFileName = line
@@ -97,6 +115,8 @@
               CALL Set_SaveCSSR(.TRUE.)
             ELSE IF (tString(1:iLen) .EQ. "RES")  THEN
               CALL Set_SaveRES(.TRUE.)
+            ELSE IF (tString(1:iLen) .EQ. "DASH")  THEN
+              CALL Set_SavePrjAtEnd(.TRUE.)
             ENDIF
 
           CASE ('T0') ! T0, the starting temperature for the SA
@@ -240,12 +260,21 @@
   100 CONTINUE 
       IF ( ( .NOT. tSdiIn ) .OR. ( .NOT. tZmIn ) ) GOTO 996
       CLOSE(hFile)
-      CALL BeginSA
+      
+      IF ( .NOT. IN_BATCH ) THEN
+         CALL UpdateZmatrixSelection
+         CALL Upload_SAParameters
+         CALL UpdateConstraintsAndRestraints
+      ENDIF
+      
+      IF ( start_it ) THEN
+         CALL BeginSA
       ! Exit DASH, but before doing so, save output to a file.
       ! it is probably best to save the output to a file that is specified in
       ! the .dbf file, because that makes it easier for the user to later relate
       ! the output back to the input.
-      CALL PrjReadWrite(PrjFileName, cWrite)
+        CALL PrjReadWrite(PrjFileName, cWrite)
+      ENDIF
       GOTO 892
 
   996 CALL ErrorMessage('Failed to read SDI or ZMATRIX line from '//TRIM(ArgString))
@@ -370,6 +399,8 @@
       LOGICAL , EXTERNAL :: SaveCSSR, SaveCCL, SaveCIF, SaveRes
       LOGICAL , EXTERNAL :: Get_SaveParamAtEnd
       LOGICAL , EXTERNAL :: Get_OutputChi2vsMoves
+      LOGICAL , EXTERNAL :: Get_SavePrjAtEnd
+      
       CHARACTER*20, EXTERNAL :: Integer2String
 
       INTEGER iHandle, i, j, iFrg, kk, fragID(2), atomSeq(2)
@@ -449,7 +480,13 @@
       ELSE
         WRITE(iHandle,'(A)',ERR=999) '# SAVE CHI'
       ENDIF
-  
+
+      IF ( Get_SavePrjAtEnd() ) THEN    
+        WRITE(iHandle,'(A)',ERR=999) 'SAVE DASH'
+      ELSE
+        WRITE(iHandle,'(A)',ERR=999) '# SAVE DASH'
+      ENDIF
+        
       WRITE(iHandle,'(A)',ERR=999) '# On a distributed system, NRUNS should probably be set to:'
       WRITE(iHandle,'(A)',ERR=999) '#     (total number of runs / number of processors)'
       WRITE(iHandle,'(A,1X,I3)',ERR=999) 'NRUNS', MaxRuns
