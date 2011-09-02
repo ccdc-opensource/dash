@@ -1,5 +1,3 @@
-
-
 !
 !*****************************************************************************
 !
@@ -16,9 +14,7 @@
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
-      USE, INTRINSIC :: ISO_C_BINDING, ONLY: C_INT, C_BOOL, C_LOC
-      USE CCDC_LICENSE_BINDINGS
-      
+
       IMPLICIT NONE
 
       LOGICAL         in_batch
@@ -30,14 +26,6 @@
 
       CHARACTER*2 Exp
       TYPE (License_Info) Info
-      
-      INTEGER (C_INT) :: USE_GUI
-      
-      USE_GUI = 0   
-      IF ( CCDC_IS_LICENSED(USE_GUI) .EQ. 1 ) THEN
-          ! Have a CCDC Academic licence so all is sweet
-          RETURN
-      ENDIF
       
       NumbLicencePath = 0
       IF (AllUsersProfileDirectory .NE. StartUpDirectory) THEN
@@ -84,13 +72,6 @@
             CALL ErrorMessage("Your DASH licence is invalid for this machine.")
         END SELECT
         CALL GetLicenceKeyDialogue(Info)
-        USE_GUI = 0
-        IF ( CCDC_IS_LICENSED(USE_GUI) .EQ. 1 ) THEN
-            ! Have a CCDC Academic licence so all is sweet
-            CALL UnloadDASHDialog(IDD_License_Dialog)
-            CALL UnloadDASHDialog(IDD_LicenceAgreement) 
-            RETURN           
-        ENDIF        
         CALL FindLicenceFile(Info, .FALSE.)
       ENDDO
       IF (Info%DaysLeft .LE. 7) THEN
@@ -171,8 +152,6 @@
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
-      USE, INTRINSIC :: ISO_C_BINDING, ONLY: C_INT, C_BOOL, C_LOC
-      USE CCDC_LICENSE_BINDINGS
 
       IMPLICIT NONE
 
@@ -181,7 +160,6 @@
       INTEGER     ICode
       CHARACTER(MaxPathLength) ClString
       TYPE (License_Info) Info
-      INTEGER (C_INT) :: USE_GUI
 
       INLOOP = .TRUE.
       Info%Valid = 0
@@ -203,12 +181,6 @@
             SELECT CASE(EventInfo%VALUE1)
               CASE (IDCANCEL, ID_Licensing_Exit)
                 CALL DoExit
-              CASE (IDF_CCDCLicence)
-                  USE_GUI = 1  
-                  IF ( CCDC_IS_LICENSED(USE_GUI) .EQ. 1 ) THEN
-                      ! Have a CCDC Academic licence so all is sweet
-                      INLOOP = .FALSE.
-                  ENDIF
               CASE (IDOK)
                 CALL DASHWDialogGetString(IDF_License_String, CLString)
                 CALL DecodeLicence(CLString, Info)
@@ -550,7 +522,7 @@
       READ(LString,'(2Z8,Z4)',ERR = 99) v(1), v(2), checksum
       cs = IEOR(v(1),v(2))
 ! ### Version dependent lines
-      cs = IEOR(cs,Z'DDED')
+      cs = IEOR(cs,Z'BBCB')
 ! Check the checksum
       IF (tCheckSum .NE. checksum) THEN
 ! If the checksum is invalid, then that's the end of our checks.
@@ -685,7 +657,8 @@
           ELSE IF ( ProgramVersion(8:8) .EQ. '1' ) THEN ! DASH 3.1
             VersionDependentMangler = Z'BBCB'
           ELSE IF ( ProgramVersion(8:8) .EQ. '2' ) THEN ! DASH 3.2
-            VersionDependentMangler = Z'DDED'
+! temp: share with 3.1
+            VersionDependentMangler = Z'BBCB'
           ENDIF
         ENDIF
         checksum = IEOR(checksum, VersionDependentMangler)

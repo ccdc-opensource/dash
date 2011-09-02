@@ -133,22 +133,13 @@
       INCLUDE 'SA_restrain.inc'
       
       REAL delta, D
-      INTEGER I,ID1,ID2,IFRG1,IFRG2,IAT1,IAT2
-      REAL, EXTERNAL :: CalculateMinContribution
-      
-      
+      INTEGER I
       SAPenalty = 0.0
       DO I = 1, DRestrNumb
-        ID1 = DRestrAtomIDs(1,I)
-        ID2 = DRestrAtomIDs(2,I)
-        CALL AtomID2Frag(ID1,IFRG1,IAT1)
-        CALL AtomID2Frag(ID2,IFRG2,IAT2)        
-        D =  CalculateMinContribution(ID1,ID2,IFRG1 .NE. IFRG2,  DRestrLens(I) )
-        delta = MAX(0.0, D - DRestrWidths(I)) ! Only penalise if D > width
+        CALL CalculateDistance(DRestrAtomIDs(1,I), DRestrAtomIDs(2,I), D)
+        delta = MAX(0.0, ABS(D - DRestrLens(I)) - DRestrWidths(I))
         SAPenalty = SAPenalty + DRestrWeights(I) * delta * delta
       ENDDO
-      
-      
       RETURN
    
       END SUBROUTINE AddPenalty
@@ -173,23 +164,15 @@
 !
 ! Calculate the distance between atomID1 of fragID1 and atomID2 of fragID2
 ! Note: no consideration about distance involving symmetry related atoms.
-      REAL FUNCTION CalculateMinContribution( atomID1, atomID2, expandBySymm, IdealLength )
+      SUBROUTINE CalculateDistance( atomID1, atomID2, D )
 
       USE ZMVAR
       USE ATMVAR
+      
       IMPLICIT NONE
       
-      INTEGER NOP,NCENT,NOPC,NLAT,NGEN,KOM13
-      COMMON /NSYM  / NOP, NCENT, NOPC, NLAT, NGEN, CENTRC, KOM13
-      LOGICAL CENTRC   
-         
-      REAL SYM,TRANS,ALAT,ORIGIN
-      INTEGER KOM26
-      COMMON /SYMDA / SYM(3,3,24), TRANS(3,24), ALAT(3,4), ORIGIN(3), KOM26
-
-      INTEGER,    INTENT (IN   ) :: atomID1, atomID2,expandBySymm
-      REAL D
-      REAL, INTENT(IN) :: IdealLength
+      INTEGER,    INTENT (IN   ) :: atomID1, atomID2
+      REAL,       INTENT (  OUT) :: D
    
       INTEGER           TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm
       COMMON  /ORDRATM/ TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm(1:MaxAtm_3)
@@ -210,64 +193,18 @@
       INTEGER I
       REAL v1(3), v2(3), tmp
       
-      REAL X1,X2,X3,C,D2
-      DIMENSION X1(3), X2(3), X3(3), C(3)
-      
-      INTEGER IC,IS,IL,NCELX,NCELY,NCELZ
-      
       ! frac -> cart
-
+      CALL PremultiplyVectorByMatrix(f2cmat, XATO(1,OrderedAtm(atomID1)), v1)
       CALL PremultiplyVectorByMatrix(f2cmat, XATO(1,OrderedAtm(atomID2)), v2)
-
-
-      
-      IF ( expandBySymm ) THEN
-         D = 1e9
-         DO IC = 1, NCENT
-    ! CYCLE OVER OPERATORS WITHOUT CENTRE:
-            DO IS = 1, NOPC
-               CALL ROTSYM( XATO(1,OrderedAtm(atomID1)),X1(1),IS, 1)
-               CALL GMADD(X1(1),TRANS(1,IS),X1(1),1,3)
-               IF (IC.EQ.2) CALL GMREV(X1,X1,1,3)            
-    ! CYCLE OVER LATTICE TRANSLATIONS:
-               DO IL = 1, NLAT
-                  CALL GMADD(X1(1),ALAT(1,IL),X2(1),1,3)
-                  DO NCELX = 1,5
-                     C(1)= FLOAT(NCELX-3)
-                     DO NCELY = 1,5
-                        C(2) = FLOAT(NCELY-3)
-                        DO NCELZ = 1,5      
-                           C(3) = FLOAT(NCELZ-3)
-                           CALL GMADD(X2(1),C(1),X3(1),1,3)
-                           CALL PremultiplyVectorByMatrix(f2cmat, X3, v1)      
-
-                           DO I = 1, 3
-                              tmp = v1(I) - v2(I)
-                              D2 = D2 + tmp * tmp
-                           END DO
-                           D2 = ABS(SQRT(D2) - IdealLength)
-                           IF ( D2 .LT. D ) THEN
-                              D = D2
-                           ENDIF        
-                        ENDDO
-                     ENDDO
-                  ENDDO
-               ENDDO
-            ENDDO
-         ENDDO
-      ELSE
-        CALL PremultiplyVectorByMatrix(f2cmat, XATO(1,OrderedAtm(atomID1)), v1)
-        DO I = 1, 3
-            tmp = v1(I) - v2(I)
-            D = D + tmp * tmp
-         END DO
-        D = ABS( SQRT(D) - IdealLength )      
-      ENDIF
-      
-      CalculateMinContribution = D
+      D = 0.0
+      DO I = 1, 3
+        tmp = v1(I) - v2(I)
+        D = D + tmp * tmp
+      END DO
+      D = SQRT(D)
       RETURN
    
-      END FUNCTION CalculateMinContribution
+      END SUBROUTINE CalculateDistance
 !
 !*****************************************************************************
 !

@@ -574,7 +574,7 @@
       INTEGER, EXTERNAL :: StrFind
       CHARACTER*20, EXTERNAL :: Integer2String
       LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
-      LOGICAL, EXTERNAL :: PutAtomsForSpecialPosition
+      LOGICAL, EXTERNAL :: PutAtomsForSpecailPosition
       LOGICAL, EXTERNAL :: PutRestraints, TOPASWriteDistance, TOPASWriteAngle, TOPASWritePlane
       INTEGER hFileTOPAS, hOutputFile
       INTEGER iLen, iPos, iStrPos
@@ -696,7 +696,7 @@
           ! Z-matrix in its own scope and then define its restraints within the same scope?)
           ! #########################################################################################
 
-          IF ( PutAtomsForSpecialPosition(.TRUE.) ) GOTO 997
+          IF ( PutAtomsForSpecailPosition() ) GOTO 997
           OPEN(UNIT=hSP_out_file, FILE="special_positions.out", STATUS='unknown', ERR=996)
        45 CONTINUE
           READ(hSP_out_file, '(A)', ERR=996, END=50) tLine

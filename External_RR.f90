@@ -502,7 +502,7 @@
 !
 !*****************************************************************************
 !
-      LOGICAL FUNCTION PutAtomsForSpecialPosition(ISTOPAS)
+      LOGICAL FUNCTION PutAtomsForSpecailPosition()
 
       USE VARIABLES
 
@@ -510,8 +510,6 @@
 
       INCLUDE 'Lattice.inc'
 
-      LOGICAL, INTENT(IN) :: ISTOPAS
-      
       INTEGER     mpdbops
       PARAMETER ( mpdbops = 192 )
 
@@ -525,7 +523,7 @@
       INTEGER ii
 
       ! Initialise to failure
-      PutAtomsForSpecialPosition = .TRUE.
+      PutAtomsForSpecailPosition = .TRUE.
 
       OPEN(UNIT=hSP_in_file, FILE="special_positions.in", STATUS='unknown', ERR=999)
       WRITE(hSP_in_file, '(A)', ERR=999) 'TOLE 0.15'
@@ -536,18 +534,13 @@
       IF ( PutAtoms(hSP_in_file, SPWriteAtom) ) GOTO 999
       CLOSE(hSP_in_file)
       ! Run the special positions program
-      IF ( ISTOPAS ) THEN
-         CALL IOSCommand( TRIM(InstallationDirectory)//DIRSPACER//'zmconv'//DIRSPACER//'special_positions'//CCDC_EXE_EXT// &
-         ' "special_positions.in" "topas"', ProcSilent+ProcBlocked)      
-      ELSE
-         CALL IOSCommand( TRIM(InstallationDirectory)//DIRSPACER//'zmconv'//DIRSPACER//'special_positions'//CCDC_EXE_EXT// &
-         ' "special_positions.in"', ProcSilent+ProcBlocked)      
-      ENDIF
-      PutAtomsForSpecialPosition = .FALSE.
+      CALL IOSCommand(TRIM(InstallationDirectory)//'special_positions'//CCDC_EXE_EXT// &
+        ' "special_positions.in"', ProcSilent+ProcBlocked)
+      PutAtomsForSpecailPosition = .FALSE.
 
   999 RETURN
 
-      END FUNCTION PutAtomsForSpecialPosition
+      END FUNCTION PutAtomsForSpecailPosition
 !
 !*****************************************************************************
 !

@@ -142,21 +142,6 @@
 !*****************************************************************************
 !
       REAL FUNCTION AScFac(ss, TheElemNumber)
-      REAL, EXTERNAL :: xrayascfac
-      REAL, EXTERNAL :: edascfac
-      LOGICAL ELECDI
-      COMMON /USEELE / ELECDI
-      
-      IF ( .NOT. ELECDI ) THEN
-          AscFac = XrayAScFac(ss,TheElemNumber)
-      ELSE
-          AscFac = EdAScFac(ss,TheElemNumber)
-      ENDIF
-      
-      END FUNCTION ASCFAC      
-
-      REAL FUNCTION XrayAScFac(ss, TheElemNumber)
-
 !
 ! INPUT   : ss            = angle dependence of the atomic scattering factor
 !           TheElemNumber = the CSD element number (1 = Carbon, 2 = Hydrogen, etc.)
@@ -170,34 +155,12 @@
       REAL,    INTENT (IN   ) :: ss
       INTEGER, INTENT (IN   ) :: TheElemNumber
 
-      XrayAScFac = A1(TheElemNumber) * EXP(-B1(TheElemNumber)*ss) +        &
+      AScFac = A1(TheElemNumber) * EXP(-B1(TheElemNumber)*ss) +        &
                A2(TheElemNumber) * EXP(-B2(TheElemNumber)*ss) +        &
                A3(TheElemNumber) * EXP(-B3(TheElemNumber)*ss) +        &
                A4(TheElemNumber) * EXP(-B4(TheElemNumber)*ss) + CV(TheElemNumber)
 
-      END FUNCTION XrayAScFac  
-
-      REAL FUNCTION EdAScFac(ss, TheElemNumber)
-
-!
-! INPUT   : ss            = angle dependence of the atomic scattering factor
-!           TheElemNumber = the CSD element number (1 = Carbon, 2 = Hydrogen, etc.)
-!
-! RETURNS : the Atomic SCattering FACtor
-!
-      USE ATMVAR
-
-      IMPLICIT NONE
-
-      REAL,    INTENT (IN   ) :: ss
-      INTEGER, INTENT (IN   ) :: TheElemNumber
-
-      EdAScFac = EDA1(TheElemNumber) * EXP(-EDB1(TheElemNumber)*ss) +        &
-                 EDA2(TheElemNumber) * EXP(-EDB2(TheElemNumber)*ss) +        &
-                 EDA3(TheElemNumber) * EXP(-EDB3(TheElemNumber)*ss) +        &
-                 EDA4(TheElemNumber) * EXP(-EDB4(TheElemNumber)*ss) + EDCV(TheElemNumber)
-
-      END FUNCTION EdAScFac      
+      END FUNCTION ASCFAC
 !
 !*****************************************************************************
 !

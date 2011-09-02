@@ -20,11 +20,11 @@
 ! For use in common block PRPKFN
 
       INTEGER     MOBS
-      PARAMETER ( MOBS = 30000 )
+      PARAMETER ( MOBS = 15000 )
 ! For common block PROFOBS and PROFBIN
 
       INTEGER MaxKtem
-	  PARAMETER ( MaxKtem = 100 )
+	  PARAMETER ( MaxKtem = 50 )
 ! Maximum dimension of KNIPT
 
       INTEGER     MAX_NPFR,      MAX_NPPR,      MAX_FITPT,         MPkDes
@@ -59,7 +59,7 @@
 ! Note the difference with MaxRuns: that's the number of runs requested by the user.
 
       INTEGER     MaxBVar
-      PARAMETER ( MaxBVar = 1050 )
+      PARAMETER ( MaxBVar = 650 )
 ! Maximum number of basic variables. Not quite sure what a basic variable is,
 ! but it has to do the number of parameters that can be refined during the Pawley
 ! refinement, so this is the number that limits the number of reflections used

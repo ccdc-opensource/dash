@@ -84,9 +84,6 @@
 ! Note that FNAME is a global variable
       INTEGER ISTAT
 
-      LOGICAL ELECDI
-      COMMON /USEELE / ELECDI
-
       DiffractionFileOpen = 1
       KLEN = LEN_TRIM(TheFileName)
       IF (KLEN .EQ. 0) RETURN
@@ -95,8 +92,6 @@
         CALL ErrorMessage("The file "//TheFileName(1:KLEN)//" does not exist!")
         RETURN
       ENDIF
-      
-      ELECDI = .FALSE.
 ! Update this throughout the program (Wizard + status bar)
       FNAME = TheFileName
       ISTAT = DiffractionFileLoad(TheFileName)

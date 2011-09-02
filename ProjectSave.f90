@@ -587,11 +587,9 @@
         IF (RW .EQ. cWrite) THEN
 ! Determine number of correlations to write out
           NCOR = 14
-          DO WHILE ( NCOR .GE. 1 ) 
-            IF ( IHCOV(NCOR,iR) .NE. 0 ) GOTO 100
+          DO WHILE ((NCOR .GE. 1) .AND. (IHCOV(NCOR,iR) .EQ. 0))
             NCOR = NCOR - 1
           ENDDO
- 100      CONTINUE
         ENDIF
 ! Number of correlations
         CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, NCOR)
