@@ -326,7 +326,7 @@
 !C 9C
 !H Modification of Harwell Fast Fourier Transform.
 !
-      DIMENSION TR(*), TI(*)
+      DIMENSION TR(1024), TI(1024)
 
       REAL            PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB
       COMMON /CONSTA/ PI, RAD, DEG, TWOPI, FOURPI, PIBY2, ALOG2, SQL2X8, VALMUB

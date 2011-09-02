@@ -143,11 +143,6 @@
       LOGICAL HcvExists
       LOGICAL PikExists
       LOGICAL DslExists
- 
-      LOGICAL ELECDI
-      COMMON /USEELE / ELECDI
-      
-      ELECDI = .FALSE.
 
       ! Initialise to failure
       SDIFileLoad = .FALSE.
@@ -208,8 +203,6 @@
           CALL INextReal(line, PAWLEYCHISQ)
         CASE ('sin') ! Single crystal
           Is_SX = .TRUE.
-        CASE ('ele') ! Electron diffraction
-          ELECDI = .TRUE.
       END SELECT
       GOTO 10 
  100  CLOSE(iHandle)

@@ -796,7 +796,7 @@
       CHARACTER*(*), INTENT (IN) :: FileNameBase
       INTEGER, INTENT (IN) :: hFileIns
 
-      LOGICAL, EXTERNAL :: PutAtomsForSpecialPosition
+      LOGICAL, EXTERNAL :: PutAtomsForSpecailPosition
       LOGICAL, EXTERNAL :: PutRestraints, RIETANWriteDistance, RIETANWriteAngle, RIETANWritePlane
       INTEGER, PARAMETER :: chFileTmp = 118, chSPFile = 60
       INTEGER I, iNumAtom, id(4), p1, p2, sp(2,3), prm_pos, prm_len
@@ -815,7 +815,7 @@
 ! We must call ShowWizardWindowRietveld() here, which will fill
 ! Xato (and all the RR variables). The Wizard window is suppressed because of the iRietveldMethod flag.
       CALL ShowWizardWindowRietveld(RR_SA_Sol)
-      IF ( PutAtomsForSpecialPosition(.FALSE.) ) GOTO 996
+      IF ( PutAtomsForSpecailPosition() ) GOTO 996
       OPEN(UNIT=chSPFile, FILE="special_positions.out", STATUS='old', ERR=996)
       OPEN(UNIT=chFileTmp, STATUS='SCRATCH', ERR=996)
 

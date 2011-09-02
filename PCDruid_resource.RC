@@ -8,7 +8,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 09/Aug/2011 13:36:19
+// Modified : 09/Jun/2010 14:17:44
 //
 ///////////////////////////////////////////////////
 //
@@ -750,9 +750,6 @@
 #define IDC_Sort_H_Down                  1585
 #define IDF_AutoSelectPeaks              1571
 #define IDSAVE                           1575
-#define IDF_TmpFileName                  1574
-#define IDF_TmpFileNameLabel             1584
-#define IDF_CCDCLicence                  1586
 
 ///////////////////////////////////////////////////
 //
@@ -871,7 +868,7 @@ BEGIN
 "Hexagonal \n"
 "Cubic \n"
 " 1065     1     1 \n"
-"------------- \n"
+"Debug Message \n"
 "[Ranges] \n"
 " 1231     -1.0000           1.0000      \n"
 "[Formats] \n"
@@ -1384,7 +1381,7 @@ BEGIN
 "Hexagonal \n"
 "Cubic \n"
 " 1065     1     1 \n"
-"------------- \n"
+"Debug message \n"
 "[Ranges] \n"
 " 1231     -1.0000           1.0000      \n"
 "[Formats] \n"
@@ -1641,22 +1638,20 @@ BEGIN
 ,0
 END
 
-IDD_License_Dialog DIALOG 0, 0,  332,  161
+IDD_License_Dialog DIALOG 0, 0,  269,  147
 STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
 CAPTION "Acquiring a licence"
 BEGIN
-    CONTROL "&OK",IDOK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,   14,  135,   38,   14
-    CONTROL "Enter Licence Key:",IDF_License_Key,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   12,   70,   94,   14
-    CONTROL "",IDF_License_String,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT,  120,   68,  132,   14
-    CONTROL "E&xit",ID_Licensing_Exit,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   56,  135,   40,   14
-    CONTROL "Generate &Request",ID_Licence_Request,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  102,  135,   74,   14
-    CONTROL "Site Code",IDF_License_SiteCodeLabel,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | SS_LEFT,   12,  110,   94,   14
-    CONTROL "&Site Licence",IDF_License_Site,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   12,   90,   94,   14
-    CONTROL "",IDF_License_SiteCode,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  120,  108,  132,   12
-    CONTROL "You need to enter a valid licence for DASH to run on this machine. To do this, either enter your licence key in the box provided or create a licence request form and e-mail it to admin@ccdc.cam.ac.uk",IDF_STRING2,"EDIT",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_MULTILINE | ES_READONLY,   16,   11,  290,   29
-    CONTROL "Register &Academic CSD Licence",IDF_CCDCLicence,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  186,  135,  112,   14
-    CONTROL "Alternatively, you can register an academic CSD license",IDF_LABEL3,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   17,   42,  289,    8
+    CONTROL "&OK",IDOK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,   38,  120,   38,   14
+    CONTROL "Enter Licence Key:",IDF_License_Key,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   12,   54,   94,   14
+    CONTROL "",IDF_License_String,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT,  120,   52,  132,   14
+    CONTROL "E&xit",ID_Licensing_Exit,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   95,  120,   40,   14
+    CONTROL "Generate &Request",ID_Licence_Request,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  156,  120,   74,   14
+    CONTROL "Site Code",IDF_License_SiteCodeLabel,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | SS_LEFT,   12,   94,   94,   14
+    CONTROL "&Site Licence",IDF_License_Site,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   12,   74,   94,   14
+    CONTROL "",IDF_License_SiteCode,"INTEGEREDIT",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  120,   92,  132,   12
+    CONTROL "You need to enter a valid licence for DASH to run on this machine. To do this, either enter your licence key in the box provided or create a licence request form and e-mail it to admin@ccdc.cam.ac.uk",IDF_STRING2,"EDIT",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_MULTILINE | ES_READONLY,   16,   11,  238,   29
 END
 
 IDD_License_Dialog RCDATA
@@ -1911,8 +1906,8 @@ FONT    8, "MS Sans Serif"
 CAPTION "Configuration"
 BEGIN
     CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  117,  210,   40,   14
-    CONTROL "-------------",IDF_ViewExe,"EDIT",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT,   47,    9,  180,   14
-    CONTROL "-------------",IDF_ViewArg,"EDIT",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT,   88,   28,   73,   14
+    CONTROL "Debug message",IDF_ViewExe,"EDIT",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT,   47,    9,  180,   14
+    CONTROL "Debug message",IDF_ViewArg,"EDIT",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT,   88,   28,   73,   14
     CONTROL "Use  built in Mercury",IDF_BuiltIn_Mercury,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  166,   28,   90,   14
     CONTROL "B&rowse...",IDBBROWSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  234,    9,   40,   14
     CONTROL "",IDF_MogulExe,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT,   47,   45,  180,   14
@@ -2176,7 +2171,8 @@ BEGIN
     CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  150,   40,   14
     CONTROL "It is recommended that you clear the peak fit ranges selected for indexing by pressing the 'Clear Peaks' button.",IDF_LABEL4,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  110,   35,  240,   20
     CONTROL "Peak shape parameters can be viewed selecting 'View' | 'Peak Widths' from the menu. When you are happy with the peaks you have selected, press 'Next >' to run the Pawley refinement.",IDF_LABEL8,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  110,  107,  240,   27
-    CONTROL "Clear &Peaks",IDF_ClearPeakFitRanges,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  209,   61,   50,   14
+    CONTROL "Clear &Peaks",IDF_ClearPeakFitRanges,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  111,   61,   50,   14
+    CONTROL "&Select Suitable Peaks",IDF_AutoSelectPeaks,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  174,   62,   78,   14
 END
 
 IDD_LicenceAgreement DIALOG 0, 0,  298,  281
@@ -3319,7 +3315,7 @@ STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | DS_3DLO
 FONT    8, "MS Sans Serif"
 CAPTION "DASH Wizard : Single Crystal Step 3: Reflections"
 BEGIN
-    CONTROL "Diffraction data",IDF_PW_Data_Group,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,   90,   19,  274,  126
+    CONTROL "Diffraction data",IDF_PW_Data_Group,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,   90,   22,  274,  106
     CONTROL "",IDF_PW_Logo1,"STATIC",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   10,   15,   70,  140,WS_EX_DLGMODALFRAME
     CONTROL "File",IDF_PW_Data_Filename,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,   95,   39,   18,    8
     CONTROL "",IDF_PW_DataFileName_String,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_AUTOHSCROLL,  119,   37,  236,   14
@@ -3370,16 +3366,16 @@ BEGIN
 ,0
 END
 
-IDD_SA_input4 DIALOG 0, 0,  385,  201
+IDD_SA_input4 DIALOG 0, 0,  385,  170
 STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
 CAPTION "DASH Wizard : Simulated Annealing Options"
 BEGIN
-    CONTROL "< &Back",IDBACK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  100,  168,   40,   14
-    CONTROL "&Solve >",IDB_Solve,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  140,  168,   40,   14
-    CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  168,   40,   14
-    CONTROL "",IDF_PW_Logo1,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   10,   15,   70,  169,WS_EX_DLGMODALFRAME
-    CONTROL "Create batch file >",IDB_BatchFile,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  294,  167,   80,   14
+    CONTROL "< &Back",IDBACK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  100,  150,   40,   14
+    CONTROL "&Solve >",IDB_Solve,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_DEFPUSHBUTTON | BS_TEXT,  140,  150,   40,   14
+    CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  150,   40,   14
+    CONTROL "",IDF_PW_Logo1,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   10,   15,   70,  140,WS_EX_DLGMODALFRAME
+    CONTROL "Create batch file >",IDB_BatchFile,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  294,  150,   80,   14
     CONTROL "Auto local &minimise",IDF_AutoLocalOptimise,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   94,   73,   76,   14
     CONTROL ".c&ssr file",IDF_OutputCSSR,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  191,   75,   54,   14
     CONTROL ".cc&l file",IDF_OutputCCL,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  248,   62,   54,   14
@@ -3399,8 +3395,6 @@ BEGIN
     CONTROL "Write out .dash file at end (recommended)",IDC_OuputDASH,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  191,   30,  170,   14
     CONTROL "For every run, write out: (not recommended)",IDF_LABEL3,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  191,   50,  160,    8
     CONTROL "Output parameters at end",IDF_OutputTbl,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  191,  108,  160,   14
-    CONTROL "",IDF_TmpFileName,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_AUTOHSCROLL,  224,  140,  154,   11
-    CONTROL "Temporary DASH Solutions File",IDF_TmpFileNameLabel,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,   94,  144,  122,    8
 END
 
 IDD_SA_input4 RCDATA
@@ -3423,8 +3417,6 @@ BEGIN
 " 1248 1 \n"
 " 1567 1 \n"
 "[Ranges] \n"
-"[Lengths] \n"
-" 1574   128 \n"
 "[Formats] \n"
 ,0
 END
@@ -3777,7 +3769,7 @@ BEGIN
     CONTROL "",IDF_FileName,"EDIT",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_AUTOHSCROLL,  122,   72,  202,   11
     CONTROL "...",IDBBROWSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  332,   72,   16,   11
     CONTROL "< &Back",IDBACK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  100,  150,   40,   14
-    CONTROL "&Next >",IDNEXT,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  140,  150,   40,   14
+    CONTROL "&Solve >",IDNEXT,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  140,  150,   40,   14
     CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  150,   40,   14
     CONTROL "Choose a DASH batch file (.dbf). Press the Solve button to start a SA task in GUI mode using the settings loaded from this file.",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  100,   20,  258,   28
     CONTROL "DBF file",IDF_GROUP,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | BS_GROUPBOX | BS_TEXT,  100,   55,  258,   40
@@ -3826,7 +3818,7 @@ BEGIN
     CONTROL "",IDF_SA_Dist_Rest_Grid,"ISSGRID",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_VSCROLL | WS_GROUP | WS_TABSTOP | GS_DEFROWLABELS | GS_COLUMNLABELS | GS_ROWLABELS,  103,   20,  251,   76
     CONTROL "SA distance restraints",IDF_SA_label,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  104,    5,  122,   11
     CONTROL "Clear table",IDF_ClearDistRest,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  142,  145,   40,   14
-    CONTROL "Only the distance between the original atoms is restrained, those involving symmetry related atoms are ignored.",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  104,  117,  260,   16
+    CONTROL "Only the distance between the original atoms is restrained, those involving symmetry related atoms are ignored..",IDF_LABEL2,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  104,  117,  260,   16
     CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  238,  145,   40,   14
 END
 
@@ -4046,4 +4038,4 @@ END
 //*WI* FILENAME    PCDruid_Resource.F90
 //*WI* FMODNAME    Druid_Header
 //*WI* LASTTYPE        2
-//*WI* LASTRES        23
+//*WI* LASTRES        33
