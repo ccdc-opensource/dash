@@ -50,9 +50,15 @@
         CALL FindLicenceFile(Info, .TRUE.)
         IF (Info%Valid .EQ. 1 ) THEN
           RETURN
-        ELSE
-          CALL AppendBatchLogFile('Error: Can not find a valid licence')
         ENDIF
+        
+        USE_GUI = 0   
+        IF ( CCDC_IS_LICENSED(USE_GUI) .EQ. 1 ) THEN
+          ! Have a CCDC Academic licence so all is sweet
+          RETURN
+        ENDIF
+           
+        CALL AppendBatchLogFile('Error: Can not find a valid licence')
         CALL DoExit
       ENDIF
 
