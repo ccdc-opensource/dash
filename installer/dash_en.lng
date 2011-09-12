@@ -1,0 +1,2 @@
+Installer.Welcome.Title=Setup - %1$s ${product_version}
+Installer.Welcome.Text=Welcome to the %1$s ${product_version} Setup Wizard\n\n
