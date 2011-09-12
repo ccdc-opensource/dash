@@ -1,0 +1,29 @@
+In order to run this version of DASH, you must first read and agree to the terms of the following Software Licence Agreement (Evaluation).
+
+DASH, excluding the component program Mercury DASH which is a copyright work of the Cambridge Crystallographic Data Centre, and its associate documentation and software have been jointly developed by and are copyright works of CCDC Software Ltd (CCDC) and the Council for the Central Laboratory of the Research Councils (CCLRC) and all rights are protected. 
+
+In consideration of the access to DASH the “Program” (including any or all components) granted you, you agree to run and use the Program solely in accordance with the following terms 
+
+You are permitted to run and to use the Program and the documentation until key expiry date for the purpose of evaluating whether or not the Program meets your requirements. Within 14 days of this date you agree to delete all copies of the Program from your computers and storage systems.
+
+You may not supply, assign, transfer or sublicense (in whole or part) the Program to any third party as part of a commercial transaction or for any consideration, in money, money's worth or otherwise, or free of charge.  The Program shall only be accessible to your employees.
+
+You may not bundle this Program together with any other software product or products without the prior written consent of CCDC Software Limited.
+
+You may copy the Program only to the extent strictly necessary for evaluation and back-up purposes. Subject thereto or as otherwise expressly permitted by applicable law, you may not copy, reproduce, translate, adapt, decompile, modify, reverse engineer or disassemble the Program. You shall ensure at all times that all copies of the Programs made by you contain the copyright notice issued by CCDC and contained in the Program.  You shall not amend or obscure this notice or any logos or trademarks of CCDC contained in the Program.  
+
+THE PROGRAM IS SUPPLIED TO YOU WITHOUT CHARGE, AND ACCORDINGLY YOU AGREE THAT THE PROGRAM IS PROVIDED ON AN *AS IS* BASIS, AND NO REPRESENTATION IS MADE OR WARRANTY GIVEN, WHETHER WITH REGARD TO THE FUNCTIONALITY OR FITNESS FOR PURPOSE OF THE PROGRAM OR OTHERWISE, AND ALL SUCH REPRESENTATIONS AND WARRANTIES, WHETHER EXPRESSED OR IMPLIED (BY LAW OR OTHERWISE) ARE HEREBY EXCLUDED TO THE FULLEST EXTENT PERMITTED BY LAW. WITHOUT PREJUDICE TO THE FOREGOING IN NO EVENT SHALL CCDC SOFTWARE LIMITED BE LIABLE TO YOU, IN CONTRACT, IN TORT OR OTHERWISE, FOR ANY INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY OR CONSEQUENTIAL LOSS OR DAMAGE, INCLUDING, WITHOUT LIMITATION, ADMINISTRATION COSTS, LOSS OF BUSINESS AND GOODWILL, LOSS UNDER CURRENT AND FUTURE CONTRACTS, LOSS OF PROFIT OR OPPORTUNITY OR FINANCIAL LOSS OF ANY KIND ARISING IN ANY WAY OUT OF OR IN CONNECTION WITH YOUR USE OF THE PROGRAM.  
+
+You agree to minimise any adverse effect of downloading, installing and using the Program, including by keeping back-up data and implementing adequate disaster recovery procedures.  Accordingly, CCDC Software Limited shall be in no manner liable for any effect which the Program may have on your data, software, hardware or other systems or products.  
+
+No amendment, variation or discharge of these terms and conditions is valid unless accepted in writing by both parties.
+
+The failure of either party to exercise or enforce any rights under these terms and conditions shall not amount to a waiver of those rights.
+
+The illegality or invalidity of any part of these terms and conditions shall not affect the legality or validity of the remainder of them. 
+
+These terms and conditions are not intended to confer rights on any third party, whether pursuant to the Contracts (Rights of Third Parties) Act 1999 or otherwise, and no third party shall have any right to enforce any provision of these terms and conditions. 
+
+The foregoing terms and conditions and any dispute in connection with them shall be governed by and construed in accordance with English law and shall be subject to the exclusive jurisdiction of the English courts.
+
+If you agree to the foregoing terms and conditions then please select the “I have read the full text above and I AGREE” option below. If you do not agree to the foregoing terms and conditions you should select the “I DO NOT AGREE” option below. After making your selection, please click OK to proceed.
