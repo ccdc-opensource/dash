@@ -2,7 +2,7 @@
     <shortName>DASH</shortName>
     <fullName>DASH</fullName>
     <version>3.3</version>
-    <licenseFile>Licence.txt</licenseFile>
+    <licenseFile>../../cppbuilds_shared/installer/licences/csd_licence.txt</licenseFile>
     <leftImage>../../cppbuilds_shared/installer/images/EFEMUX01_163x314.png</leftImage>
     <logoImage>../../cppbuilds_shared/installer/images/ccdc_logo_48x48.png</logoImage>
     <splashImage>../../cppbuilds_shared/installer/images/ccdc_logo_350x82.png</splashImage>
@@ -115,6 +115,7 @@ Release Notes Here!</text>
                     <name>${product_fullname} ${product_version}</name>
                     <path></path>
                     <platforms>all</platforms>
+                    <runAsAdmin>0</runAsAdmin>
                     <runInTerminal>0</runInTerminal>
                     <windowsExec>${installdir}/dash.exe</windowsExec>
                     <windowsExecArgs></windowsExecArgs>
@@ -136,6 +137,7 @@ Release Notes Here!</text>
                             <name>Uninstall ${product_fullname}</name>
                             <path>${installdir}</path>
                             <platforms>all</platforms>
+                            <runAsAdmin>0</runAsAdmin>
                             <runInTerminal>0</runInTerminal>
                             <windowsExec>${installdir}/${uninstallerName}.exe</windowsExec>
                             <windowsExecArgs></windowsExecArgs>
@@ -172,6 +174,7 @@ Release Notes Here!</text>
                 <startMenuShortcut>
                     <comment>Uninstall ${product_fullname}</comment>
                     <name>Uninstall ${product_fullname}</name>
+                    <runAsAdmin>0</runAsAdmin>
                     <runInTerminal>0</runInTerminal>
                     <windowsExec>${installdir}/${uninstallerName}.exe</windowsExec>
                     <windowsExecArgs></windowsExecArgs>
@@ -181,6 +184,7 @@ Release Notes Here!</text>
                 <startMenuShortcut>
                     <comment>${product_fullname} ${product_version}</comment>
                     <name>${product_fullname} ${product_version}</name>
+                    <runAsAdmin>0</runAsAdmin>
                     <runInTerminal>0</runInTerminal>
                     <windowsExec>${installdir}/dash.exe</windowsExec>
                     <windowsExecArgs></windowsExecArgs>
@@ -195,6 +199,7 @@ Release Notes Here!</text>
                             <comment>View the DASH documentation</comment>
                             <filePath>${installdir}\Documentation\manual\output\portable_html\TOC.html</filePath>
                             <name>DASH Documentation</name>
+                            <runAsAdmin>0</runAsAdmin>
                             <runInTerminal>0</runInTerminal>
                             <windowsIcon></windowsIcon>
                         </startMenuFileShortcut>
@@ -202,6 +207,7 @@ Release Notes Here!</text>
                             <comment>View the DASH Release Notes</comment>
                             <filePath>${installdir}\Release-Notes.txt</filePath>
                             <name>DASH Release Notes</name>
+                            <runAsAdmin>0</runAsAdmin>
                             <runInTerminal>0</runInTerminal>
                             <windowsIcon></windowsIcon>
                         </startMenuFileShortcut>
@@ -218,7 +224,6 @@ Release Notes Here!</text>
             <show>1</show>
             <folderList>
                 <folder>
-                    <description>New Folder</description>
                     <destination>${installdir}</destination>
                     <name>vcfiles</name>
                     <platforms>all</platforms>
@@ -265,7 +270,7 @@ Release Notes Here!</text>
         <launchBrowser>
             <progressText>View DASH 3.3 release notes</progressText>
             <run>0</run>
-            <url>http://www.ccdc.cam.ac.uk/support/documentation/dash/release_notes/dash-3-2-release-notes.txt</url>
+            <url>http://www.ccdc.cam.ac.uk/support/documentation/dash/release_notes/dash-3-3-release-notes.txt</url>
         </launchBrowser>
         <actionGroup>
             <progressText>Launch DASH</progressText>
