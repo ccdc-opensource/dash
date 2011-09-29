@@ -560,7 +560,7 @@
       READ(LString,'(2Z8,Z4)',ERR = 99) v(1), v(2), checksum
       cs = IEOR(v(1),v(2))
 ! ### Version dependent lines
-      cs = IEOR(cs,Z'DDED')
+      cs = IEOR(cs,Z'AABA')
 ! Check the checksum
       IF (tCheckSum .NE. checksum) THEN
 ! If the checksum is invalid, then that's the end of our checks.
@@ -696,6 +696,8 @@
             VersionDependentMangler = Z'BBCB'
           ELSE IF ( ProgramVersion(8:8) .EQ. '2' ) THEN ! DASH 3.2
             VersionDependentMangler = Z'DDED'
+          ELSE IF ( ProgramVersion(8:8) .EQ. '3' ) THEN ! DASH 3.3
+            VersionDependentMangler = Z'AABA'
           ENDIF
         ENDIF
         checksum = IEOR(checksum, VersionDependentMangler)
