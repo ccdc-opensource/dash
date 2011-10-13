@@ -91,7 +91,73 @@
             <text>DASH 3.3 Release Notes
 ======================
 
-Release Notes Here!</text>
+This version of the program includes all of the changes from DASH 3.2 (see below)
+and also an amended license system to allow use with a valid CSDS licence.
+
+DASH 3.2 Release Notes
+======================
+
+This version of the program includes 6 
+major new features and several minor changes, all summarised below.
+  	 
+Major New Features
+==================
+  	 
+1. Mogul Distribution Biasing (MDB)
+  	 
+MDB is a technique for biasing the search space using torsion distributions. 
+Unlike the previous method for using Mogul in searching, MDB can be used as a
+'black box'; the user can ask to bias searching to regions suggested by torsion
+angle distributions. The algorithm is such that distributions with little 
+information content do not lead to spurious biasing.  Access to the CSD System
+is required for this feature.
+ 
+2. Aggressive Early Termination
+
+The program can now be set in a mode where it will search for a local 
+optimisation to a likely minimum more quickly than in previous DASH versions.
+
+3. Automatic Peak Picking for Indexing
+
+There is an option that allows for auto-selection of peaks in a pattern which
+makes selection easier for about 80% of patterns encountered
+
+4. Tethering
+
+Tethers can be applied to atoms during simulated annealing. A bond in a ring 
+can be broken to allow the conformation to be explored whilst retaining the 
+correct distance restraint with a ring-closing tether.  Atoms from different 
+Z-matrices can be tethered, allowing the separation between molecular species
+or ions to be restrained.
+
+5. Increased Pattern Data Point Support
+
+The number of pattern data points supported has been increased to 30,000 from
+15,000 to allow for ultra-fine 2-theta width pattern measurements
+
+6. Increased Reflection Limit
+
+The Pawley fitting reflection limit has been increased to 1,000 reflections 
+from 600
+
+Minor Changes and Bug Fixes
+===========================
+
+
+1. It is now possible to input cell data directly from an ins or cif
+2. It is now possible to read batch files back in to DASH
+3. Z-matrix generation now treats linear torsions as rigid
+4. DASH-TOPAS preferred orientation option in TOPAS inp file is can now be 
+   activated
+5. Overwriting of .inp files for TOPAS: .inp files are now backed up at each
+   step
+6. DASH now saves a temporary output file during simulated annealing so if a
+   power-cut interrupts a run, completed solutions can still be accessed.
+7. In Indexing Step 2: Triclinic is now selected by default
+8. Modal torsion angle selection no longer selects the wrong torsion on occasion
+9. Reaching a negative temperature during the SA causes run termination 
+
+</text>
         </writeFile>
     </postInstallationActionList>
     <enableRollback>1</enableRollback>
