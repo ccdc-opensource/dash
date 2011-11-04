@@ -20,7 +20,7 @@
       COMMON /FCSTOR/ FOB(MaxAtm_3,MaxRef)
 
       REAL            COSQS,               SINQS
-      COMMON /CSQSTO/ COSQS(-20:20,3,MaxAtm_3), SINQS(-20:20,3,MaxAtm_3)
+      COMMON /CSQSTO/ COSQS(-100:100,3,MaxAtm_3), SINQS(-100:100,3,MaxAtm_3)
 
       LOGICAL           LOG_HYDROGENS
       COMMON /HYDROGEN/ LOG_HYDROGENS

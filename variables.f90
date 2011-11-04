@@ -24,6 +24,8 @@
       DATA FNAME / ' ' /     ! Current filename
 
       CHARACTER(MaxPathLength) ::  InstallationDirectory
+      CHARACTER(MaxPathLength) ::  DocumentationHTMLdirectory
+      CHARACTER(MaxPathLength) ::  DocumentationRoot
       CHARACTER(MaxPathLength) ::  StartUpDirectory
       CHARACTER(MaxPathLength) ::  AllUsersProfileDirectory
       CHARACTER(MaxPathLength) ::  AppDataDirectory
@@ -66,7 +68,7 @@
 ! to a Mogul exe specified
 
       CHARACTER(8) :: ProgramVersion
-      DATA ProgramVersion / 'DASH 3.2' /
+      DATA ProgramVersion / 'DASH 3.3' /
 
 ! File information; Names of files used by DASH For I/O
       CHARACTER(MaxPathLength)  DashTicFile

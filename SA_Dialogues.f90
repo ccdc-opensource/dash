@@ -1654,6 +1654,7 @@
       INTEGER kk, iOption, jFrg
       INTEGER UndoModalFlag
       CHARACTER*36 parlabel(mvar)
+      LOGICAL IsCheckedAlready
 
 ! We are now on window number 2
       CALL PushActiveWindowID
@@ -1700,8 +1701,10 @@
             CASE (IDCANCEL, IDCLOSE)
               CALL EndWizardPastPawley
             CASE (IDF_SetupMDB)
+              CALL WCursorShape(CurHourGlass)
               CALL DASHWDialogGetInteger(IDF_MDBMinHit, iMinHits)
               CALL SetupMDB(iMinHits)
+              CALL WCursorShape(CurCrossHair)         
             CASE (IDB_Relabel)
               CALL DASHWDialogGetMenu(IDF_MENU1, iOption)
               ! Update memory
@@ -1793,10 +1796,14 @@
                   ! Checkbox, no bother by the move-cell messages, i.e. different to/from
                   IF (EventInfo%X .NE. EventInfo%Y) GOTO 300
                   CALL DASHWGridGetCellCheckBox(IDF_parameter_grid_modal, IFCol, IFRow, ICHK)
-                  IF (ICHK .EQ. Checked) THEN
+                  IsCheckedAlready = ( ( ub(IFRow) - lb(IFRow) ) .LE. 4.01E-5 )
+                  IF ( IsCheckedAlready .NE. ( ICHK .EQ. 1 )) THEN
+                   IF (ICHK .EQ. Checked) THEN
                     CALL DASHWGridGetCellReal(IDF_parameter_grid_modal,1,IFRow,xtem)
                     prevflag(IFRow) = ModalFlag(IFRow)
                     IF (ModalFlag(IFRow) .EQ. 4) ModalFlag(IFRow) = 1
+                    prevlb(IFRow) = lb(IFRow)
+                    prevub(IFRow) = ub(IFRow) 
                     lb(IFRow) = xtem-1.0E-5
                     ub(IFRow) = xtem+1.0E-5
                     CALL WGridStateCell(IDF_parameter_grid_modal, 1, IFRow, DialogReadOnly)
@@ -1813,10 +1820,12 @@
                     IF (ModalFlag(IFRow) .NE. 0) THEN ! It's a torsion angle
                       CALL WGridStateCell(IDF_parameter_grid_modal, 5, IFRow, Enabled)
                     ENDIF
-                  ENDIF
+                   ENDIF
+                  
                   CALL RefreshTorsionRow(IFRow, .TRUE.)
                   LimsChanged = .TRUE.
- 300              CONTINUE
+                 ENDIF
+ 300             CONTINUE
               END SELECT ! IFCol
           END SELECT ! EventInfo%Value1 Field Changed Options
       END SELECT  ! EventType
@@ -2188,11 +2197,17 @@
       REAL                                                           ChiMult
       COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult
 
+      INTEGER                  OFBN_Len
+      CHARACTER(MaxPathLength)           OutputFilesBaseName
+      CHARACTER(3)                                            SA_RunNumberStr
+      COMMON /basnam/          OFBN_Len, OutputFilesBaseName, SA_RunNumberStr
+
       LOGICAL           Resume_SA
       COMMON /RESUMESA/ Resume_SA
 
       LOGICAL, EXTERNAL :: Confirm, DASHWDialogGetCheckBoxLogical
       INTEGER, EXTERNAL :: WriteSAParametersToFile
+      CHARACTER*20, EXTERNAL :: GetSeed1SuffixString
       INTEGER IHANDLE, KPOS
       REAL    MaxMoves1
       INTEGER MaxMoves2
@@ -2231,6 +2246,8 @@
               ELSE
                 CALL SelectDASHDialog(IDD_SAW_Page5)
                 CALL WDialogClearField(IDF_SA_Summary)
+                CALL SelectDASHDialog(IDD_SA_input4)
+                CALL WDialogPutString(IDF_TmpFileName,TRIM(OutputFilesBaseName)//TRIM(GetSeed1SuffixString())//'Tmp.dash')
                 CALL WizardWindowShow(IDD_SA_input4)
               ENDIF
             CASE (IDCANCEL, IDCLOSE)
@@ -2940,11 +2957,12 @@
             CASE (IDNEXT)
               CALL DASHWDialogGetString(IDF_FileName, CTEMP)
               IF (LEN_TRIM(CTEMP) .LE. 0) THEN
-                CALL ErrorMessage('Have you chosen a BDF file?')
+                CALL ErrorMessage('Have you chosen a DBF file?')
               ELSE
                 CALL SplitPath(CTEMP, tDirName, tFileName)
                 CALL IOsDirChange(tDirName)
-                CALL BatchMode(tFileName)
+                CALL BatchMode(tFileName, .FALSE.)
+                CALL ShowWithWizardWindowSASettings
               ENDIF
             CASE (IDBBROWSE)
               CALL DASHWDialogGetString(IDF_FileName, CTEMP)

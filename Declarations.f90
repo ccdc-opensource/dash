@@ -31,7 +31,7 @@
       REAL                         XOBS,       YOBS,       EOBS
       COMMON /PROFOBS/ NOBS,       XOBS(MOBS), YOBS(MOBS), EOBS(MOBS)
 
-! MOBS  = (=15000) Maximum number of observations, i.e. data points in powder pattern
+! MOBS  = (=30000) Maximum number of observations, i.e. data points in powder pattern
 ! NOBS  = Number of data points in powder pattern
 ! XOBS  = 2 theta
 ! YOBS  = observed number of counts ('intensity') for the corresponding 2 theta value
@@ -45,7 +45,7 @@
       REAL                         XBIN,       YOBIN,       YCBIN,       YBBIN,       EBIN,       AVGESD
       COMMON /PROFBIN/ NBIN, LBIN, XBIN(MOBS), YOBIN(MOBS), YCBIN(MOBS), YBBIN(MOBS), EBIN(MOBS), AVGESD
 
-! MOBS  = (=15000) Maximum number of observations, i.e. data points in powder pattern
+! MOBS  = (=30000) Maximum number of observations, i.e. data points in powder pattern
 ! NBIN  = Number of bins
 ! LBIN  = width of bin (=1 always)
 ! XBIN  = 2 theta
@@ -277,7 +277,8 @@
 
       REAL             prevx,       prevlb,       prevub
       LOGICAL                                                   LimsChanged
-      COMMON /pvalues/ prevx(mvar), prevlb(mvar), prevub(mvar), LimsChanged
+      INTEGER                                                                prevflag
+      COMMON /pvalues/ prevx(mvar), prevlb(mvar), prevub(mvar), LimsChanged, prevflag(mvar)
 
 ! These are the values from the SA Parameter Bound Wizard window, stored to track changes made
 ! by the user. Must be initialised before the SA Parameter Bound Wizard window is displayed.

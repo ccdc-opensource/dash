@@ -323,7 +323,7 @@
       COMMON /LENINT/ NBITS
       COMMON /LINKAG/ NUMFV, NUMPAK, KKFV(200), KTYPFV(200), KSTFV(200),&
      &                KTIME(200), KUNPFV(5,30), NTIME, NUMCON,          &
-     &                KKCON(500), AMCON(500), KPTCON(MaxConstraints+1), KSTCON(MaxConstraints), &
+     &                KKCON(MaxConstraints*2), AMCON(MaxConstraints*2), KPTCON(MaxConstraints+1), KSTCON(MaxConstraints), &
      &                KTPCON(MaxConstraints)
 
       INTEGER         IBMBER
@@ -386,7 +386,7 @@
       CALL ERRCHK(2,NUMCON,MaxConstraints,0,'LSQ constraints')
 !WD Check for array upper bounds for KKCON and AMCON: as NPAR is usually 2, 
 !   their size should be at least 2*MaxConstraints, but only 500 now.
-      CALL ERRCHK(1,KPTCON(NUMCON)+NPAR,500,0,'LSQ constraints parameters')
+      CALL ERRCHK(1,KPTCON(NUMCON)+NPAR,MaxConstraints*2,0,'LSQ constraints parameters')
       IF (IBMBER .NE. 0) THEN
         NUMCON = NUMCON - 1 ! NUMCON got increment in ERRCHK(2,NUMCON,....)
         RETURN
@@ -4045,7 +4045,7 @@
       COMMON /IOUNIT/ LPT, LUNI
       COMMON /LINKAG/ NUMFV, NUMPAK, KKFV(200), KTYPFV(200), KSTFV(200),&
      &                KTIME(200), KUNPFV(5,30), NTIME, NUMCON,          &
-     &                KKCON(500), AMCON(500), KPTCON(MaxConstraints+1), KSTCON(MaxConstraints), &
+     &                KKCON(MaxConstraints*2), AMCON(MaxConstraints*2), KPTCON(MaxConstraints+1), KSTCON(MaxConstraints), &
      &                KTPCON(MaxConstraints)
 
       INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
@@ -7548,7 +7548,7 @@
       COMMON /CELFIX/ IPTCEL(6), AMCELL(6), NCELF, NCELG, NCELS, KOM3
       COMMON /CELPAR/ CELL(3,3,2), V(2), ORTH(3,3,2), CPARS(6,2),       &
      &                KCPARS(6), CELESD(6,6,2), CELLSD(6,6), KOM4
-      COMMON /CONSTR/ JCONST, JROWPT(301), JCMAT(200), AMOUNT(200), NEXTJ
+      COMMON /CONSTR/ JCONST, JROWPT(MaxConstraints+1), JCMAT(MaxConstraints), AMOUNT(MaxConstraints), NEXTJ
 
       INTEGER         LVRBS,          LVRPR,          LBSVR,          LRDVR
       COMMON /POINTS/ LVRBS(MaxVVar), LVRPR(MaxVVar), LBSVR(MaxBVar), LRDVR(MaxConstraints)
@@ -10165,7 +10165,7 @@
       CHARACTER*4 IPR1(8), IPR2(8), NAM1, NAM2, NOLD
       LOGICAL F4, F5
       DIMENSION K1(8), K2(8)
-      COMMON /CONSTR/ JCONST, JROWPT(301), JCMAT(200), AMOUNT(200), NEXTJ
+      COMMON /CONSTR/ JCONST, JROWPT(MaxConstraints+1), JCMAT(MaxConstraints), AMOUNT(MaxConstraints), NEXTJ
 
       REAL            DERIVB
       INTEGER                          LVARB
@@ -10955,7 +10955,7 @@
       COMMON /IOUNIT/ LPT, LUNI
       COMMON /LINKAG/ NUMFV, NUMPAK, KKFV(200), KTYPFV(200), KSTFV(200),&
      &                KTIME(200), KUNPFV(5,30), NTIME, NUMCON,          &
-     &                KKCON(500), AMCON(500), KPTCON(MaxConstraints+1), KSTCON(MaxConstraints), &
+     &                KKCON(MaxConstraints), AMCON(MaxConstraints), KPTCON(MaxConstraints+1), KSTCON(MaxConstraints), &
      &                KTPCON(MaxConstraints)
 
       INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
@@ -11947,7 +11947,7 @@
 !
       INCLUDE 'params.inc'
       
-      COMMON /CONSTR/ JCONST, JROWPT(301), JCMAT(200), AMOUNT(200), NEXTJ
+      COMMON /CONSTR/ JCONST, JROWPT(MaxConstraints+1), JCMAT(MaxConstraints), AMOUNT(MaxConstraints), NEXTJ
 
       REAL            DERIVB
       INTEGER                          LVARB
@@ -13088,7 +13088,7 @@
 !
       INCLUDE "params.inc"
       
-      COMMON /CONSTR/ JCONST, JROWPT(301), JCMAT(200), AMOUNT(200), NEXTJ
+      COMMON /CONSTR/ JCONST, JROWPT(MaxConstraints+1), JCMAT(MaxConstraints), AMOUNT(MaxConstraints), NEXTJ
 
       REAL            DERIVB
       INTEGER                          LVARB
@@ -15347,9 +15347,9 @@
       INCLUDE 'params.inc'
 
       LOGICAL FOUND, KSAME, FX
-      DIMENSION KKCOL(500), KBVCOL(500), A(500,MaxConstraints), KPRVR(2000)
+      DIMENSION KKCOL(MaxConstraints*2), KBVCOL(MaxConstraints*2), A(MaxConstraints*2,MaxConstraints), KPRVR(2000)
       DIMENSION KREDUN(MaxConstraints)
-      COMMON /CONSTR/ JCONST, JROWPT(301), JCMAT(200), AMOUNT(200), NEXTJ
+      COMMON /CONSTR/ JCONST, JROWPT(MaxConstraints+1), JCMAT(MaxConstraints), AMOUNT(MaxConstraints), NEXTJ
 
       REAL            DERIVB
       INTEGER                          LVARB
@@ -15363,7 +15363,7 @@
       COMMON /IOUNIT/ LPT, LUNI
       COMMON /LINKAG/ NUMFV, NUMPAK, KKFV(200), KTYPFV(200), KSTFV(200),&
      &                KTIME(200), KUNPFV(5,30), NTIME, NUMCON,          &
-     &                KKCON(500), AMCON(500), KPTCON(MaxConstraints+1), KSTCON(MaxConstraints), &
+     &                KKCON(MaxConstraints*2), AMCON(MaxConstraints*2), KPTCON(MaxConstraints+1), KSTCON(MaxConstraints), &
      &                KTPCON(MaxConstraints)
 
       INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
@@ -15472,7 +15472,7 @@
 ! IS IT THERE ALREADY?
           IF (NFIND(KKCON(K),KKCOL,NPAR).GT.0) GOTO 42
 ! ADD TO LIST:
-   43     CALL ERRCHK(2,NPAR,500,0,'parameters in strict constraints')
+   43     CALL ERRCHK(2,NPAR,MaxConstraints,0,'parameters in strict constraints')
           IF (IBMBER .NE. 0) RETURN
 ! IN DESCENDING SEQUENCE (SO THAT REDUNDANTS WILL BE LATER PARAMETERS)
           DO J = 1, NPAR - 1
@@ -15493,7 +15493,7 @@
    41 ENDDO
 ! FILL IN MATRIX OF COEFFICIENTS IN CONSTRAINTS:
 ! IN MATRIX A, FIRST SUBSCRIPT = PARAMETER, SECOND=CONSTRAINT
-      CALL GMZER(A,500,MaxConstraints)
+      CALL GMZER(A,MaxConstraints*2,MaxConstraints)
       NCON = 0
       DO I = 1, NUMCON
         IF (KSTCON(I).EQ.0) GOTO 51
@@ -15646,7 +15646,7 @@
       DO I = 1, NCON
         LV = KREDUN(I)
         IF (LV.EQ.0) GOTO 30
-        CALL ERRCHK(2,JCONST,300,0,'strict constraints')
+        CALL ERRCHK(2,JCONST,MaxConstraints,0,'strict constraints')
         IF (IBMBER .NE. 0) THEN
           JCONST = JCONST - 1 ! JCONST got increment in ERRCHK(2,JCONST,....)
           RETURN
@@ -15657,7 +15657,7 @@
         DO J = NCON + 1, NPAR
           IF (ABS(A(J,I)).LT.SMALL) GOTO 31
 ! PUT CONSTRAINT INTO TABLE TO USE THIS CYCLE:
-          CALL ERRCHK(1,NEXTJ,200,0,'strict constraints')
+          CALL ERRCHK(1,NEXTJ,MaxConstraints,0,'strict constraints')
           IF (IBMBER .NE. 0) RETURN
           JCMAT(NEXTJ) = KBVCOL(J)
           AMOUNT(NEXTJ) = -A(J,I)

@@ -89,7 +89,12 @@
       USE VARIABLES
 
       IMPLICIT NONE
+      
+      LOGICAL ELECDI
+      COMMON /USEELE / ELECDI
 
+      LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
+      
       CALL PushActiveWindowID
       CALL SelectDASHDialog(IDD_SX_Page1a)
       SELECT CASE (EventType)
@@ -103,8 +108,10 @@
               CALL SelectDASHDialog(IDD_ViewPawley)
               CALL WDialogPutReal(IDF_MaxResolution, SXMaxResolution)
               CALL SelectDASHDialog(IDD_SX_Page2)
+!              ELECDI = DASHWDialogGetCheckBoxLogical(IDF_ElectronDiffraction)
               CALL WDialogFieldStateLogical(IDNEXT, .FALSE.)
               PastPawley = .TRUE.
+
               CALL WizardWindowShow(IDD_SX_Page2)
           END SELECT
       END SELECT
