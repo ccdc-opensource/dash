@@ -1853,7 +1853,11 @@
         CALL PCXX(5)
         IF (FIXED) CALL INDFIX(rHKL(1,KNOW),IH)
         IF (ISTRIK(KNOW).EQ.1) NTYP1 = 2
-        IF (KNOW.GT.1 .AND. ISTRIK(KNOW-1).EQ.1 .AND. ISTRIK(KNOW).NE.1) NTYP1 = 5
+        
+        IF (KNOW.GT.1 ) THEN
+            IF ( ISTRIK(KNOW-1).EQ.1 .AND. ISTRIK(KNOW).NE.1) NTYP1 = 5
+        ENDIF
+        
 ! ^^^^^ BE CAREFUL OF THE NEXT LINE
         IF (ISTRIK(KNOW).EQ.2) NTYP1 = 4
         IF (ISLAK(KNOW).NE.0) NTYP2 = 3
@@ -3445,7 +3449,7 @@
 !
       INCLUDE 'params.inc'
 
-      COMMON /CONSTR/ JCONST, JROWPT(301), JCMAT(200), AMOUNT(200), NEXTJ
+      COMMON /CONSTR/ JCONST, JROWPT(MaxConstraints+1), JCMAT(MaxConstraints), AMOUNT(MaxConstraints), NEXTJ
       COMMON /F4PARS/ NGEN4(9,5), F4VAL(3,MF4PAR), F4PAR(3,MF4PAR),     &
      &                KF4PAR(3,MF4PAR), F4PESD(3,MF4PAR), KOM6
 
@@ -3648,7 +3652,7 @@
       COMMON /IOUNIT/ LPT, LUNI
       COMMON /LINKAG/ NUMFV, NUMPAK, KKFV(200), KTYPFV(200), KSTFV(200),&
      &                KTIME(200), KUNPFV(5,30), NTIME, NUMCON,          &
-     &                KKCON(500), AMCON(500), KPTCON(MaxConstraints+1), KSTCON(MaxConstraints), &
+     &                KKCON(MaxConstraints*2), AMCON(MaxConstraints*2), KPTCON(MaxConstraints+1), KSTCON(MaxConstraints), &
      &                KTPCON(MaxConstraints)
       COMMON /LSETDA/ MFAM, MGEN, MSPC, LASTST
       COMMON /LSQPAK/ KKPACK(10,3)
@@ -5690,9 +5694,17 @@
 ! CHECK NOT TOO MANY SPECIES FOR THIS FAMILY+GENUS:
     3 IF (ISPC.GT.NSPCPS(IFAM,JPHASE)) GOTO 2
 ! ALSO, FAMILIES 1, 3 AND 6 HAVE INDIVIDUAL GENERA OF DIFFERING LENGTHS:
-      IF (IFAM.EQ.1 .AND. ISPC.GT.IABS(LF1SP(IGEN))) GOTO 2
-      IF (IFAM.EQ.3 .AND. ISPC.GT.IABS(LF3SP(IGEN,JPHASE,JSOURC))) GOTO 2
-      IF (IFAM.EQ.6 .AND. ISPC.GT.IABS(LF6SP(IGEN,JSOURC))) GOTO 2
+      IF (IFAM.EQ.1 ) THEN
+        IF ( ISPC.GT.IABS(LF1SP(IGEN))) GOTO 2
+      END IF
+       
+      IF (IFAM.EQ.3 ) THEN
+        IF (ISPC.GT.IABS(LF3SP(IGEN,JPHASE,JSOURC))) GOTO 2
+      END IF
+      
+      IF (IFAM.EQ.6 ) THEN
+        IF ( ISPC.GT.IABS(LF6SP(IGEN,JSOURC))) GOTO 2
+      END IF
       GOTO 100
 ! NEXT GENUS:
     2 IGEN = IGEN + 1

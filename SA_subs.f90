@@ -93,7 +93,7 @@
 
       REAL, EXTERNAL :: EXPREP, RANMAR_2, GetMaxwellRandomNumber, GetMDBRandomTorsion
       LOGICAL, EXTERNAL :: IsEventWaiting, Get_AutoAlign
-      LOGICAL, EXTERNAL :: CheckTerm, OutOfBounds
+      LOGICAL, EXTERNAL :: CheckTerm, OutOfBounds, GoodSolution
       CHARACTER*20, EXTERNAL :: GetSeed1SuffixString
       CHARACTER(MaxPathLength) tTmpSaveName
       INTEGER NumTrialsPar(MVAR), NumParPerTrial, iParNum
@@ -115,13 +115,16 @@
       INTEGER TotNumTrials
       CHARACTER*3 RowLabelStr
       REAL XP(MVAR)
+
       REAL xtem, tempupper, templower, tempupper2
       REAL Initial_T ! As calculated during intial run, not as set by the user.
       REAL VM(MVAR)
       REAL InitialProChiSqrd
       REAL ProgressIndicator ! 0.0 = just begun, 1.0 = best profile chi-sqrd <= Pawley chi-sqrd
+      
 
-      tTmpSaveName = TRIM(OutputFilesBaseName)//TRIM(GetSeed1SuffixString())//'Tmp.dash'
+      CALL SetTmpSaveFileName(tTmpSaveName)
+      
       WasMinimised = .FALSE.
       NumParPerTrial = 1
       TotNumTrials = 0
@@ -252,15 +255,16 @@
         NACP(I) = 0
         NumTrialsPar(I) = 0
       ENDDO
+
 ! ##########################################
 !   Starting point for multiple iterations
 ! ##########################################
   100 CONTINUE
+  
       Curr_SA_Iteration = Curr_SA_Iteration + 1
       ! Next line is wrong for single crystal, which should use the intensity chi-sqrd
       ProgressIndicator = 1.0 -( (CHIPROBEST - (ChiMult*PAWLEYCHISQ)) / (InitialProChiSqrd - (ChiMult*PAWLEYCHISQ)))
-      !CALL SetSpringWeight( ProgressIndicator )
-      CALL SetSpringWeight( float(ntotmov) / float(MaxMoves) )
+      CALL SetSpringWeight( ProgressIndicator )
       NUP = 0
       NDOWN = 0
       DO II = 1, nvar
@@ -282,6 +286,7 @@
       DO M = 1, NT
         DO J = 1, NS
           DO IH = 1, NPAR
+          
             DO I = 1, nvar
               XP(I) = x_unique(I)
             ENDDO
@@ -383,6 +388,7 @@
  555          CONTINUE
               IF (kzmpar2(H) .EQ. 7) CurrParsInclPO = .TRUE.
             ENDDO
+
 ! Evaluate the function with the trial point XP and return as FP.
             IF (NumParPerTrial .EQ. 1) THEN
               IF (PrevRejected) THEN
@@ -556,6 +562,7 @@
         IF (.NOT. CheckTerm(NTOTMOV, tTestEarlyTerm)) &
           GOTO 100 ! Next iteration
       ENDIF
+      
 ! End of a run in a multi-run. This is the place for a final local minimisation
       NumOf_SA_Runs = Curr_SA_Run
 ! Get AutoLocalMinimisation from the Configuration Window
@@ -1010,6 +1017,35 @@
       CheckTerm =  .FALSE.
 
       END FUNCTION CheckTerm
+
+      LOGICAL FUNCTION GoodSolution()
+
+      IMPLICIT NONE
+
+      INCLUDE 'params.inc'
+
+
+      REAL             PAWLEYCHISQ, RWPOBS, RWPEXP
+      COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP
+
+      LOGICAL           Is_SX
+      COMMON  / SXCOM / Is_SX
+
+      REAL              XOPT,       C,       FOPT
+      COMMON / sacmn /  XOPT(MVAR), C(MVAR), FOPT
+
+      REAL             CHIPROBEST
+      COMMON /PLTSTO2/ CHIPROBEST
+
+
+      REAL Best_CHI
+
+      GoodSolution = .TRUE.
+
+      IF (Is_SX) RETURN
+      GoodSolution = ( CHIPROBEST .LT. 10.0*PAWLEYCHISQ )
+
+      END FUNCTION GoodSolution
 !
 !*****************************************************************************
 !

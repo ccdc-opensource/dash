@@ -350,9 +350,11 @@
       INTEGER I
 
       I = LEN_TRIM(PathName)
-      DO WHILE ((I .GT. 0) .AND. (PathName(I:I) .NE. DIRSPACER))
-        I = I - 1
-      ENDDO
+      IF ( I .GT. 0 ) THEN
+        DO WHILE ((I .GT. 0) .AND. (PathName(I:I) .NE. DIRSPACER))
+          I = I - 1
+        ENDDO
+      END IF
       IF (I .EQ. 0) THEN
         DirName  = ''
         FileName = PathName

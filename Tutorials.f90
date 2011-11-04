@@ -45,17 +45,14 @@
 
       TutorialFileName = "tutorial-"//TRIM(NumberStr)//".html"
 
-      DocumentationPath = TRIM(InstallationDirectory)//"Documentation"
-      ManualPath        = TRIM(DocumentationPath)//DIRSPACER//"manual"//DIRSPACER//"portable_html"
-
-      FileDir = TRIM(DocumentationPath)//DIRSPACER//"Tutorial"//NumberStr//DIRSPACER//"Data files"
+      FileDir = TRIM(DocumentationRoot)//DIRSPACER//"Tutorial"//NumberStr//DIRSPACER//"Data files"
       CALL IOsDirChange(TRIM(FileDir))
       CALL IOsCopyFile('Tutorial_'//NumberStr//'.xye',TRIM(DestineDir)//DIRSPACER)
       CALL IOsCopyFile('Tutorial_'//NumberStr//'.raw',TRIM(DestineDir)//DIRSPACER)
       CALL IOsCopyFile('Tutorial_'//NumberStr//'*.mol2',TRIM(DestineDir)//DIRSPACER)
       CALL IOsCopyFile('Tutorial_'//NumberStr//'*.zmatrix',TRIM(DestineDir)//DIRSPACER)
 
-      CALL IOsDirChange(TRIM(ManualPath))
+      CALL IOsDirChange(TRIM(DocumentationHTMLdirectory))
 
       CALL WHelpFile(' ') ! In case the help file is open already
       CALL WHelpFile(TutorialFileName)

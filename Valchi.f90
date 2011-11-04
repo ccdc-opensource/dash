@@ -372,7 +372,7 @@
       COMMON  /ORDRATM/ TotNumOfAtoms, NumOfHydrogens, NumOfNonHydrogens, OrderedAtm(1:MaxAtm_3)
 
       REAL            COSQS,               SINQS
-      COMMON /CSQSTO/ COSQS(-20:20,3,300), SINQS(-20:20,3,300)
+      COMMON /CSQSTO/ COSQS(-100:100,3,MaxAtm_3), SINQS(-100:100,3,MaxAtm_3)
 
       LOGICAL         IHMINLT0, IKMINLT0, ILMINLT0
       COMMON /CSQLOG/ IHMINLT0, IKMINLT0, ILMINLT0

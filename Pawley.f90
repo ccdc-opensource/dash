@@ -776,6 +776,10 @@
       INTEGER, EXTERNAL :: WRTDSL
       INTEGER LSDI, iDot, I, L1, L4, iDummy, iFile
       CHARACTER*(MaxPathLength) DirName, FileName
+      
+      LOGICAL ELECDI
+      COMMON /USEELE / ELECDI
+      
 
 ! Initialise to error
       CreateSDIFile = 1
@@ -849,6 +853,8 @@
       WRITE(iFile,8160,ERR=999) PAWLEYCHISQ
  8160 FORMAT(' PawleyChiSq ',F10.2)
       IF (Is_SX) WRITE(iFile,*,ERR=999) "Single Crystal"
+      
+      IF (ELECDI) WRITE(iFile,*,ERR=999) "Electron Diffraction"
       CLOSE(iFile)
       CreateSDIFile = 0
       RETURN
