@@ -51,7 +51,7 @@ REM Copy files from dash_rep/dash
     SET EXPORTSPEC=-r %CVSTAG%
 
     %CVSCMD% %EXPORTSPEC% -d %OUTPUTDIR%                          "dash/ExtinctionSymbol.exe"
-!    %CVSCMD% %EXPORTSPEC% -d %OUTPUTDIR%                          "dash/special_positions.exe"
+REM    %CVSCMD% %EXPORTSPEC% -d %OUTPUTDIR%                          "dash/special_positions.exe"
     %CVSCMD% %EXPORTSPEC% -d %OUTPUTDIR%                          "dash/SpaceGroupSymbols.dat"
     %CVSCMD% %EXPORTSPEC% -d %OUTPUTDIR%                          "dash/TOPAS.inc"
     %CVSCMD% %EXPORTSPEC% -d %OUTPUTDIR%                          "dash/RIETAN.cmd"
