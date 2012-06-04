@@ -1,6 +1,5 @@
-# $Id: readexp.tcl,v 1.46 2005/09/13 17:44:33 toby Exp toby $
 # Routines to deal with the .EXP "data structure"
-set expmap(Revision) {$Revision: 1.46 $ $Date: 2005/09/13 17:44:33 $}
+set expmap(Revision) {$Revision: 1.2 $ $Date: 2007-08-31 12:06:14 $}
 
 #  The GSAS data is read from an EXP file.
 #   ... reading an EXP file into an array

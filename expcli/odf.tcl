@@ -1,5 +1,3 @@
-# $Id: odf.tcl,v 1.7 2004/10/04 16:11:47 toby Exp toby $
-
 # Convert a Laue code as used in SPACEGRP to a number, as used in odfchk
 proc LaueCode2number {laueaxis} {
     switch -exact $laueaxis {

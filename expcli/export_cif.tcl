@@ -1,4 +1,3 @@
-# $Id: export_cif.tcl,v 1.2 2007/10/01 13:55:01 dong Exp $
 # set local variables that define the proc to execute and the menu label
 set label "coords-only CIF"
 set action exp2cif
