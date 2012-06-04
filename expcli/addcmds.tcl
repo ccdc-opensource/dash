@@ -1,5 +1,3 @@
-# $Id: addcmds.tcl,v 1.40 2006/03/29 03:47:44 toby Exp toby $
-
 #----------- Add Phase routines ----------------------------------------
 
 proc MakeAddPhaseBox {} {
