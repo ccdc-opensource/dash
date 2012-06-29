@@ -76,8 +76,8 @@ if [ ! -z "$REFINE" ]; then
 fi
 
 if [ ! -z "$LST2CIF" -a -e "$SAMPLE.lst" ]; then
-    	[ -e "$SAMPLE.cif" ] && mv -f "$SAMPLE.cif" "$SAMPLE.cif.BAK"
-    	LST2CIF=$RIETAN
+        [ -e "$SAMPLE.cif" ] && mv -f "$SAMPLE.cif" "$SAMPLE.cif.BAK"
+        LST2CIF=$RIETAN
         "$RIETAN/lst2cif" "$SAMPLE.lst" || quit
 fi
 
@@ -92,7 +92,7 @@ if [ ! -z "$ORFFE" ]; then
         "$RIETAN/orffe" "$SAMPLE.xyz" > "$SAMPLE.dst" || quit
         echo ORFFE Done
     else
-    	echo Cannot find "$SAMPLE.xyz", make sure NDA set correctly
+        echo Cannot find "$SAMPLE.xyz", make sure NDA set correctly
     fi
 fi
 
@@ -101,9 +101,9 @@ if [ ! -z "$REFINE" ]; then
         if [ -e "$RIETAN/gnuplot/bin/gnuplot" ]; then
              [ -e "$SAMPLE.plt" ] && "%RIETAN%gnuplot/bin/gnuplot" /noend "$SAMPLE.plt"
         else
-        	echo
-        	echo Cannot run gnuplot!
-        	echo No such file: "$RIETAN/gnuplot/bin/gnuplot"
+            echo
+            echo Cannot run gnuplot!
+            echo No such file: "$RIETAN/gnuplot/bin/gnuplot"
         fi
     fi
     rm -f "$SAMPLE.sav"
