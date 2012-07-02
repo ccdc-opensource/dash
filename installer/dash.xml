@@ -160,7 +160,7 @@ Please note that DASH 3.2 will be the last version of DASH supported on Windows 
     </postInstallationActionList>
     <enableRollback>1</enableRollback>
     <enableTimestamp>1</enableTimestamp>
-    <outputDirectory>../../distribution/dash</outputDirectory>
+    <outputDirectory>${env(DISTRIBUTION_DIRECTORY)}/dash</outputDirectory>
     <saveRelativePaths>1</saveRelativePaths>
     <startMenuGroupName>CCDC/${product_fullname} ${product_version}</startMenuGroupName>
     <vendor>CCDC</vendor>
@@ -221,7 +221,7 @@ Please note that DASH 3.2 will be the last version of DASH supported on Windows 
                     <platforms>windows</platforms>
                     <distributionFileList>
                         <distributionDirectory allowWildcards="1">
-                            <origin>../../distribution/dash/dash_latest/*</origin>
+                            <origin>${env(DISTRIBUTION_DIRECTORY)}/dash/dash_latest/*</origin>
                         </distributionDirectory>
                     </distributionFileList>
                 </folder>
