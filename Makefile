@@ -335,11 +335,12 @@ DIST          = /local/buildman/tools/qt/qt-4.4.2-linux-deb4-debug/mkspecs/commo
 		/local/buildman/tools/qt/qt-4.4.2-linux-deb4-debug/mkspecs/features/yacc.prf \
 		/local/buildman/tools/qt/qt-4.4.2-linux-deb4-debug/mkspecs/features/lex.prf \
 		dash.pro
-# CSDS_NOV_2011_BRANCH: DO NOT MERGE TO HEAD
-# Dash has stopped building on Linux.
-# Don't really care but do want it checked out to aid with tagging 
+# Dash has stopped building on Linux, so QMAKE_TARGET and TARGET are commented out,
+# to prevent build failures.
+#QMAKE_TARGET  = dash.x
 QMAKE_TARGET  = 
 DESTDIR       = 
+#TARGET        = dash.x
 TARGET        = 
 
 first: all
