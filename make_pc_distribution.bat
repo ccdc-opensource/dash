@@ -35,33 +35,30 @@ if not exist %DASH_EXE% goto noexe
 REM For now, take these from the HEAD branch
 
 SET ZMCONV_EXE=%BUILD_DIRECTORY%makezmatrix\Release\makezmatrix.exe
-SET ZMCONV_ROOT_DIR=%BUILD_DIRECTORY%DASH_3_2_BRANCH
+SET ZMCONV_ROOT_DIR=%BUILD_DIRECTORY%
 
 SET SPECIAL_POSN_EXE=%BUILD_DIRECTORY%utilities\special_positions\release\special_positions.exe
 SET SPECIAL_POSN_ROOT_DIR=%BUILD_DIRECTORY%
 
-SET MERCURY_EXE=%BUILD_DIRECTORY%mercury\mercury_quick_build\Release\mercury_quick_build.exe
-SET MERCURY_ROOT_DIR=%BUILD_DIRECTORY%
+SET MERCURY_FOLDER=%DISTRIBUTION_DIRECTORY%\mercury\latest
 
 REM =================================================================================
-REM Copy files from dash_rep/dash
+REM Copy files from dash project
 
-    SET CVS_REPOSITORY=":ssh;username=%USERNAME%;hostname=basalt:/cvs/dash_rep"
-    SET CVSCMD=%CVS_EXECUTABLE% -d %CVS_REPOSITORY% -Q export
-    SET EXPORTSPEC=-r %CVSTAG%
+    CALL %BUILD_DIRECTORY%\export_command.bat %OUTPUTDIR%                          "dash/ExtinctionSymbol.exe"
+REM        CALL %BUILD_DIRECTORY%\export_command.bat %OUTPUTDIR%                          "dash/special_positions.exe"
+    CALL %BUILD_DIRECTORY%\export_command.bat %OUTPUTDIR%                          "dash/SpaceGroupSymbols.dat"
+    CALL %BUILD_DIRECTORY%\export_command.bat %OUTPUTDIR%                          "dash/TOPAS.inc"
+    CALL %BUILD_DIRECTORY%\export_command.bat %OUTPUTDIR%                          "dash/RIETAN.cmd"
+    CALL %BUILD_DIRECTORY%\export_command.bat %OUTPUTDIR%                          "dash/RIETAN2000.tem"
+    CALL %BUILD_DIRECTORY%\export_command.bat %OUTPUTDIR%                          "dash/RIETANFP.tem"
 
-    %CVSCMD% %EXPORTSPEC% -d %OUTPUTDIR%                          "dash/ExtinctionSymbol.exe"
-REM    %CVSCMD% %EXPORTSPEC% -d %OUTPUTDIR%                          "dash/special_positions.exe"
-    %CVSCMD% %EXPORTSPEC% -d %OUTPUTDIR%                          "dash/SpaceGroupSymbols.dat"
-    %CVSCMD% %EXPORTSPEC% -d %OUTPUTDIR%                          "dash/TOPAS.inc"
-    %CVSCMD% %EXPORTSPEC% -d %OUTPUTDIR%                          "dash/RIETAN.cmd"
-    %CVSCMD% %EXPORTSPEC% -d %OUTPUTDIR%                          "dash/RIETAN2000.tem"
-    %CVSCMD% %EXPORTSPEC% -d %OUTPUTDIR%                          "dash/RIETANFP.tem"
-
-
-    %CVSCMD% %EXPORTSPEC% -d %OUTPUTDIR%\icons                          "dash/icons"
-    %CVSCMD% %EXPORTSPEC% -d "%OUTPUTDIR%\Unsupported Extras"             "dash/Unsupported Extras"
-    %CVSCMD% %EXPORTSPEC% -d %OUTPUTDIR%\expcli                         "dash/expcli"
+    CALL %BUILD_DIRECTORY%\export_command.bat %OUTPUTDIR%\icons                          "dash/icons"
+    MKDIR "%OUTPUTDIR%\Unsupported Extras"
+    CALL %BUILD_DIRECTORY%\export_command.bat "%OUTPUTDIR%\Unsupported Extras"             "dash/Unsupported Extras/MDash.exe"
+    CALL %BUILD_DIRECTORY%\export_command.bat "%OUTPUTDIR%\Unsupported Extras"             "dash/Unsupported Extras/MDASH.pdf"
+    CALL %BUILD_DIRECTORY%\export_command.bat "%OUTPUTDIR%\Unsupported Extras"             "dash/Unsupported Extras/ReadMe.txt"
+    CALL %BUILD_DIRECTORY%\export_command.bat %OUTPUTDIR%\expcli                         "dash/expcli"
 
 REM Make Documentation areas
 
@@ -83,36 +80,36 @@ REM Make Documentation areas
     MKDIR "%OUTPUTDIR%\Documentation\Tutorial6\Data files"
 
 REM copy tutorial files
-    %CVSCMD% %EXPORTSPEC% -d "%OUTPUTDIR%\Documentation\Tutorial1\Data files"    "dash/Tutorial_1.xye"
-    %CVSCMD% %EXPORTSPEC% -d "%OUTPUTDIR%\Documentation\Tutorial1\Data files"    "dash/Tutorial_1.mol2"
+        CALL %BUILD_DIRECTORY%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial1\Data files"    "dash/Tutorial_1.xye"
+        CALL %BUILD_DIRECTORY%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial1\Data files"    "dash/Tutorial_1.mol2"
     
-    %CVSCMD% %EXPORTSPEC% -d "%OUTPUTDIR%\Documentation\Tutorial2\Data files"    "dash/Tutorial_2.xye"
-    %CVSCMD% %EXPORTSPEC% -d "%OUTPUTDIR%\Documentation\Tutorial2\Data Files"    "dash/Tutorial_2.mol2"
+        CALL %BUILD_DIRECTORY%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial2\Data files"    "dash/Tutorial_2.xye"
+        CALL %BUILD_DIRECTORY%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial2\Data Files"    "dash/Tutorial_2.mol2"
     
-    %CVSCMD% %EXPORTSPEC% -d "%OUTPUTDIR%\Documentation\Tutorial3\Data files"    "dash/Tutorial_3.xye"
-    %CVSCMD% %EXPORTSPEC% -d "%OUTPUTDIR%\Documentation\Tutorial3\Data files"    "dash/Tutorial_3-trans.mol2"
-    %CVSCMD% %EXPORTSPEC% -d "%OUTPUTDIR%\Documentation\Tutorial3\Data files"    "dash/Tutorial_3-cis.mol2"
-    %CVSCMD% %EXPORTSPEC% -d "%OUTPUTDIR%\Documentation\Tutorial3\Data files"    "dash/Tutorial_3-ModelA.zmatrix"
-    %CVSCMD% %EXPORTSPEC% -d "%OUTPUTDIR%\Documentation\Tutorial3\Data files"    "dash/Tutorial_3-ModelB.zmatrix"
-    %CVSCMD% %EXPORTSPEC% -d "%OUTPUTDIR%\Documentation\Tutorial3\Data files"    "dash/Tutorial_3-ModelC.zmatrix"
+        CALL %BUILD_DIRECTORY%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial3\Data files"    "dash/Tutorial_3.xye"
+        CALL %BUILD_DIRECTORY%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial3\Data files"    "dash/Tutorial_3-trans.mol2"
+        CALL %BUILD_DIRECTORY%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial3\Data files"    "dash/Tutorial_3-cis.mol2"
+        CALL %BUILD_DIRECTORY%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial3\Data files"    "dash/Tutorial_3-ModelA.zmatrix"
+        CALL %BUILD_DIRECTORY%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial3\Data files"    "dash/Tutorial_3-ModelB.zmatrix"
+        CALL %BUILD_DIRECTORY%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial3\Data files"    "dash/Tutorial_3-ModelC.zmatrix"
 
-    %CVSCMD% %EXPORTSPEC% -d "%OUTPUTDIR%\Documentation\Tutorial4\Data files"    "dash/Tutorial_4.xye"
-    %CVSCMD% %EXPORTSPEC% -d "%OUTPUTDIR%\Documentation\Tutorial4\Data files"    "dash/Tutorial_4-half.mol2"
-    %CVSCMD% %EXPORTSPEC% -d "%OUTPUTDIR%\Documentation\Tutorial4\Data files"    "dash/Tutorial_4-full.mol2"
+        CALL %BUILD_DIRECTORY%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial4\Data files"    "dash/Tutorial_4.xye"
+        CALL %BUILD_DIRECTORY%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial4\Data files"    "dash/Tutorial_4-half.mol2"
+        CALL %BUILD_DIRECTORY%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial4\Data files"    "dash/Tutorial_4-full.mol2"
     
-    %CVSCMD% %EXPORTSPEC% -d "%OUTPUTDIR%\Documentation\Tutorial5\Data files"    "dash/Tutorial_5.xye"
-    %CVSCMD% %EXPORTSPEC% -d "%OUTPUTDIR%\Documentation\Tutorial5\Data files"    "dash/Tutorial_5.mol2"
-    %CVSCMD% %EXPORTSPEC% -d "%OUTPUTDIR%\Documentation\Tutorial5\Data files"    "dash/Tutorial_5-2.mol2"
+        CALL %BUILD_DIRECTORY%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial5\Data files"    "dash/Tutorial_5.xye"
+        CALL %BUILD_DIRECTORY%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial5\Data files"    "dash/Tutorial_5.mol2"
+        CALL %BUILD_DIRECTORY%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial5\Data files"    "dash/Tutorial_5-2.mol2"
         
-    %CVSCMD% %EXPORTSPEC% -d "%OUTPUTDIR%\Documentation\Tutorial6\Data files"    "dash/Tutorial_6.raw"
-    %CVSCMD% %EXPORTSPEC% -d "%OUTPUTDIR%\Documentation\Tutorial6\Data files"    "dash/Tutorial_6-atoms.mol2"
-    %CVSCMD% %EXPORTSPEC% -d "%OUTPUTDIR%\Documentation\Tutorial6\Data files"    "dash/Tutorial_6-frags.mol2"
+        CALL %BUILD_DIRECTORY%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial6\Data files"    "dash/Tutorial_6.raw"
+        CALL %BUILD_DIRECTORY%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial6\Data files"    "dash/Tutorial_6-atoms.mol2"
+        CALL %BUILD_DIRECTORY%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial6\Data files"    "dash/Tutorial_6-frags.mol2"
 
 REM Copy Extinction Symbol Docs
-    %CVSCMD% %EXPORTSPEC% -d "%OUTPUTDIR%\Documentation\Extinction Symbol Documents" "dash/Extinction Symbol Documents/Advanced.asc"
-    %CVSCMD% %EXPORTSPEC% -d "%OUTPUTDIR%\Documentation\Extinction Symbol Documents" "dash/Extinction Symbol Documents/Dopmmm.hkl"
-    %CVSCMD% %EXPORTSPEC% -d "%OUTPUTDIR%\Documentation\Extinction Symbol Documents" "dash/Extinction Symbol Documents/ESMANUAL for DASH.DOC"
-    %CVSCMD% %EXPORTSPEC% -d "%OUTPUTDIR%\Documentation\Extinction Symbol Documents" "dash/Extinction Symbol Documents/parameter_input.asc"
+        CALL %BUILD_DIRECTORY%\export_command.bat "%OUTPUTDIR%\Documentation\Extinction Symbol Documents" "dash/Extinction Symbol Documents/Advanced.asc"
+        CALL %BUILD_DIRECTORY%\export_command.bat "%OUTPUTDIR%\Documentation\Extinction Symbol Documents" "dash/Extinction Symbol Documents/Dopmmm.hkl"
+        CALL %BUILD_DIRECTORY%\export_command.bat "%OUTPUTDIR%\Documentation\Extinction Symbol Documents" "dash/Extinction Symbol Documents/ESMANUAL for DASH.DOC"
+        CALL %BUILD_DIRECTORY%\export_command.bat "%OUTPUTDIR%\Documentation\Extinction Symbol Documents" "dash/Extinction Symbol Documents/parameter_input.asc"
     
     
 REM =================================================================================
@@ -151,38 +148,39 @@ REM  ZMCONV to use same distributed libraries
     
 :start_mercury
 
-if not exist %MERCURY_EXE% goto nomercury
-    set WD=%cd%
-    cd %MERCURY_ROOT_DIR%
-    call copy_qt_exe.bat %MERCURY_EXE% %OUTPUTDIR%\Mercury
-    cd %WD%
-    set BUILD_DIRECTORY=%THIS_BUILD_DIRECTORY%
+if not exist %MERCURY_FOLDER% goto nomercury
+    echo %BUILD_DIRECTORY%\copy_directory.bat "%MERCURY_FOLDER%" "%OUTPUTDIR%\mercury"
+    call %BUILD_DIRECTORY%\copy_directory.bat "%MERCURY_FOLDER%" "%OUTPUTDIR%\mercury"
+
     goto start_dash
 
 :nomercury
-    echo Could not locate the mercury executable %MERCURY_EXE%
+    echo Could not locate the mercury executable %MERCURY_FOLDER%
     echo distribution will be incomplete
     
 :start_dash    
     copy %DASH_EXE% %OUTPUTDIR%
     
 
-	  REM /q doesn't list names of each file copied
+    REM /q doesn't list names of each file copied
     REM /y over-writes any existing files
     REM /k preserves modification dates 
     set XCOPY_ARGS=/Q /Y /K
     
     REM Copy the Intel fortran DLLs
     
-    REM TODO:	Hremove need for ugly hard coded path!!!
-    set INTEL_DLL_FOLDER="C:\Program Files\Intel\Compiler\11.1\046\bin\ia32"
-    XCOPY %XCOPY_ARGS% %INTEL_DLL_FOLDER%\lib*.dll %OUTPUTDIR%
+    REM TODO:  Hremove need for ugly hard coded path!!!
+    set INTEL_DLL_FOLDER="C:\Program Files (x86)\Common Files\Intel\Shared Libraries\redist\ia32\compiler"
+    
+    XCOPY %XCOPY_ARGS% %INTEL_DLL_FOLDER%\libifcoremd.dll %OUTPUTDIR%
+    XCOPY %XCOPY_ARGS% %INTEL_DLL_FOLDER%\libmmd.dll %OUTPUTDIR%
+    XCOPY %XCOPY_ARGS% %INTEL_DLL_FOLDER%\svml_dispmd.dll %OUTPUTDIR%
     call copy_qt_exe.bat %DASH_EXE% %OUTPUTDIR%    
 :start_mercury    
 
     set CURRENT_DIRECTORY=%cd%
     cd %OUTPUTDIR%\Mercury
-    RENAME mercury_quick_build.exe dash_mercury.exe
+    RENAME mercury.exe dash_mercury.exe
     
     cd %CURRENT_DIRECTORY%
     
