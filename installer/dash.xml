@@ -1,7 +1,7 @@
 <project>
     <shortName>DASH</shortName>
     <fullName>DASH</fullName>
-    <version>3.2</version>
+    <version>3.3.1</version>
     <licenseFile>Licence.txt</licenseFile>
     <leftImage>../../cppbuilds_shared/installer/images/EFEMUX01_163x314.png</leftImage>
     <logoImage>../../cppbuilds_shared/installer/images/ccdc_logo_48x48.png</logoImage>
@@ -24,18 +24,6 @@
         <deleteFile>
             <path>${build_project_directory}/installer_generated.lng</path>
         </deleteFile>
-        <runProgram>
-            <abortOnError>0</abortOnError>
-            <explanation>Running signtool</explanation>
-            <program>C:\Program Files\Microsoft Visual Studio 8\SDK\v2.0\Bin\signtool.exe</program>
-            <programArguments>sign /f X:\bardwell\digitalid\newdigitalid.pfx /p ccdcsign /d ${product_shortname} /du http://www.ccdc.cam.ac.uk /t http://timestamp.verisign.com/scripts/timstamp.dll ${installerfilename}</programArguments>
-            <workingDirectory>${project.outputDirectory}</workingDirectory>
-            <ruleList>
-                <platformTest>
-                    <type>windows</type>
-                </platformTest>
-            </ruleList>
-        </runProgram>
     </postBuildActionList>
     <preInstallationActionList>
         <registryGet>
@@ -84,79 +72,6 @@
             <type>REG_SZ</type>
             <value>${installdir}</value>
         </registrySet>
-        <writeFile>
-            <encoding>ascii</encoding>
-            <path>${installdir}\Release-Notes.txt</path>
-            <show>0</show>
-            <text>DASH 3.2 Release Notes
-======================
-
-We are pleased to release DASH 3.2. This version of the program includes 6 
-major new features and several minor changes, all summarised below.
-
-Major New Features
-==================
-
-1. Mogul Distribution Biasing (MDB)
-
-MDB is a technique for biasing the search space using torsion distributions. 
-Unlike the previous method for using Mogul in searching, MDB can be used as a
-'black box'; the user can ask to bias searching to regions suggested by torsion
-angle distributions. The algorithm is such that distributions with little 
-information content do not lead to spurious biasing.  Access to the CSD System
-is required for this feature.
-
-2. Aggressive Early Termination
-
-The program can now be set in a mode where it will search for a local 
-optimisation to a likely minimum more quickly than in previous DASH versions.
-
-3. Automatic Peak Picking for Indexing
-
-There is an option that allows for auto-selection of peaks in a pattern which
-makes selection easier for about 80% of patterns encountered
-
-4. Tethering
-
-Tethers can be applied to atoms during simulated annealing. A bond in a ring 
-can be broken to allow the conformation to be explored whilst retaining the 
-correct distance restraint with a ring-closing tether.  Atoms from different 
-Z-matrices can be tethered, allowing the separation between molecular species
-or ions to be restrained.
-
-5. Increased Pattern Data Point Support
-
-The number of pattern data points supported has been increased to 30,000 from
-15,000 to allow for ultra-fine 2-theta width pattern measurements
-
-6. Increased Reflection Limit
-
-The Pawley fitting reflection limit has been increased to 1,000 reflections 
-from 600
-
-Minor Changes and Bug Fixes
-===========================
-
-
-1. It is now possible to input cell data directly from an ins or cif
-2. It is now possible to read batch files back in to DASH
-3. Z-matrix generation now treats linear torsions as rigid
-4. DASH-TOPAS preferred orientation option in TOPAS inp file is can now be 
-   activated
-5. Overwriting of .inp files for TOPAS: .inp files are now backed up at each
-   step
-6. DASH now saves a temporary output file during simulated annealing so if a
-   power-cut interrupts a run, completed solutions can still be accessed.
-7. In Indexing Step 2: Triclinic is now selected by default
-8. Modal torsion angle selection no longer selects the wrong torsion on occasion
-9. Reaching a negative temperature during the SA causes run termination 
-
-
-Future Support
-==============
-
-Please note that DASH 3.2 will be the last version of DASH supported on Windows 2000</text>
-        </writeFile>
     </postInstallationActionList>
     <enableRollback>1</enableRollback>
     <enableTimestamp>1</enableTimestamp>
@@ -165,6 +80,9 @@ Please note that DASH 3.2 will be the last version of DASH supported on Windows 
     <startMenuGroupName>CCDC/${product_fullname} ${product_version}</startMenuGroupName>
     <vendor>CCDC</vendor>
     <componentList>
+        <include>
+            <file>../../cppbuilds_shared/installer/components/vcredist.xml</file>
+        </include>
         <component>
             <name>default</name>
             <description>Default Component</description>
@@ -273,51 +191,6 @@ Please note that DASH 3.2 will be the last version of DASH supported on Windows 
                 </startMenuFolder>
             </startMenuShortcutList>
         </component>
-        <component>
-            <name>vcredist</name>
-            <description>Visual C runtime</description>
-            <canBeEdited>1</canBeEdited>
-            <detailedDescription>Microsoft Visual C++ run-time files and operating system components that are required by most projects created with Visual C++</detailedDescription>
-            <selected>1</selected>
-            <show>1</show>
-            <folderList>
-                <folder>
-                    <description>New Folder</description>
-                    <destination>${installdir}</destination>
-                    <name>vcfiles</name>
-                    <platforms>all</platforms>
-                    <distributionFileList>
-                        <distributionFile>
-                            <origin>../../../../x_mirror/buildman/tools/vcredist/vcredist_x86.exe</origin>
-                        </distributionFile>
-                    </distributionFileList>
-                </folder>
-            </folderList>
-            <initializationActionList>
-                <componentSelection>
-                    <deselect>vcredist</deselect>
-                    <ruleEvaluationLogic>or</ruleEvaluationLogic>
-                    <select></select>
-                    <ruleList>
-                        <registryTest>
-                            <key>HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\DevDiv\VC\Servicing\9.0\RED\1033</key>
-                            <logic>exists</logic>
-                            <name>Install</name>
-                        </registryTest>
-                        <registryTest>
-                            <key>HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\DevDiv\VC\Servicing\9.0\RED\1033</key>
-                            <logic>exists</logic>
-                            <name>Install</name>
-                        </registryTest>
-                    </ruleList>
-                </componentSelection>
-            </initializationActionList>
-            <shouldPackRuleList>
-                <platformTest>
-                    <type>windows</type>
-                </platformTest>
-            </shouldPackRuleList>
-        </component>
     </componentList>
     <customLanguageFileList>
         <language>
@@ -326,11 +199,6 @@ Please note that DASH 3.2 will be the last version of DASH supported on Windows 
         </language>
     </customLanguageFileList>
     <finalPageActionList>
-        <launchBrowser>
-            <progressText>View DASH 3.2 release notes</progressText>
-            <run>0</run>
-            <url>http://www.ccdc.cam.ac.uk/support/documentation/dash/release_notes/dash-3-2-release-notes.txt</url>
-        </launchBrowser>
         <actionGroup>
             <progressText>Launch DASH</progressText>
             <actionList>
@@ -390,7 +258,7 @@ select the "External DICVOL" option to use the version of DICVOL you have instal
             <preShowPageActionList>
                 <setInstallerVariable>
                     <name>installdir</name>
-                    <value>${platform_install_prefix}/CCDC/DASH 3.2</value>
+                    <value>${platform_install_prefix}/CCDC/DASH 3.3.1</value>
                 </setInstallerVariable>
             </preShowPageActionList>
         </directoryParameter>
