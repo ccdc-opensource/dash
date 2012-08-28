@@ -18,8 +18,6 @@ import xlwt
 import xlutils
 
 # Change this to the xls file that contains the customer data
-# spreadsheet_name = "DASH Keys_160811.xls"
-
 spreadsheet_name = "example.xls"
 
 ##
