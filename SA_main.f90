@@ -34,7 +34,7 @@
       CALL PushActiveWindowID
       tFileHandle = 10
       OPEN(tFileHandle,FILE=TheFileName,ERR=999)
-      WRITE(tFileHandle,'("  Parameters for simulated annealing in ",A8)',ERR=999) ProgramVersion
+      WRITE(tFileHandle,'("  Parameters for simulated annealing in ",A)',ERR=999) ProgramVersion
       CALL Date2String(DateToday(),DateStr,tLen)
       WRITE(tFileHandle,'(A)',ERR=999) "  Date = "//DateStr(1:tLen)
       CALL SelectDASHDialog(IDD_SAW_Page1)
