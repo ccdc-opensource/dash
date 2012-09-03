@@ -67,8 +67,8 @@
 ! Stops the user constantly being reminded that there isn't a path
 ! to a Mogul exe specified
 
-      CHARACTER(8) :: ProgramVersion
-      DATA ProgramVersion / 'DASH 3.3.1' /
+      CHARACTER(10) :: ProgramVersion
+      DATA ProgramVersion / 'DASH 3.3.2' /
 
 ! File information; Names of files used by DASH For I/O
       CHARACTER(MaxPathLength)  DashTicFile
