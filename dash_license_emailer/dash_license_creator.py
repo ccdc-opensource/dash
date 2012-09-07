@@ -19,6 +19,7 @@ import xlutils
 
 # Change this to the xls file that contains the customer data
 spreadsheet_name = "example.xls"
+generation_status = "Test Generation 2012"
 
 ##
 test_email_account = 'cole@ccdc.cam.ac.uk'
@@ -211,7 +212,7 @@ def create_dash_post_data(hostid,
     
     values['initial'] = "LST"
     # If we change here, we can influence what we see in the licence db
-    values['comment'] = "Agreement Number " + agreement_number + " Host " + str(hostid) + " Live Generation 2011"
+    values['comment'] = "Agreement Number " + agreement_number + " Host " + str(hostid) + " " + generation_status 
     return values
 
 def create_dash_licence(hostid,
