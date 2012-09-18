@@ -18,18 +18,24 @@ import xlwt
 import xlutils
 
 # Change this to the xls file that contains the customer data
-spreadsheet_name = "example.xls"
+spreadsheet_name = "DASHKeys_test.xls"
 generation_status = "Test Generation 2012"
 
 ##
-test_email_account = 'cole@ccdc.cam.ac.uk'
+# test_email_account = 'cole@ccdc.cam.ac.uk'
 # Changing the above line to this will mean you get e-mail sent to the accounts as specified in the spreadsheet
-# test_email_account = None
+test_email_account = None
 
 # These should be fine
 smtp_server = 'jeeves.ccdc.cam.ac.uk'
 generation_url =  "http://intranet.ccdc.cam.ac.uk/~bardwell/web_licence_database/dash/dash_lic/validate.php"
 license_text_url = "http://intranet.ccdc.cam.ac.uk/~bardwell/web_licence_database/dash/dash_lic/licence_file.txt"
+
+#generation_url =  "http://intranet.ccdc.cam.ac.uk/licence/dash/dash_lic/validate.php"
+#license_text_url = "http://intranet.ccdc.cam.ac.uk/licence/dash/dash_lic/licence_file.txt"
+
+# Change this each year! - depends on what you have in the spreadsheet, but eXcel can seem to return this for 30/09/2012 ...
+last_years = "41182.0"
 
 def get_email(org):
     if test_email_account != None:
@@ -66,7 +72,7 @@ class LicenseDatum:
         else:
             self.host_id = "ABCDABCD"
             self.version = "3.2"
-            self.expiry = "30/9/2011"
+            self.expiry = "30/9/2012"
         
         self.key     = "Unassigned"
         
@@ -112,8 +118,11 @@ class Organisation:
         most_recent = []
         self.licence_data = []
         for l in current:
-             if l.expiry == "30/9/2011" and string.find(l.host_id,"(old)") == -1:
+             if l.expiry == last_years and string.find(l.host_id,"(old)") == -1:
                  most_recent.append(l)
+             else:
+                print l.expiry
+                print last_years
         self.licence_data = most_recent
 
     def __repr__(self):
@@ -190,7 +199,7 @@ def create_dash_post_data(hostid,
        values['sitenumber'] = ""
 
     values['expirydate'] = "absolute"
-    values['expiryyear'] = 2012
+    values['expiryyear'] = 2013
     values['expirymonth'] = 9
     values['expiryday'] = 30
     values['relativeexpirydate'] = 60
@@ -329,7 +338,7 @@ def write_email_japan(org, out):
     body_text += u"""
  
 Attached key(s) are valid until 30 September 2013. 
-These key(s) are for: DASH 3.0 - 3.2.   
+These key(s) are for: DASH 2.0 - 3.2.   
 
 For CSD users: These keys will not work for DASH 3.3 which is distributed with the CSD system.
 
@@ -487,63 +496,66 @@ def write_emails(organisations,out):
 #        if len(org.licence_data) > 0 and org.country == "Japan":
 #            out.write(str(org) + "\n")
 
-#def write_spreadsheet_for_hiromi(organisations,out):
-#    
-#    def site_line(org):
-#        return 'Site licence key is: %s for site id %s' % ( org.licence_data[0].key, org.licence_data[0].host_id)
-#        
-#    def node_line(org):
-#        ret = "Key for "
-#        for lic in org.licence_data:
-#            v = "%s is %s," % (lic.host_id,lic.key)  
-#            ret = ret + v
-#
-#        # chop off last comma
-#        return ret[:-1]
-#        
-#    out.write('"Agreement#",Org,Name,e-mail,"Site licence or ** installations","S/N and Keys"\n')
-#    for org in organisations:
-#        if len(org.licence_data) > 0 and org.country == "Japan":
-#            if len(org.licence_data) > 1 or len(org.licence_data[0].host_id) > 5:
-#                key_line = node_line(org)
-#                key_info = str(int(org.nlic)) + " installations"
-#            else:
-#                key_line = site_line(org)
-#                key_info = "unlimited"
-#            
-# 
-#            name =  org.site_contact_title + ' ' + org.site_contact_firstname + ' ' + org.site_contact_surname
-#
-#            out.write('"%s","%s","%s","%s","%s","%s"\n' % ( org.agreement_number,org.organisation,name,org.email,key_info,key_line ) )
+def write_spreadsheet_for_hiromi(organisations,out):
+    
+    def site_line(org):
+        return 'Site licence key is: %s for site id %s' % ( org.licence_data[0].key, org.licence_data[0].host_id)
+        
+    def node_line(org):
+        ret = "Key for "
+        for lic in org.licence_data:
+            v = "%s is %s," % (lic.host_id,lic.key)  
+            ret = ret + v
+
+        # chop off last comma
+        return ret[:-1]
+        
+    out.write('"Agreement#",Org,Name,e-mail,"Site licence or ** installations","S/N and Keys"\n')
+    for org in organisations:
+        if len(org.licence_data) > 0 and org.country == "Japan":
+            if len(org.licence_data) > 1 or len(org.licence_data[0].host_id) > 5:
+                key_line = node_line(org)
+                key_info = str(int(org.nlic)) + " installations"
+            else:
+                key_line = site_line(org)
+                key_info = "unlimited"
+            
+ 
+            name =  org.site_contact_title + ' ' + org.site_contact_firstname + ' ' + org.site_contact_surname
+
+            out.write('"%s","%s","%s","%s","%s","%s"\n' % ( org.agreement_number,org.organisation,name,org.email,key_info,key_line ) )
             
 
 # Filter out the junk
 
-#sys.stderr = open("Errors.txt","w")
+sys.stderr = open("Errors.txt","w")
 
-#raw_organisations = read_worksheet(spreadsheet_name)
+raw_organisations = read_worksheet(spreadsheet_name)
 
-#organisations = prune_organisations(raw_organisations)
+organisations = prune_organisations(raw_organisations)
+
+print "I'm going to generate ", len(organisations), "licenses"
 
 # Run the licence generation proces
 # generation process for the pruned organisations
 
-#generate_licences(organisations)
+generate_licences(organisations)
 
 # Write out a csv containing the organisations who are going to get keys
-#orgout = open("pruned_organisations.csv","wb")
-#save_organisations(organisations,orgout)
+
+orgout = open("pruned_organisations.csv","wb")
+save_organisations(organisations,orgout)
 
 # write out all the emails - currently to a text file and send via jeeves 
 
-organisations = [ Organisation() ]
+#organisations = [ Organisation() ]
 
 out = open("emails.txt","wb")
 write_emails(organisations,out)
 
 # Write out a CSV file with Japanese license keys
-#out2 = open("japan.csv","wb")
-#write_spreadsheet_for_hiromi(organisations,out2)
+out2 = open("japan.csv","wb")
+write_spreadsheet_for_hiromi(organisations,out2)
 
 # out3 = open("japan_emails.txt","wb")
 # write_japanese_emails(organisations,out3)
