@@ -42,7 +42,12 @@ def get_email(org):
         return  test_email_account
     else:
         return org.email
-
+        
+def get_return_email(org = None):
+    if org != None and org.country == "Japan":
+        return 'crystal@jaici.or.jp'
+    else:
+        return 'admin@ccdc.cam.ac.uk'
 
 def generate_licences(organisations):
     generate_licences_implementation(organisations)
@@ -359,9 +364,8 @@ For CSD users: These keys will not work for DASH 3.3 which is distributed with t
     for l in f:
         body_text += l
 
-    me = 'admin@ccdc.cam.ac.uk'
+    me = get_return_email(org)
     you = get_email(org)
-    
     return create_email_draft(me,you,'DASH Licence Keys for the next calendar year',body_text)
     
 
@@ -387,7 +391,7 @@ def write_email_row(org, out):
     body_text += "\nThis licence key expires on 30 September 2013. Before the licence expires we will send a replacement\n"
     body_text += "\n\nBest Wishes\n\nLaura Petley\nCCDC"
 
-    me = 'admin@ccdc.cam.ac.uk'
+    me = get_return_email(org)
     you = get_email(org)
     
     #draft.set_unixfrom('admin')
@@ -463,12 +467,16 @@ def write_email( org, out, do_send = 1):
     
     if do_send == 1:
         you = get_email(org)
-        me = 'admin@ccdc.cam.ac.uk'
+        me = get_return_email(org)
         if len(you) > 0:
+            print "Mailing",you,"from",me
             # Now - lets send this via SMTP
-            s = smtplib.SMTP(smtp_server)
-            s.sendmail(me, [you], draft.as_string())
-            s.quit()
+            try:
+                s = smtplib.SMTP(smtp_server)
+                s.sendmail(me, [you], draft.as_string())
+                s.quit()
+            except:
+                sys.stderr.write("Failed to email for %s - exception on sending\n%s" % ( org.agreement_number, sys.exc_info()[0] ) )
         else:
             sys.stderr.write("Failed to email for %s - no email\n" % ( org.agreement_number ) )
 
