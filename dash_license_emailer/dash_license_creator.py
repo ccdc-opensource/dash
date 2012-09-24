@@ -18,11 +18,13 @@ import xlwt
 import xlutils
 
 # Change this to the xls file that contains the customer data
-spreadsheet_name = "DASHKeys_test.xls"
-generation_status = "Test Generation 2012"
+#spreadsheet_name = "JTest.xls"
+spreadsheet_name = "JapanDASHKeys_Renewals_academic.xls"
+#spreadsheet_name = "DASHKeys_2012.xls"
+generation_status = "Final Generation 2012"
 
 ##
-# test_email_account = 'cole@ccdc.cam.ac.uk'
+#test_email_account = 'dave.bardwell@gmail.com'
 # Changing the above line to this will mean you get e-mail sent to the accounts as specified in the spreadsheet
 test_email_account = None
 
@@ -194,7 +196,7 @@ def create_dash_post_data(hostid,
                      agreement_number):
 
     values = {}
-    if len(hostid) < 8:
+    if len(hostid) < 6:
        values['licencetype'] = "site"
        values['nodenumber'] = ""
        values['sitenumber'] = str(hostid)
@@ -267,7 +269,6 @@ def create_dash_licence(hostid,
     # This request fires off the license generator
     response = urllib2.urlopen(request)
     first_page_content = response.read()
-    
 
         
     # Rather crude error checking!!
