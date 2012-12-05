@@ -1797,7 +1797,7 @@
                   IF (EventInfo%X .NE. EventInfo%Y) GOTO 300
                   CALL DASHWGridGetCellCheckBox(IDF_parameter_grid_modal, IFCol, IFRow, ICHK)
                   IsCheckedAlready = ( ( ub(IFRow) - lb(IFRow) ) .LE. 4.01E-5 )
-                  IF ( IsCheckedAlready .NE. ( ICHK .EQ. 1 )) THEN
+                  IF ( IsCheckedAlready .NEQV. ( ICHK .EQ. 1 )) THEN
                    IF (ICHK .EQ. Checked) THEN
                     CALL DASHWGridGetCellReal(IDF_parameter_grid_modal,1,IFRow,xtem)
                     prevflag(IFRow) = ModalFlag(IFRow)

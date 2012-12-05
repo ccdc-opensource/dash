@@ -324,6 +324,7 @@
 
 #ifdef __G95__
       PROCEDURE (CallbackFunc), POINTER :: Handler
+      INTEGER dummy
 #else
 ! 'p' is now a code pointer to the subroutine 'Handler'
       EXTERNAL Handler
@@ -393,12 +394,15 @@
 #ifdef __G95__
             ! Can't directly call a procedure pointed by an arraya element, as the
             ! brackets causing confusion. G95 reports this line as conflicts:
-            ! CALL ChildWinHandler(EventInfo%WIN)%p()
-            Handler => ChildWinHandler(EventInfo%WIN)%p
+            dummy = EventInfo%WIN
+	    !CALL ChildWinHandler(dummy)%p()
+            Handler => ChildWinHandler(dummy)%p
+	    !CALL Handler         
 #else
             p = ChildWinHandler(EventInfo%WIN)
-#endif
             CALL Handler
+#endif
+
             GOTO 10
           ENDIF
         CASE (IDD_Background_Fit)

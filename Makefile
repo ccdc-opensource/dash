@@ -17,18 +17,18 @@ else
 	VERFLAG	= $(DBGFLG)
 endif
 FF            = g95
-RC            = /usr/local/wint/bin/rc
+RC            = $(WINTER)/bin/rc
 CC            = gcc
 CXX           = g++
 DEFINES       = -DCCDC_STD_EXPORT= -DCCDC_THREAD_SUPPORT
 FFLAGS        = -cpp -ffree-line-length-huge -fmod=obj $(VERFLAG) #-fstatic
-RFLAGS        = -cg95 -i/usr/local/wint/include 
+RFLAGS        = -cg95 -i$(WINTER)/include 
 CFLAGS        = -pipe -Wall -W $(DEFINES) $(VERFLAG)
 CXXFLAGS      = -pipe -Wall -W $(DEFINES) $(VERFLAG)
-INCPATH       = -I. -I/usr/local/wint/lib.g95
+INCPATH       = -I. -I$(WINTER)/lib.g95
 LINK          = g95
 LFLAGS        = $(VERFLAG)
-LIBS          = $(SUBLIBS)  -L/usr/local/wint/lib.g95 -lwint -L/usr/X11R6/lib -lXm -lXt -lX11 -lm
+LIBS          = $(SUBLIBS)  -L$(WINTER)/lib.g95 -lwint -Llibs -lXm -lXt -lX11 -lm
 AR            = ar cqs
 RANLIB        = 
 QMAKE         = /local/buildman/tools/qt/qt-4.4.2-linux-deb4-debug/bin/qmake
@@ -63,7 +63,8 @@ SOURCES       = ATMVAR.f90 \
 		Basic_Vectors.f90 \
 		BatchMode.f90 \
 		Ccslmain.f90 \
-		DICVAR.f90 \
+		CCDC_LICENSE_BINDINGS.f90 \
+                DICVAR.f90 \
 		DICVO2.f90 \
 		DICVO3.f90 \
 		DICVO4.f90 \
@@ -193,7 +194,8 @@ RESSRC        = ./PCDruid_resource.RC \
 		res/wizard.bmp \
 		res/WizardWelcome.bmp
 MODS       = obj/atmvar.mod \
-		obj/dicvar.mod \
+		obj/ccdc_license_bindings.mod \
+                obj/dicvar.mod \
 		obj/druid_header.mod \
 		obj/po_var.mod \
 		obj/prjvar.mod \
@@ -213,7 +215,8 @@ OBJECTS       = obj/ATMVAR.o \
 		obj/Basic_Strings.o \
 		obj/Basic_Vectors.o \
 		obj/BatchMode.o \
-		obj/Ccslmain.o \
+		obj/CCDC_LICENSE_BINDINGS.o \
+                obj/Ccslmain.o \
 		obj/DICVAR.o \
 		obj/DICVO2.o \
 		obj/DICVO3.o \
@@ -335,13 +338,10 @@ DIST          = /local/buildman/tools/qt/qt-4.4.2-linux-deb4-debug/mkspecs/commo
 		/local/buildman/tools/qt/qt-4.4.2-linux-deb4-debug/mkspecs/features/yacc.prf \
 		/local/buildman/tools/qt/qt-4.4.2-linux-deb4-debug/mkspecs/features/lex.prf \
 		dash.pro
-# Dash has stopped building on Linux, so QMAKE_TARGET and TARGET are commented out,
-# to prevent build failures.
-#QMAKE_TARGET  = dash.x
-QMAKE_TARGET  = 
+
+QMAKE_TARGET  = dash.x
 DESTDIR       = 
-#TARGET        = dash.x
-TARGET        = 
+TARGET        = dash.x
 
 first: all
 ####### Implicit rules
@@ -412,6 +412,9 @@ compiler_clean:
 
 obj/atmvar.mod obj/ATMVAR.o: ATMVAR.f90 
 	$(FF) -c $(FFLAGS) $(INCPATH) -o obj/ATMVAR.o ATMVAR.f90
+
+obj/ccdc_license_bindings.mod obj/CCDC_LICENSE_BINDINGS.o: CCDC_LICENSE_BINDINGS.f90
+	$(FF) -c $(FFLAGS) $(INCPATH) -o obj/CCDC_LICENSE_BINDINGS.o CCDC_LICENSE_BINDINGS.f90
 
 obj/dicvar.mod obj/DICVAR.o: DICVAR.f90 
 	$(FF) -c $(FFLAGS) $(INCPATH) -o obj/DICVAR.o DICVAR.f90

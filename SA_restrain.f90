@@ -187,7 +187,8 @@
       INTEGER KOM26
       COMMON /SYMDA / SYM(3,3,24), TRANS(3,24), ALAT(3,4), ORIGIN(3), KOM26
 
-      INTEGER,    INTENT (IN   ) :: atomID1, atomID2,expandBySymm
+      INTEGER,    INTENT (IN   ) :: atomID1, atomID2
+      LOGICAL,    INTENT (IN   ) :: expandBySymm
       REAL D
       REAL, INTENT(IN) :: IdealLength
    

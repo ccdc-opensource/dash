@@ -12,6 +12,8 @@
 !*****************************************************************************
 !
       SUBROUTINE CheckLicence
+#ifdef __G95__
+#else
 
       USE WINTERACTER
       USE DRUID_HEADER
@@ -109,13 +111,14 @@
       ENDIF
       CALL UnloadDASHDialog(IDD_License_Dialog)
       CALL UnloadDASHDialog(IDD_LicenceAgreement)
-
+#endif
       END SUBROUTINE CheckLicence
 !
 !*****************************************************************************
 !
       SUBROUTINE FindLicenceFile(Info, TillValid)
-
+#ifdef __G95__
+#else
       USE VARIABLES  
 
       IMPLICIT NONE
@@ -141,7 +144,7 @@
       Info%Valid = -1
       Info%KeyStr = ''
       RETURN
-
+#endif
       END SUBROUTINE FindLicenceFile
 !
 !*****************************************************************************
@@ -192,6 +195,10 @@
       CHARACTER(MaxPathLength) ClString
       TYPE (License_Info) Info
       INTEGER (C_INT) :: USE_GUI
+
+#ifdef __G95__
+      Info%Valid = 1
+#else
 
       INLOOP = .TRUE.
       Info%Valid = 0
@@ -273,7 +280,7 @@
       ENDDO
    99 CALL SelectDASHDialog(IDD_License_Dialog)
       CALL WDialogHide
-
+#endif
       END SUBROUTINE GetLicenceKeyDialogue
 !
 !*****************************************************************************
@@ -345,7 +352,8 @@
 !*****************************************************************************
 !
       INTEGER FUNCTION Get_DiskSerialNumber( lpszDriveName )
-
+#ifdef __G95__
+#else
 #ifdef _WIN32
       USE DFWIN
 #else
@@ -386,12 +394,14 @@
       lpszSerialNumber = GetHostID()
 #endif
       Get_DiskSerialNumber = IEOR(lpszSerialNumber,Mangler)
-
+#endif
       END FUNCTION Get_DiskSerialNumber
 !
 !*****************************************************************************
 !
       SUBROUTINE ShowLicenceAgreement(Info)
+
+
 !
 ! RETURNS : 1 = I do NOT agree
 !           2 = I agree
@@ -410,6 +420,9 @@
       CHARACTER*18 tDateStr
       INTEGER  iOption, tLen
 
+#ifdef __G95__
+       Info%VAlid = 1
+#else
 ! Initialise to failure
       Info%Valid = -5
       NextLine = CHAR(13)//CHAR(10)//CHAR(13)//CHAR(10)
@@ -502,7 +515,7 @@
             RETURN
         END SELECT
       ENDDO
-
+#endif
       END SUBROUTINE ShowLicenceAgreement
 !
 !*****************************************************************************
