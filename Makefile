@@ -21,6 +21,8 @@ RC            = $(WINTER)/bin/rc
 CC            = gcc
 CXX           = g++
 DEFINES       = -DCCDC_STD_EXPORT= -DCCDC_THREAD_SUPPORT
+# Add these to FFLAGS for debugging
+FFDBGFLAGS    = -g -fbounds-check -ftrace=full 
 FFLAGS        = -cpp -ffree-line-length-huge -fmod=obj $(VERFLAG) #-fstatic
 RFLAGS        = -cg95 -i$(WINTER)/include 
 CFLAGS        = -pipe -Wall -W $(DEFINES) $(VERFLAG)
