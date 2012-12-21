@@ -195,10 +195,12 @@
       DO I = 1, NVAR
         DBLEP(I) = XOPT(I)
       ENDDO
+ 
       DO II = 1, N
         I = IP(II)
         DBLEP(I) = P(II)
       ENDDO
+      
       IF (PrefParExists) CALL PO_PRECFC(DBLEP(iPrfPar))
       CALL FCN(DBLEP, CHIANS, 0, .FALSE.)
       SA_FCN = CHIANS
@@ -302,7 +304,7 @@
           ENDDO
           CALL VCOPY(EX,V,N)
           C(1) = SA_FCN(N,V(1,1))
-          CALL SASIMP0(V,DSMALL,C,IR,N)
+          CALL SASIMP0(V,D,C,IR,N)
           CMIN = C(IR(N+1))
         ELSE
           RETURN
@@ -354,7 +356,7 @@
 
       REAL V(N,*), C(*), D(*)
       INTEGER IR(*)
-
+ 
       DO I = 2, N + 1
         CALL VCOPY(V,V(1,I),N)
         V(I-1,I) = V(I-1,I) + D(I-1)
