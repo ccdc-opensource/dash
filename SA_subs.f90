@@ -486,7 +486,9 @@
             VM(I) = 0.01*RULB(I)
           ENDIF
         ENDDO
-        CALL PeekEvent
+	IF ( .NOT. in_batch ) &
+            CALL PeekEvent
+
         IF (WasMinimised) THEN
           F = FOPT          
           WasMinimised = .FALSE.
