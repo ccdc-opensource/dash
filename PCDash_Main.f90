@@ -57,8 +57,8 @@
 
       in_batch = .FALSE.
       BatchLogName = ''
-
       CALL WInitialise(' ')
+      
 
       IF (NARGS() .GT. 1) THEN
         CALL GetArg(1, ArgString)
@@ -73,15 +73,19 @@
           CALL StrUpperCase(StrFileExtension)
           IF (StrFileExtension .EQ. 'DBF   ') THEN
             in_batch = .TRUE.
+	    
             CALL IOsFullPathname(TRIM(ArgString)//'.log',BatchLogName) 
-            CALL ClearBatchLogFile()
+            WRITE(6,*) 'Batch Log File is ',BatchLogName
+	    CALL ClearBatchLogFile()
           ENDIF
         ENDIF
       ENDIF
       first_zm_in_win = 1
 ! Initialise Winteracter
+      if (.NOT. in_batch ) THEN
 
-      CALL InitialiseDASHDialogState
+          CALL InitialiseDASHDialogState
+      ENDIF
 
       CALL GetInstallationDirectory
 ! Check if there are any command line arguments
@@ -114,6 +118,7 @@
       CALL CheckLicence
 
 ! Initialise space group information
+
       CALL PolyFitterInitialise
       CALL InitialiseVariables(in_batch)
 
