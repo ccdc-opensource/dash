@@ -28,16 +28,16 @@ if exist %OUTPUTDIR% goto outputdir_ok
     if not exist %OUTPUTDIR% goto nooutputdir
 
 :outputdir_ok
-    SET DASH_EXE=%BUILD_DIRECTORY%dash\Release\DASH.exe
+    SET DASH_EXE=%BUILD_DIRECTORY%\dash\Release\DASH.exe
 
 if not exist %DASH_EXE% goto noexe
 
 REM For now, take these from the HEAD branch
 
-SET ZMCONV_EXE=%BUILD_DIRECTORY%makezmatrix\Release\makezmatrix.exe
+SET ZMCONV_EXE=%BUILD_DIRECTORY%\makezmatrix\Release\makezmatrix.exe
 SET ZMCONV_ROOT_DIR=%BUILD_DIRECTORY%
 
-SET SPECIAL_POSN_EXE=%BUILD_DIRECTORY%utilities\special_positions\release\special_positions.exe
+SET SPECIAL_POSN_EXE=%BUILD_DIRECTORY%\utilities\special_positions\release\special_positions.exe
 SET SPECIAL_POSN_ROOT_DIR=%BUILD_DIRECTORY%
 
 SET MERCURY_FOLDER=%DISTRIBUTION_DIRECTORY%\mercury\latest
