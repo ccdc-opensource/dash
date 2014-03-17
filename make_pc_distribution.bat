@@ -28,37 +28,37 @@ if exist %OUTPUTDIR% goto outputdir_ok
     if not exist %OUTPUTDIR% goto nooutputdir
 
 :outputdir_ok
-    SET DASH_EXE=%BUILD_DIRECTORY%\dash\Release\DASH.exe
+    SET DASH_EXE=%~dp0Release\DASH.exe
 
 if not exist %DASH_EXE% goto noexe
 
 REM For now, take these from the HEAD branch
 
-SET ZMCONV_EXE=%BUILD_DIRECTORY%\makezmatrix\Release\makezmatrix.exe
-SET ZMCONV_ROOT_DIR=%BUILD_DIRECTORY%
+SET ZMCONV_EXE=%MAINDIR%\makezmatrix\Release\makezmatrix.exe
+SET ZMCONV_ROOT_DIR=%MAINDIR%
 
-SET SPECIAL_POSN_EXE=%BUILD_DIRECTORY%\utilities\special_positions\release\special_positions.exe
-SET SPECIAL_POSN_ROOT_DIR=%BUILD_DIRECTORY%
+SET SPECIAL_POSN_EXE=%MAINDIR%\utilities\special_positions\release\special_positions.exe
+SET SPECIAL_POSN_ROOT_DIR=%MAINDIR%
 
 SET MERCURY_FOLDER=%DISTRIBUTION_DIRECTORY%\mercury\latest
 
 REM =================================================================================
 REM Copy files from dash project
 
-    CALL %BUILD_DIRECTORY%\export_command.bat %OUTPUTDIR%                          "dash/ExtinctionSymbol.exe"
-REM        CALL %BUILD_DIRECTORY%\export_command.bat %OUTPUTDIR%                          "dash/special_positions.exe"
-    CALL %BUILD_DIRECTORY%\export_command.bat %OUTPUTDIR%                          "dash/SpaceGroupSymbols.dat"
-    CALL %BUILD_DIRECTORY%\export_command.bat %OUTPUTDIR%                          "dash/TOPAS.inc"
-    CALL %BUILD_DIRECTORY%\export_command.bat %OUTPUTDIR%                          "dash/RIETAN.cmd"
-    CALL %BUILD_DIRECTORY%\export_command.bat %OUTPUTDIR%                          "dash/RIETAN2000.tem"
-    CALL %BUILD_DIRECTORY%\export_command.bat %OUTPUTDIR%                          "dash/RIETANFP.tem"
+    CALL %MAINDIR%\export_command.bat %OUTPUTDIR%                          "dash/ExtinctionSymbol.exe"
+REM        CALL %MAINDIR%\export_command.bat %OUTPUTDIR%                          "dash/special_positions.exe"
+    CALL %MAINDIR%\export_command.bat %OUTPUTDIR%                          "dash/SpaceGroupSymbols.dat"
+    CALL %MAINDIR%\export_command.bat %OUTPUTDIR%                          "dash/TOPAS.inc"
+    CALL %MAINDIR%\export_command.bat %OUTPUTDIR%                          "dash/RIETAN.cmd"
+    CALL %MAINDIR%\export_command.bat %OUTPUTDIR%                          "dash/RIETAN2000.tem"
+    CALL %MAINDIR%\export_command.bat %OUTPUTDIR%                          "dash/RIETANFP.tem"
 
-    CALL %BUILD_DIRECTORY%\export_command.bat %OUTPUTDIR%\icons                          "dash/icons"
+    CALL %MAINDIR%\export_command.bat %OUTPUTDIR%\icons                          "dash/icons"
     MKDIR "%OUTPUTDIR%\Unsupported Extras"
-    CALL %BUILD_DIRECTORY%\export_command.bat "%OUTPUTDIR%\Unsupported Extras"             "dash/Unsupported Extras/MDash.exe"
-    CALL %BUILD_DIRECTORY%\export_command.bat "%OUTPUTDIR%\Unsupported Extras"             "dash/Unsupported Extras/MDASH.pdf"
-    CALL %BUILD_DIRECTORY%\export_command.bat "%OUTPUTDIR%\Unsupported Extras"             "dash/Unsupported Extras/ReadMe.txt"
-    CALL %BUILD_DIRECTORY%\export_command.bat %OUTPUTDIR%\expcli                         "dash/expcli"
+    CALL %MAINDIR%\export_command.bat "%OUTPUTDIR%\Unsupported Extras"             "dash/Unsupported Extras/MDash.exe"
+    CALL %MAINDIR%\export_command.bat "%OUTPUTDIR%\Unsupported Extras"             "dash/Unsupported Extras/MDASH.pdf"
+    CALL %MAINDIR%\export_command.bat "%OUTPUTDIR%\Unsupported Extras"             "dash/Unsupported Extras/ReadMe.txt"
+    CALL %MAINDIR%\export_command.bat %OUTPUTDIR%\expcli                         "dash/expcli"
 
 REM Make Documentation areas
 
@@ -80,36 +80,36 @@ REM Make Documentation areas
     MKDIR "%OUTPUTDIR%\Documentation\Tutorial6\Data files"
 
 REM copy tutorial files
-        CALL %BUILD_DIRECTORY%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial1\Data files"    "dash/Tutorial_1.xye"
-        CALL %BUILD_DIRECTORY%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial1\Data files"    "dash/Tutorial_1.mol2"
+        CALL %MAINDIR%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial1\Data files"    "dash/Tutorial_1.xye"
+        CALL %MAINDIR%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial1\Data files"    "dash/Tutorial_1.mol2"
     
-        CALL %BUILD_DIRECTORY%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial2\Data files"    "dash/Tutorial_2.xye"
-        CALL %BUILD_DIRECTORY%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial2\Data Files"    "dash/Tutorial_2.mol2"
+        CALL %MAINDIR%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial2\Data files"    "dash/Tutorial_2.xye"
+        CALL %MAINDIR%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial2\Data Files"    "dash/Tutorial_2.mol2"
     
-        CALL %BUILD_DIRECTORY%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial3\Data files"    "dash/Tutorial_3.xye"
-        CALL %BUILD_DIRECTORY%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial3\Data files"    "dash/Tutorial_3-trans.mol2"
-        CALL %BUILD_DIRECTORY%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial3\Data files"    "dash/Tutorial_3-cis.mol2"
-        CALL %BUILD_DIRECTORY%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial3\Data files"    "dash/Tutorial_3-ModelA.zmatrix"
-        CALL %BUILD_DIRECTORY%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial3\Data files"    "dash/Tutorial_3-ModelB.zmatrix"
-        CALL %BUILD_DIRECTORY%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial3\Data files"    "dash/Tutorial_3-ModelC.zmatrix"
+        CALL %MAINDIR%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial3\Data files"    "dash/Tutorial_3.xye"
+        CALL %MAINDIR%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial3\Data files"    "dash/Tutorial_3-trans.mol2"
+        CALL %MAINDIR%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial3\Data files"    "dash/Tutorial_3-cis.mol2"
+        CALL %MAINDIR%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial3\Data files"    "dash/Tutorial_3-ModelA.zmatrix"
+        CALL %MAINDIR%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial3\Data files"    "dash/Tutorial_3-ModelB.zmatrix"
+        CALL %MAINDIR%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial3\Data files"    "dash/Tutorial_3-ModelC.zmatrix"
 
-        CALL %BUILD_DIRECTORY%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial4\Data files"    "dash/Tutorial_4.xye"
-        CALL %BUILD_DIRECTORY%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial4\Data files"    "dash/Tutorial_4-half.mol2"
-        CALL %BUILD_DIRECTORY%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial4\Data files"    "dash/Tutorial_4-full.mol2"
+        CALL %MAINDIR%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial4\Data files"    "dash/Tutorial_4.xye"
+        CALL %MAINDIR%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial4\Data files"    "dash/Tutorial_4-half.mol2"
+        CALL %MAINDIR%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial4\Data files"    "dash/Tutorial_4-full.mol2"
     
-        CALL %BUILD_DIRECTORY%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial5\Data files"    "dash/Tutorial_5.xye"
-        CALL %BUILD_DIRECTORY%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial5\Data files"    "dash/Tutorial_5.mol2"
-        CALL %BUILD_DIRECTORY%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial5\Data files"    "dash/Tutorial_5-2.mol2"
+        CALL %MAINDIR%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial5\Data files"    "dash/Tutorial_5.xye"
+        CALL %MAINDIR%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial5\Data files"    "dash/Tutorial_5.mol2"
+        CALL %MAINDIR%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial5\Data files"    "dash/Tutorial_5-2.mol2"
         
-        CALL %BUILD_DIRECTORY%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial6\Data files"    "dash/Tutorial_6.raw"
-        CALL %BUILD_DIRECTORY%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial6\Data files"    "dash/Tutorial_6-atoms.mol2"
-        CALL %BUILD_DIRECTORY%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial6\Data files"    "dash/Tutorial_6-frags.mol2"
+        CALL %MAINDIR%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial6\Data files"    "dash/Tutorial_6.raw"
+        CALL %MAINDIR%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial6\Data files"    "dash/Tutorial_6-atoms.mol2"
+        CALL %MAINDIR%\export_command.bat "%OUTPUTDIR%\Documentation\Tutorial6\Data files"    "dash/Tutorial_6-frags.mol2"
 
 REM Copy Extinction Symbol Docs
-        CALL %BUILD_DIRECTORY%\export_command.bat "%OUTPUTDIR%\Documentation\Extinction Symbol Documents" "dash/Extinction Symbol Documents/Advanced.asc"
-        CALL %BUILD_DIRECTORY%\export_command.bat "%OUTPUTDIR%\Documentation\Extinction Symbol Documents" "dash/Extinction Symbol Documents/Dopmmm.hkl"
-        CALL %BUILD_DIRECTORY%\export_command.bat "%OUTPUTDIR%\Documentation\Extinction Symbol Documents" "dash/Extinction Symbol Documents/ESMANUAL for DASH.DOC"
-        CALL %BUILD_DIRECTORY%\export_command.bat "%OUTPUTDIR%\Documentation\Extinction Symbol Documents" "dash/Extinction Symbol Documents/parameter_input.asc"
+        CALL %MAINDIR%\export_command.bat "%OUTPUTDIR%\Documentation\Extinction Symbol Documents" "dash/Extinction Symbol Documents/Advanced.asc"
+        CALL %MAINDIR%\export_command.bat "%OUTPUTDIR%\Documentation\Extinction Symbol Documents" "dash/Extinction Symbol Documents/Dopmmm.hkl"
+        CALL %MAINDIR%\export_command.bat "%OUTPUTDIR%\Documentation\Extinction Symbol Documents" "dash/Extinction Symbol Documents/ESMANUAL for DASH.DOC"
+        CALL %MAINDIR%\export_command.bat "%OUTPUTDIR%\Documentation\Extinction Symbol Documents" "dash/Extinction Symbol Documents/parameter_input.asc"
     
     
 REM =================================================================================
@@ -129,7 +129,7 @@ REM == TODO: Extinction Symbol Docs ==
 REM =================================================================================
 REM Copy files from makezmatrix
 
-set THIS_BUILD_DIRECTORY=%BUILD_DIRECTORY%
+set THIS_BUILD_DIRECTORY=%MAINDIR%
 
 if not exist %ZMCONV_EXE% goto nozmconv
 
@@ -140,7 +140,6 @@ REM  put the special positions exe in the same place as
 REM  ZMCONV to use same distributed libraries
     COPY %SPECIAL_POSN_EXE% %OUTPUTDIR%\zmconv 
     cd %WD%
-    set BUILD_DIRECTORY=%THIS_BUILD_DIRECTORY%
     goto start_mercury
 :nozmconv    
     echo Could not locate the zmconv executable %ZMCONV_EXE%
@@ -149,8 +148,8 @@ REM  ZMCONV to use same distributed libraries
 :start_mercury
 
 if not exist %MERCURY_FOLDER% goto nomercury
-    echo %BUILD_DIRECTORY%\copy_directory.bat "%MERCURY_FOLDER%" "%OUTPUTDIR%\mercury"
-    call %BUILD_DIRECTORY%\copy_directory.bat "%MERCURY_FOLDER%" "%OUTPUTDIR%\mercury"
+    echo %MAINDIR%\copy_directory.bat "%MERCURY_FOLDER%" "%OUTPUTDIR%\mercury"
+    call %MAINDIR%\copy_directory.bat "%MERCURY_FOLDER%" "%OUTPUTDIR%\mercury"
 
     goto start_dash
 
