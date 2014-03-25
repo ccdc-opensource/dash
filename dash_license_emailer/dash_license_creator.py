@@ -59,7 +59,7 @@ def generate_licences(organisations):
 ###########################################################################################
 import types
 def cell_to_string(value):
-        if type(value) == types.FloatType:
+        if isinstance(value, types.FloatType):
             return str(value)
         else:
             return value.encode('utf8')
@@ -69,7 +69,7 @@ class LicenseDatum:
     def __init__(self, sheet, row):
         if sheet != None and row != None:
             v = sheet.cell(row, 6).value
-            if type(v) == types.FloatType:
+            if isinstance(v, types.FloatType):
                 self.host_id = str(int(v))
             else:
                 self.host_id = v.encode('utf8')
