@@ -1,6 +1,7 @@
 """
 Read DASH spreadsheet and filter out superfluous data
 """
+from __future__ import print_function
 import string
 import urllib
 import urllib2
@@ -128,8 +129,8 @@ class Organisation:
              if l.expiry == last_years and l.host_id.find("(old)") == -1:
                  most_recent.append(l)
              else:
-                print l.expiry
-                print last_years
+                print(l.expiry)
+                print(last_years)
         self.licence_data = most_recent
 
     def __repr__(self):
@@ -327,7 +328,7 @@ def generate_licences_implementation(organisations):
             if licence_key == None:
                 sys.stderr.write("Failed for %s with host id %s" % (org.agreement_number, licence.host_id) + "\n")
             else:
-                print "Success %s with host id %s : key returned - %s" % (org.agreement_number, licence.host_id, licence_key)
+                print("Success %s with host id %s : key returned - %s" % (org.agreement_number, licence.host_id, licence_key))
             licence.key = licence_key
             time.sleep(0.5)
 
@@ -470,7 +471,7 @@ def write_email( org, out, do_send = 1):
         you = get_email(org)
         me = get_return_email(org)
         if len(you) > 0:
-            print "Mailing", you, "from", me
+            print("Mailing", you, "from", me)
             # Now - lets send this via SMTP
             try:
                 s = smtplib.SMTP(smtp_server)
@@ -543,7 +544,7 @@ raw_organisations = read_worksheet(spreadsheet_name)
 
 organisations = prune_organisations(raw_organisations)
 
-print "I'm going to generate ", len(organisations), "licenses"
+print("I'm going to generate ", len(organisations), "licenses")
 
 # Run the licence generation proces
 # generation process for the pruned organisations
