@@ -1,4 +1,4 @@
-from __future__ import print_function
+from __future__ import division, print_function
 import imaplib
 import time
 import email.message
