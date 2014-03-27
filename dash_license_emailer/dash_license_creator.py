@@ -4,8 +4,7 @@ Read DASH spreadsheet and filter out superfluous data
 from __future__ import division, absolute_import, print_function
 from six import text_type
 import string
-import urllib
-import urllib2
+from six.moves import urllib
 import base64
 import sys
 import email
@@ -258,8 +257,8 @@ def create_dash_licence(hostid,
                      email,
                      agreement_number)
 
-    data = urllib.urlencode(values)
-    request = urllib2.Request(generation_url, data)
+    data = urllib.parse.urlencode(values)
+    request = urllib.request.Request(generation_url, data)
     
     base64string = base64.encodestring(
                 '%s:%s' % (username, password))[:-1]
@@ -268,7 +267,7 @@ def create_dash_licence(hostid,
     request.add_header("Authorization", authheader)
 
     # This request fires off the license generator
-    response = urllib2.urlopen(request)
+    response = urllib.request.urlopen(request)
     first_page_content = response.read()
 
         
@@ -297,12 +296,12 @@ def create_dash_licence(hostid,
         
     # This request reads back licence_file.txt from the web server which was created in the previous
     # request
-    request = urllib2.Request(license_text_url)
+    request = urllib.request.Request(license_text_url)
     request.add_header("Authorization", authheader)
     try:
-        response = urllib2.urlopen(request)
+        response = urllib.request.urlopen(request)
         return response.read()
-    except urllib2.HTTPError: # This ususally means file not found, which means the first request failed
+    except urllib.error.HTTPError: # This ususally means file not found, which means the first request failed
         sys.stderr.write("Other failure\n")
         sys.stderr.writelines(first_page_content)
         return None
