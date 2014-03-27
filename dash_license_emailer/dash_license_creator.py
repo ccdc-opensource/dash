@@ -1,7 +1,7 @@
 """
 Read DASH spreadsheet and filter out superfluous data
 """
-from __future__ import division, print_function
+from __future__ import division, absolute_import, print_function
 import string
 import urllib
 import urllib2
