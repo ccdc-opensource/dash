@@ -125,7 +125,7 @@ class Organisation:
         most_recent = []
         self.licence_data = []
         for l in current:
-             if l.expiry == last_years and string.find(l.host_id, "(old)") == -1:
+             if l.expiry == last_years and l.host_id.find("(old)") == -1:
                  most_recent.append(l)
              else:
                 print l.expiry
