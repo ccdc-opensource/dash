@@ -653,6 +653,7 @@
       ENDIF
       ExtensionStr = tInputFile(iPos+1:iLen)
       CALL ILowerCase(ExtensionStr)
+      fmt = '        '
       SELECT CASE (ExtensionStr)
         CASE ('cif ')
           fmt = '-cif'
@@ -662,7 +663,7 @@
           tInputFile = tInputFile(1:iLen-4)//'mol2'
           iLen = LEN_TRIM(tInputFile)
           fmt = '-mol2'
-        CASE ('res ')
+        CASE ('res ', 'ins ')
           fmt = '-res'
         CASE ('xyz ')
           fmt = '-xyz'
@@ -672,6 +673,9 @@
           fmt = '-mol2'
         CASE ('mol ','mdl ')
           fmt = '-mol'
+        CASE DEFAULT
+          CALL ErrorMessage("Error occurred when converting crystal structure file "//ExtensionStr(1:LEN_TRIM(ExtensionStr))//" is an unrecognised file extension")
+          GOTO 200
       END SELECT
 ! Run silently, 
       CALL IOSDeleteFile('MakeZmatrix.log')
