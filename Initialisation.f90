@@ -579,6 +579,7 @@
       ENDIF
 
       CALL Set_AutoLocalMinimisation(.TRUE.)
+      CALL Set_SimplexOnly(.FALSE.)
       CALL Set_UseHydrogensDuringAutoLocalMinimise(.TRUE.)
       CALL Set_UseCrystallographicCoM(.TRUE.)
       CALL Set_AutoAlign(.TRUE.)
