@@ -121,6 +121,9 @@
                                         TRIM(InstallationDirectory)//'TOPAS.inc"'
       ! Ideally, we need to figure out if penalties_weighting_K1 can be made local to the "str" keyword.
       WRITE(hFileTOPAS, '(A)', ERR=999) 'penalties_weighting_K1 5'
+      
+      ! Ideally this next line would account for topas4/5 distinction 
+      ! but it is commented out so should not hurt either way
       WRITE(hFileTOPAS, '(A)', ERR=999) "'do_errors"
       WRITE(hFileTOPAS, '(A)', ERR=999) 'r_exp 1.0'
       WRITE(hFileTOPAS, '(A)', ERR=999) 'r_exp_dash 1.0'
@@ -540,9 +543,7 @@
       ENDIF
       GOTO 10
    40 CLOSE(hOutputFile)
-!      IF ( DASHWDialogGetCheckBoxLogical(IDC_IncludeESDs) ) THEN
-!        WRITE(hFileTOPAS, '(A)', ERR=999) 'do_errors'
-!      ENDIF
+
       WriteTOPASPawleyAnisotropic = 0
       CLOSE(hFileTOPAS)
       RETURN
@@ -753,12 +754,24 @@
       ELSE IF ( (word_len .EQ. 19) .AND. (word(1:19) .EQ. 'OUT_POWDERDATABLOCK') ) THEN
         ! Do nothing: it will be added at the end if necessary
       ELSE IF ( ((word_len .EQ. 9) .AND. (word(1:9) .EQ. 'DO_ERRORS')) &
-          .OR.  ((word_len .EQ. 10) .AND. (word(1:10) .EQ. "'DO_ERRORS")) ) THEN
+          .OR.  ((word_len .EQ. 10) .AND. (word(1:10) .EQ. "'DO_ERRORS")) &
+          .OR.  ((word_len .EQ. 27) .AND. (word(1:27) .EQ. 'DO_ERRORS_INCLUDE_PENALTIES')) &
+          .OR.  ((word_len .EQ. 28) .AND. (word(1:28) .EQ. "'DO_ERRORS_INCLUDE_PENALTIES")) ) THEN
+        
         IF ( DASHWDialogGetCheckBoxLogical(IDC_IncludeESDs) ) THEN
-          WRITE(hFileTOPAS, '(A)', ERR=999) 'do_errors'
+          IF ( DASHWDialogGetCheckBoxLogical(IDC_topas5_format_check) ) THEN
+             WRITE(hFileTOPAS, '(A)', ERR=999) 'do_errors_include_penalties'
+          ELSE
+             WRITE(hFileTOPAS, '(A)', ERR=999) 'do_errors'
+          ENDIF
         ELSE
-          WRITE(hFileTOPAS, '(A)', ERR=999) "'do_errors"
+          IF ( DASHWDialogGetCheckBoxLogical(IDC_topas5_format_check) ) THEN
+             WRITE(hFileTOPAS, '(A)', ERR=999) "'do_errors_include_penalties"
+          ELSE
+             WRITE(hFileTOPAS, '(A)', ERR=999) "'do_errors"
+          ENDIF
         ENDIF
+        
       ELSE IF ( (word_len .EQ. 3) .AND. (word(1:3) .EQ. 'PRM') ) THEN
         ! Need to check if this is the "prm sh_scale 1.0 min 0.0001" line.
         iPos = StrFind(tLine, iLen, 'sh_scale', 8)
