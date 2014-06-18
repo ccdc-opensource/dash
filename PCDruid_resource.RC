@@ -8,7 +8,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 18/Jun/2014 14:28:56
+// Modified : 18/Jun/2014 14:48:32
 //
 ///////////////////////////////////////////////////
 //
@@ -754,6 +754,7 @@
 #define IDF_TmpFileNameLabel             1584
 #define IDF_CCDCLicence                  1586
 #define IDF_SimplexOnly_Check            1587
+#define IDC_topas5_format_check          1588
 
 ///////////////////////////////////////////////////
 //
@@ -3568,6 +3569,7 @@ BEGIN
     CONTROL "&Restore",IDB_RESTORE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   90,  135,   35,   14
     CONTROL "saved .inp and .out files",IDF_LABEL4,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  127,  136,   78,    9
     CONTROL "&View",IDB_View,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  205,  135,   35,   14
+    CONTROL "Write Topas 5.0 format files",IDC_topas5_format_check,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   90,  150,  144,   12
 END
 
 IDD_SAW_Page7_TOPAS RCDATA
@@ -3584,6 +3586,7 @@ BEGIN
 " 1449 0 \n"
 " 1563 0 \n"
 " 1448 1 \n"
+" 1588 0 \n"
 "[Ranges] \n"
 " 1399               0         9999999 \n"
 " 1536               0      2147483647 \n"
