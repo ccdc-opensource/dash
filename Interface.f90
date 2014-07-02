@@ -411,6 +411,38 @@
         CALL PopActiveWindowID
       ENDIF
       END SUBROUTINE Set_AutoLocalMinimisation
+    
+    
+      SUBROUTINE Set_SimplexOnly(TheValue)
+
+! When .TRUE., each run in a multi run ends with a local minimisation
+
+      USE WINTERACTER
+      USE DRUID_HEADER
+
+      IMPLICIT NONE
+
+      LOGICAL, INTENT (IN   ) :: TheValue
+
+      LOGICAL         in_batch
+      COMMON /BATEXE/ in_batch
+
+      LOGICAL         SimplexOnly
+      COMMON /SIMPONLY/ SimplexOnly
+      
+      IF ( .NOT. IN_BATCH ) THEN
+        CALL PushActiveWindowID
+        CALL SelectDASHDialog(IDD_SA_input4)
+        CALL WDialogPutCheckBoxLogical(IDF_SimplexOnly_Check, TheValue)
+      ENDIF
+
+      SimplexOnly = TheValue
+
+      IF (.NOT. IN_BATCH ) THEN
+        CALL PopActiveWindowID
+      ENDIF
+      
+      END SUBROUTINE Set_SimplexOnly    
 !
 !*****************************************************************************
 !
