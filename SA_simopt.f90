@@ -143,6 +143,7 @@
             CALL SelectDASHDialog(IDD_Summary)
             CALL WGridPutCellReal(IDF_SA_Summary, 4, Curr_SA_Run, CHIPROBEST, '(F7.2)')
             CALL WGridPutCellReal(IDF_SA_Summary, 5, Curr_SA_Run, FOPT, '(F7.2)')
+            Call PeekEvent
     !U      CALL SelectDASHDialog(IDD_Parameter_Status)
     !U      DO i = 1, nvar
     !U        CALL WGridPutCellReal(IDF_CPL_grid,1,i,xopt(i),'(F12.5)')
