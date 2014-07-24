@@ -88,6 +88,10 @@
       INTEGER                                                                    HydrogenTreatment
       COMMON /SAOPT/  AutoMinimise, UseHAutoMin, RandomInitVal, UseCCoM, LAlign, HydrogenTreatment
 
+      LOGICAL         SimplexOnly
+      COMMON /SIMPONLY/ SimplexOnly
+
+      
       REAL             PAWLEYCHISQ, RWPOBS, RWPEXP
       COMMON /PRCHISQ/ PAWLEYCHISQ, RWPOBS, RWPEXP
 
@@ -179,6 +183,7 @@
         ENDIF
       CALL OpenChiSqPlotWindow
       Resume_SA = .FALSE.
+
 ! ####################################
 !   Starting point for multiple runs
 ! ####################################
@@ -198,7 +203,7 @@
                                               ' of '//CMRuns(1:LEN_TRIM(CMRuns)))
         CALL PopActiveWindowID
       ENDIF
-
+      
       MAKET0 = (T0.LE.0.0)  ! T0 is estimated each run of a multirun
       IF (MAKET0) THEN
         T = 100000.0
@@ -256,12 +261,15 @@
         NumTrialsPar(I) = 0
       ENDDO
 
+      
+
 ! ##########################################
 !   Starting point for multiple iterations
 ! ##########################################
-  100 CONTINUE
-  
+  100 CONTINUE  
       Curr_SA_Iteration = Curr_SA_Iteration + 1
+      IF ( .NOT. SimplexOnly ) THEN
+          
       ! Next line is wrong for single crystal, which should use the intensity chi-sqrd
       ProgressIndicator = 1.0 -( (CHIPROBEST - (ChiMult*PAWLEYCHISQ)) / (InitialProChiSqrd - (ChiMult*PAWLEYCHISQ)))
       CALL SetSpringWeight( ProgressIndicator )
@@ -283,6 +291,8 @@
 ! ##########################################
 !   Starting point for multiple moves
 ! ##########################################
+      
+      
       DO M = 1, NT
         DO J = 1, NS
           DO IH = 1, NPAR
@@ -486,13 +496,15 @@
             VM(I) = 0.01*RULB(I)
           ENDIF
         ENDDO
-	IF ( .NOT. in_batch ) &
+        
+        IF ( .NOT. in_batch ) &
             CALL PeekEvent
 
         IF (WasMinimised) THEN
           F = FOPT          
           WasMinimised = .FALSE.
         ENDIF
+        
         DO WHILE (iMyExit .EQ. 6) ! Pause
           CALL GetEvent
           IF (EventInfo%WIN .EQ. IDD_Pause) THEN
@@ -565,10 +577,12 @@
           GOTO 100 ! Next iteration
       ENDIF
       
+      ENDIF ! Simplex only test
+      
 ! End of a run in a multi-run. This is the place for a final local minimisation
       NumOf_SA_Runs = Curr_SA_Run
 ! Get AutoLocalMinimisation from the Configuration Window
-      IF ((iMyExit .NE. 5) .AND. AutoMinimise) THEN
+      IF ( (iMyExit .NE. 5) .AND. ( AutoMinimise .OR. SimplexOnly ) ) THEN
         CALL LocalMinimise(.TRUE., .FALSE.)
         CALL ChiSqPlot_UpdateIterAndChiProBest(Curr_SA_Iteration)
       ENDIF

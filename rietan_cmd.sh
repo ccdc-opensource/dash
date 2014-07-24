@@ -4,7 +4,7 @@
 
 usage()
 {
-    echo Usage: `basename $0` Path_to_RIETAN.exe ins_File \[ task-code \]
+    echo Usage: `basename "$0"` Path_to_RIETAN.exe ins_File \[ task-code \]
     echo
     echo "  task-code: 0 rietan; 1 lst2cif; 2 rietan+orffe; others rietan+lst2cif"
     echo
@@ -31,16 +31,16 @@ match()
 
 [ $# -lt 2 ] && quit show_usage
 
-RIETANEXE=$1; shift
-SAMPLE=$1; shift
-[ -e $RIETANEXE -a -e $SAMPLE ] || quit show_usage
+RIETANEXE="$1"; shift
+SAMPLE="$1"; shift
+[ -e "$RIETANEXE" -a -e "$SAMPLE" ] || quit show_usage
 
-RIETAN=`dirname $RIETANEXE`
-export RIETAN=$RIETAN
+RIETAN=`dirname "$RIETANEXE"`
+export RIETAN="$RIETAN"
 
-cd `dirname $SAMPLE`
-#SAMPLE=`basename ${SAMPLE/%.???/}`
-SAMPLE=`basename $SAMPLE | sed -e 's/\.[^.]*$//' `
+cd "`dirname "$SAMPLE"`"
+#SAMPLE=`basename "${SAMPLE/%.???/}"`
+SAMPLE=`basename "$SAMPLE" | sed -e 's/\.[^.]*$//' `
 
 REFINE=1
 LST2CIF=1
