@@ -1,4 +1,4 @@
-! Winteracter resource identifiers. Created : 09/Aug/2011 13:36:19
+! Winteracter resource identifiers. Created : 18/Jun/2014 14:48:32
 !
       MODULE Druid_Header
       IMPLICIT NONE
@@ -731,4 +731,6 @@
       INTEGER, PARAMETER :: IDF_TmpFileName                 =  1574
       INTEGER, PARAMETER :: IDF_TmpFileNameLabel            =  1584
       INTEGER, PARAMETER :: IDF_CCDCLicence                 =  1586
+      INTEGER, PARAMETER :: IDF_SimplexOnly_Check           =  1587
+      INTEGER, PARAMETER :: IDC_topas5_format_check         =  1588
       END MODULE Druid_Header

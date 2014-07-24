@@ -8,7 +8,7 @@
 //
 // Winteracter resource script. 
 //
-// Modified : 09/Aug/2011 13:36:19
+// Modified : 18/Jun/2014 14:48:32
 //
 ///////////////////////////////////////////////////
 //
@@ -753,6 +753,8 @@
 #define IDF_TmpFileName                  1574
 #define IDF_TmpFileNameLabel             1584
 #define IDF_CCDCLicence                  1586
+#define IDF_SimplexOnly_Check            1587
+#define IDC_topas5_format_check          1588
 
 ///////////////////////////////////////////////////
 //
@@ -822,8 +824,6 @@ BEGIN
 "  107  Cell Parameters \n"
 "  106  Peak &Widths \n"
 "  127  Pawley / SA \n"
-"[Ranges] \n"
-"[Formats] \n"
 ,0
 END
 
@@ -1028,8 +1028,6 @@ BEGIN
 "  114  HMSL \n"
 "  115  Equations \n"
 "  163  FWHM \n"
-"[Ranges] \n"
-"[Formats] \n"
 ,0
 END
 
@@ -1328,8 +1326,6 @@ BEGIN
 " 1254 0 \n"
 " 1255 0 \n"
 " 1549 0 \n"
-"[Ranges] \n"
-"[Formats] \n"
 ,0
 END
 
@@ -1410,10 +1406,8 @@ END
 
 IDD_PW_Page3 RCDATA
 BEGIN
-"[Ranges] \n"
 "[Lengths] \n"
 " 1263   255 \n"
-"[Formats] \n"
 ,0
 END
 
@@ -1664,7 +1658,6 @@ BEGIN
 "[Checks] \n"
 " 1359 0 \n"
 "[Ranges] \n"
-"[Formats] \n"
 ,0
 END
 
@@ -1691,7 +1684,6 @@ BEGIN
 "[Ranges] \n"
 " 1211               1             100 \n"
 " 1212               1             500 \n"
-"[Formats] \n"
 ,0
 END
 
@@ -1824,7 +1816,6 @@ BEGIN
 " 1564               1              99 \n"
 " 1565               1              36 \n"
 " 1566               1              12 \n"
-"[Formats] \n"
 ,0
 END
 
@@ -1841,7 +1832,6 @@ END
 
 IDD_DV_Results RCDATA
 BEGIN
-"[Ranges] \n"
 "[Grids] \n"
 " 1232    11     30   146 \n"
 "   20 \n"
@@ -1875,7 +1865,6 @@ BEGIN
 "28 \n"
 "29 \n"
 "30 \n"
-"[Formats] \n"
 ,0
 END
 
@@ -1953,11 +1942,9 @@ BEGIN
 " 1562 1 \n"
 " 1569 1 \n"
 " 1585 1 \n"
-"[Ranges] \n"
 "[Lengths] \n"
 " 1257   255 \n"
 " 1256    20 \n"
-"[Formats] \n"
 ,0
 END
 
@@ -1976,8 +1963,6 @@ END
 IDD_DataRangeSTOE RCDATA
 BEGIN
 "[Menus] \n"
-"[Ranges] \n"
-"[Formats] \n"
 ,0
 END
 
@@ -2008,8 +1993,6 @@ BEGIN
 " 1129 0 \n"
 " 1130 0 \n"
 " 1131 0 \n"
-"[Ranges] \n"
-"[Formats] \n"
 ,0
 END
 
@@ -2099,7 +2082,6 @@ END
 
 IDD_PW_Page9 RCDATA
 BEGIN
-"[Ranges] \n"
 "[Grids] \n"
 " 1232    11     30   152 \n"
 "   20 \n"
@@ -2133,7 +2115,6 @@ BEGIN
 "28 \n"
 "29 \n"
 "30 \n"
-"[Formats] \n"
 ,0
 END
 
@@ -2200,10 +2181,8 @@ BEGIN
 " 1386 1 \n"
 " 1228 0 \n"
 " 1407 0 \n"
-"[Ranges] \n"
 "[Lengths] \n"
 " 1225  5000 \n"
-"[Formats] \n"
 ,0
 END
 
@@ -2233,7 +2212,6 @@ BEGIN
 " 1229            -100             100 \n"
 " 1236            -100             100 \n"
 " 1237            -100             100 \n"
-"[Formats] \n"
 ,0
 END
 
@@ -2247,7 +2225,6 @@ END
 
 IDD_Parameter_Status_2 RCDATA
 BEGIN
-"[Ranges] \n"
 "[Grids] \n"
 " 1401     8     40   158 \n"
 "   60 \n"
@@ -2291,7 +2268,6 @@ BEGIN
 "parameter 38 \n"
 "parameter 39 \n"
 "parameter 40 \n"
-"[Formats] \n"
 ,0
 END
 
@@ -2379,7 +2355,6 @@ BEGIN
 " 1111               1              99 \n"
 "[Lengths] \n"
 " 1110   255 \n"
-"[Formats] \n"
 ,0
 END
 
@@ -2567,7 +2542,6 @@ BEGIN
 " 1471 0 \n"
 "[Ranges] \n"
 " 1472               1             100 \n"
-"[Formats] \n"
 ,0
 END
 
@@ -2615,7 +2589,6 @@ BEGIN
 "[Grids] \n"
 " 1136     7    999   176 \n"
 "   32 \n"
-"[Formats] \n"
 ,0
 END
 
@@ -2679,7 +2652,6 @@ BEGIN
 "[Grids] \n"
 " 1136     5    999   178 \n"
 "   32 \n"
-"[Formats] \n"
 ,0
 END
 
@@ -2789,13 +2761,8 @@ BEGIN
 "the best solution \n"
 "selected solutions \n"
 "all solutions \n"
-"[Ranges] \n"
-" 1260      1.0000           9.0000      \n"
-" 1277      1.0000           9.0000      \n"
-" 1043      1.0000           9.0000      \n"
 "[Lengths] \n"
 " 1416   255 \n"
-"[Formats] \n"
 ,0
 END
 
@@ -2818,8 +2785,6 @@ BEGIN
 " 1264     2     0 \n"
 " \n"
 " \n"
-"[Ranges] \n"
-"[Formats] \n"
 ,0
 END
 
@@ -2869,7 +2834,6 @@ BEGIN
 "[Grids] \n"
 " 1363     5     99   162 \n"
 "  100 \n"
-"[Formats] \n"
 ,0
 END
 
@@ -3122,11 +3086,9 @@ BEGIN
 " 1129 0 \n"
 " 1130 0 \n"
 " 1131 0 \n"
-"[Ranges] \n"
 "[Lengths] \n"
 " 1541   255 \n"
 " 1542   255 \n"
-"[Formats] \n"
 ,0
 END
 
@@ -3153,7 +3115,6 @@ BEGIN
 " 1229            -100             100 \n"
 " 1236            -100             100 \n"
 " 1237            -100             100 \n"
-"[Formats] \n"
 ,0
 END
 
@@ -3190,10 +3151,13 @@ BEGIN
     CONTROL "Random seeds",IDF_LABEL12,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_CENTER,  139,  105,   30,   18
     CONTROL "314",IDF_SA_RandomSeed1,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_AUTOHSCROLL,  171,   99,   43,   14
     CONTROL "159",IDF_SA_RandomSeed2,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE | ES_AUTOHSCROLL,  171,  115,   43,   14
+    CONTROL "Simplex only from random start points",IDF_SimplexOnly_Check,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,  236,  112,  136,   14
 END
 
 IDD_SA_input3_2 RCDATA
 BEGIN
+"[Checks] \n"
+" 1587 0 \n"
 "[Ranges] \n"
 " 1151      0.0000          0.10000E+006 \n"
 " 1179     0.10000E-002     0.50000      \n"
@@ -3220,7 +3184,6 @@ END
 
 IDD_FWHM_info RCDATA
 BEGIN
-"[Ranges] \n"
 "[Grids] \n"
 " 1396     3     20   164 \n"
 "   20 \n"
@@ -3244,7 +3207,6 @@ BEGIN
 "18 \n"
 "19 \n"
 "20 \n"
-"[Formats] \n"
 ,0
 END
 
@@ -3422,10 +3384,8 @@ BEGIN
 " 1550 0 \n"
 " 1248 1 \n"
 " 1567 1 \n"
-"[Ranges] \n"
 "[Lengths] \n"
 " 1574   128 \n"
-"[Formats] \n"
 ,0
 END
 
@@ -3529,8 +3489,6 @@ BEGIN
 " 1129 0 \n"
 " 1130 0 \n"
 " 1131 0 \n"
-"[Ranges] \n"
-"[Formats] \n"
 ,0
 END
 
@@ -3571,19 +3529,18 @@ BEGIN
 "[Ranges] \n"
 " 1446               1             999 \n"
 " 1445               1             999 \n"
-"[Formats] \n"
 ,0
 END
 
-IDD_SAW_Page7_TOPAS DIALOG 0, 0,  375,  170
+IDD_SAW_Page7_TOPAS DIALOG 0, 0,  385,  190
 STYLE WS_POPUP | WS_BORDER | WS_DLGFRAME | WS_SYSMENU | WS_MINIMIZEBOX | DS_3DLOOK | DS_MODALFRAME
 FONT    8, "MS Sans Serif"
 CAPTION "DASH Wizard : Rietveld Refinement with TOPAS"
 BEGIN
     CONTROL "",IDF_PW_Logo1,"STATIC",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_BORDER | WS_GROUP | SS_BITMAP | SS_NOTIFY | SS_CENTERIMAGE,   10,   15,   70,  140,WS_EX_DLGMODALFRAME
-    CONTROL "< &Back",IDBACK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  100,  150,   40,   14
-    CONTROL "&Next >",IDNEXT,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  140,  150,   40,   14
-    CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  150,   40,   14
+    CONTROL "< &Back",IDBACK,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  100,  168,   40,   14
+    CONTROL "&Next >",IDNEXT,"BUTTON",WS_CHILD | WS_VISIBLE | WS_DISABLED | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  140,  168,   40,   14
+    CONTROL "&Close",IDCLOSE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  180,  168,   40,   14
     CONTROL "",IDF_Ext_RR_inp_file_name,"EDIT",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_READONLY,   91,   13,  270,   14,WS_EX_STATICEDGE
     CONTROL "Use DASH recommendation",IDC_UseDASHRecommendation,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   93,   38,  140,   14
     CONTROL "5",IDF_K1,"INTEGERSPIN",WS_CHILD | WS_VISIBLE | WS_BORDER | WS_GROUP | WS_TABSTOP | ES_LEFT | ES_RIGHT | ES_MULTILINE,  185,   53,   40,   14
@@ -3612,6 +3569,7 @@ BEGIN
     CONTROL "&Restore",IDB_RESTORE,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,   90,  135,   35,   14
     CONTROL "saved .inp and .out files",IDF_LABEL4,"STATIC",WS_CHILD | WS_VISIBLE | WS_GROUP | SS_LEFT,  127,  136,   78,    9
     CONTROL "&View",IDB_View,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_PUSHBUTTON | BS_TEXT,  205,  135,   35,   14
+    CONTROL "Write Topas 5.0 format files",IDC_topas5_format_check,"BUTTON",WS_CHILD | WS_VISIBLE | WS_GROUP | WS_TABSTOP | BS_AUTOCHECKBOX | BS_TEXT,   90,  150,  144,   12
 END
 
 IDD_SAW_Page7_TOPAS RCDATA
@@ -3628,12 +3586,12 @@ BEGIN
 " 1449 0 \n"
 " 1563 0 \n"
 " 1448 1 \n"
+" 1588 0 \n"
 "[Ranges] \n"
 " 1399               0         9999999 \n"
 " 1536               0      2147483647 \n"
 " 1544               0      2147483647 \n"
 " 1545               0      2147483647 \n"
-"[Formats] \n"
 ,0
 END
 
@@ -3763,8 +3721,6 @@ BEGIN
 " 1140 1 \n"
 " 1129 0 \n"
 " 1130 0 \n"
-"[Ranges] \n"
-"[Formats] \n"
 ,0
 END
 
@@ -3785,10 +3741,8 @@ END
 
 IDD_SA_ByDbfFile RCDATA
 BEGIN
-"[Ranges] \n"
 "[Lengths] \n"
 " 1578   255 \n"
-"[Formats] \n"
 ,0
 END
 
@@ -3811,8 +3765,6 @@ BEGIN
 "[Checks] \n"
 " 1140 1 \n"
 " 1129 0 \n"
-"[Ranges] \n"
-"[Formats] \n"
 ,0
 END
 
@@ -3832,11 +3784,9 @@ END
 
 IDD_SA_Dist_Rest RCDATA
 BEGIN
-"[Ranges] \n"
 "[Grids] \n"
 " 1582     5    100   172 \n"
 "   20 \n"
-"[Formats] \n"
 ,0
 END
 
@@ -3923,12 +3873,12 @@ END
 
 IDR_MENU1 RCDATA
 BEGIN
-ID_FILE,1,0
-ID_Druid_Mode_Menu,2,0
-ID_ViewMenu,3,0
-ID_Options,4,0
-ID_HELP,5,0
-ID_Polyfitter_Tips,5,3,0
+ID_FILE,1,0,
+ID_Druid_Mode_Menu,2,0,
+ID_ViewMenu,3,0,
+ID_Options,4,0,
+ID_HELP,5,0,
+ID_Polyfitter_Tips,5,3,0,
 0
 END
 
@@ -4046,4 +3996,4 @@ END
 //*WI* FILENAME    PCDruid_Resource.F90
 //*WI* FMODNAME    Druid_Header
 //*WI* LASTTYPE        2
-//*WI* LASTRES        23
+//*WI* LASTRES        76

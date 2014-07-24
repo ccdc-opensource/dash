@@ -119,7 +119,10 @@
 
       LOGICAL           Resume_SA
       COMMON /RESUMESA/ Resume_SA
-
+      
+      LOGICAL           SimplexOnly
+      COMMON /SIMPONLY/ SimplexOnly
+      
       CALL PushActiveWindowID
       CALL SelectDASHDialog(IDD_SAW_Page1)
       SELECT CASE (EventType)
@@ -132,6 +135,7 @@
               CALL WDialogPutRadioButton(IDF_RADIO1)
             CASE (IDNEXT, IDB_PO)
               Resume_SA = .FALSE. ! Initialisation
+              SimplexOnly = .FALSE.
 ! Go to the next stage of the SA input
 ! Grey out 'Load DASH Pawley file' button on toolbar
               CALL WMenuSetState(ID_import_dpj_file, ItemEnabled, WintOff)
@@ -2285,6 +2289,8 @@
               CALL DASHWDialogGetInteger(IDF_SA_RandomSeed2, ISeed2)
             CASE (IDF_SA_Tredrate)
               CALL DASHWDialogGetReal(IDF_SA_Tredrate, RT)
+            CASE (IDF_SimplexOnly_Check)
+              CALL Set_SimplexOnly(DASHWDialogGetCheckBoxLogical(IDF_SimplexOnly_Check))
           END SELECT
       END SELECT
       CALL PopActiveWindowID
@@ -2334,7 +2340,7 @@
               CALL Set_HydrogenTreatment(tInteger)
             CASE (IDF_AutoLocalOptimise)
               CALL Set_AutoLocalMinimisation(DASHWDialogGetCheckBoxLogical(IDF_AutoLocalOptimise))
-          END SELECT
+            END SELECT
       END SELECT
       CALL PopActiveWindowID
 
