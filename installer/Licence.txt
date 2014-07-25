@@ -2,7 +2,7 @@ In order to run this version of DASH, you must first read and agree to the terms
 
 DASH, excluding the component program Mercury DASH which is a copyright work of the Cambridge Crystallographic Data Centre, and its associate documentation and software have been jointly developed by and are copyright works of CCDC Software Ltd (CCDC) and the Council for the Central Laboratory of the Research Councils (CCLRC) and all rights are protected. 
 
-In consideration of the access to DASH the “Program” (including any or all components) granted you, you agree to run and use the Program solely in accordance with the following terms 
+In consideration of the access to DASH the "Program" (including any or all components) granted you, you agree to run and use the Program solely in accordance with the following terms 
 
 You are permitted to run and to use the Program and the documentation until key expiry date for the purpose of evaluating whether or not the Program meets your requirements. Within 14 days of this date you agree to delete all copies of the Program from your computers and storage systems.
 
@@ -26,4 +26,4 @@ These terms and conditions are not intended to confer rights on any third party,
 
 The foregoing terms and conditions and any dispute in connection with them shall be governed by and construed in accordance with English law and shall be subject to the exclusive jurisdiction of the English courts.
 
-If you agree to the foregoing terms and conditions then please select the “I have read the full text above and I AGREE” option below. If you do not agree to the foregoing terms and conditions you should select the “I DO NOT AGREE” option below. After making your selection, please click OK to proceed.
+If you agree to the foregoing terms and conditions then please select the "I have read the full text above and I AGREE" option below. If you do not agree to the foregoing terms and conditions you should select the "I DO NOT AGREE" option below. After making your selection, please click OK to proceed.
