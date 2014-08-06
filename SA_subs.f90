@@ -521,7 +521,8 @@
       Last_NUP   = NUP
 ! Calculate the average energy and deviation
       FPAV = FPSUM1/FPSUM0
-      FPSD = SQRT(MAX(0.0,(FPSUM2/FPSUM0)-(FPAV**2)))
+      FPSD = SQRT( ABS ( (FPSUM2/FPSUM0)-(FPAV**2) ) )
+      ! FPSD = SQRT((FPSUM2/FPSUM0)+(FPAV**2))
       DO I = 1, nvar
         IF (X0SUM(I) .GT. 0.0) THEN
           DXVAV(I) = 1.0 !XSUM(I)/X0SUM(I)
