@@ -1,3 +1,4 @@
+from __future__ import division, absolute_import, print_function
 import imaplib
 import time
 import email.message
@@ -5,10 +6,10 @@ import getpass
 
 def open_connection(verbose=False):
     # Connect to the server
-    print "at connection creation"
+    print("at connection creation")
     connection = imaplib.IMAP4_SSL('mail01.ccdc.cam.ac.uk')
     # Login to our account
-    print "login", getpass.getuser(), getpass.getpass()
+    print("login", getpass.getuser(), getpass.getpass())
     connection.login(getpass.getuser(), getpass.getpass())
     return connection
 
