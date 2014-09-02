@@ -113,18 +113,9 @@ REM Copy Extinction Symbol Docs
     
     
 REM =================================================================================
-REM Copy files from doc_rep/dash
+REM Copy docs
 
-    SET CVS_REPOSITORY=":ssh;username=%USERNAME%;hostname=basalt:/cvs/doc_rep"
-    SET CVSCMD=%CVS_EXECUTABLE% -d %CVS_REPOSITORY% -Q export
-
-
-
-    %CVSCMD% -r %CVSDOCTAG% -d %OUTPUTDIR%\Documentation\manual\output\images "dash/output/images"
-    %CVSCMD% -r %CVSDOCTAG% -d %OUTPUTDIR%\Documentation\manual\output\portable_html "dash/output/portable_html"
-    %CVSCMD% -r %CVSDOCTAG% -d %OUTPUTDIR%\Documentation\manual\output\ "dash/output/pdf/dash_31.pdf"
-    
-REM == TODO: Extinction Symbol Docs ==
+   CALL %MAINDIR%\export_command.bat %OUTPUTDIR%\Documentation\dash                    \\unix.ccdc.cam.ac.uk\buildman\documentation\CSDS\dash\dash_files
 
 REM =================================================================================
 REM Copy files from makezmatrix

@@ -6,6 +6,117 @@
     <leftImage>../../cppbuilds_shared/installer/images/EFEMUX01_163x314.png</leftImage>
     <logoImage>../../cppbuilds_shared/installer/images/ccdc_logo_48x48.png</logoImage>
     <splashImage>../../cppbuilds_shared/installer/images/ccdc_logo_350x82.png</splashImage>
+    <componentList>
+        <include>
+            <file>../../cppbuilds_shared/installer/components/vcredist.xml</file>
+        </include>
+        <component>
+            <name>default</name>
+            <description>Default Component</description>
+            <canBeEdited>1</canBeEdited>
+            <selected>1</selected>
+            <show>1</show>
+            <desktopShortcutList>
+                <shortcut>
+                    <comment>Launch ${product_fullname} ${product_version}</comment>
+                    <exec></exec>
+                    <icon></icon>
+                    <name>${product_fullname} ${product_version}</name>
+                    <path></path>
+                    <platforms>all</platforms>
+                    <runAsAdmin>0</runAsAdmin>
+                    <runInTerminal>0</runInTerminal>
+                    <windowsExec>${installdir}/dash.exe</windowsExec>
+                    <windowsExecArgs></windowsExecArgs>
+                    <windowsIcon>${installdir}/icons/dash.ico</windowsIcon>
+                    <windowsPath>${installdir}</windowsPath>
+                </shortcut>
+            </desktopShortcutList>
+            <folderList>
+                <folder>
+                    <description>Program Files</description>
+                    <destination>${installdir}</destination>
+                    <name>programfiles</name>
+                    <platforms>all</platforms>
+                    <shortcutList>
+                        <shortcut>
+                            <comment>Uninstall</comment>
+                            <exec>${installdir}/${uninstallerName}</exec>
+                            <icon></icon>
+                            <name>Uninstall ${product_fullname}</name>
+                            <path>${installdir}</path>
+                            <platforms>all</platforms>
+                            <runAsAdmin>0</runAsAdmin>
+                            <runInTerminal>0</runInTerminal>
+                            <windowsExec>${installdir}/${uninstallerName}.exe</windowsExec>
+                            <windowsExecArgs></windowsExecArgs>
+                            <windowsIcon></windowsIcon>
+                            <windowsPath>${installdir}</windowsPath>
+                        </shortcut>
+                    </shortcutList>
+                </folder>
+                <folder>
+                    <description>Program Files</description>
+                    <destination>${installdir}</destination>
+                    <name>programfileslinux</name>
+                    <platforms>linux</platforms>
+                </folder>
+                <folder>
+                    <description>Program Files</description>
+                    <destination>${installdir}</destination>
+                    <name>programfileswindows</name>
+                    <platforms>windows</platforms>
+                    <distributionFileList>
+                        <distributionDirectory allowWildcards="1">
+                            <origin>${env(DISTRIBUTION_DIRECTORY)}/dash/dash_latest/*</origin>
+                        </distributionDirectory>
+                    </distributionFileList>
+                </folder>
+                <folder>
+                    <description>Program Files</description>
+                    <destination>${installdir}</destination>
+                    <name>programfilesosx</name>
+                    <platforms>osx</platforms>
+                </folder>
+            </folderList>
+            <startMenuShortcutList>
+                <startMenuShortcut>
+                    <comment>Uninstall ${product_fullname}</comment>
+                    <name>Uninstall ${product_fullname}</name>
+                    <runAsAdmin>0</runAsAdmin>
+                    <runInTerminal>0</runInTerminal>
+                    <windowsExec>${installdir}/${uninstallerName}.exe</windowsExec>
+                    <windowsExecArgs></windowsExecArgs>
+                    <windowsIcon></windowsIcon>
+                    <windowsPath>${installdir}/</windowsPath>
+                </startMenuShortcut>
+                <startMenuShortcut>
+                    <comment>${product_fullname} ${product_version}</comment>
+                    <name>${product_fullname} ${product_version}</name>
+                    <runAsAdmin>0</runAsAdmin>
+                    <runInTerminal>0</runInTerminal>
+                    <windowsExec>${installdir}/dash.exe</windowsExec>
+                    <windowsExecArgs></windowsExecArgs>
+                    <windowsIcon>${installdir}/icons/dash.ico</windowsIcon>
+                    <windowsPath>${installdir}/</windowsPath>
+                </startMenuShortcut>
+                <startMenuFolder>
+                    <name>Documentation</name>
+                    <platforms>windows</platforms>
+                    <startMenuShortcutList>
+                        <startMenuFileShortcut>
+                            <comment>View the DASH documentation</comment>
+                            <filePath>${installdir}\Documentation\dash\dash.html</filePath>
+                            <name>DASH Documentation</name>
+                            <runAsAdmin>0</runAsAdmin>
+                            <runInTerminal>0</runInTerminal>
+                            <windowsIcon></windowsIcon>
+                        </startMenuFileShortcut>
+                    </startMenuShortcutList>
+                </startMenuFolder>
+            </startMenuShortcutList>
+        </component>
+    </componentList>
     <preBuildActionList>
         <copyFile>
             <destination>${build_project_directory}/installer_generated.lng</destination>
@@ -79,119 +190,6 @@
     <saveRelativePaths>1</saveRelativePaths>
     <startMenuGroupName>CCDC/${product_fullname} ${product_version}</startMenuGroupName>
     <vendor>CCDC</vendor>
-    <componentList>
-        <include>
-            <file>../../cppbuilds_shared/installer/components/vcredist.xml</file>
-        </include>
-        <component>
-            <name>default</name>
-            <description>Default Component</description>
-            <canBeEdited>1</canBeEdited>
-            <selected>1</selected>
-            <show>1</show>
-            <desktopShortcutList>
-                <shortcut>
-                    <comment>Launch ${product_fullname} ${product_version}</comment>
-                    <exec></exec>
-                    <icon></icon>
-                    <name>${product_fullname} ${product_version}</name>
-                    <path></path>
-                    <platforms>all</platforms>
-                    <runInTerminal>0</runInTerminal>
-                    <windowsExec>${installdir}/dash.exe</windowsExec>
-                    <windowsExecArgs></windowsExecArgs>
-                    <windowsIcon>${installdir}/icons/dash.ico</windowsIcon>
-                    <windowsPath>${installdir}</windowsPath>
-                </shortcut>
-            </desktopShortcutList>
-            <folderList>
-                <folder>
-                    <description>Program Files</description>
-                    <destination>${installdir}</destination>
-                    <name>programfiles</name>
-                    <platforms>all</platforms>
-                    <shortcutList>
-                        <shortcut>
-                            <comment>Uninstall</comment>
-                            <exec>${installdir}/${uninstallerName}</exec>
-                            <icon></icon>
-                            <name>Uninstall ${product_fullname}</name>
-                            <path>${installdir}</path>
-                            <platforms>all</platforms>
-                            <runInTerminal>0</runInTerminal>
-                            <windowsExec>${installdir}/${uninstallerName}.exe</windowsExec>
-                            <windowsExecArgs></windowsExecArgs>
-                            <windowsIcon></windowsIcon>
-                            <windowsPath>${installdir}</windowsPath>
-                        </shortcut>
-                    </shortcutList>
-                </folder>
-                <folder>
-                    <description>Program Files</description>
-                    <destination>${installdir}</destination>
-                    <name>programfileslinux</name>
-                    <platforms>linux</platforms>
-                </folder>
-                <folder>
-                    <description>Program Files</description>
-                    <destination>${installdir}</destination>
-                    <name>programfileswindows</name>
-                    <platforms>windows</platforms>
-                    <distributionFileList>
-                        <distributionDirectory allowWildcards="1">
-                            <origin>${env(DISTRIBUTION_DIRECTORY)}/dash/dash_latest/*</origin>
-                        </distributionDirectory>
-                    </distributionFileList>
-                </folder>
-                <folder>
-                    <description>Program Files</description>
-                    <destination>${installdir}</destination>
-                    <name>programfilesosx</name>
-                    <platforms>osx</platforms>
-                </folder>
-            </folderList>
-            <startMenuShortcutList>
-                <startMenuShortcut>
-                    <comment>Uninstall ${product_fullname}</comment>
-                    <name>Uninstall ${product_fullname}</name>
-                    <runInTerminal>0</runInTerminal>
-                    <windowsExec>${installdir}/${uninstallerName}.exe</windowsExec>
-                    <windowsExecArgs></windowsExecArgs>
-                    <windowsIcon></windowsIcon>
-                    <windowsPath>${installdir}/</windowsPath>
-                </startMenuShortcut>
-                <startMenuShortcut>
-                    <comment>${product_fullname} ${product_version}</comment>
-                    <name>${product_fullname} ${product_version}</name>
-                    <runInTerminal>0</runInTerminal>
-                    <windowsExec>${installdir}/dash.exe</windowsExec>
-                    <windowsExecArgs></windowsExecArgs>
-                    <windowsIcon>${installdir}/icons/dash.ico</windowsIcon>
-                    <windowsPath>${installdir}/</windowsPath>
-                </startMenuShortcut>
-                <startMenuFolder>
-                    <name>Documentation</name>
-                    <platforms>windows</platforms>
-                    <startMenuShortcutList>
-                        <startMenuFileShortcut>
-                            <comment>View the DASH documentation</comment>
-                            <filePath>${installdir}\Documentation\manual\output\portable_html\TOC.html</filePath>
-                            <name>DASH Documentation</name>
-                            <runInTerminal>0</runInTerminal>
-                            <windowsIcon></windowsIcon>
-                        </startMenuFileShortcut>
-                        <startMenuFileShortcut>
-                            <comment>View the DASH Release Notes</comment>
-                            <filePath>${installdir}\Release-Notes.txt</filePath>
-                            <name>DASH Release Notes</name>
-                            <runInTerminal>0</runInTerminal>
-                            <windowsIcon></windowsIcon>
-                        </startMenuFileShortcut>
-                    </startMenuShortcutList>
-                </startMenuFolder>
-            </startMenuShortcutList>
-        </component>
-    </componentList>
     <customLanguageFileList>
         <language>
             <code>en</code>
