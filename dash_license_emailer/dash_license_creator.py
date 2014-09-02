@@ -1,9 +1,10 @@
 """
 Read DASH spreadsheet and filter out superfluous data
 """
+from __future__ import division, absolute_import, print_function
+from six import text_type
 import string
-import urllib
-import urllib2
+from six.moves import urllib
 import base64
 import sys
 import email
@@ -57,9 +58,8 @@ def generate_licences(organisations):
 
 
 ###########################################################################################
-import types
 def cell_to_string(value):
-        if type(value) == types.FloatType:
+        if isinstance(value, float):
             return str(value)
         else:
             return value.encode('utf8')
@@ -68,14 +68,14 @@ def cell_to_string(value):
 class LicenseDatum:
     def __init__(self, sheet, row):
         if sheet != None and row != None:
-            v = sheet.cell(row,6).value
-            if type(v) == types.FloatType:
+            v = sheet.cell(row, 6).value
+            if isinstance(v, float):
                 self.host_id = str(int(v))
             else:
                 self.host_id = v.encode('utf8')
         
-            self.version = cell_to_string(sheet.cell(row,7).value)
-            self.expiry  = cell_to_string(sheet.cell(row,8).value)
+            self.version = cell_to_string(sheet.cell(row, 7).value)
+            self.expiry  = cell_to_string(sheet.cell(row, 8).value)
         else:
             self.host_id = "ABCDABCD"
             self.version = "3.2"
@@ -90,17 +90,17 @@ class LicenseDatum:
 class Organisation:
     def __init__(self, sheet = None, row = None):
         if sheet != None and row != None:
-            self.code       = str(sheet.cell(row,0).value)
-            self.agreement_number       = sheet.cell(row,1).value.encode('utf8')
-            self.country                = sheet.cell(row,2).value.encode('utf8')
-            self.organisation           = sheet.cell(row,3).value.encode('utf8')
-            self.type                   = sheet.cell(row,4).value.encode('utf8')
-            self.nlic                   = sheet.cell(row,5).value
-            self.licence_data           = [ LicenseDatum(sheet,row) ]
-            self.site_contact_title     = sheet.cell(row,9).value.encode('utf8')
-            self.site_contact_firstname = sheet.cell(row,10).value.encode('utf8')
-            self.site_contact_surname   = sheet.cell(row,11).value.encode('utf8')
-            self.email                  = sheet.cell(row,12).value.encode('utf8')
+            self.code       = str(sheet.cell(row, 0).value)
+            self.agreement_number       = sheet.cell(row, 1).value.encode('utf8')
+            self.country                = sheet.cell(row, 2).value.encode('utf8')
+            self.organisation           = sheet.cell(row, 3).value.encode('utf8')
+            self.type                   = sheet.cell(row, 4).value.encode('utf8')
+            self.nlic                   = sheet.cell(row, 5).value
+            self.licence_data           = [ LicenseDatum(sheet, row) ]
+            self.site_contact_title     = sheet.cell(row, 9).value.encode('utf8')
+            self.site_contact_firstname = sheet.cell(row, 10).value.encode('utf8')
+            self.site_contact_surname   = sheet.cell(row, 11).value.encode('utf8')
+            self.email                  = sheet.cell(row, 12).value.encode('utf8')
         else:
             self.code       = "1111"
             self.agreement_number       = "D/0000/0000"
@@ -108,14 +108,14 @@ class Organisation:
             self.organisation           = "Mickey Mouse University"
             self.type                   = "Academic"
             self.nlic                   = 10
-            self.licence_data           = [ LicenseDatum(sheet,row) ]
+            self.licence_data           = [ LicenseDatum(sheet, row) ]
             self.site_contact_title     = "Dr"
             self.site_contact_firstname = "Bob"
             self.site_contact_surname   = "Monkey"
             self.email                  = test_email_account
         
-    def add_row(self, sheet,row):
-        self.licence_data.append(LicenseDatum(sheet,row))
+    def add_row(self, sheet, row):
+        self.licence_data.append(LicenseDatum(sheet, row))
 
     def prune_to_best_licences(self):
         # cut down to only licences from last year
@@ -125,21 +125,21 @@ class Organisation:
         most_recent = []
         self.licence_data = []
         for l in current:
-             if l.expiry == last_years and string.find(l.host_id,"(old)") == -1:
+             if l.expiry == last_years and l.host_id.find("(old)") == -1:
                  most_recent.append(l)
              else:
-                print l.expiry
-                print last_years
+                print(l.expiry)
+                print(last_years)
         self.licence_data = most_recent
 
     def __repr__(self):
         rep = ""
         for datum in self.licence_data:
             rep += "\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",%s,\"%s\",\"%s\",\"%s\",\"%s\"\n" % \
-            ( self.code,self.agreement_number,
-              self.country,self.organisation,self.type,self.nlic,
-              datum,self.site_contact_title,self.site_contact_firstname,
-              self.site_contact_surname,self.email)
+            ( self.code, self.agreement_number,
+              self.country, self.organisation, self.type, self.nlic,
+              datum, self.site_contact_title, self.site_contact_firstname,
+              self.site_contact_surname, self.email)
         return rep[:-1]
 
 def read_worksheet(worksheet_name):
@@ -152,18 +152,18 @@ def read_worksheet(worksheet_name):
         current_org = None
         for row in range(s.nrows):
             if row == 0:
-                header = Organisation(s,row) # its the header, lets ignore
+                header = Organisation(s, row) # its the header, lets ignore
                 pass
             
-            sval = s.cell(row,1).value
+            sval = s.cell(row, 1).value
 
             # New Organisation
             if len(sval) > 0:
                 if current_org != None:
                     organisations.append(current_org)
-                current_org = Organisation(s,row)
+                current_org = Organisation(s, row)
             else:
-                current_org.add_row(s,row)
+                current_org.add_row(s, row)
 
         if current_org != None:
             organisations.append(current_org)
@@ -257,8 +257,8 @@ def create_dash_licence(hostid,
                      email,
                      agreement_number)
 
-    data = urllib.urlencode(values)
-    request = urllib2.Request(generation_url,data)
+    data = urllib.parse.urlencode(values)
+    request = urllib.request.Request(generation_url, data)
     
     base64string = base64.encodestring(
                 '%s:%s' % (username, password))[:-1]
@@ -267,7 +267,7 @@ def create_dash_licence(hostid,
     request.add_header("Authorization", authheader)
 
     # This request fires off the license generator
-    response = urllib2.urlopen(request)
+    response = urllib.request.urlopen(request)
     first_page_content = response.read()
 
         
@@ -296,12 +296,12 @@ def create_dash_licence(hostid,
         
     # This request reads back licence_file.txt from the web server which was created in the previous
     # request
-    request = urllib2.Request(license_text_url)
+    request = urllib.request.Request(license_text_url)
     request.add_header("Authorization", authheader)
     try:
-        response = urllib2.urlopen(request)
+        response = urllib.request.urlopen(request)
         return response.read()
-    except urllib2.HTTPError: # This ususally means file not found, which means the first request failed
+    except urllib.error.HTTPError: # This ususally means file not found, which means the first request failed
         sys.stderr.write("Other failure\n")
         sys.stderr.writelines(first_page_content)
         return None
@@ -325,9 +325,9 @@ def generate_licences_implementation(organisations):
             )
             
             if licence_key == None:
-                sys.stderr.write("Failed for %s with host id %s" % (org.agreement_number,licence.host_id) + "\n")
+                sys.stderr.write("Failed for %s with host id %s" % (org.agreement_number, licence.host_id) + "\n")
             else:
-                print "Success %s with host id %s : key returned - %s" % (org.agreement_number,licence.host_id, licence_key)
+                print("Success %s with host id %s : key returned - %s" % (org.agreement_number, licence.host_id, licence_key))
             licence.key = licence_key
             time.sleep(0.5)
 
@@ -335,12 +335,12 @@ def generate_licences_implementation(organisations):
 def write_email_japan(org, out):
     
     import codecs
-    f = codecs.open("japan_template_header.unic",encoding='utf-16')
+    f = codecs.open("japan_template_header.unic", encoding='utf-16')
     body_text = u""
     for l in f:
         body_text += l
 
-    body_text += u"\n\nDear Customer (Organisation: %s, Agreement:  %s)" % (org.organisation,org.agreement_number)
+    body_text += u"\n\nDear Customer (Organisation: %s, Agreement:  %s)" % (org.organisation, org.agreement_number)
     body_text += u"""
  
 Attached key(s) are valid until 30 September 2013. 
@@ -358,16 +358,16 @@ For CSD users: These keys will not work for DASH 3.3 which is distributed with t
             else:
                 body_text += "Host Id "
 
-            body_text += "%s: %s \n" % (licence.host_id,licence.key)
+            body_text += "%s: %s \n" % (licence.host_id, licence.key)
 
-    f = codecs.open("japan_template_footer.unic",encoding='utf-16')
+    f = codecs.open("japan_template_footer.unic", encoding='utf-16')
     body_text += u"\n\n"
     for l in f:
         body_text += l
 
     me = get_return_email(org)
     you = get_email(org)
-    return create_email_draft(me,you,'DASH Licence Keys for the next calendar year',body_text)
+    return create_email_draft(me, you, 'DASH Licence Keys for the next calendar year', body_text)
     
 
 def write_email_row(org, out):
@@ -387,7 +387,7 @@ def write_email_row(org, out):
             else:
                 body_text += "Host Id "
 
-            body_text += "%s: %s \n" % (licence.host_id,licence.key)
+            body_text += "%s: %s \n" % (licence.host_id, licence.key)
 
     body_text += "\nThis licence key expires on 30 September 2013. Before the licence expires we will send a replacement\n"
     body_text += "\n\nBest Wishes\n\nLaura Petley\nCCDC"
@@ -402,7 +402,7 @@ def write_email_row(org, out):
     #draft.set_payload(body_text)
     
     
-    return create_email_draft(me,you,'DASH Licence Keys for the next calendar year',body_text)
+    return create_email_draft(me, you, 'DASH Licence Keys for the next calendar year', body_text)
     
 def create_email_draft(sender, recipient, subject, body):
     from smtplib import SMTP
@@ -443,8 +443,8 @@ def create_email_draft(sender, recipient, subject, body):
 
     # We must always pass Unicode strings to Header, otherwise it will
     # use RFC 2047 encoding even on plain ASCII strings.
-    sender_name = str(Header(unicode(sender_name), header_charset))
-    recipient_name = str(Header(unicode(recipient_name), header_charset))
+    sender_name = str(Header(text_type(sender_name), header_charset))
+    recipient_name = str(Header(text_type(recipient_name), header_charset))
 
     # Make sure email addresses do not contain non-ASCII characters
     sender_addr = sender_addr.encode('ascii')
@@ -454,7 +454,7 @@ def create_email_draft(sender, recipient, subject, body):
     msg = MIMEText(body.encode(body_charset), 'plain', body_charset)
     msg['From'] = formataddr((sender_name, sender_addr))
     msg['To'] = formataddr((recipient_name, recipient_addr))
-    msg['Subject'] = Header(unicode(subject), header_charset)
+    msg['Subject'] = Header(text_type(subject), header_charset)
     return msg
 
 def write_email( org, out, do_send = 1): 
@@ -470,7 +470,7 @@ def write_email( org, out, do_send = 1):
         you = get_email(org)
         me = get_return_email(org)
         if len(you) > 0:
-            print "Mailing",you,"from",me
+            print("Mailing", you, "from", me)
             # Now - lets send this via SMTP
             try:
                 s = smtplib.SMTP(smtp_server)
@@ -481,14 +481,14 @@ def write_email( org, out, do_send = 1):
         else:
             sys.stderr.write("Failed to email for %s - no email\n" % ( org.agreement_number ) )
 
-def write_emails(organisations,out):
+def write_emails(organisations, out):
     for org in organisations:
         count = 0
         for licence in org.licence_data:
             if licence.key != None: count += 1
 
         if count > 0:
-            write_email(org,out,1)
+            write_email(org, out, 1)
 
 #def write_japanese_emails(organisations,out):
 #    for org in organisations:
@@ -505,7 +505,7 @@ def write_emails(organisations,out):
 #        if len(org.licence_data) > 0 and org.country == "Japan":
 #            out.write(str(org) + "\n")
 
-def write_spreadsheet_for_hiromi(organisations,out):
+def write_spreadsheet_for_hiromi(organisations, out):
     
     def site_line(org):
         return 'Site licence key is: %s for site id %s' % ( org.licence_data[0].key, org.licence_data[0].host_id)
@@ -513,7 +513,7 @@ def write_spreadsheet_for_hiromi(organisations,out):
     def node_line(org):
         ret = "Key for "
         for lic in org.licence_data:
-            v = "%s is %s," % (lic.host_id,lic.key)  
+            v = "%s is %s," % (lic.host_id, lic.key)  
             ret = ret + v
 
         # chop off last comma
@@ -532,18 +532,18 @@ def write_spreadsheet_for_hiromi(organisations,out):
  
             name =  org.site_contact_title + ' ' + org.site_contact_firstname + ' ' + org.site_contact_surname
 
-            out.write('"%s","%s","%s","%s","%s","%s"\n' % ( org.agreement_number,org.organisation,name,org.email,key_info,key_line ) )
+            out.write('"%s","%s","%s","%s","%s","%s"\n' % ( org.agreement_number, org.organisation, name, org.email, key_info, key_line ) )
             
 
 # Filter out the junk
 
-sys.stderr = open("Errors.txt","w")
+sys.stderr = open("Errors.txt", "w")
 
 raw_organisations = read_worksheet(spreadsheet_name)
 
 organisations = prune_organisations(raw_organisations)
 
-print "I'm going to generate ", len(organisations), "licenses"
+print("I'm going to generate ", len(organisations), "licenses")
 
 # Run the licence generation proces
 # generation process for the pruned organisations
@@ -552,19 +552,19 @@ generate_licences(organisations)
 
 # Write out a csv containing the organisations who are going to get keys
 
-orgout = open("pruned_organisations.csv","wb")
-save_organisations(organisations,orgout)
+orgout = open("pruned_organisations.csv", "wb")
+save_organisations(organisations, orgout)
 
 # write out all the emails - currently to a text file and send via jeeves 
 
 #organisations = [ Organisation() ]
 
-out = open("emails.txt","wb")
-write_emails(organisations,out)
+out = open("emails.txt", "wb")
+write_emails(organisations, out)
 
 # Write out a CSV file with Japanese license keys
-out2 = open("japan.csv","wb")
-write_spreadsheet_for_hiromi(organisations,out2)
+out2 = open("japan.csv", "wb")
+write_spreadsheet_for_hiromi(organisations, out2)
 
 # out3 = open("japan_emails.txt","wb")
 # write_japanese_emails(organisations,out3)

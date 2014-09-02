@@ -1,4 +1,5 @@
 # Import smtplib for the actual sending function
+from __future__ import division, absolute_import, print_function
 import smtplib
 import email
 
