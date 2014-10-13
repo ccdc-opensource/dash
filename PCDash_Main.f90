@@ -465,7 +465,8 @@
 
       IMPLICIT NONE
 
-      CHARACTER(LEN=712) :: CABOUT
+!   If the text changes, need to ensure the buffer is sufficient
+      CHARACTER(LEN=1000) :: CABOUT
       INTEGER tLen
 
       CABOUT = 'DASH: A structure solution package for X-ray powder '//CHAR(13)//&
@@ -491,7 +492,7 @@
 #endif
       tLen = LEN_TRIM(CABOUT)
       CABOUT = CABOUT(1:tLen)//CHAR(13)//CHAR(13)//&
-               'Copyright CCDC and STFC, February 2008'//CHAR(13)//CHAR(13)//&
+               'Copyright CCDC and STFC, (2008-2014)'//CHAR(13)//CHAR(13)//&
                'Licenced as part of the CSDS System'//CHAR(13)
       CALL WMessageBox(OkOnly, InformationIcon, CommonOk, TRIM(CABOUT), 'About DASH')
 
