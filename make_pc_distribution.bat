@@ -115,7 +115,7 @@ REM Copy Extinction Symbol Docs
 REM =================================================================================
 REM Copy docs
 
-   CALL %MAINDIR%\export_command.bat %OUTPUTDIR%\Documentation\dash                    \\unix.ccdc.cam.ac.uk\buildman\documentation\CSDS\dash\dash_files
+   CALL %MAINDIR%\export_command.bat %OUTPUTDIR%\Documentation\dash                    %MAINDIR%\..\docs\CSDS\dash\dash_files
 
 REM =================================================================================
 REM Copy files from makezmatrix
