@@ -445,11 +445,11 @@
      
 #ifdef _WIN32
       CALL IOsDirChange(TRIM(DocumentationHTMLdirectory))      
-      d=WinExec('cmd /c "dash.1.1.html" 'C,SW_HIDE)
+      d=WinExec('cmd /c "dash.html" 'C,SW_HIDE)
       CALL IOsDirChange(TRIM(WorkingDir))
 #else
       CALL IOsCommand(TRIM(InstallationDirectory)//'nss.sh file://'// &
-                      TRIM(DocumentationHTMLdirectory)//DIRSPACER//'dash.1.1.html')
+                      TRIM(DocumentationHTMLdirectory)//DIRSPACER//'dash.html')
 #endif
 
       END SUBROUTINE LaunchHelp
