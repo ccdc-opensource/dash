@@ -166,11 +166,7 @@ if not exist %MERCURY_FOLDER% goto nomercury
     call copy_qt_exe.bat %DASH_EXE% %OUTPUTDIR%    
 :start_mercury    
 
-    set CURRENT_DIRECTORY=%cd%
-    cd %OUTPUTDIR%\Mercury
-    RENAME mercury.exe dash_mercury.exe
-    
-    cd %CURRENT_DIRECTORY%
+    RENAME %OUTPUTDIR%\mercury\mercury.exe dash_mercury.exe
     
     goto out
 
