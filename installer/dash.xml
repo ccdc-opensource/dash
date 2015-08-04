@@ -2,6 +2,7 @@
     <shortName>DASH</shortName>
     <fullName>DASH</fullName>
     <version>3.3.5</version>
+    <installerFilename>${project.shortName}-${platform_name}-installer.${platform_exec_suffix}</installerFilename>
     <licenseFile>Licence.txt</licenseFile>
     <leftImage>../../cppbuilds_shared/installer/images/EFEMUX01_163x314.png</leftImage>
     <logoImage>../../cppbuilds_shared/installer/images/ccdc_logo_48x48.png</logoImage>
