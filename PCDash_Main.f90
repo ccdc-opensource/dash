@@ -492,7 +492,7 @@
 #endif
       tLen = LEN_TRIM(CABOUT)
       CABOUT = CABOUT(1:tLen)//CHAR(13)//CHAR(13)//&
-               'Copyright CCDC and STFC, (2008-2014)'//CHAR(13)//CHAR(13)//&
+               'Copyright CCDC and STFC, (2008-2015)'//CHAR(13)//CHAR(13)//&
                'Licenced as part of the CSDS System'//CHAR(13)
       CALL WMessageBox(OkOnly, InformationIcon, CommonOk, TRIM(CABOUT), 'About DASH')
 
