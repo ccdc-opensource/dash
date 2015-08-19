@@ -68,7 +68,7 @@
 ! to a Mogul exe specified
 
       CHARACTER(10) :: ProgramVersion
-      DATA ProgramVersion / 'DASH 3.3.3' /
+      DATA ProgramVersion / 'DASH 3.3.5' /
 
 ! File information; Names of files used by DASH For I/O
       CHARACTER(MaxPathLength)  DashTicFile
@@ -76,20 +76,6 @@
       CHARACTER(MaxPathLength)  DashPikFile
       CHARACTER(MaxPathLength)  DashRawFile
       CHARACTER(MaxPathLength)  DashDslFile
-
-! New license information structure    
-      TYPE License_Info
-        CHARACTER(80) KeyStr
-        INTEGER   ExpiryDate
-        INTEGER   DaysLeft
-        INTEGER   SerialNumber
-        INTEGER   LicenceType
-        INTEGER   Valid
-      END TYPE
-      INTEGER NodeKey, DemoKey, SiteKey
-      PARAMETER (NodeKey = 1)
-      PARAMETER (DemoKey = 2)
-      PARAMETER (SiteKey = 3)
 
       INTEGER            EventType
       TYPE(WIN_MESSAGE)  EventInfo
