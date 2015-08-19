@@ -63,8 +63,6 @@ REM        CALL %MAINDIR%\export_command.bat %OUTPUTDIR%                        
 REM Make Documentation areas
 
     MKDIR %OUTPUTDIR%\Documentation
-    MKDIR %OUTPUTDIR%\Documentation\manual
-    MKDIR %OUTPUTDIR%\Documentation\manual\output
     MKDIR "%OUTPUTDIR%\Documentation\Extinction Symbol Documents"
     MKDIR %OUTPUTDIR%\Documentation\Tutorial1\
     MKDIR "%OUTPUTDIR%\Documentation\Tutorial1\Data files"
@@ -168,11 +166,7 @@ if not exist %MERCURY_FOLDER% goto nomercury
     call copy_qt_exe.bat %DASH_EXE% %OUTPUTDIR%    
 :start_mercury    
 
-    set CURRENT_DIRECTORY=%cd%
-    cd %OUTPUTDIR%\Mercury
-    RENAME mercury.exe dash_mercury.exe
-    
-    cd %CURRENT_DIRECTORY%
+    RENAME %OUTPUTDIR%\mercury\mercury.exe dash_mercury.exe
     
     goto out
 

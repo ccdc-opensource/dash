@@ -35,8 +35,7 @@
       CALL IOsDirName(InstallationDirectory)
       InstallationDirectory = TRIM(InstallationDirectory)//DIRSPACER
       DocumentationRoot = TRIM(InstallationDirectory)//"Documentation"//DIRSPACER
-      DocumentationHTMLdirectory =  TRIM(DocumentationRoot)//"manual"//DIRSPACER//"output"//DIRSPACER &
-                                   //"portable_html"//DIRSPACER
+      DocumentationHTMLdirectory =  TRIM(DocumentationRoot)//"dash"//DIRSPACER
 
 #ifdef _WIN32
       ! Operating system version number (e.g. 400=4.00)

@@ -3441,7 +3441,7 @@
         AH(I) = ABS(H(I))
       ENDDO
 ! NMAX= LARGEST:
-      NMAX = MAX1(AH(1),AH(2),AH(3))
+      NMAX = NINT(MAX(AH(1),AH(2),AH(3)))
 ! FOR 0,0,0 EXIT WITH N=0
       IF (NMAX.EQ.0) GOTO 100
       FN = FLOAT(NMAX)
