@@ -69,7 +69,7 @@
                     <platforms>windows</platforms>
                     <distributionFileList>
                         <distributionDirectory allowWildcards="1">
-                            <origin>${env(DISTRIBUTION_DIRECTORY)}/dash/dash_latest/*</origin>
+                            <origin>${env(DISTRIBUTION_DIRECTORY)}/dash/latest/*</origin>
                         </distributionDirectory>
                     </distributionFileList>
                 </folder>
