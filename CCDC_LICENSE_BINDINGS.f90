@@ -5,7 +5,7 @@
       MODULE CCDC_LICENSE_BINDINGS 
       INTERFACE
       INTEGER (C_INT) FUNCTION CCDC_IS_LICENSED(USE_GUI) & 
-      BIND(C,NAME='is_licensed')
+      BIND(C,NAME='is_dash_licensed')
       USE FTN_C_1
       IMPLICIT NONE 
       INTEGER (C_INT), VALUE :: USE_GUI
