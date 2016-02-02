@@ -176,7 +176,7 @@ RESSRC        = ./PCDruid_resource.RC \
 		res/bimodal.ico \
 		res/ChiSqd3.bmp \
 		res/cooling.bmp \
-		res/DASH.ico \
+		../cppbuilds_shared/icons/dash/dash.ico \
 		res/DeleteFile.bmp \
 		res/Del_abc.bmp \
 		res/Del_PFR.bmp \
