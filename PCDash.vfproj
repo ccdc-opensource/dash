@@ -152,7 +152,7 @@
 		<File RelativePath=".\statlog.inc"/></Filter>
 		<Filter Name="Resource Files" Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe">
 		<File RelativePath=".\res\bimodal.ico"/>
-		<File RelativePath=".\res\DASH.ico"/>
+		<File RelativePath="..\cppbuilds_shared\icons\dash\dash.ico"/>
 		<File RelativePath=".\res\OpenFile.bmp"/>
 		<File RelativePath=".\PCDruid_resource.RC">
 			<FileConfiguration Name="release_build|Win32">

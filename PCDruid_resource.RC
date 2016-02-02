@@ -3920,7 +3920,7 @@ IDB_Down                        BITMAP DISCARDABLE "res\\Down.bmp"
 //
 // Icons
 //
-icon1                           ICON   DISCARDABLE "res\\DASH.ico"
+icon1                           ICON   DISCARDABLE "..\\cppbuilds_shared\\icons\\dash\\dash.ico"
 IDF_BimodalIcon                 ICON   DISCARDABLE "res\\bimodal.ico"
 IDF_TriModalIcon                ICON   DISCARDABLE "res\\trimodal.ico"
 
