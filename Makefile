@@ -173,7 +173,7 @@ INCLS      = GLBVAR.INC \
 		statlog.inc \
 		SGinc/ffcalctop.inc 
 RESSRC        = ./PCDruid_resource.RC \
-		res/bimodal.ico \
+		../cppbuilds_shared/icons/bimodal.ico \
 		res/ChiSqd3.bmp \
 		res/cooling.bmp \
 		../cppbuilds_shared/icons/dash/dash.ico \
@@ -190,7 +190,7 @@ RESSRC        = ./PCDruid_resource.RC \
 		res/PolyFitterWizard.bmp \
 		res/save.bmp \
 		res/TOOLBAR1.BMP \
-		res/trimodal.ico \
+		../cppbuilds_shared/icons/trimodal.ico \
 		res/Up.bmp \
 		res/WidthEquations.bmp \
 		res/wizard.bmp \
