@@ -53,7 +53,7 @@ REM        CALL %MAINDIR%\export_command.bat %OUTPUTDIR%                        
     CALL %MAINDIR%\export_command.bat %OUTPUTDIR%                          "dash/RIETAN2000.tem"
     CALL %MAINDIR%\export_command.bat %OUTPUTDIR%                          "dash/RIETANFP.tem"
 
-    CALL %MAINDIR%\export_command.bat %OUTPUTDIR%\icons                          "dash/icons"
+    CALL %MAINDIR%\export_command.bat %OUTPUTDIR%\icons                          "cppbuilds_shared/icons/dash"
     MKDIR "%OUTPUTDIR%\Unsupported Extras"
     CALL %MAINDIR%\export_command.bat "%OUTPUTDIR%\Unsupported Extras"             "dash/Unsupported Extras/MDash.exe"
     CALL %MAINDIR%\export_command.bat "%OUTPUTDIR%\Unsupported Extras"             "dash/Unsupported Extras/MDASH.pdf"
