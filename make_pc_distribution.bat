@@ -129,21 +129,9 @@ REM  put the special positions exe in the same place as
 REM  ZMCONV to use same distributed libraries
     COPY %SPECIAL_POSN_EXE% %OUTPUTDIR%\zmconv 
     cd %WD%
-    goto start_mercury
+    goto start_dash
 :nozmconv    
     echo Could not locate the zmconv executable %ZMCONV_EXE%
-    echo distribution will be incomplete
-    
-:start_mercury
-
-if not exist %MERCURY_FOLDER% goto nomercury
-    echo %MAINDIR%\copy_directory.bat "%MERCURY_FOLDER%" "%OUTPUTDIR%\mercury"
-    call %MAINDIR%\copy_directory.bat "%MERCURY_FOLDER%" "%OUTPUTDIR%\mercury"
-
-    goto start_dash
-
-:nomercury
-    echo Could not locate the mercury executable %MERCURY_FOLDER%
     echo distribution will be incomplete
     
 :start_dash    
@@ -164,9 +152,6 @@ if not exist %MERCURY_FOLDER% goto nomercury
     XCOPY %XCOPY_ARGS% %INTEL_DLL_FOLDER%\libmmd.dll %OUTPUTDIR%
     XCOPY %XCOPY_ARGS% %INTEL_DLL_FOLDER%\svml_dispmd.dll %OUTPUTDIR%
     call copy_qt_exe.bat %DASH_EXE% %OUTPUTDIR%    
-:start_mercury    
-
-    RENAME %OUTPUTDIR%\mercury\mercury.exe dash_mercury.exe
     
     goto out
 
