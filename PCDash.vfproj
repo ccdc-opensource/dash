@@ -43,7 +43,7 @@
 		<File RelativePath=".\Basic_Strings.f90"/>
 		<File RelativePath=".\Basic_Vectors.f90"/>
 		<File RelativePath=".\BatchMode.f90"/>
-		<File RelativePath=".\CCDC_LICENSE_BINDINGS.f90"/>
+		<File RelativePath=".\CCDC_CPLUSPLUS_CODE_BINDINGS.f90"/>
 		<File RelativePath=".\Ccslmain.f90"/>
 		<File RelativePath=".\Chi_sq_plot.F90"/>
 		<File RelativePath=".\create_fob.f90"/>
