@@ -64,11 +64,12 @@
       END SELECT
       CALL PopActiveWindowID
 
-      END SUBROUTINE DealWithSAStatusWindow
+    END SUBROUTINE DealWithSAStatusWindow
 !
 !*****************************************************************************
 !
-      SUBROUTINE ViewStructure(TheFileName, BuiltInOnly)
+
+    SUBROUTINE ViewStructure(TheFileName, BuiltInOnly)
 !
 ! This routine displays a molecular file
 ! TheFileName may include the full path, but cannot be a relative path ("..\molecule.pdb" is not allowed)
@@ -76,6 +77,7 @@
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
+      USE CCDC_EXTERNAL_APPLICATIONS_BINDINGS
 
       IMPLICIT NONE
 
@@ -86,6 +88,12 @@
       INTEGER I, M
       LOGICAL exists, tBuiltInMercury, tUseClient
       CHARACTER(MaxPathLength+40) tArgStr, tExeStr
+      CHARACTER(1024) FullFileName
+      
+      
+      INTEGER iUseClient
+      
+
 
       IF (BuiltInOnly) THEN
         tBuiltInMercury = .TRUE.
@@ -100,29 +108,48 @@
         CALL DASHWDialogGetString(IDF_ViewArg,ViewArg)
         CALL PopActiveWindowID
       ENDIF
+      
+      
       IF (tBuiltInMercury) THEN
-        tExeStr = TRIM(InstallationDirectory)//'Mercury'//DIRSPACER//'dash_mercury'//CCDC_EXE_EXT
-        tArgStr = '-lf "'//TRIM(PathToLicenseFile)//'" -load-all-files'
-        IF (tUseClient) tArgStr = TRIM(tArgStr)//' -client'
+
+          
+         iUseClient = 0
+         IF (tUseClient) iUseClient = 1
+         
+         CALL IOsFullPathname(TheFileName,FullFileName)
+
+         I = CCDC_LAUNCH_MERCURY( TRIM(FullFileName)//CHAR(0), iUseClient )
+         
+         IF ( I.EQ.0 ) &
+            RETURN
+         
+         IF ( I.EQ.2 ) THEN
+             tArgStr = 'The file named '//TRIM(FullFileName)//' Doesnt seem to exist or is unreadable ...'
+             CALL ErrorMessage(TRIM(tArgStr))
+             RETURN
+         ENDIF
       ELSE
         tExeStr = ViewExe
         tArgStr = ViewArg
-      ENDIF
-      I = LEN_TRIM(tExeStr)
-      IF (I .EQ. 0) THEN
-        CALL ErrorMessage('DASH could not launch the viewer. '// &
-                          'No viewer executable is currently specified.'//CHAR(13)//&
-                          'This can be changed in the Configuration... window'//CHAR(13)//&
-                          'under Options in the menu bar.')
+
+        I = LEN_TRIM(tExeStr)
+      
+        IF (I .EQ. 0) THEN
+           CALL ErrorMessage('DASH could not launch the viewer. '// &
+                             'No viewer executable is currently specified.'//CHAR(13)//&
+                             'This can be changed in the Configuration... window'//CHAR(13)//&
+                             'under Options in the menu bar.')
+          RETURN
+        ENDIF
+   
+        INQUIRE(FILE = tExeStr(1:I),EXIST=exists)
+        IF (.NOT. exists) GOTO 999
+        M = InfoError(1) ! Clear errors
+        CALL IOSCommand('"'//tExeStr(1:I)//'" '//TRIM(tArgStr)//' "'//TRIM(TheFileName)//'"')
+        IF (InfoError(1) .NE. 0) GOTO 999
         RETURN
-      ENDIF
-      INQUIRE(FILE = tExeStr(1:I),EXIST=exists)
-      IF (.NOT. exists) GOTO 999
-      M = InfoError(1) ! Clear errors
-      CALL IOSCommand('"'//tExeStr(1:I)//'" '//TRIM(tArgStr)//' "'//TRIM(TheFileName)//'"')
-      IF (InfoError(1) .NE. 0) GOTO 999
-      RETURN
-  999 IF (tBuiltInMercury) THEN
+      ENDIF   
+999   IF (tBuiltInMercury) THEN
         tArgStr = 'DASH could not find or launch the built in Mercury: '//CHAR(13)//tExeStr(1:I)
       ELSE
         tArgStr = 'DASH could not find or launch the viewer. '// &
@@ -133,6 +160,7 @@
       ENDIF
       CALL ErrorMessage(TRIM(tArgStr))
       RETURN
+
       
       END SUBROUTINE ViewStructure
 !
