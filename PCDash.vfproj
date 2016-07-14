@@ -5,7 +5,24 @@
 	<Configurations>
 		<Configuration Name="Release|Win32" OutputDirectory="Release" IntermediateDirectory="Release" DeleteExtensionsOnClean="*.obj;*.mod;*.pdb;*.asm;*.map;*.dyn;*.dpi;*.tmp;*.log;*.ilk;*.exe;$(TargetPath)">
 				<Tool Name="VFFortranCompilerTool" AdditionalOptions="/QxW" SuppressStartupBanner="true" BufferedIO="true" HeapArrays="0" Preprocess="preprocessYes" AdditionalIncludeDirectories="Release/;D:\x_mirror\buildman\tools\Winteracter 8.0\lib.if8;D:\x_mirror\buildman\tools\Winteracter 8.0\include" LocalVariableStorage="localStorageSave" CommonElementAlignment="alignCommonFourBytes" ModulePath="$(INTDIR)/" ObjectFile="$(INTDIR)/" AssemblerListingLocation="$(INTDIR)/" RuntimeLibrary="rtMultiThreadedDLL"/>
-				<Tool Name="VFLinkerTool" AdditionalOptions="/MACHINE:I386" OutputFile="Release\DASH.exe" LinkIncremental="linkIncrementalNo" SuppressStartupBanner="true" AdditionalLibraryDirectories="D:\x_mirror\buildman\tools\Winteracter 8.0\lib.if8" GenerateDebugInformation="true" ProgramDatabaseFile="$(OUTDIR)/DASH.pdb" GenerateMapFile="true" MapFileName="$(INTDIR)/DASH.map" SubSystem="subSystemWindowsXP" ImportLibrary="" AdditionalDependencies="winter.lib htmlhelp.lib winmm.lib version.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib snmpapi.lib Ws2_32.lib Pdh.lib d:\x_mirror\buildman\tools\qt4.8.1-net-2010\lib\QtSql4.lib d:\x_mirror\buildman\tools\qt4.8.1-net-2010\lib\QtXml4.lib d:\x_mirror\buildman\tools\qt4.8.1-net-2010\lib\QtGui4.lib d:\x_mirror\buildman\tools\qt4.8.1-net-2010\lib\QtNetwork4.lib d:\x_mirror\buildman\tools\qt4.8.1-net-2010\lib\QtCore4.lib D:\x_mirror\buildman\tools\zlib125-dll\lib\zdll.lib ..\licencelib\licencelib_qt\release\licencelib_qt.lib ..\licencelib\licencelib_kernel\release\licencelib_kernel.lib ..\utilitieslib\utilitieslib_kernel\release\utilitieslib_kernel.lib ..\guilib\guilib_qt\release\guilib_qt.lib ..\guilib\guilib_kernel\release\guilib_kernel.lib ..\utilitieslib\utilitieslib_qt\release\utilitieslib_qt.lib"/>
+				<Tool Name="VFLinkerTool" AdditionalOptions="/MACHINE:I386" OutputFile="Release\DASH.exe" LinkIncremental="linkIncrementalNo" SuppressStartupBanner="true" AdditionalLibraryDirectories=
+				"D:\x_mirror\buildman\tools\Winteracter 8.0\lib.if8" 
+				GenerateDebugInformation="true" 
+				ProgramDatabaseFile="$(OUTDIR)/DASH.pdb" 
+				GenerateMapFile="true" 
+				MapFileName="$(INTDIR)/DASH.map" 
+				SubSystem="subSystemWindowsXP" 
+				ImportLibrary="" 
+				AdditionalDependencies="winter.lib htmlhelp.lib winmm.lib version.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib 
+				advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib snmpapi.lib Ws2_32.lib Pdh.lib 
+				d:\x_mirror\buildman\tools\qt4.8.1-net-2010\lib\QtSql4.lib d:\x_mirror\buildman\tools\qt4.8.1-net-2010\lib\QtXml4.lib 
+				d:\x_mirror\buildman\tools\qt4.8.1-net-2010\lib\QtGui4.lib d:\x_mirror\buildman\tools\qt4.8.1-net-2010\lib\QtNetwork4.lib 
+				d:\x_mirror\buildman\tools\qt4.8.1-net-2010\lib\QtCore4.lib D:\x_mirror\buildman\tools\zlib125-dll\lib\zdll.lib 
+				..\licencelib\licencelib_qt\release\licencelib_qt.lib ..\licencelib\licencelib_kernel\release\licencelib_kernel.lib 
+				..\utilitieslib\utilitieslib_kernel\release\utilitieslib_kernel.lib
+				..\database_entrylib\database_entrylib_kernel\release\database_entrylib_kernel.lib
+				..\guilib\guilib_qt\release\guilib_qt.lib ..\guilib\guilib_kernel\release\guilib_kernel.lib 
+				..\utilitieslib\utilitieslib_qt\release\utilitieslib_qt.lib"/>
 				<Tool Name="VFResourceCompilerTool" PreprocessorDefinitions="NDEBUG" Culture="rcEnglishBritain" AdditionalIncludeDirectories="D:\x_mirror\buildman\tools\Winteracter 8.0\include" ResourceOutputFileName="$(INTDIR)/$(InputName).res"/>
 				<Tool Name="VFMidlTool" PreprocessorDefinitions="NDEBUG" MkTypLibCompatible="true" SuppressStartupBanner="true" HeaderFileName="" DLLDataFileName="" TypeLibraryName="$(OUTDIR)/PCDash.tlb"/>
 				<Tool Name="VFCustomBuildTool"/>
@@ -15,7 +32,19 @@
 				<Tool Name="VFManifestTool" SuppressStartupBanner="true"/></Configuration>
 		<Configuration Name="Debug|Win32" OutputDirectory="Debug" IntermediateDirectory="Debug" DeleteExtensionsOnClean="*.obj;*.mod;*.pdb;*.asm;*.map;*.dyn;*.dpi;*.tmp;*.log;*.ilk;*.exe;$(TargetPath)">
 				<Tool Name="VFFortranCompilerTool" SuppressStartupBanner="true" DebugInformationFormat="debugEnabled" Optimization="optimizeDisabled" BufferedIO="true" Preprocess="preprocessYes" AdditionalIncludeDirectories="Debug/;D:\x_mirror\buildman\tools\Winteracter 8.0\lib.if8;D:\x_mirror\buildman\tools\Winteracter 8.0\include" PreprocessorDefinitions="ONTBUG" WarnUnusedVariables="true" WarnTruncateSource="true" LocalVariableStorage="localStorageSave" CommonElementAlignment="alignCommonEightBytes" AlignSEQUENCE="true" ModulePath="$(INTDIR)/" ObjectFile="$(INTDIR)/" AssemblerListingLocation="$(INTDIR)/" Traceback="true" NullPointerCheck="true" BoundsCheck="true" UninitializedVariablesCheck="true" RuntimeLibrary="rtMultiThreadedDebugDLL"/>
-				<Tool Name="VFLinkerTool" AdditionalOptions="/MACHINE:I386" OutputFile="Debug/DASH.exe" LinkIncremental="linkIncrementalNo" SuppressStartupBanner="true" AdditionalLibraryDirectories="D:\x_mirror\buildman\tools\Winteracter 8.0\lib.if8;..\libs\debug" GenerateDebugInformation="true" ProgramDatabaseFile="$(OUTDIR)/BDASH.pdb" SubSystem="subSystemWindows" ImportLibrary="" AdditionalDependencies="winter.lib htmlhelp.lib winmm.lib version.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib snmpapi.lib Ws2_32.lib Pdh.lib  d:\x_mirror\buildman\tools\qt4.8.1-net-2010\lib\QtSqld4.lib d:\x_mirror\buildman\tools\qt4.8.1-net-2010\lib\QtXmld4.lib d:\x_mirror\buildman\tools\qt4.8.1-net-2010\lib\QtGuid4.lib d:\x_mirror\buildman\tools\qt4.8.1-net-2010\lib\QtNetworkd4.lib d:\x_mirror\buildman\tools\qt4.8.1-net-2010\lib\QtCored4.lib D:\x_mirror\buildman\tools\zlib125-dll\lib\zdll.lib ..\licencelib\licencelib_qt\debug\licencelib_qt_debug.lib ..\licencelib\licencelib_kernel\debug\licencelib_kernel_debug.lib ..\guilib\guilib_qt\debug\guilib_qt_debug.lib ..\guilib\guilib_kernel\debug\guilib_kernel_debug.lib ..\utilitieslib\utilitieslib_kernel\debug\utilitieslib_kernel_debug.lib"/>
+				<Tool Name="VFLinkerTool" AdditionalOptions="/MACHINE:I386" OutputFile="Debug/DASH.exe" LinkIncremental="linkIncrementalNo" SuppressStartupBanner="true"
+				 AdditionalLibraryDirectories="D:\x_mirror\buildman\tools\Winteracter 8.0\lib.if8;..\libs\debug" 
+				 GenerateDebugInformation="true" ProgramDatabaseFile="$(OUTDIR)/BDASH.pdb" SubSystem="subSystemWindows" 
+				 ImportLibrary="" 
+				 AdditionalDependencies="winter.lib htmlhelp.lib winmm.lib version.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib 
+				 shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib snmpapi.lib Ws2_32.lib Pdh.lib  
+				 d:\x_mirror\buildman\tools\qt4.8.1-net-2010\lib\QtSqld4.lib d:\x_mirror\buildman\tools\qt4.8.1-net-2010\lib\QtXmld4.lib 
+				 d:\x_mirror\buildman\tools\qt4.8.1-net-2010\lib\QtGuid4.lib d:\x_mirror\buildman\tools\qt4.8.1-net-2010\lib\QtNetworkd4.lib 
+				 d:\x_mirror\buildman\tools\qt4.8.1-net-2010\lib\QtCored4.lib D:\x_mirror\buildman\tools\zlib125-dll\lib\zdll.lib 
+				 ..\licencelib\licencelib_qt\debug\licencelib_qt_debug.lib ..\licencelib\licencelib_kernel\debug\licencelib_kernel_debug.lib 
+				 ..\database_entrylib\database_entrylib_kernel\debug\database_entrylib_kernel_debug.lib
+				 ..\guilib\guilib_qt\debug\guilib_qt_debug.lib ..\guilib\guilib_kernel\debug\guilib_kernel_debug.lib 
+				 ..\utilitieslib\utilitieslib_kernel\debug\utilitieslib_kernel_debug.lib"/>
 				<Tool Name="VFResourceCompilerTool" PreprocessorDefinitions="_DEBUG" Culture="rcEnglishBritain" AdditionalIncludeDirectories="D:\x_mirror\buildman\tools\Winteracter 8.0\include" ResourceOutputFileName="$(INTDIR)/$(InputName).res"/>
 				<Tool Name="VFMidlTool" PreprocessorDefinitions="_DEBUG" MkTypLibCompatible="true" SuppressStartupBanner="true" HeaderFileName="" DLLDataFileName="" TypeLibraryName="$(OUTDIR)/PCDash.tlb"/>
 				<Tool Name="VFCustomBuildTool"/>
