@@ -68,7 +68,7 @@
 ! to a Mogul exe specified
 
       CHARACTER(10) :: ProgramVersion
-      DATA ProgramVersion / 'DASH 3.3.5' /
+      DATA ProgramVersion / 'DASH 3.3.6' /
 
 ! File information; Names of files used by DASH For I/O
       CHARACTER(MaxPathLength)  DashTicFile
