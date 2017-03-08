@@ -71,13 +71,13 @@ install(
 )
 
 install(
-    DIRECTORIES ${MAINDIR}/cppbuilds_shared/icons/dash/
+    DIRECTORY   ${MAINDIR}/cppbuilds_shared/icons/dash/
     DESTINATION ${basedir}/icons
     COMPONENT   ${component}
 )
 
 install(
-    DIRECTORIES expcli
+    DIRECTORY   expcli
     DESTINATION ${basedir}
     COMPONENT   ${component}
 )
