@@ -10,13 +10,13 @@ set(docs "${basedir}/Documentation")
 
 install(
     FILES       Tutorial_1.xye Tutorial_1.mol2
-    DESTINATION "${docs}/Tutorial1/Data Files"
+    DESTINATION "${docs}/Tutorial1/Data files"
     COMPONENT   ${component}
 )
 
 install(
     FILES       Tutorial_2.xye Tutorial_2.mol2
-    DESTINATION "${docs}/Tutorial2/Data Files"
+    DESTINATION "${docs}/Tutorial2/Data files"
     COMPONENT   ${component}
 )
 
@@ -24,25 +24,25 @@ install(
     FILES       Tutorial_3.xye Tutorial_3-trans.mol2 Tutorial_3-cis.mol2
                 Tutorial_3-ModelA.zmatrix Tutorial_3-ModelB.zmatrix
                 Tutorial_3-ModelC.zmatrix
-    DESTINATION "${docs}/Tutorial3/Data Files"
+    DESTINATION "${docs}/Tutorial3/Data files"
     COMPONENT   ${component}
 )
 
 install(
     FILES       Tutorial_4.xye Tutorial_4-half.mol2 Tutorial_4-full.mol2
-    DESTINATION "${docs}/Tutorial4/Data Files"
+    DESTINATION "${docs}/Tutorial4/Data files"
     COMPONENT   ${component}
 )
 
 install(
     FILES       Tutorial_5.xye Tutorial_5.mol2 Tutorial_5-2.mol2
-    DESTINATION "${docs}/Tutorial5/Data Files"
+    DESTINATION "${docs}/Tutorial5/Data files"
     COMPONENT   ${component}
 )
 
 install(
     FILES       Tutorial_6.raw Tutorial_6-atoms.mol2 Tutorial_6-frags.mol2
-    DESTINATION "${docs}/Tutorial6/Data Files"
+    DESTINATION "${docs}/Tutorial6/Data files"
     COMPONENT   ${component}
 )
 
