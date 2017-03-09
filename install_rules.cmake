@@ -71,7 +71,7 @@ install(
 )
 
 install(
-    DIRECTORY   ${MAINDIR}/cppbuilds_shared/icons/dash/
+    DIRECTORY   ${MAIN_SOURCE_DIR}/cppbuilds_shared/icons/dash/
     DESTINATION ${basedir}/icons
     COMPONENT   ${component}
 )
