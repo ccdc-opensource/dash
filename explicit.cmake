@@ -28,4 +28,11 @@ endif()
 
 set(DASH_BUILD_DIR      "${DASH_BINARY_DIR}/dash.dir")
 set(VFPRO_FILE          "${DASH_BUILD_DIR}/PCDash.vfproj")
-include_external_msproject(${VFPRO_FILE})
+include_external_msproject(
+    dash
+    ${VFPRO_FILE}
+
+    # Hard coded dependencies: TODO Somehow generate this from within build tool
+    guilib_qt
+    licencelib_qt
+)
