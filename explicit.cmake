@@ -1,4 +1,8 @@
 
+# Silently disable this
+return()
+
+
 # We can get only here, if we are actually build on Windows and CCDC_WANT_DASH is set, so we can hard code an error
 # if there's no intel fortran compiler:
 
