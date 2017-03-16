@@ -26,14 +26,14 @@ if(NOT MSVC_IDE)
 endif()
 
 
-set(DASH_BUILD_DIR      "${DASH_BINARY_DIR}/dash.dir")
-set(VFPRO_FILE          "${DASH_BUILD_DIR}/PCDash.vfproj")
+set(DASH_BUILD_DIR "${DASH_BINARY_DIR}/dash.dir")
+file(TO_NATIVE_PATH "${DASH_BUILD_DIR}/PCDash.vfproj" VFPRO_FILE)
 
 add_custom_target(
     dash ALL
 
     COMMAND
-        devenv ${VFPRO_FILE} /build /config:$<CONFIG>
+        devenv ${VFPRO_FILE} /Build $<CONFIG>
 
     WORKING_DIRECTORY
         ${DASH_BUILD_DIR}
