@@ -11,21 +11,6 @@ if(NOT $ENV{CCDC_IFORTRAN_AVAILABLE})
     return()
 endif()
 
-# Compiling DASH only works, if the make-tool is the Microsoft Visual Studio _IDE_!
-# (nmake, jom or ninja based build are not supported)
-#
-# 1. These tools don't know how to build a ".vfproj" file
-# 2. Since the .vfproj contains both debug and release settings, we'd need to have much more information avaiable than
-#    we can get from looking at the current environment variables.
-
-if(NOT MSVC_IDE)
-    message(
-        FATAL_ERROR
-        "Compiling DASH requires to build using the Microsoft Visual Studio IDE. NMake, Jom, Ninja or similar make tools are not supported."
-    )
-endif()
-
-
 set(DASH_BUILD_DIR "${DASH_BINARY_DIR}/dash.dir")
 file(TO_NATIVE_PATH "${DASH_BUILD_DIR}/PCDash.vfproj" VFPRO_FILE)
 
