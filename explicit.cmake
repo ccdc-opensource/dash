@@ -33,7 +33,7 @@ add_custom_target(
     dash ALL
 
     COMMAND
-        devenv /build /config:$<CONFIG> ${VFPRO_FILE}
+        devenv ${VFPRO_FILE} /build /config:$<CONFIG>
 
     WORKING_DIRECTORY
         ${DASH_BUILD_DIR}
