@@ -28,7 +28,7 @@ endif()
 
 set(DASH_BUILD_DIR      "${DASH_BINARY_DIR}/dash.dir")
 set(VFPRO_FILE          "${DASH_BUILD_DIR}/PCDash.vfproj")
-get_env_path(DEVENV_EXE "CURRENT_BUILD_DEVSTUDIO")
+ccdc_get_env_path(DEVENV_EXE "CURRENT_BUILD_DEVSTUDIO")
 
 add_custom_target(
     dash ALL
