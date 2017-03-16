@@ -9,6 +9,12 @@ ccdc_install_docs_dirs(
 set(docs "${basedir}/Documentation")
 
 install(
+    FILES       ${CMAKE_BINARY_DIR}/bin/Release/DASH.exe
+    DESTINATION ${basedir}
+    COMPONENT   ${component}
+)
+
+install(
     FILES       Tutorial_1.xye Tutorial_1.mol2
     DESTINATION "${docs}/Tutorial1/Data files"
     COMPONENT   ${component}
