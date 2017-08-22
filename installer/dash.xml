@@ -1,7 +1,7 @@
 <project>
     <shortName>DASH</shortName>
     <fullName>DASH</fullName>
-    <version>3.3.7</version>
+    <version>${DASH_version}</version>
     <installerFilename>${project.shortName}-${platform_name}-installer.${platform_exec_suffix}</installerFilename>
     <licenseFile>Licence.txt</licenseFile>
     <leftImage>../../cppbuilds_shared/installer/images/EFEMUX01_163x314.png</leftImage>
@@ -257,7 +257,7 @@ select the "External DICVOL" option to use the version of DICVOL you have instal
             <preShowPageActionList>
                 <setInstallerVariable>
                     <name>installdir</name>
-                    <value>${platform_install_prefix}/CCDC/DASH 3.3.7</value>
+                    <value>${platform_install_prefix}/CCDC/DASH ${DASH_version}</value>
                 </setInstallerVariable>
             </preShowPageActionList>
         </directoryParameter>
