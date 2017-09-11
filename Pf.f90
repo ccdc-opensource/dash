@@ -301,7 +301,7 @@
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
-     &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
+     &                KPACK, LKH, SHESD, IISHFT, AVSHFT, AMAXSH
 
       INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
       REAL                                                       SCALEP
@@ -380,7 +380,7 @@
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
-     &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
+     &                KPACK, LKH, SHESD, IISHFT, AVSHFT, AMAXSH
 
       INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
       REAL                                                       SCALEP

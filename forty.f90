@@ -59,10 +59,10 @@
       INTEGER                                 IFAM, IGEN, ISPC, NEWIN
       INTEGER         KPACK, LKH
       REAL                        SHESD
-      INTEGER                            ISHFT
+      INTEGER                            IISHFT
       REAL                                      AVSHFT, AMAXSH
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
-     &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
+     &                KPACK, LKH, SHESD, IISHFT, AVSHFT, AMAXSH
 
       REAL            OBS, DOBS, GCALC, YCALC, DIFF
       INTEGER                                        ICODE
@@ -507,7 +507,7 @@
       COMMON /IOUNIT/ LPT, LUNI
 
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
-     &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
+     &                KPACK, LKH, SHESD, IISHFT, AVSHFT, AMAXSH
 
       LOGICAL STRKT
       COMMON /PAWLPR/ AKLO, AKHI, SLACK, STRKT, STRTOL, SLKTOL, ITST,   &

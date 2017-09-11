@@ -25,7 +25,7 @@
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
-     &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
+     &                KPACK, LKH, SHESD, IISHFT, AVSHFT, AMAXSH
 
       INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
       REAL                                                       SCALEP
@@ -172,7 +172,7 @@
       COMMON /F4PARS/ NGEN4(9,5), F4VAL(3,MF4PAR), F4PAR(3,MF4PAR),     &
      &                KF4PAR(3,MF4PAR), F4PESD(3,MF4PAR), KOM6
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
-     &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
+     &                KPACK, LKH, SHESD, IISHFT, AVSHFT, AMAXSH
 
       XOLD = PAR
       XTEM = (XOLD+SHIFT)/F4VAL(IGEN,ISPC)
@@ -236,7 +236,7 @@
       EQUIVALENCE (MM(1),MATPNT(2))
 
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
-     &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
+     &                KPACK, LKH, SHESD, IISHFT, AVSHFT, AMAXSH
 
       INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
       REAL                                                       SCALEP
@@ -612,7 +612,7 @@
       COMMON /IOUNIT/ LPT, LUNI
 
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
-     &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
+     &                KPACK, LKH, SHESD, IISHFT, AVSHFT, AMAXSH
 
       COMMON /OBSCAL/ OBS, DOBS, GCALC, YCALC, DIFF, ICODE, SUMWD, NOBS,&
      &                IWGH(5), WTC(4), WT, SQRTWT, WDIFF, YBACK, YPEAK, &
@@ -1526,7 +1526,7 @@
       COMMON /IOUNIT/ LPT, LUNI
 
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
-     &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
+     &                KPACK, LKH, SHESD, IISHFT, AVSHFT, AMAXSH
       COMMON /PREXTN/ NEXTYP, EXTPR, KEXTPR, EXTCO, DEREXQ, DXDFQ
       COMMON /REFINE/ IREF, NCYC, NCYC1, LASTCY, ICYC, MODERR(5),       &
      &                MODEOB(5), IPRNT(20), MAXCOR, IONLY(9), SIMUL,    &
@@ -1631,7 +1631,7 @@
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
-     &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
+     &                KPACK, LKH, SHESD, IISHFT, AVSHFT, AMAXSH
       COMMON /PAWLPR/ AKLO, AKHI, SLACK, STRKT, STRTOL, SLKTOL, ITST,   &
      &                ISPSLK(2,1000), IGSLAK(1000), AMSLAK(2,1000),     &
      &                WTSLAK(1000), WEELEV, KOM16
@@ -2032,7 +2032,7 @@
       COMMON /F4PARS/ NGEN4(9,5), F4VAL(3,MF4PAR), F4PAR(3,MF4PAR),     &
      &                KF4PAR(3,MF4PAR), F4PESD(3,MF4PAR), KOM6
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
-     &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
+     &                KPACK, LKH, SHESD, IISHFT, AVSHFT, AMAXSH
 
       INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
       REAL                                                       SCALEP
@@ -3581,7 +3581,7 @@
       DIMENSION ILREAD(22)
       EQUIVALENCE (ILREAD(1),ILREA(1,1))
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
-     &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
+     &                KPACK, LKH, SHESD, IISHFT, AVSHFT, AMAXSH
 
       INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
       REAL                                                       SCALEP
@@ -3785,7 +3785,7 @@
       DIMENSION ILREAD(22)
       EQUIVALENCE (ILREAD(1),ILREA(1,1))
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
-     &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
+     &                KPACK, LKH, SHESD, IISHFT, AVSHFT, AMAXSH
 
       INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
       REAL                                                       SCALEP
@@ -3868,7 +3868,7 @@
      &                KBCKGD(100,5), NBK, LBKD(20), ZBAKIN
       LOGICAL ZBAKIN
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
-     &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
+     &                KPACK, LKH, SHESD, IISHFT, AVSHFT, AMAXSH
       COMMON /PHAS0 / INRLP0, ICDLP0, INRLP1, ICDLP1, NCDF0
 
       INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
@@ -4077,7 +4077,7 @@
       LOGICAL                                MULFAS, MULSOU, MULONE
       COMMON /GLOBAL/ NINIT, NBATCH, NSYSTM, MULFAS, MULSOU, MULONE
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
-     &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
+     &                KPACK, LKH, SHESD, IISHFT, AVSHFT, AMAXSH
 
       INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
       REAL                                                       SCALEP
@@ -4355,7 +4355,7 @@
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
-     &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
+     &                KPACK, LKH, SHESD, IISHFT, AVSHFT, AMAXSH
 
       INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
       REAL                                                       SCALEP
@@ -4913,7 +4913,7 @@
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
-     &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
+     &                KPACK, LKH, SHESD, IISHFT, AVSHFT, AMAXSH
       COMMON /PREORI/ NPRTYP, PRFDIR(3), PRFLEN, PRFPAR, KPRFPR, PRFCOR,&
      &                DERPRQ
 
@@ -6262,7 +6262,7 @@
       COMMON /IOUNIT/ LPT, LUNI
 
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
-     &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
+     &                KPACK, LKH, SHESD, IISHFT, AVSHFT, AMAXSH
 
       INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
       REAL                                                       SCALEP
@@ -6573,7 +6573,7 @@
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
-     &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
+     &                KPACK, LKH, SHESD, IISHFT, AVSHFT, AMAXSH
 
       INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
       REAL                                                       SCALEP

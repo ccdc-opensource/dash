@@ -2181,7 +2181,32 @@
       END SUBROUTINE ShowWithWizardWindowSASettings      
 !
 !*****************************************************************************
-!
+      
+      INTEGER FUNCTION SAParams_PullDownState
+      
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+      USE ZMVAR
+
+      IMPLICIT NONE 
+      REAL            T0, RT
+      COMMON /saparl/ T0, RT
+
+      INTEGER         nvar, ns, nt, iseed1, iseed2
+      COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
+      
+      IF ( NS .EQ. 73 .AND. NT .EQ. 56 .AND. RT .EQ. 0.27) THEN
+         SAParams_PullDownState = 1
+      ELSE IF ( NS .EQ. 20 .AND. NT .EQ. 25 .AND. RT .EQ. 0.02) THEN
+         SAParams_PullDownState = 2
+      ELSE
+         SAParams_PullDownState = 3
+      ENDIF
+ 
+      RETURN      
+      END FUNCTION SAParams_PullDownState
+      
       SUBROUTINE DealWithWizardWindowSASettings
 
       USE WINTERACTER
@@ -2212,13 +2237,17 @@
       LOGICAL, EXTERNAL :: Confirm, DASHWDialogGetCheckBoxLogical
       INTEGER, EXTERNAL :: WriteSAParametersToFile
       CHARACTER*20, EXTERNAL :: GetSeed1SuffixString
+
+      INTEGER, EXTERNAL :: SAParams_PullDownState
+      
       INTEGER IHANDLE, KPOS
       REAL    MaxMoves1
       INTEGER MaxMoves2
-
+    
 ! We are now on window number 3
       CALL PushActiveWindowID
       CALL SelectDASHDialog(IDD_SA_input3_2)
+      
       SELECT CASE (EventType)
         CASE (PushButton)
           SELECT CASE (EventInfo%VALUE1)
@@ -2270,9 +2299,17 @@
 ! two 'Print' outputs on screen. The possibility of editing the file is probably more useful.
                 CALL SetChildWinAutoClose(IHANDLE)
               ENDIF
+            CASE (IDF_SA_Fast_Settings)
+              CALL Upload_FastSettings()
+              KPOS = NS * NT * NVAR
+              CALL WDialogPutInteger(IDF_SA_Moves, KPOS)
+            CASE (IDF_SA_v33_Default_Settings)
+              CALL Upload_V33_Settings()
+              KPOS = NS * NT * NVAR
+              CALL WDialogPutInteger(IDF_SA_Moves, KPOS)                
           END SELECT
         CASE (FieldChanged)
-          SELECT CASE (EventInfo%VALUE1)
+          SELECT CASE (EventInfo%VALUE1)          
             CASE (IDF_SA_T0) 
               CALL DASHWDialogGetReal(IDF_SA_T0, T0)
             CASE (IDF_SA_NS) 
@@ -2282,7 +2319,7 @@
             CASE (IDF_SA_NT) 
               CALL DASHWDialogGetInteger(IDF_SA_NT, NT)
               KPOS = NS * NT * NVAR
-              CALL WDialogPutInteger(IDF_SA_Moves, KPOS)
+              CALL WDialogPutInteger(IDF_SA_Moves, KPOS)           
             CASE (IDF_SA_RandomSeed1) 
               CALL DASHWDialogGetInteger(IDF_SA_RandomSeed1, ISeed1)
             CASE (IDF_SA_RandomSeed2) 
