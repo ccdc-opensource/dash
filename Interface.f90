@@ -3258,8 +3258,18 @@
       REAL                                                           ChiMult
       COMMON /MULRUN/ Curr_SA_Run, NumOf_SA_Runs, MaxRuns, MaxMoves, ChiMult      
       
+      
+      INTEGER Start_N1,Start_N2
+      REAL Start_CoolRate
+      COMMON / CoolSchd / Start_N1, Start_N2, Start_CoolRate
+      
+
       INTEGER tInt
       REAL tReal
+
+      Start_N1 = Ns
+      Start_N2 = NT
+      Start_CoolRate = RT
 
       IF ( IN_BATCH ) RETURN
       
@@ -3299,6 +3309,55 @@
       CALL Upload_Integer_SA_input3(IDF_SA_NT,TheValue)
       
       END SUBROUTINE Upload_N2
+
+      SUBROUTINE Upload_N1_N2_and_CoolingRate(N1,N2,CoolingRate)
+      USE WINTERACTER
+      USE DRUID_HEADER
+      USE VARIABLES
+      INTEGER, INTENT(IN) :: N1
+      INTEGER, INTENT(IN) :: N2
+      REAL, INTENT(IN) :: CoolingRate
+      
+      
+      
+      CALL Upload_N1(N1)
+      CALL Upload_N2(N2)
+      CALL Upload_CoolingRate(CoolingRate)
+      
+      END SUBROUTINE Upload_N1_N2_and_CoolingRate
+
+      SUBROUTINE Upload_FastSettings()
+      
+      REAL            T0, RT
+      COMMON /saparl/ T0, RT
+
+      INTEGER         nvar, ns, nt, iseed1, iseed2
+      COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
+      
+      NS = 73
+      NT = 56
+      RT = 0.27
+      
+      CALL Upload_N1_N2_and_CoolingRate(73,56,0.27)
+      
+      END SUBROUTINE Upload_FastSettings
+
+      SUBROUTINE Upload_V33_Settings()
+      
+      REAL            T0, RT
+      COMMON /saparl/ T0, RT
+
+      INTEGER         nvar, ns, nt, iseed1, iseed2
+      COMMON /sapars/ nvar, ns, nt, iseed1, iseed2
+      
+      NS = 20
+      NT = 25
+      RT = 0.02
+            
+      CALL Upload_N1_N2_and_CoolingRate(20,25,0.02)
+            
+      END SUBROUTINE Upload_V33_Settings
+
 
       SUBROUTINE Upload_MaxRuns(TheValue)
       USE WINTERACTER
@@ -3360,6 +3419,7 @@
       CALL Upload_Real_SA_input3(IDF_SA_T0,TheValue)
       
       END SUBROUTINE Upload_T0
+      
       
       SUBROUTINE Upload_CoolingRate(TheValue)
       USE WINTERACTER

@@ -194,7 +194,7 @@
       COMMON /F4PARS/ NGEN4(9,5), F4VAL(3,MF4PAR), F4PAR(3,MF4PAR),     &
      &                KF4PAR(3,MF4PAR), F4PESD(3,MF4PAR), KOM6
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
-     &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
+     &                KPACK, LKH, SHESD, IISHFT, AVSHFT, AMAXSH
 
       INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
       REAL                                                       SCALEP

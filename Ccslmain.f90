@@ -543,7 +543,7 @@
       COMMON /FUDG  / NFUDGE, IFDGPT(20), FUDGE1(20), FUDGE2(20),       &
      &                IFDTYP(20)
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
-     &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
+     &                KPACK, LKH, SHESD, IISHFT, AVSHFT, AMAXSH
       REAL FudgeFactor
 
       XOLD = PAR
@@ -1766,7 +1766,7 @@
       COMMON /CELPAR/ CELL(3,3,2), V(2), ORTH(3,3,2), CPARS(6,2),       &
      &                KCPARS(6), CELESD(6,6,2), CELLSD(6,6), KOM4
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
-     &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
+     &                KPACK, LKH, SHESD, IISHFT, AVSHFT, AMAXSH
       COMMON /SCRACH/ MESSAG, NAMFIL
       CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
       EQUIVALENCE (ICARD,MESSAG)
@@ -2824,7 +2824,7 @@
      &                , DEXDFQ, DEXDRQ, DEXDGQ, LOREN, GAUSS
       LOGICAL LOREN, GAUSS
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
-     &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
+     &                KPACK, LKH, SHESD, IISHFT, AVSHFT, AMAXSH
 
       GOTO (1,2,2,4,5,6), N
       ENTRY EXTIN1
@@ -2916,7 +2916,7 @@
       COMMON /FORMDA/ NFORMF(MaxAtm_3), MODE(20), NT(20), F(40,20), S(40,20),&
      &                CMULT(20), KCMULT(MaxAtm_3), NBAKF(20), NUMFNM, KOM7
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
-     &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
+     &                KPACK, LKH, SHESD, IISHFT, AVSHFT, AMAXSH
       INTEGER         NATOM
       REAL                   X
       INTEGER                          KX
@@ -3178,7 +3178,7 @@
       COMMON /FORMDA/ NFORMF(MaxAtm_3), MODE(20), NT(20), F(40,20), S(40,20),&
      &                CMULT(20), KCMULT(MaxAtm_3), NBAKF(20), NUMFNM, KOM7
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
-     &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
+     &                KPACK, LKH, SHESD, IISHFT, AVSHFT, AMAXSH
       INTEGER         NATOM
       REAL                   X
       INTEGER                          KX
@@ -3480,16 +3480,16 @@
 !A  N=3 print at cycle end
 !A On entry 2 SH holds the shift
 !A            ES holds the esd
-!P In /NEWOLD/ ISHFT = number of shifts dealt with so far in this cycle,
+!P In /NEWOLD/ IISHFT = number of shifts dealt with so far in this cycle,
 !P             AVSHFT=the sum of their SHIFT/ESD so far,
 !P             AMAXSH=the maximum SHIFT/ESD so far.
-!D Updates ISHFT, AVSHFT and AMAXSH
+!D Updates IISHFT, AVSHFT and AMAXSH
 !
       LOGICAL TESTOV
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
-     &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
+     &                KPACK, LKH, SHESD, IISHFT, AVSHFT, AMAXSH
       COMMON /REFINE/ IREF, NCYC, NCYC1, LASTCY, ICYC, MODERR(5),       &
      &                MODEOB(5), IPRNT(20), MAXCOR, IONLY(9), SIMUL,    &
      &                MAG, MPL, FIXED, DONE, CONV
@@ -3499,18 +3499,18 @@
       GOTO (1,2,3), N
 ! INITIALISE:
     1 AVSHFT = 0.
-      ISHFT = 0
+      IISHFT = 0
       AMAXSH = 0.
       GOTO 100
 ! ADD IN TOTALS:
     2 SHESD = 0.
       IF (.NOT.TESTOV(SH,ES)) SHESD = ABS(SH/ES)
-      ISHFT = ISHFT + 1
+      IISHFT = IISHFT + 1
       AVSHFT = AVSHFT + SHESD
       AMAXSH = MAX(AMAXSH,SHESD)
       GOTO 100
 ! PRINT AT CYCLE END:
-    3 WRITE (LPT,2002) ICYC, AVSHFT/ISHFT, AMAXSH
+    3 WRITE (LPT,2002) ICYC, AVSHFT/IISHFT, AMAXSH
  2002 FORMAT (//' Average SHIFT/ESD for cycle ',I3,' =',G14.5/' Maximum SHIFT/ESD = ',G14.5)
   100 RETURN
 
@@ -4613,7 +4613,7 @@
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
-     &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
+     &                KPACK, LKH, SHESD, IISHFT, AVSHFT, AMAXSH
 
       INTEGER         LVRBS,          LVRPR,          LBSVR,          LRDVR
       COMMON /POINTS/ LVRBS(MaxVVar), LVRPR(MaxVVar), LBSVR(MaxBVar), LRDVR(MaxConstraints)
@@ -5711,7 +5711,7 @@
       COMMON /MAPRD / ZRDVAL(20), ZCRD, IRD, IZRD, IDUMPR
       COMMON /MAPSV / ZSVVAL(20), ZCSV, ISV, IZSV, NDUMPS, NSAV
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
-     &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
+     &                KPACK, LKH, SHESD, IISHFT, AVSHFT, AMAXSH
 
       INTEGER         NPHASE, IPHASE, JPHASE, KPHASE, NPHUNI
       REAL                                                       SCALEP
@@ -7299,7 +7299,7 @@
       INTEGER         LPT, LUNI
       COMMON /IOUNIT/ LPT, LUNI
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
-     &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
+     &                KPACK, LKH, SHESD, IISHFT, AVSHFT, AMAXSH
       COMMON /OVER  / ITFAC, OTFAC(10), KOTFAC(10), NTFAC, JTFAC, KOM15
       EQUIVALENCE (TFAC,OTFAC(1))
       EQUIVALENCE (KTFAC,KOTFAC(1))
@@ -8300,7 +8300,7 @@
 !H .CCN at RAL, .CRY at ILL, for unit NEWIN in /NEWOLD/
 !
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
-     &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
+     &                KPACK, LKH, SHESD, IISHFT, AVSHFT, AMAXSH
       COMMON /SCRACH/ MESSAG, NAMFIL
       CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
       EQUIVALENCE (ICARD,MESSAG)
@@ -8861,7 +8861,7 @@
       EQUIVALENCE (INREAD(1),INREA(1,1))
       EQUIVALENCE (ICDNO(1),ICDN(1,1))
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
-     &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
+     &                KPACK, LKH, SHESD, IISHFT, AVSHFT, AMAXSH
       COMMON /SCRACH/ MESSAG, NAMFIL
       CHARACTER*80 ICARD, MESSAG*100, NAMFIL*100
       EQUIVALENCE (ICARD,MESSAG)
@@ -9282,7 +9282,7 @@
       COMMON /IINFOW/ IIREAD(20)
       CHARACTER*4 IIREAD
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
-     &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
+     &                KPACK, LKH, SHESD, IISHFT, AVSHFT, AMAXSH
       COMMON /REFINE/ IREF, NCYC, NCYC1, LASTCY, ICYC, MODERR(5),       &
      &                MODEOB(5), IPRNT(20), MAXCOR, IONLY(9), SIMUL,    &
      &                MAG, MPL, FIXED, DONE, CONV
@@ -13102,7 +13102,7 @@
       EQUIVALENCE (MM(1),MATPNT(2))
 
       COMMON /NEWOLD/ SHIFT, XOLD, XNEW, ESD, IFAM, IGEN, ISPC, NEWIN,  &
-     &                KPACK, LKH, SHESD, ISHFT, AVSHFT, AMAXSH
+     &                KPACK, LKH, SHESD, IISHFT, AVSHFT, AMAXSH
       JROW = JROWPT(J)
       JNEXT = JROWPT(J+1) - 1
       SHIFT = 0.
