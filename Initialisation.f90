@@ -469,8 +469,12 @@
       lRebin = .FALSE.
       iBinWidth = 1
       RR_SA_Sol = 1
-      NS = 20
-      NT = 25
+      
+! Use Kabova (2017) settings as defaults
+      NS = 73
+      NT = 56
+      RT = 0.27
+      
       ISeed1 = 315
       ISeed2 = 159
       DO I = 1, MVAR
@@ -557,7 +561,7 @@
       PastPawley = .FALSE.
       NoWavelengthInXYE = .FALSE.
       T0 = 0.0
-      RT = 0.02
+
       ChiMult = 5.0 ! Dodgy: this must agree with the default specified in the resource file...
       MaxRuns = 25  ! Dodgy: this must agree with the default specified in the resource file...
       MaxMoves = 10000000 ! Dodgy: this must agree with the default specified in the resource file...
