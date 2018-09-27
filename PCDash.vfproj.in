@@ -4,6 +4,7 @@
     <Configurations>
         <Configuration
             Name="Release|Win32"
+            TargetName="DASH"
             OutputDirectory="${DASH_OUT_DIR_RELEASE}"
             IntermediateDirectory="${DASH_INT_DIR_RELEASE}"
             DeleteExtensionsOnClean="*.obj;*.mod;*.pdb;*.asm;*.map;*.dyn;*.dpi;*.tmp;*.log;*.ilk;*.exe;$(TargetPath)">
@@ -59,6 +60,7 @@
         </Configuration>
         <Configuration
             Name="Debug|Win32"
+            TargetName="DASH"
             OutputDirectory="${DASH_OUT_DIR_DEBUG}"
             IntermediateDirectory="${DASH_INT_DIR_DEBUG}"
             DeleteExtensionsOnClean="*.obj;*.mod;*.pdb;*.asm;*.map;*.dyn;*.dpi;*.tmp;*.log;*.ilk;*.exe;$(TargetPath)">
