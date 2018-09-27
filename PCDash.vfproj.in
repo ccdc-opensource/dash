@@ -87,7 +87,7 @@
             <Tool
                 Name="VFLinkerTool"
                 AdditionalOptions="/MACHINE:I386"
-                OutputFile="${DASH_DEBUG_EXE}"
+                OutputFile="${DASH_EXE_DEBUG}"
                 LinkIncremental="linkIncrementalNo"
                 SuppressStartupBanner="true"
                 AdditionalLibraryDirectories="D:\x_mirror\buildman\tools\Winteracter 8.0\lib.if8"
