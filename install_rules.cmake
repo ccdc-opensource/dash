@@ -8,8 +8,14 @@ ccdc_install_docs_dirs(
 
 set(docs "${basedir}/Documentation")
 
+if ("${CMAKE_MAKE_PROGRAM}" MATCHES ".*inja.*")
+    set(DASH_OUTPUT_PATH "${CMAKE_BINARY_DIR}/bin")
+else()
+    set(DASH_OUTPUT_PATH "${CMAKE_BINARY_DIR}/bin/Release")
+endif()
+
 install(
-    FILES       ${CMAKE_BINARY_DIR}/bin/Release/DASH.exe
+    FILES       ${DASH_OUTPUT_PATH}/DASH.exe
     DESTINATION ${basedir}
     COMPONENT   ${component}
 )
