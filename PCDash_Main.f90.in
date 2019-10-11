@@ -55,6 +55,8 @@
       CHARACTER(MaxPathLength) BatchLogName
       COMMON /BATLOG/ BatchLogName
 
+      CALL InitializeLicensing
+      
       in_batch = .FALSE.
       BatchLogName = ''
       CALL WInitialise(' ')
@@ -547,6 +549,9 @@
       CLOSE(UNIT=6, STATUS='DELETE', IOSTAT=ISTAT)  ! dash.out
       CALL DeleteTempFiles
       CALL WindowCloseWrap
+      
+      CALL FinalizeLicensing
+      
       STOP
 
       END SUBROUTINE DoExit

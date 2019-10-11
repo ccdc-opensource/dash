@@ -21,3 +21,24 @@
   
 #endif
       END SUBROUTINE CheckLicence
+
+    
+      SUBROUTINE InitializeLicensing
+#ifdef __G95__
+#else
+      USE CCDC_LICENSE_BINDINGS      
+      IMPLICIT NONE
+      
+      CALL INITIALIZE_LICENSING 
+#endif
+      END SUBROUTINE InitializeLicensing
+
+      SUBROUTINE FinalizeLicensing
+#ifdef __G95__
+#else
+      USE CCDC_LICENSE_BINDINGS      
+      IMPLICIT NONE
+      
+      CALL FINALIZE_LICENSING 
+#endif
+      END SUBROUTINE FinalizeLicensing
