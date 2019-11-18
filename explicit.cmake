@@ -31,5 +31,5 @@ add_dependencies(
 
     # Hard coded dependencies: TODO Somehow generate this from within build tool
     guilib_qt
-    licencelib_qt
+    licensinglib_dash
 )
