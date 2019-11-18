@@ -55,6 +55,8 @@
       CHARACTER(MaxPathLength) BatchLogName
       COMMON /BATLOG/ BatchLogName
 
+      CALL InitializeLicensing
+      
       in_batch = .FALSE.
       BatchLogName = ''
       CALL WInitialise(' ')
@@ -493,7 +495,7 @@
       tLen = LEN_TRIM(CABOUT)
       CABOUT = CABOUT(1:tLen)//CHAR(13)//CHAR(13)//&
                'Copyright CCDC and STFC, (2008-@CSDS_COPYRIGHT_YEAR@)'//CHAR(13)//CHAR(13)//&
-               'Licenced as part of the CSDS System'//CHAR(13)
+               'Licenced as part of the CSD-Materials package'//CHAR(13)
       CALL WMessageBox(OkOnly, InformationIcon, CommonOk, TRIM(CABOUT), 'About DASH')
 
       END SUBROUTINE About
@@ -547,6 +549,9 @@
       CLOSE(UNIT=6, STATUS='DELETE', IOSTAT=ISTAT)  ! dash.out
       CALL DeleteTempFiles
       CALL WindowCloseWrap
+      
+      CALL FinalizeLicensing
+      
       STOP
 
       END SUBROUTINE DoExit
