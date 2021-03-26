@@ -10,6 +10,8 @@ project(DASH
     Fortran
 )
 
+include(FetchContent)
+
 # Set up variables that will be replaced in source files
 set(DASH_VERSION ${CMAKE_PROJECT_VERSION})
 set(DASH_COPYRIGHT_YEAR "2021")
@@ -19,7 +21,13 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/PCDash_Main.f90.in" "${CMAKE_CURRENT
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/variables.f90.in" "${CMAKE_CURRENT_BINARY_DIR}/variables.f90" @ONLY)
 
 # A temporary path for winteracter 9.2
-set(WINTERACTER_ROOT "D:/winteracter/winteracter-9.2-minimal")
+FetchContent_Declare(
+  winteracter
+  URL      "https://artifactory.ccdc.cam.ac.uk/artifactory/ccdc-legacy-windows-distributions/winteracter-9.2.7z"
+  URL_HASH "SHA256=6c13d4e9b343e258630d879ff91f2d2d463ebe87d53d4224516e087197c2bf04"
+  HTTP_HEADER "X-JFrog-Art-Api:$ENV{ARTIFACTORY_API_KEY}"
+)
+FetchContent_MakeAvailable(winteracter)
 
 # Create the DASH executable target
 add_executable(DASH)
@@ -27,11 +35,11 @@ add_executable(DASH)
 target_include_directories(
   DASH
   PRIVATE
-  ${WINTERACTER_ROOT}/include
-  ${WINTERACTER_ROOT}/lib.if8
+  ${winteracter_SOURCE_DIR}/include
+  ${winteracter_SOURCE_DIR}/lib.if8
   ${CMAKE_CURRENT_SOURCE_DIR}
 )
-target_link_directories(DASH PRIVATE ${WINTERACTER_ROOT}/lib.if8)
+target_link_directories(DASH PRIVATE ${winteracter_SOURCE_DIR}/lib.if8)
 
 # DASH was built with /QxW, which has been superseded by /arch switches
 target_compile_options(DASH PRIVATE "/arch:SSE2")
@@ -200,7 +208,6 @@ set(DASH_REQUIREMENTS_SHA256 "0fcc736df8659cff4a98c16628070e5435088bd62b53f6aa0f
 # While DASH can be built in 32bit mode, nothing stops us from starting 64bit executables
 set(DASH_REQUIREMENTS_PLATFORM "windows-dynamic-64")
 
-include(FetchContent)
 FetchContent_Declare(
   dash_requirements
   URL      "https://artifactory.ccdc.cam.ac.uk/artifactory/ccdc-cpp-main-builds/${DASH_REQUIREMENTS_PLATFORM}/distribution/dash_requirements/dash_requirements-${DASH_REQUIREMENTS_BUILD}-${DASH_REQUIREMENTS_BRANCH}-${DASH_REQUIREMENTS_PLATFORM}.7z"
