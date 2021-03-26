@@ -1,4 +1,4 @@
-! @CCDC_GENERATED_MESSAGE@
+! This file is generated from variables.f90.in by cmake
 !*****************************************************************************
 !
 ! JvdS The following global variables seem to be needed:
@@ -68,7 +68,7 @@
 ! to a Mogul exe specified
 
       CHARACTER(10) :: ProgramVersion
-      DATA ProgramVersion / 'DASH @DASH_VER@' /
+      DATA ProgramVersion / 'DASH @DASH_VERSION@' /
 
 ! File information; Names of files used by DASH For I/O
       CHARACTER(MaxPathLength)  DashTicFile
