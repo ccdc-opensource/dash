@@ -33,6 +33,8 @@
       StartUpDirectory = TRIM(StartUpDirectory)//DIRSPACER
       CALL IOsDirChange(InstallationDirectory)
       CALL IOsDirName(InstallationDirectory)
+! For debugging purposes
+!      InstallationDirectory = 'D:\default\dash-install'
       InstallationDirectory = TRIM(InstallationDirectory)//DIRSPACER
       DocumentationRoot = TRIM(InstallationDirectory)//"Documentation"//DIRSPACER
       DocumentationHTMLdirectory =  TRIM(DocumentationRoot)//"dash"//DIRSPACER

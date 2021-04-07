@@ -77,7 +77,6 @@
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
-      USE CCDC_EXTERNAL_APPLICATIONS_BINDINGS
 
       IMPLICIT NONE
 
@@ -85,14 +84,14 @@
       LOGICAL,       INTENT (IN   ) :: BuiltInOnly
 
       LOGICAL, EXTERNAL :: DASHWDialogGetCheckBoxLogical
-      INTEGER I, M
+      INTEGER I, M, ISTATUS, IEXCOD
       LOGICAL exists, tBuiltInMercury, tUseClient
       CHARACTER(MaxPathLength+40) tArgStr, tExeStr
       CHARACTER(1024) FullFileName
       
       
-      INTEGER iUseClient
-      
+      CHARACTER(1) cUseClient
+      INTEGER, DIMENSION(2) :: ID
 
 
       IF (BuiltInOnly) THEN
@@ -113,17 +112,22 @@
       IF (tBuiltInMercury) THEN
 
           
-         iUseClient = 0
-         IF (tUseClient) iUseClient = 1
+         cUseClient = '0'
+         IF (tUseClient) cUseClient = '1'
          
          CALL IOsFullPathname(TheFileName,FullFileName)
+         M = WInfoError(3) ! Clear errors
+         CALL IOSCommand( TRIM(InstallationDirectory)//DIRSPACER//'zmconv'//DIRSPACER//'dash_csd_connector'//CCDC_EXE_EXT//' --launch-mercury "'//TRIM(FullFileName)//'" '//cUseClient , ProcSilent, IDPROC=ID)      
+         DO
+             CALL IOsCommandCheck(ID, ISTATUS, IEXCOD)
+             IF (ISTATUS==0) EXIT
+             CALL IOsWait(5)
+         END DO
 
-         I = CCDC_LAUNCH_MERCURY( TRIM(FullFileName)//CHAR(0), iUseClient )
-         
-         IF ( I.EQ.0 ) &
+         IF ( ISTATUS.EQ.0 ) &
             RETURN
          
-         IF ( I.EQ.2 ) THEN
+         IF ( ISTATUS.EQ.2 ) THEN
              tArgStr = 'The file named '//TRIM(FullFileName)//' Doesnt seem to exist or is unreadable ...'
              CALL ErrorMessage(TRIM(tArgStr))
              RETURN
