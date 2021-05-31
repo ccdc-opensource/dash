@@ -16,7 +16,6 @@ include(FetchContent)
 set(DASH_VERSION ${CMAKE_PROJECT_VERSION})
 set(DASH_COPYRIGHT_YEAR "2021")
 
-include(InstallRequiredSystemLibraries)
 # Configure CPack based package generation
 set(CPACK_PACKAGE_NAME "DASH")
 set(CPACK_PACKAGE_VENDOR "The Cambridge Crystallographic Data Centre")
