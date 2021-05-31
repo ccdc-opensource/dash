@@ -284,8 +284,8 @@ install(
 )
 
 install(
-    DIRECTORY   ${CMAKE_CURRENT_SOURCE_DIR}/../cppbuilds_shared/icons/dash/
-    DESTINATION icons
+    DIRECTORY  icons
+    DESTINATION .
 )
 
 install(
