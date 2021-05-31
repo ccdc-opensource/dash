@@ -173,9 +173,9 @@ target_sources(
   SGinc/ffcalctop.inc
 
   # Resources
-  ${CMAKE_CURRENT_SOURCE_DIR}/../cppbuilds_shared/icons/dash/bimodal.ico
-  ${CMAKE_CURRENT_SOURCE_DIR}/../cppbuilds_shared/icons/dash/dash.ico
-  ${CMAKE_CURRENT_SOURCE_DIR}/../cppbuilds_shared/icons/dash/trimodal.ico
+  icons/bimodal.ico
+  icons/dash.ico
+  icons/trimodal.ico
 
   PCDruid_resource.RC
   res/OpenFile.bmp
