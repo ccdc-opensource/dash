@@ -249,11 +249,12 @@ install(
 
 # Install Documentation
 set(docs "Documentation")
-# It is expected that the docs repository is cloned next to the main repository
-# install(
-#     DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../../docs/CSDS/dash/dash_files/"
-#     DESTINATION ${docs}/dash
-# )
+# It is expected that the CSDS/dash/dash_files directory of the 
+# docs repository is cloned in the docs_dash_files subdirectory
+install(
+     DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/docs_dash_files/"
+     DESTINATION ${docs}/dash
+)
 
 # Install Tutorials
 install(
