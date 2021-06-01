@@ -17,15 +17,17 @@ set(DASH_VERSION ${CMAKE_PROJECT_VERSION})
 set(DASH_COPYRIGHT_YEAR "2021")
 
 # Configure CPack based package generation
-set(CPACK_PACKAGE_NAME "DASH")
+set(CPACK_PACKAGE_NAME "dash")
 set(CPACK_PACKAGE_VENDOR "The Cambridge Crystallographic Data Centre")
-set(CPACK_PACKAGE_DESCRIPTION_FILE "description.txt")
+set(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/description.txt")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A versatile and interactive package for solving crystal structures from powder diffraction data")
 set(CPACK_PACKAGE_HOMEPAGE_URL "https://github.org/ccdc-opensource/dash")
 if($ENV{BUILD_NUMBER})
     set(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_NAME}-${DASH_VERSION}-$ENV{BUILD_NUMBER}-win32)
+    set(CPACK_SOURCE_PACKAGE_FILE_NAME ${CPACK_PACKAGE_NAME}-${DASH_VERSION}-$ENV{BUILD_NUMBER})
 else()
     set(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_NAME}-${DASH_VERSION}-developer-build-win32)
+    set(CPACK_SOURCE_PACKAGE_FILE_NAME ${CPACK_PACKAGE_NAME}-${DASH_VERSION}-developer-build)
 endif()
 # set(CPACK_PACKAGE_INSTALL_DIRECTORY "")
 set(CPACK_PACKAGE_ICON icons/dash_128x128.png)
@@ -38,7 +40,6 @@ set(CPACK_PACKAGE_EXECUTABLES dash;DASH)
 set(CPACK_VERBATIM_VARIABLES TRUE)
 set(CPACK_GENERATOR "7Z")
 
-set(CPACK_SOURCE_PACKAGE_FILE_NAME ${CPACK_PACKAGE_NAME}-${DASH_VERSION})
 
 include(CPack)
 
