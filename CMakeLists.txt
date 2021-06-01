@@ -16,6 +16,32 @@ include(FetchContent)
 set(DASH_VERSION ${CMAKE_PROJECT_VERSION})
 set(DASH_COPYRIGHT_YEAR "2021")
 
+# Configure CPack based package generation
+set(CPACK_PACKAGE_NAME "DASH")
+set(CPACK_PACKAGE_VENDOR "The Cambridge Crystallographic Data Centre")
+set(CPACK_PACKAGE_DESCRIPTION_FILE "description.txt")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A versatile and interactive package for solving crystal structures from powder diffraction data")
+set(CPACK_PACKAGE_HOMEPAGE_URL "https://github.org/ccdc-opensource/dash")
+if($ENV{BUILD_NUMBER})
+    set(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_NAME}-${DASH_VERSION}-$ENV{BUILD_NUMBER}-win32)
+else()
+    set(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_NAME}-${DASH_VERSION}-developer-build-win32)
+endif()
+# set(CPACK_PACKAGE_INSTALL_DIRECTORY "")
+set(CPACK_PACKAGE_ICON icons/dash_128x128.png)
+set(CPACK_PACKAGE_CHECKSUM SHA256)
+# set(CPACK_RESOURCE_FILE_LICENSE LICENSE)
+# set(CPACK_RESOURCE_FILE_README )
+# set(CPACK_RESOURCE_FILE_WELCOME)
+set(CPACK_MONOLITHIC_INSTALL TRUE)
+set(CPACK_PACKAGE_EXECUTABLES dash;DASH)
+set(CPACK_VERBATIM_VARIABLES TRUE)
+set(CPACK_GENERATOR "7Z")
+
+set(CPACK_SOURCE_PACKAGE_FILE_NAME ${CPACK_PACKAGE_NAME}-${DASH_VERSION})
+
+include(CPack)
+
 # Transform variables in .in files into their values (output goes to the build directory)
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/PCDash_Main.f90.in" "${CMAKE_CURRENT_BINARY_DIR}/PCDash_Main.f90" @ONLY)
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/variables.f90.in" "${CMAKE_CURRENT_BINARY_DIR}/variables.f90" @ONLY)
@@ -173,9 +199,9 @@ target_sources(
   SGinc/ffcalctop.inc
 
   # Resources
-  ${CMAKE_CURRENT_SOURCE_DIR}/../cppbuilds_shared/icons/dash/bimodal.ico
-  ${CMAKE_CURRENT_SOURCE_DIR}/../cppbuilds_shared/icons/dash/dash.ico
-  ${CMAKE_CURRENT_SOURCE_DIR}/../cppbuilds_shared/icons/dash/trimodal.ico
+  icons/bimodal.ico
+  icons/dash.ico
+  icons/trimodal.ico
 
   PCDruid_resource.RC
   res/OpenFile.bmp
@@ -201,9 +227,9 @@ if(NOT DEFINED ENV{ARTIFACTORY_API_KEY})
 endif()
 
 # Specify a build of dash_requirements. This part can become more complex later, downloading the latest version from a branch perhaps
-set(DASH_REQUIREMENTS_BUILD "307660")
-set(DASH_REQUIREMENTS_BRANCH "bm_2020_1")
-set(DASH_REQUIREMENTS_SHA256 "0fcc736df8659cff4a98c16628070e5435088bd62b53f6aa0f47cdfd0df3bcbf")
+set(DASH_REQUIREMENTS_BUILD "314611")
+set(DASH_REQUIREMENTS_BRANCH "main")
+set(DASH_REQUIREMENTS_SHA256 "e004d8a30066c1efb749cea9ccef54c29e47a14100f47cd7aeee7e929cf3c2d3")
 
 # While DASH can be built in 32bit mode, nothing stops us from starting 64bit executables
 set(DASH_REQUIREMENTS_PLATFORM "windows-dynamic-64")
@@ -223,10 +249,11 @@ install(
 
 # Install Documentation
 set(docs "Documentation")
-# It is expected that the docs repository is cloned next to the main repository
+# It is expected that the CSDS/dash/dash_files directory of the 
+# docs repository is cloned in the docs_dash_files subdirectory
 install(
-    DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../../docs/CSDS/dash/dash_files/"
-    DESTINATION ${docs}/dash
+     DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/docs_dash_files/"
+     DESTINATION ${docs}/dash
 )
 
 # Install Tutorials
@@ -284,8 +311,8 @@ install(
 )
 
 install(
-    DIRECTORY   ${CMAKE_CURRENT_SOURCE_DIR}/../cppbuilds_shared/icons/dash/
-    DESTINATION icons
+    DIRECTORY  icons
+    DESTINATION .
 )
 
 install(
