@@ -1,0 +1,1 @@
+DASH solves structures by simulated annealing of structural models to indexed diffraction data and features a helpful wizard to guide you through the entire structure solution process.
