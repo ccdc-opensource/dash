@@ -321,3 +321,16 @@ install(
     DESTINATION .
     COMPONENT
 )
+
+# Install required intel fortran DLLs.
+# Proper fix requires using include(InstallRequiredSystemLibraries)
+# moving the DASH executable to bin and fixing file lookup behaviour in both DASH and mercury. 
+set(INTEL_FORTRAN_COMMON_FILES "C:/Program Files (x86)/Common Files/Intel/Shared Libraries/redist/ia32_win/compiler")
+install(
+    FILES
+    "${INTEL_FORTRAN_COMMON_FILES}/libifcoremd.dll"
+    "${INTEL_FORTRAN_COMMON_FILES}/libmmd.dll"
+    "${INTEL_FORTRAN_COMMON_FILES}/svml_dispmd.dll"
+    DESTINATION .
+    COMPONENT
+)
