@@ -57,7 +57,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(winteracter)
 
 # Create the DASH executable target
-add_executable(DASH)
+add_executable(DASH WIN32)
 
 target_include_directories(
   DASH
