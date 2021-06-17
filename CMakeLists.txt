@@ -228,9 +228,9 @@ if(NOT DEFINED ENV{ARTIFACTORY_API_KEY})
 endif()
 
 # Specify a build of dash_requirements. This part can become more complex later, downloading the latest version from a branch perhaps
-set(DASH_REQUIREMENTS_BUILD "314611")
+set(DASH_REQUIREMENTS_BUILD "316732")
 set(DASH_REQUIREMENTS_BRANCH "main")
-set(DASH_REQUIREMENTS_SHA256 "e004d8a30066c1efb749cea9ccef54c29e47a14100f47cd7aeee7e929cf3c2d3")
+set(DASH_REQUIREMENTS_SHA256 "f30832ea6f7e483ecadf657f5196ea378b403dbb116f4eafa028027644dde9f7")
 
 # While DASH can be built in 32bit mode, nothing stops us from starting 64bit executables
 set(DASH_REQUIREMENTS_PLATFORM "windows-dynamic-64")
