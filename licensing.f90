@@ -36,7 +36,7 @@
         CALL AppendBatchLogFile('Error: Can not find a valid DASH licence')
       ELSE
         ! This is only one of the many reasons DASH might not be licensed.
-        CALL ErrorMessage("FATAL: Your licence does not include use of the 'pxrd' feature."//CHAR(13)// &
+        CALL ErrorMessage("FATAL: Your licence does not include use of the 'dash' feature."//CHAR(13)// &
                           "If you have a question about your licence details, please contact admin@ccdc.cam.ac.uk")
       ENDIF
 
