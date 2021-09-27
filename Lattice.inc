@@ -28,7 +28,7 @@
       COMMON /PWLYST/ SlimValue, ScalFac, BackRef
 
       REAL :: CellPar, ZeroPoint
-	  LOGICAL CellParConstrained 
+      LOGICAL CellParConstrained 
       COMMON /CELLREF/ CellPar(6), ZeroPoint, CellParConstrained(6)
 
       INTEGER MVAL
@@ -52,7 +52,7 @@
 !
 
       CHARACTER*12   CrystalSystemString(10)
-	  COMMON /CrySysStr/ CrystalSystemString
+      COMMON /CrySysStr/ CrystalSystemString
 
       INTEGER MaxSPGR
       PARAMETER (MaxSPGR=530)
