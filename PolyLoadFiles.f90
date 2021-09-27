@@ -1,3 +1,26 @@
+! This file is part of DASH.
+! SPDX-Identifier: MIT
+!
+! Copyright 2001 Science and Technology Facilities Council
+! Copyright 2001 Cambridge Crystallographic Data Centre
+!
+! Permission is hereby granted, free of charge, to any person obtaining a copy
+! of this software and associated documentation files (the "Software"), to deal
+! in the Software without restriction, including without limitation the rights
+! to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+! copies of the Software, and to permit persons to whom the Software is
+! furnished to do so, subject to the following conditions:
+!
+! The above copyright notice and this permission notice shall be included in
+! all copies or substantial portions of the Software.
+!
+! THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+! IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+! FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+! AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+! LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+! OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+! SOFTWARE.
 !
 !*****************************************************************************
 !
@@ -2326,7 +2349,7 @@
 !File: d:\data temp\stephan\tablet_1_0aa1.x01
 !User: d1d1
 !Specimen: tablet_1    Crystal:     Reflection: 0 0 4
-!Wavelength: 1.54056 Å    Bragg angle: 34.5636 °    kV: 40.00    mA: 50.00
+!Wavelength: 1.54056 ï¿½    Bragg angle: 34.5636 ï¿½    kV: 40.00    mA: 50.00
 ! paracetamol tablet
 !Time: 15:15 Date : 1/30/2002
 !Scanning axis: 2Theta Scan direction: increasing
