@@ -48,7 +48,7 @@
 ! For common block PROFOBS and PROFBIN
 
       INTEGER MaxKtem
-	  PARAMETER ( MaxKtem = 100 )
+      PARAMETER ( MaxKtem = 100 )
 ! Maximum dimension of KNIPT
 
       INTEGER     MAX_NPFR,      MAX_NPPR,      MAX_FITPT,         MPkDes
@@ -119,11 +119,11 @@
 ! For use in common block IPKCMN
 
       INTEGER     MaxAtm_4
-      PARAMETER	( MaxAtm_4 = 300)
+      PARAMETER   ( MaxAtm_4 = 300)
 ! Maximum number of atoms
 
       INTEGER     MaxNumT
-      PARAMETER	( MaxNumT = 50)
+      PARAMETER   ( MaxNumT = 50)
 ! Maximum number of Temperatures for parallel tempering
 
       INTEGER     MaxMogulBin
