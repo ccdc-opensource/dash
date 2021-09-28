@@ -1,3 +1,26 @@
+! This file is part of DASH.
+! SPDX-Identifier: MIT
+!
+! Copyright 2001 Science and Technology Facilities Council
+! Copyright 2001 Cambridge Crystallographic Data Centre
+!
+! Permission is hereby granted, free of charge, to any person obtaining a copy
+! of this software and associated documentation files (the "Software"), to deal
+! in the Software without restriction, including without limitation the rights
+! to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+! copies of the Software, and to permit persons to whom the Software is
+! furnished to do so, subject to the following conditions:
+!
+! The above copyright notice and this permission notice shall be included in
+! all copies or substantial portions of the Software.
+!
+! THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+! IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+! FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+! AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+! LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+! OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+! SOFTWARE.
 !
 !*****************************************************************************
 !
@@ -128,7 +151,7 @@
         WRITE(tFileHandle,'("  Maximum number of moves per run = ",A)',ERR=999) TRIM(MaxMovesStr)
         CALL DASHWDialogGetReal(IDF_SA_ChiTest,R)
         WRITE(tFileHandle,123,ERR=999) R, PAWLEYCHISQ, R*PAWLEYCHISQ
-123     FORMAT('  A run will stop when the profile chi² is less than ',F6.2,' · ',F7.3,' = ',F8.4)
+123     FORMAT('  A run will stop when the profile chiï¿½ is less than ',F6.2,' ï¿½ ',F7.3,' = ',F8.4)
       ENDIF
       CLOSE(tFileHandle)
       CALL PopActiveWindowID
