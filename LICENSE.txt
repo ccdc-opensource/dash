@@ -1,5 +1,7 @@
 Copyright 2001 Science and Technology Facilities Council
 Copyright 2001 Cambridge Crystallographic Data Centre
+Copyright 1999 J.C. Matthewman, P.J. Brown
+With contributions from W.I.F. David, J.B. Forsyth and J.H. Matthewman.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
