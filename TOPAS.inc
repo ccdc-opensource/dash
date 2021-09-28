@@ -65,13 +65,13 @@ macro Out_CIF_STR_Uiso(file)
 }
 macro Out_X_Yobs_Ycalc_and_Difference_divide_by_SigmaYobs(file)
 {
-	xdd_out file load out_record out_fmt out_eqn
-	{
-	" %11.5f " = X;
-	" %11.5f " = Yobs;
-	" %11.5f " = Ycalc;
-	" %11.5f\n" = (Yobs-Ycalc)/SigmaYobs;
-	}
+   xdd_out file load out_record out_fmt out_eqn
+   {
+   " %11.5f " = X;
+   " %11.5f " = Yobs;
+   " %11.5f " = Ycalc;
+   " %11.5f\n" = (Yobs-Ycalc)/SigmaYobs;
+   }
 }
 '******************************************************************************
 
