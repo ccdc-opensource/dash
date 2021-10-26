@@ -120,7 +120,6 @@ target_sources(
   Init_Routines.f90
   Initialisation.f90
   Interface.f90
-  licensing.f90
   LoadRAWFiles.f90
   LoadSDI.f90
   Mag.f90
@@ -210,8 +209,6 @@ target_sources(
   res/TOOLBAR1.BMP
   res/WidthEquations.bmp
   res/WizardWelcome.bmp
-
-  UnusedCode.txt
 )
 
 # Installation section
