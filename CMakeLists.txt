@@ -1,9 +1,9 @@
 # Minimum required content of a CMakeLists.txt file
-cmake_minimum_required(VERSION 3.19...3.20)
+cmake_minimum_required(VERSION 3.19...3.21)
 
 project(DASH
   VERSION
-      3.5.1
+      3.99.1
   DESCRIPTION
     "DASH powder diffraction solution"
   LANGUAGES
