@@ -247,12 +247,6 @@ install(
 
 # Install Documentation
 set(docs "Documentation")
-# It is expected that the CSDS/dash/dash_files directory of the 
-# docs repository is cloned in the docs_dash_files subdirectory
-install(
-     DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/docs_dash_files/"
-     DESTINATION ${docs}/dash
-)
 
 # Install Tutorials
 install(
@@ -288,22 +282,7 @@ install(
 )
 
 install(
-    FILES       "Extinction Symbol Documents/Advanced.asc"
-                "Extinction Symbol Documents/Dopmmm.hkl"
-                "Extinction Symbol Documents/ESMANUAL for DASH.DOC"
-                "Extinction Symbol Documents/parameter_input.asc"
-    DESTINATION "${docs}/Extinction Symbol Documents"
-)
-
-install(
-    FILES       "Unsupported Extras/MDash.exe"
-                "Unsupported Extras/MDASH.pdf"
-                "Unsupported Extras/ReadMe.txt"
-    DESTINATION "Unsupported Extras"
-)
-
-install(
-    FILES       ExtinctionSymbol.exe SpaceGroupSymbols.dat TOPAS.inc
+    FILES       SpaceGroupSymbols.dat TOPAS.inc
                 RIETAN.cmd RIETAN2000.tem RIETANFP.tem
     DESTINATION .
 )
