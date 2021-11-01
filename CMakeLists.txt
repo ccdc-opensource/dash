@@ -11,6 +11,7 @@ project(DASH
 )
 
 include(FetchContent)
+include(GNUInstallDirs)
 
 # Set up variables that will be replaced in source files
 set(DASH_VERSION ${CMAKE_PROJECT_VERSION})
@@ -207,7 +208,7 @@ target_sources(
 # Everything here is installed relative to the value of CMAKE_INSTALL_PREFIX (this is CMake's default behaviour)
 install(
     TARGETS  DASH
-    RUNTIME DESTINATION .
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
 # Fetch current version of dash_requirements distribution from artifactory
@@ -234,40 +235,43 @@ FetchContent_MakeAvailable(dash_requirements)
 
 install(
     DIRECTORY   "${dash_requirements_SOURCE_DIR}/"
-    DESTINATION zmconv
+    DESTINATION ${CMAKE_INSTALL_BINDIR}/zmconv
 )
 
 install(
-    DIRECTORY   doc
-    DESTINATION share/doc/dash
-)
-
-install(
-    FILES       SpaceGroupSymbols.dat src/TOPAS.inc
-                RIETAN.cmd RIETAN2000.tem RIETANFP.tem
-    DESTINATION .
-)
-
-install(
-    DIRECTORY  icons
-    DESTINATION share/icons/dash
+    FILES       distribution/bin/RIETAN.cmd
+    DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
 install(
     DIRECTORY   expcli
-    DESTINATION .
+    DESTINATION ${CMAKE_INSTALL_BINDIR}
     COMPONENT
 )
 
+install(
+    DIRECTORY   distribution/share/doc/
+    DESTINATION ${CMAKE_INSTALL_DOCDIR}
+)
+
+install(
+    DIRECTORY  distribution/share/icons
+    DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}
+)
+
+install(
+    DIRECTORY  distribution/share/dash
+    DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}
+)
+
 # Install required intel fortran DLLs.
-# Proper fix requires using include(InstallRequiredSystemLibraries)
-# moving the DASH executable to bin and fixing file lookup behaviour in both DASH and mercury. 
+# InstallRequiredSystemLibraries currently has difficulties with our legacy fortran compiler
 set(INTEL_FORTRAN_COMMON_FILES "C:/Program Files (x86)/Common Files/Intel/Shared Libraries/redist/ia32_win/compiler")
 install(
     FILES
     "${INTEL_FORTRAN_COMMON_FILES}/libifcoremd.dll"
     "${INTEL_FORTRAN_COMMON_FILES}/libmmd.dll"
     "${INTEL_FORTRAN_COMMON_FILES}/svml_dispmd.dll"
-    DESTINATION .
+    DESTINATION ${CMAKE_INSTALL_BINDIR}
     COMPONENT
 )
