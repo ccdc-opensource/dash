@@ -200,16 +200,7 @@ target_sources(
   SGinc/ffcalctop.inc
 
   # Resources
-  icons/bimodal.ico
-  icons/dash.ico
-  icons/trimodal.ico
-
   src/PCDruid_resource.RC
-  src/res/OpenFile.bmp
-  src/res/PolyFitterWizard.bmp
-  src/res/TOOLBAR1.BMP
-  src/res/WidthEquations.bmp
-  src/res/WizardWelcome.bmp
 )
 
 # Installation section
