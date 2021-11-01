@@ -238,6 +238,19 @@ install(
     DESTINATION ${CMAKE_INSTALL_BINDIR}/zmconv
 )
 
+FetchContent_Declare(
+  extinction_symbol_exe
+  URL      "https://github.com/ccdc-opensource/dash/releases/download/extinction_symbol_2009/ExtinctionSymbol.exe"
+  URL_HASH "SHA256=399353ca13a35f40c898973a1e19ebe7ce12642f2e672a485c731d0f42c6bb16"
+  DOWNLOAD_NO_EXTRACT YES
+)
+FetchContent_MakeAvailable(extinction_symbol_exe)
+
+install(
+    DIRECTORY   "${extinction_symbol_exe_SOURCE_DIR}/"
+    DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
+
 install(
     FILES       distribution/bin/RIETAN.cmd
     DESTINATION ${CMAKE_INSTALL_BINDIR}

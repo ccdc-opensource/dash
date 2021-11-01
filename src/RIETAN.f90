@@ -124,7 +124,7 @@
       CALL StrUpperCase(tExtension)
       IF ( tExtension .NE. 'EXE' ) goto 998
 #endif
-      ScriptName = TRIM(InstallationDirectory)//ctScriptFile
+      ScriptName = TRIM(BinDirectory)//ctScriptFile
       INQUIRE(FILE=ScriptName, EXIST=exists)
       IF ( .NOT. exists ) GOTO 999
  10   CheckRIETANExe = 0
@@ -645,9 +645,9 @@
       ENDIF
       ! RIETAN instruction file: copy/fill template file
       IF ( Rietan_FP ) THEN
-        tFileName = TRIM(InstallationDirectory)//'RIETANFP.tem'
+        tFileName = TRIM(ShareDashDirectory)//'RIETANFP.tem'
       ELSE
-        tFileName = TRIM(InstallationDirectory)//'RIETAN2000.tem'
+        tFileName = TRIM(ShareDashDirectory)//'RIETAN2000.tem'
       ENDIF
       OPEN(UNIT=chFileTmp,FILE=TRIM(tFileName),STATUS='old',ERR=997)
       tFileName = FileNameBase(1:iBaseLen)//'.ins'

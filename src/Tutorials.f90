@@ -42,40 +42,38 @@
       CHARACTER(MaxPathLength) DestineDir
 
       CHARACTER(MaxPathLength) TutorialFileName
-      CHARACTER(1)             NumberStr
+      CHARACTER(2)             NumberStr
 
       INTEGER d
 
-      DestineDir = TRIM(AppDataDirectory)//'DASH_files'
+      DestineDir = TRIM(AppDataDirectory)//DIRSPACER//'DASH_files'
       IF (.NOT. IOsDirExists(DestineDir)) CALL IOsDirMake(DestineDir)
       CALL WSelectDir(DirCreate, DestineDir, 'Directory to save tutorial files')
       IF (WInfoDialog(ExitButtonCommon) .NE. CommonOK .OR. LEN_TRIM(DestineDir) .LE. 0) RETURN
 
       SELECT CASE (Tutorial_ID)
         CASE (ID_Tutorial_1)
-          NumberStr = '1'
+          NumberStr = '01'
         CASE (ID_Tutorial_2)
-          NumberStr = '2'
+          NumberStr = '02'
         CASE (ID_Tutorial_3)
-          NumberStr = '3'
+          NumberStr = '03'
         CASE (ID_Tutorial_4)
-          NumberStr = '4'
+          NumberStr = '04'
         CASE (ID_Tutorial_5)
-          NumberStr = '5'
+          NumberStr = '05'
         CASE (ID_Tutorial_6)
-          NumberStr = '6'
+          NumberStr = '06'
       END SELECT
 
-      TutorialFileName = "tutorial-"//TRIM(NumberStr)//".html"
+      TutorialFileName = TRIM("tutorial-"//TRIM(NumberStr)//".html")
 
-      FileDir = TRIM(DocumentationRoot)//DIRSPACER//"Tutorial"//NumberStr//DIRSPACER//"Data files"
-      CALL IOsDirChange(TRIM(FileDir))
+      FileDir = TRIM(TRIM(DocumentationRoot)//DIRSPACER//"tutorials"//DIRSPACER//"tutorial-"//NumberStr//DIRSPACER//"data")
+      CALL IOsDirChange(FileDir)
       CALL IOsCopyFile('Tutorial_'//NumberStr//'.xye',TRIM(DestineDir)//DIRSPACER)
       CALL IOsCopyFile('Tutorial_'//NumberStr//'.raw',TRIM(DestineDir)//DIRSPACER)
       CALL IOsCopyFile('Tutorial_'//NumberStr//'*.mol2',TRIM(DestineDir)//DIRSPACER)
       CALL IOsCopyFile('Tutorial_'//NumberStr//'*.zmatrix',TRIM(DestineDir)//DIRSPACER)
-
-      CALL IOsDirChange(TRIM(DocumentationHTMLdirectory))
 
       CALL WHelpFile(' ') ! In case the help file is open already
       CALL WHelpFile(TutorialFileName)

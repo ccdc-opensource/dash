@@ -112,7 +112,7 @@
           CALL InitialiseDASHDialogState
       ENDIF
 
-      CALL GetInstallationDirectory
+      CALL InitialisePathLookupVariables
 ! Check if there are any command line arguments
 ! Try to redirect stdout - change working directory if unsuccessful
       IF (NARGS() .EQ. 0) CALL Init_StdOut
@@ -451,17 +451,9 @@
 !
       SUBROUTINE LaunchHelp
 
-#ifdef _WIN32
-      USE KERNEL32
-      USE dfwinty
-      IMPLICIT NONE
-      INTEGER d
-      d=WinExec('cmd /c "start https://github.com/ccdc-opensource/dash/wiki" 'C,SW_HIDE)
-#else
       USE WINTERACTER
       IMPLICIT NONE
-      CALL IOsCommand('xdg-open https://github.com/ccdc-opensource/dash/wiki')
-#endif
+      CALL WHelpFile('https://github.com/ccdc-opensource/dash/wiki')
 
       END SUBROUTINE LaunchHelp
 !

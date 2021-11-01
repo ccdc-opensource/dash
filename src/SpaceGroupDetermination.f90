@@ -36,7 +36,7 @@
       REAL Correction
       LOGICAL Exists
 
-      INQUIRE(FILE=TRIM(InstallationDirectory)//DIRSPACER//ExtSymEXE,EXIST=exists)
+      INQUIRE(FILE=TRIM(BinDirectory)//DIRSPACER//ExtSymEXE,EXIST=exists)
       IF (.NOT. exists) GOTO 777
 
       CALL IosDirName(CurrentDirectory)
@@ -129,7 +129,7 @@
 ! Before calling the executable in the DASH installation directory.
      CALL IosDeleteFile(TRIM(CurrentDirectory)//DIRSPACER//'table.asc')
      errcode = InfoError(1) 
-     CALL IOsCommand(TRIM(InstallationDirectory)//ExtSymEXE,2)
+     CALL IOsCommand(TRIM(BinDirectory)//ExtSymEXE,2)
      errcode = InfoError(1) 
 #ifdef _WIN32
      IF (errcode .EQ. ErrOsCommand) GOTO 888 ! error ocurred 
