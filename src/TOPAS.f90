@@ -140,7 +140,7 @@
       tLen = LEN_TRIM(TheFileName)
       OPEN(UNIT=hFileTOPAS, FILE=TheFileName(1:tLen), STATUS='unknown', ERR=999)
       WRITE(hFileTOPAS, '(A)', ERR=999) '#include "'// &
-                                        TRIM(InstallationDirectory)//'TOPAS.inc"'
+                                        TRIM(ShareDashDirectory)//'TOPAS.inc"'
       ! Ideally, we need to figure out if penalties_weighting_K1 can be made local to the "str" keyword.
       WRITE(hFileTOPAS, '(A)', ERR=999) 'penalties_weighting_K1 5'
       
