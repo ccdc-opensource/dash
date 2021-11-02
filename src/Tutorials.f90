@@ -41,7 +41,7 @@
       CHARACTER(MaxPathLength) ManualPath, DocumentationPath, FileDir
       CHARACTER(MaxPathLength) DestineDir
 
-      CHARACTER(MaxPathLength) TutorialFileName
+      CHARACTER(MaxPathLength) TutorialWikiPage
       CHARACTER(2)             NumberStr
 
       INTEGER d
@@ -66,7 +66,6 @@
           NumberStr = '06'
       END SELECT
 
-      TutorialFileName = TRIM("tutorial-"//TRIM(NumberStr)//".html")
 
       FileDir = TRIM(TRIM(DocumentationRoot)//DIRSPACER//"tutorials"//DIRSPACER//"tutorial-"//NumberStr//DIRSPACER//"data")
       CALL IOsDirChange(FileDir)
@@ -75,13 +74,8 @@
       CALL IOsCopyFile('Tutorial_'//NumberStr//'*.mol2',TRIM(DestineDir)//DIRSPACER)
       CALL IOsCopyFile('Tutorial_'//NumberStr//'*.zmatrix',TRIM(DestineDir)//DIRSPACER)
 
-      CALL WHelpFile(' ') ! In case the help file is open already
-      CALL WHelpFile(TutorialFileName)
-
-#ifdef _WIN32
-      d=WinExec('cmd /c "'//TRIM(TutorialFileName)//'" 'C,SW_HIDE)
-#else
-#endif
+      TutorialWikiPage = TRIM("https://github.com/ccdc-opensource/dash/wiki/Tutorial"//TRIM(NumberStr))
+      CALL WHelpFile(TutorialWikiPage)
 
       CALL IOsDirChange(TRIM(DestineDir))
 
