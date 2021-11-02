@@ -541,6 +541,7 @@
       VIEWARG = ''
       VIEWEXE = ''
       MOGULEXE = ' '
+      PYAPIEXE = ' '
       DICVOLEXE = ''
       McMailleEXE = ''
       TOPASEXE = ''

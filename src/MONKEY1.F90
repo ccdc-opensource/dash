@@ -510,11 +510,208 @@
    30 CONTINUE  ! failure
       i = RegCloseKey(hKey) ! Close the key handle.
 
-      END SUBROUTINE GetPathToMogulFromRegistry
+    END SUBROUTINE GetPathToMogulFromRegistry
+    
+    
+    SUBROUTINE GetPathToCSDPythonAPIFromRegistry
+
+      USE DFWIN
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+      INTEGER*4, PARAMETER :: MAX_VALUE_NAME = 128
+      INTEGER*4, PARAMETER :: MAX_DATA_LEN   = 1024
+
+      INTEGER*4                  hKeyRoot
+      CHARACTER*(512)            RegPath
+      CHARACTER*(6)              LatestVersion
+      CHARACTER*(128)            TempValueName
+      INTEGER*4                  hKey
+      INTEGER*4                  retCode
+      CHARACTER*(MAX_PATH)       ClassName
+      INTEGER*4                  dwcClassLen
+      INTEGER*4                  dwcSubKeys
+      INTEGER*4                  dwcMaxSubKey
+      INTEGER*4                  dwcMaxClass
+      INTEGER*4                  dwcValues
+      INTEGER*4                  dwcMaxValueName
+      INTEGER*4                  dwcMaxValueData
+      INTEGER*4                  dwcSecDesc
+      TYPE (T_FILETIME)          ftLastWriteTime
+      CHARACTER*(MAX_VALUE_NAME) ValueName
+      INTEGER*4                  cbValueName
+      INTEGER*4                  cbData
+      INTEGER*4                  dwLBIndex
+      INTEGER*4                  dwType
+      CHARACTER*MAX_DATA_LEN     bData
+      INTEGER                    i, j, k
+
+      LOGICAL, EXTERNAL :: InfoMessage
+
+      DO k = 1,2
+      
+        cbValueName = MAX_VALUE_NAME
+        dwcClassLen = MAX_PATH
+        if (k .EQ. 1) THEN
+            hKeyRoot = HKEY_LOCAL_MACHINE 
+        else
+            hKeyRoot = HKEY_CURRENT_USER !HKEY_CLASSES_ROOT
+        endif
+! Need to get latest version number of Python API
+        RegPath = 'SOFTWARE\CCDC\'//CHAR(0)
+! 
+
+        retCode = RegOpenKeyEx(hKeyRoot,    &
+                             RegPath,     &
+                             0,           &
+                             KEY_EXECUTE, &
+                             LOC(hKey))
+        IF (retCode .NE. ERROR_SUCCESS) GOTO 20
+! ADD A QUERY AND ALLOCATE A BUFFER FOR BDATA.
+        retCode = RegQueryInfoKey(hKey,                 &  ! Key handle returned from RegOpenKeyEx.
+                                ClassName,            &  ! Buffer for class name.
+                                LOC(dwcClassLen),     &  ! Length of class string.
+                                NULL,                 &  ! Reserved.
+                                LOC(dwcSubKeys),      &  ! Number of sub keys.
+                                LOC(dwcMaxSubKey),    &  ! Longest sub key size.
+                                LOC(dwcMaxClass),     &  ! Longest class string.
+                                LOC(dwcValues),       &  ! Number of values for this key.
+                                LOC(dwcMaxValueName), &  ! Longest Value name.
+                                LOC(dwcMaxValueData), &  ! Longest Value data.
+                                LOC(dwcSecDesc),      &  ! Security descriptor.
+                                ftLastWriteTime)         ! Last write time.
+        i = RegCloseKey(hKey) ! Close the key handle.
+
+
+! Look through values of key
+        DO J = 1, dwcValues
+! Use RegOpenKeyEx() with the new Registry path to get an open handle
+! to the child key you want to enumerate.
+        retCode = RegOpenKeyEx(hKeyRoot,    &
+                             RegPath,     &
+                             0,           &
+                             KEY_EXECUTE, &
+                             LOC(hKey))
+        IF (retCode .NE. ERROR_SUCCESS) GOTO 20
+! ADD A QUERY AND ALLOCATE A BUFFER FOR BDATA.
+        retCode = RegQueryInfoKey(hKey,                 &  ! Key handle returned from RegOpenKeyEx.
+                                ClassName,            &  ! Buffer for class name.
+                                LOC(dwcClassLen),     &  ! Length of class string.
+                                NULL,                 &  ! Reserved.
+                                LOC(dwcSubKeys),      &  ! Number of sub keys.
+                                LOC(dwcMaxSubKey),    &  ! Longest sub key size.
+                                LOC(dwcMaxClass),     &  ! Longest class string.
+                                LOC(dwcValues),       &  ! Number of values for this key.
+                                LOC(dwcMaxValueName), &  ! Longest Value name.
+                                LOC(dwcMaxValueData), &  ! Longest Value data.
+                                LOC(dwcSecDesc),      &  ! Security descriptor.
+                                ftLastWriteTime)         ! Last write time.
+        IF (retCode .NE. ERROR_SUCCESS) GOTO 20
+        cbData = dwcMaxValueData
+! ENUMERATE THE KEY.
+        dwLBIndex = J - 1
+        cbValueName = MAX_VALUE_NAME
+        retCode = RegEnumValue (hKey,             & ! Key handle returned from RegOpenKeyEx.
+                              dwLBIndex,        & ! Value index, taken from listbox.
+                              ValueName,        & ! Name of value.
+                              LOC(cbValueName), & ! Size of value name.
+                              NULL,             & ! Reserved, dword = NULL.
+                              LOC(dwType),      & ! Type of data.
+                              LOC(bData),       & ! Data buffer.
+                              LOC(cbData))        ! Size of data buffer.
+        IF (retCode .NE. ERROR_SUCCESS) GOTO 20
+        IF (dwType .NE. REG_SZ) GOTO 20
+      
+        IF (ValueName(1:9) .EQ. 'CSDPython') THEN
+          LatestVersion = TRIM(bData)
+          RegPath = 'SOFTWARE\CCDC\CSDPythonAPI\'//LatestVersion(1:cbData)//'\'//CHAR(0)
+          EXIT
+        ENDIF
+        i = RegCloseKey(hKey) ! Close the key handle.
+        ENDDO
+
+!Looking for executable but will more than one directory listed (install, data etc)
+!so need to find number of values for key
+      retCode = RegOpenKeyEx(hKeyRoot,    &
+                             RegPath,     &
+                             0,           &
+                             KEY_EXECUTE, &
+                             LOC(hKey))
+      IF (retCode .NE. ERROR_SUCCESS) GOTO 20
+! ADD A QUERY AND ALLOCATE A BUFFER FOR BDATA.
+      retCode = RegQueryInfoKey(hKey,                 &  ! Key handle returned from RegOpenKeyEx.
+                                ClassName,            &  ! Buffer for class name.
+                                LOC(dwcClassLen),     &  ! Length of class string.
+                                NULL,                 &  ! Reserved.
+                                LOC(dwcSubKeys),      &  ! Number of sub keys.
+                                LOC(dwcMaxSubKey),    &  ! Longest sub key size.
+                                LOC(dwcMaxClass),     &  ! Longest class string.
+                                LOC(dwcValues),       &  ! Number of values for this key.
+                                LOC(dwcMaxValueName), &  ! Longest Value name.
+                                LOC(dwcMaxValueData), &  ! Longest Value data.
+                                LOC(dwcSecDesc),      &  ! Security descriptor.
+                                ftLastWriteTime)         ! Last write time.
+      i = RegCloseKey(hKey) ! Close the key handle.
+
+
+      DO J = 1, dwcValues
+      retCode = RegOpenKeyEx(hKeyRoot,    &
+                             RegPath,     &
+                             0,           &
+                             KEY_EXECUTE, &
+                             LOC(hKey))
+      IF (retCode .NE. ERROR_SUCCESS) GOTO 20
+! ADD A QUERY AND ALLOCATE A BUFFER FOR BDATA.
+      retCode = RegQueryInfoKey(hKey,                 &  ! Key handle returned from RegOpenKeyEx.
+                                ClassName,            &  ! Buffer for class name.
+                                LOC(dwcClassLen),     &  ! Length of class string.
+                                NULL,                 &  ! Reserved.
+                                LOC(dwcSubKeys),      &  ! Number of sub keys.
+                                LOC(dwcMaxSubKey),    &  ! Longest sub key size.
+                                LOC(dwcMaxClass),     &  ! Longest class string.
+                                LOC(dwcValues),       &  ! Number of values for this key.
+                                LOC(dwcMaxValueName), &  ! Longest Value name.
+                                LOC(dwcMaxValueData), &  ! Longest Value data.
+                                LOC(dwcSecDesc),      &  ! Security descriptor.
+                                ftLastWriteTime)         ! Last write time.
+      IF (retCode .NE. ERROR_SUCCESS) GOTO 20
+      cbData = dwcMaxValueData
+
+! ENUMERATE THE KEY.
+      dwLBIndex = J - 1
+      cbValueName = MAX_VALUE_NAME
+      retCode = RegEnumValue (hKey,             & ! Key handle returned from RegOpenKeyEx.
+                              dwLBIndex,        & ! Value index, taken from listbox.
+                              ValueName,        & ! Name of value.
+                              LOC(cbValueName), & ! Size of value name.
+                              NULL,             & ! Reserved, dword = NULL.
+                              LOC(dwType),      & ! Type of data.
+                              LOC(bData),       & ! Data buffer.
+                              LOC(cbData))        ! Size of data buffer.
+      IF (retCode .NE. ERROR_SUCCESS) GOTO 20
+      IF (dwType .NE. REG_SZ) GOTO 20
+      TempValueName = ValueName
+      IF (TempValueName(1:3) .EQ. 'Exe') THEN
+          PYAPIEXE = ''
+          PYAPIEXE(1:cbData) = bData(1:cbData)
+          PYAPIEXE(cbData+1 : cbData+1) = CHAR(0)
+          RETURN
+      ENDIF
+      i = RegCloseKey(hKey) ! Close the key handle.
+      ENDDO        
+        
+20    CONTINUE
+      ENDDO
+      PYAPIEXE = 'NOTFOUND'
+      i = RegCloseKey(hKey) ! Close the key handle.
+
+    END SUBROUTINE GetPathToCSDPythonAPIFromRegistry    
+    
 !
 !*****************************************************************************
 !
-      SUBROUTINE GetPathToExpguiFromRegistry
+    SUBROUTINE GetPathToExpguiFromRegistry
 
       USE DFWIN
       USE VARIABLES
@@ -723,7 +920,10 @@
 ! Failure...
       RETURN
 
-      END SUBROUTINE GetPathToTopasFromRegistry
+    END SUBROUTINE GetPathToTopasFromRegistry
+    
+    
+
 !
 !*****************************************************************************
 !
@@ -754,10 +954,13 @@
       ENDIF
       RETURN
 
-      END SUBROUTINE CopyFirstString
+    END SUBROUTINE CopyFirstString
 !
 !*****************************************************************************
 !
+    
+    
+    
 #else
 
       SUBROUTINE GetPathToMercuryFromRegistry()
