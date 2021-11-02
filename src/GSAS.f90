@@ -118,7 +118,6 @@
       CHARACTER*(*), INTENT (IN   ) :: ExpguiExe
       LOGICAL,       INTENT (IN   ) :: fg_EXPGUI
 
-!TMP     CHARACTER*(*), PARAMETER :: ctScriptFile = 'dashexpcli', ctScriptDir = 'dashexpcli'
       CHARACTER*(*), PARAMETER :: ctScriptFile = 'expcli', ctScriptDir = 'expcli'
       CHARACTER(MaxPathLength) :: tDirName, tFileName
       LOGICAL exists
@@ -158,7 +157,7 @@
       ScriptName = TRIM(tDirName)//ctScriptDir//DIRSPACER//ctScriptFile
       INQUIRE(FILE=ScriptName, EXIST=exists)
       IF ( exists ) GOTO 10
-      ScriptName = TRIM(InstallationDirectory)//ctScriptDir//DIRSPACER//ctScriptFile
+      ScriptName = TRIM(BinDirectory)//ctScriptDir//DIRSPACER//ctScriptFile
       INQUIRE(FILE=ScriptName, EXIST=exists)
       IF ( .NOT. exists ) GOTO 999
  10   CheckEXPGUIExe = 0

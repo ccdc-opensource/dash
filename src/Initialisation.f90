@@ -24,7 +24,7 @@
 !
 !*****************************************************************************
 !
-      SUBROUTINE GetInstallationDirectory
+      SUBROUTINE InitialisePathLookupVariables
  
       USE WINTERACTER
       USE VARIABLES
@@ -34,63 +34,58 @@
 
       IMPLICIT NONE
 
-      CHARACTER(MaxPathLength) tString
-      CHARACTER(MaxPathLength) tFile
+      CHARACTER(MaxPathLength) tInstallationDirectory
+      CHARACTER(MaxPathLength) tCurrentExecutable
+      CHARACTER(MaxPathLength) tCurrentExecutableDirectory
+      CHARACTER(MaxPathLength) tCurrentExecutableFileName
       INTEGER*4 tProcess, tSize
       INTEGER IDummy
-! Determine the directory where DASH.exe resides and store it in "InstallationDirectory"
+! Determine the directory where DASH.exe resides and store it in "BinDirectory"
       tSize = MaxPathLength
       tProcess = 0 ! this program
 #ifdef _WIN32
-      IDummy = GetModuleFileName(tProcess, tString, LOC(tSize))
+      IDummy = GetModuleFileName(tProcess, tCurrentExecutable, LOC(tSize))
 #else
-      CALL GetArg(0, tString)
+      CALL GetArg(0, tCurrentExecutable)
 #endif
       
-! tString should now contain the full path to DASH.exe irrespective of the way
+! tCurrentExecutable should now contain the full path to DASH.exe irrespective of the way
 ! DASH has been invoked.
-      CALL SplitPath(tString, InstallationDirectory, tFile)
-      IF (LEN_TRIM(InstallationDirectory) .EQ. 0) InstallationDirectory = '.'//DIRSPACER
+      CALL SplitPath(tCurrentExecutable, tCurrentExecutableDirectory, tCurrentExecutableFileName)
+      IF (LEN_TRIM(tCurrentExecutableDirectory) .EQ. 0) tCurrentExecutableDirectory = '.'
       
+! Store the directory where DASH was invoked from      
       CALL IOsDirName(StartUpDirectory)
-      StartUpDirectory = TRIM(StartUpDirectory)//DIRSPACER
-      CALL IOsDirChange(InstallationDirectory)
-      CALL IOsDirName(InstallationDirectory)
+      CALL IOsDirChange('..')
+! If we were started from a directory whose parent has a share directory, we're probably being debugged
+! In this case, consider the directory we were started in as the dash-distribution/bin directory 
+      IF (IOsDirExists('share')) THEN
+          Bindirectory = StartupDirectory 
+      ELSE
+! In any other case, use the directory where DASH.exe is and use that as the dash distribution bin directory
+          BinDirectory = tCurrentExecutableDirectory
+      END IF
+
+! Cd in the bin directory and re-read the full directory name
+      CALL IOsDirChange(BinDirectory)
+      CALL IOsDirName(BinDirectory)
+      CALL IOsDirChange('..')
+      CALL IOsDirName(tInstallationDirectory)
+! Finally, return to the directory from where we were invoked
+      CALL IOsDirChange(StartUpDirectory)
+
 ! For debugging purposes
 !      InstallationDirectory = 'D:\default\dash-install'
-      InstallationDirectory = TRIM(InstallationDirectory)//DIRSPACER
-      DocumentationRoot = TRIM(InstallationDirectory)//"Documentation"//DIRSPACER
-      DocumentationHTMLdirectory =  TRIM(DocumentationRoot)//"dash"//DIRSPACER
-
-#ifdef _WIN32
-      ! Operating system version number (e.g. 400=4.00)
-      IF ( InfoOpSystem(OSVersion) .LT. 600 ) THEN
-        CALL IOsVariable('ALLUSERSPROFILE', AllUsersProfileDirectory)
-      ELSE
-! Vista  'C:\Users\Public\'
-        CALL IOsVariable('PUBLIC', AllUsersProfileDirectory)
-      ENDIF
-#else
-      AllUsersProfileDirectory = ''
-#endif
-      IF ( LEN_TRIM(AllUsersProfileDirectory) .GT. 0 ) THEN
-        AllUsersProfileDirectory = TRIM(AllUsersProfileDirectory)//DIRSPACER
-      ELSE
-        AllUsersProfileDirectory = StartUpDirectory
-      ENDIF
+      ShareDashDirectory = TRIM(tInstallationDirectory)//DIRSPACER//"share"//DIRSPACER//"dash"
+      DocumentationRoot = TRIM(tInstallationDirectory)//DIRSPACER//"share"//DIRSPACER//"doc"//DIRSPACER//"DASH"
 
 #ifdef _WIN32
       CALL IOsVariable('APPDATA', AppDataDirectory)
 #else
       CALL IOsVariable('HOME', AppDataDirectory)
 #endif
-      IF ( LEN_TRIM(AppDataDirectory) .GT. 0 ) THEN
-        AppDataDirectory = TRIM(AppDataDirectory)//DIRSPACER
-      ELSE
-        AppDataDirectory = StartUpDirectory
-      ENDIF
 
-      END SUBROUTINE GetInstallationDirectory
+      END SUBROUTINE InitialisePathLookupVariables
 !
 !*****************************************************************************
 !
@@ -339,7 +334,7 @@
       LPosSG(10) = 489
       LPosSG(11) = MaxSPGR+1
 ! Get the space group symbols ...
-      OPEN(110,FILE=TRIM(InstallationDirectory)//'SpaceGroupSymbols.dat',STATUS='OLD', ERR = 999)
+      OPEN(110,FILE=TRIM(ShareDashDirectory)//DIRSPACER//'SpaceGroupSymbols.dat',STATUS='OLD', ERR = 999)
       i = 0
  10   lintem=' '
       READ(110,1100,END=100) lintem
@@ -383,7 +378,7 @@
       CALL ErrorMessage("Sorry, DASH is not installed correctly: could not find the file"//CHAR(13) &
                           //'SpaceGroupSymbols.dat'//CHAR(13)// &
                           "in the installation directory"//CHAR(13)//&
-                          TRIM(InstallationDirectory))              
+                          TRIM(ShareDashDirectory))              
       CALL WindowCloseWrap
       STOP
 
@@ -853,7 +848,7 @@
         RETURN
       RW = 0
       hFile = 10
-      tFileName = TRIM(AppDataDirectory)//'D3.cfg'
+      tFileName = TRIM(AppDataDirectory)//DIRSPACER//'D3.cfg'
 ! Open the file as direct access (i.e. non-sequential) unformatted with a record length of 1 (=4 bytes)
       OPEN(UNIT=hFile,FILE=tFileName,ACCESS='DIRECT',RECL=cRECLMult,FORM='UNFORMATTED',ERR=999)
       RecNr = 1
@@ -1105,7 +1100,7 @@
       COMMON /BATEXE/ in_batch
 
       RW = 1
-      tFileName = TRIM(AppDataDirectory)//'D3.cfg'
+      tFileName = TRIM(AppDataDirectory)//DIRSPACER//'D3.cfg'
       INQUIRE(FILE=tFileName,EXIST=FExists)
       IF (.NOT. FExists) RETURN
       hFile = 10

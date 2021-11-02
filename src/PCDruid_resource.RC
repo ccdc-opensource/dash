@@ -3924,9 +3924,9 @@ IDB_Down                        BITMAP DISCARDABLE "res\\Down.bmp"
 //
 // Icons
 //
-icon1                           ICON   DISCARDABLE "icons/dash.ico"
-IDF_BimodalIcon                 ICON   DISCARDABLE "icons/bimodal.ico"
-IDF_TriModalIcon                ICON   DISCARDABLE "icons/trimodal.ico"
+icon1                           ICON   DISCARDABLE "../distribution/share/icons/dash/dash.ico"
+IDF_BimodalIcon                 ICON   DISCARDABLE "../distribution/share/icons/dash/bimodal.ico"
+IDF_TriModalIcon                ICON   DISCARDABLE "../distribution/share/icons/dash/trimodal.ico"
 
 ///////////////////////////////////////////////////
 //

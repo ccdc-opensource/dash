@@ -708,7 +708,7 @@
         IF (tInputFile(I:I) .EQ. DIRSPACER) iStart = I + 1
       ENDDO
       CALL WCursorShape(CurHourGlass)
-      CALL IOSCommand('"'//TRIM(InstallationDirectory)//DIRSPACER//'zmconv'//DIRSPACER// &
+      CALL IOSCommand('"'//TRIM(BinDirectory)//DIRSPACER//'zmconv'//DIRSPACER// &
         'makezmatrix'//CCDC_EXE_EXT//'" '// &
         TRIM(fmt)//' "'//tInputFile(iStart:iLen)//'"'//TRIM(tExtraArg), ProcSilent+ProcBlocked)
       iStat = WInfoError(1)

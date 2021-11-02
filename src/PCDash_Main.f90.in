@@ -112,7 +112,7 @@
           CALL InitialiseDASHDialogState
       ENDIF
 
-      CALL GetInstallationDirectory
+      CALL InitialisePathLookupVariables
 ! Check if there are any command line arguments
 ! Try to redirect stdout - change working directory if unsuccessful
       IF (NARGS() .EQ. 0) CALL Init_StdOut
@@ -452,29 +452,8 @@
       SUBROUTINE LaunchHelp
 
       USE WINTERACTER
-      USE VARIABLES
-#ifdef _WIN32
-      USE KERNEL32
-      USE dfwinty
-#endif
- 
       IMPLICIT NONE
-
-      CHARACTER(MaxPathLength) WorkingDir
-
-      INTEGER d
-
-      CALL IOsDirName(WorkingDir)
-
-     
-#ifdef _WIN32
-      CALL IOsDirChange(TRIM(DocumentationHTMLdirectory))      
-      d=WinExec('cmd /c "dash.html" 'C,SW_HIDE)
-      CALL IOsDirChange(TRIM(WorkingDir))
-#else
-      CALL IOsCommand(TRIM(InstallationDirectory)//'nss.sh file://'// &
-                      TRIM(DocumentationHTMLdirectory)//DIRSPACER//'dash.html')
-#endif
+      CALL WHelpFile('https://github.com/ccdc-opensource/dash/wiki')
 
       END SUBROUTINE LaunchHelp
 !
