@@ -48,13 +48,12 @@
       CHARACTER(MaxPathLength) ::  FNAME
       DATA FNAME / ' ' /     ! Current filename
 
-      CHARACTER(MaxPathLength) ::  InstallationDirectory
-      CHARACTER(MaxPathLength) ::  DocumentationHTMLdirectory
+      CHARACTER(MaxPathLength) ::  BinDirectory
+      CHARACTER(MaxPathLength) ::  ShareDashDirectory
       CHARACTER(MaxPathLength) ::  DocumentationRoot
       CHARACTER(MaxPathLength) ::  StartUpDirectory
-      CHARACTER(MaxPathLength) ::  AllUsersProfileDirectory
       CHARACTER(MaxPathLength) ::  AppDataDirectory
-      CHARACTER(MaxPathLength) ::  PathToLicenseFile
+
 
 #ifdef _WIN32
       CHARACTER(1),  PARAMETER :: DIRSPACER= '\' ! Windows spacer

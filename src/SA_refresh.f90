@@ -140,7 +140,7 @@
          
          CALL IOsFullPathname(TheFileName,FullFileName)
          M = WInfoError(3) ! Clear errors
-         CALL IOSCommand( TRIM(InstallationDirectory)//DIRSPACER//'zmconv'//DIRSPACER//'dash_csd_connector'//CCDC_EXE_EXT//' --launch-mercury "'//TRIM(FullFileName)//'" '//cUseClient , ProcSilent, IDPROC=ID)      
+         CALL IOSCommand( TRIM(BinDirectory)//DIRSPACER//'zmconv'//DIRSPACER//'dash_csd_connector'//CCDC_EXE_EXT//' --launch-mercury "'//TRIM(FullFileName)//'" '//cUseClient , ProcSilent, IDPROC=ID)      
          DO
              CALL IOsCommandCheck(ID, ISTATUS, IEXCOD)
              IF (ISTATUS==0) EXIT

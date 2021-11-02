@@ -559,10 +559,10 @@
       CLOSE(hSP_in_file)
       ! Run the special positions program
       IF ( ISTOPAS ) THEN
-         CALL IOSCommand( TRIM(InstallationDirectory)//DIRSPACER//'zmconv'//DIRSPACER//'special_positions'//CCDC_EXE_EXT// &
+         CALL IOSCommand( TRIM(BinDirectory)//DIRSPACER//'zmconv'//DIRSPACER//'special_positions'//CCDC_EXE_EXT// &
          ' "special_positions.in" "topas"', ProcSilent+ProcBlocked)      
       ELSE
-         CALL IOSCommand( TRIM(InstallationDirectory)//DIRSPACER//'zmconv'//DIRSPACER//'special_positions'//CCDC_EXE_EXT// &
+         CALL IOSCommand( TRIM(BinDirectory)//DIRSPACER//'zmconv'//DIRSPACER//'special_positions'//CCDC_EXE_EXT// &
          ' "special_positions.in"', ProcSilent+ProcBlocked)      
       ENDIF
       PutAtomsForSpecialPosition = .FALSE.
