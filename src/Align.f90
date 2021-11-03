@@ -155,7 +155,7 @@
         ENDDO
 !--------- End of Checks ----------
 
-      OPEN(220,FILE=ShareDashDirectory(1:LEN_TRIM(ShareDashDirectory))//'SpaceGroupSymbols.dat',STATUS='OLD', ERR = 10)
+      OPEN(220,FILE=ShareDashDirectory(1:LEN_TRIM(ShareDashDirectory))//DIRSPACER//'SpaceGroupSymbols.dat',STATUS='OLD', ERR = 10)
       DO j = 1,(NumberSGTable-1)
         READ (220, 50) line
         nlin = LEN_TRIM(line)
