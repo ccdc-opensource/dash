@@ -43,9 +43,12 @@ set(CPACK_PACKAGE_CHECKSUM SHA256)
 set(CPACK_MONOLITHIC_INSTALL TRUE)
 set(CPACK_PACKAGE_EXECUTABLES dash;DASH)
 set(CPACK_VERBATIM_VARIABLES TRUE)
+if(WIN32)
 set(CPACK_WIX_UPGRADE_GUID "f45138d2-73a1-4f1b-9099-85ecadd4f86e")
 set(CPACK_GENERATOR "7Z;WIX")
-
+else()
+  set(CPACK_GENERATOR "7Z")
+endif()
 
 include(CPack)
 
@@ -53,14 +56,13 @@ include(CPack)
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/PCDash_Main.f90.in" "${CMAKE_CURRENT_BINARY_DIR}/src/PCDash_Main.f90" @ONLY)
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/variables.f90.in" "${CMAKE_CURRENT_BINARY_DIR}/src/variables.f90" @ONLY)
 
-# A temporary path for winteracter 9.2
-FetchContent_Declare(
-  winteracter
-  URL      "https://artifactory.ccdc.cam.ac.uk/artifactory/ccdc-legacy-windows-distributions/winteracter-9.2.7z"
-  URL_HASH "SHA256=6c13d4e9b343e258630d879ff91f2d2d463ebe87d53d4224516e087197c2bf04"
-  HTTP_HEADER "X-JFrog-Art-Api:$ENV{ARTIFACTORY_API_KEY}"
-)
-FetchContent_MakeAvailable(winteracter)
+# Select the right library directory based on the compiler
+if(WIN32)
+  set(WINTERACTER_ROOT "c:/wint" CACHE STRING "Location where winteracter is installed")
+  if(${CMAKE_Fortran_COMPILER_ID} STREQUAL "Intel")
+    set(winteracter_LIBRARY_PATH ${WINTERACTER_ROOT}/lib.if8)
+  endif()
+endif()
 
 # Create the DASH executable target
 add_executable(DASH WIN32)
@@ -68,15 +70,19 @@ add_executable(DASH WIN32)
 target_include_directories(
   DASH
   PRIVATE
-  ${winteracter_SOURCE_DIR}/include
-  ${winteracter_SOURCE_DIR}/lib.if8
+  ${WINTERACTER_ROOT}/include
+  ${winteracter_LIBRARY_PATH}
   ${CMAKE_CURRENT_SOURCE_DIR}/src
   ${CMAKE_CURRENT_SOURCE_DIR}
 )
-target_link_directories(DASH PRIVATE ${winteracter_SOURCE_DIR}/lib.if8)
+target_link_directories(DASH PRIVATE ${winteracter_LIBRARY_PATH})
 
+if(WIN32)
+  if(${CMAKE_Fortran_COMPILER_ID} STREQUAL "Intel")
 # DASH was built with /QxW, which has been superseded by /arch switches
 target_compile_options(DASH PRIVATE "/arch:SSE2")
+  endif()
+endif()
 
 target_link_libraries(
   DASH PRIVATE 
