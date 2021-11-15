@@ -545,7 +545,7 @@
       Rietan_FP = .FALSE.
       
       IF ( .NOT. in_batch ) then
-        CALL GetPathToMercuryFromRegistry
+        CALL GetPathToMercury
         CALL GetPathToMogulFromRegistry
         CALL GetPathToTopasFromRegistry
         CALL GetPathToExpguiFromRegistry
