@@ -49,7 +49,7 @@
           CALL IOsRegistryGet(KEYNAME='HKEY_LOCAL_MACHINE\Software\CCDC\Mercury\'//tLatestVersion, VALUE=tInstallDirectory, VALNAME='InstallDir', TYPE=tRetCode)
           IF (tRetCode .NE. 1) THEN
              MercuryExecutable = ''
-      RETURN
+             RETURN
           ENDIF
       ENDIF
       MercuryExecutable = TRIM(tInstallDirectory)//DIRSPACER//'bin'//DIRSPACER//'Mercury.exe'

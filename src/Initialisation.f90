@@ -534,7 +534,7 @@
 ! Initialise path to viewer and argument for viewer. These will be overwritten if
 ! the configuration file is found and used.
       VIEWARG = ''
-      VIEWEXE = ''
+      ViewerExecutable = ''
       MOGULEXE = ' '
       DICVOLEXE = ''
       McMailleEXE = ''
@@ -594,7 +594,7 @@
         CALL SelectDASHDialog(IDD_Index_Preparation)
         CALL WDialogPutReal(IDF_eps, 0.03, '(F5.3)')
         CALL SelectDASHDialog(IDD_Configuration)
-        CALL WDialogPutString(IDF_ViewExe, ViewExe)
+        CALL WDialogPutString(IDF_ViewExe, ViewerExecutable)
         CALL WDialogPutString(IDF_ViewArg, ViewArg)
         CALL WDialogPutString(IDF_MogulExe, MogulExe)
         CALL WDialogPutString(IDF_TopasExe, TopasExe)
@@ -953,8 +953,13 @@
       CALL FileWriteReal(hFile, RecNr, DASHDefaultMaxResolution)
 ! Save the viewer
       CALL SelectDASHDialog(IDD_Configuration)
-      CALL DASHWDialogGetString(IDF_ViewExe, ViewExe)
-      CALL FileWriteString(hFile, RecNr, ViewExe)
+
+      CALL DASHWDialogGetString(IDF_ViewExe, ViewerExecutable)
+      IF (ViewerExecutable .EQ. MercuryExecutable) THEN
+            CALL FileWriteString(hFile, RecNr, '')
+      ELSE
+            CALL FileWriteString(hFile, RecNr, ViewerExecutable)
+      ENDIF
 ! and the viewer arguments
       CALL DASHWDialogGetString(IDF_ViewArg, ViewArg)
       CALL FileWriteString(hFile, RecNr, ViewArg)
@@ -1233,10 +1238,13 @@
 ! Read the viewer
       IF ( .NOT. IN_BATCH ) &
         CALL SelectDASHDialog(IDD_Configuration)
-      CALL FileReadString(hFile, RecNr, ViewExe)
-  
-      IF ( .NOT. IN_BATCH ) &
-        CALL WDialogPutString(IDF_ViewExe, ViewExe)
+
+      CALL FileReadString(hFile, RecNr, ViewerExecutable)
+      IF (( .NOT. IN_BATCH ) .AND. (LEN_TRIM(ViewerExecutable) .GT. 0)) THEN
+        CALL WDialogPutString(IDF_ViewExe, ViewerExecutable)
+      ELSE 
+        CALL WDialogPutString(IDF_ViewExe, MercuryExecutable)
+      ENDIF
 ! and the viewer arguments
       CALL FileReadString(hFile, RecNr, ViewArg)
 

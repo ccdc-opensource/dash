@@ -76,7 +76,8 @@
       INTEGER, PARAMETER :: cRECLMult = 1
 #endif
 
-      CHARACTER(MaxPathLength) :: VIEWEXE
+      CHARACTER(MaxPathLength) :: MercuryExecutable
+      CHARACTER(MaxPathLength) :: ViewerExecutable
       CHARACTER(20)            :: VIEWARG
       CHARACTER(MaxPathLength) :: MOGULEXE
       CHARACTER(MaxPathLength) :: DICVOLEXE
