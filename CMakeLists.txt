@@ -60,7 +60,11 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/variables.f90.in" "${CMAKE_CURRE
 if(WIN32)
   set(WINTERACTER_ROOT "c:/wint" CACHE STRING "Location where winteracter is installed")
   if(${CMAKE_Fortran_COMPILER_ID} STREQUAL "Intel")
-    set(winteracter_LIBRARY_PATH ${WINTERACTER_ROOT}/lib.if8)
+    if (${CMAKE_Fortran_COMPILER_ARCHITECTURE_ID} STREQUAL "x64")
+      set(winteracter_LIBRARY_PATH ${WINTERACTER_ROOT}/lib.i64)
+    else()
+      set(winteracter_LIBRARY_PATH ${WINTERACTER_ROOT}/lib.if8)
+    endif()
   endif()
 endif()
 
@@ -289,12 +293,21 @@ install(
 
 # Install required intel fortran DLLs.
 # InstallRequiredSystemLibraries currently has difficulties with our legacy fortran compiler
-set(INTEL_FORTRAN_COMMON_FILES "C:/Program Files (x86)/Common Files/Intel/Shared Libraries/redist/ia32_win/compiler")
-install(
-    FILES
-    "${INTEL_FORTRAN_COMMON_FILES}/libifcoremd.dll"
-    "${INTEL_FORTRAN_COMMON_FILES}/libmmd.dll"
-    "${INTEL_FORTRAN_COMMON_FILES}/svml_dispmd.dll"
-    DESTINATION ${CMAKE_INSTALL_BINDIR}
-    COMPONENT
-)
+if(WIN32)
+  if(${CMAKE_Fortran_COMPILER_ID} STREQUAL "Intel")
+    if (${CMAKE_Fortran_COMPILER_ARCHITECTURE_ID} STREQUAL "x64")
+      set(INTEL_FORTRAN_COMMON_FILES "C:/Program Files (x86)/Intel/oneAPI/compiler/2021.4.0/windows/redist/intel64_win/compiler")
+    else()
+      set(INTEL_FORTRAN_COMMON_FILES "C:/Program Files (x86)/Intel/oneAPI/compiler/2021.4.0/windows/redist/ia32_win/compiler")
+    endif()
+    install(
+      FILES
+      "${INTEL_FORTRAN_COMMON_FILES}/libifcoremd.dll"
+      "${INTEL_FORTRAN_COMMON_FILES}/libmmd.dll"
+      "${INTEL_FORTRAN_COMMON_FILES}/svml_dispmd.dll"
+      DESTINATION ${CMAKE_INSTALL_BINDIR}
+      COMPONENT
+    )
+    endif()
+endif()
+
