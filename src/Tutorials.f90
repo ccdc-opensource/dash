@@ -29,19 +29,13 @@
       USE WINTERACTER
       USE DRUID_HEADER
       USE VARIABLES
-#ifdef _WIN32
-      USE KERNEL32
-      USE dfwinty
-#endif
- 
+
       IMPLICIT NONE
 
       INTEGER, INTENT (IN   ) :: Tutorial_ID
 
-      CHARACTER(MaxPathLength) ManualPath, DocumentationPath, FileDir
+      CHARACTER(MaxPathLength) DocumentationPath
       CHARACTER(MaxPathLength) DestineDir
-
-      CHARACTER(MaxPathLength) TutorialWikiPage
       CHARACTER(2)             NumberStr
 
       INTEGER d
@@ -66,18 +60,16 @@
           NumberStr = '06'
       END SELECT
 
+      CALL IOsDirChange(TRIM(DocumentationRoot)//DIRSPACER//"tutorials"//DIRSPACER//"tutorial-"//NumberStr//DIRSPACER//"data")
+      CALL IOsCopyFile('*.xye',TRIM(DestineDir)//DIRSPACER)
+      CALL IOsCopyFile('*.raw',TRIM(DestineDir)//DIRSPACER)
+      CALL IOsCopyFile('*.mol2',TRIM(DestineDir)//DIRSPACER)
+      CALL IOsCopyFile('*.zmatrix',TRIM(DestineDir)//DIRSPACER)
 
-      FileDir = TRIM(TRIM(DocumentationRoot)//DIRSPACER//"tutorials"//DIRSPACER//"tutorial-"//NumberStr//DIRSPACER//"data")
-      CALL IOsDirChange(FileDir)
-      CALL IOsCopyFile('Tutorial_'//NumberStr//'.xye',TRIM(DestineDir)//DIRSPACER)
-      CALL IOsCopyFile('Tutorial_'//NumberStr//'.raw',TRIM(DestineDir)//DIRSPACER)
-      CALL IOsCopyFile('Tutorial_'//NumberStr//'*.mol2',TRIM(DestineDir)//DIRSPACER)
-      CALL IOsCopyFile('Tutorial_'//NumberStr//'*.zmatrix',TRIM(DestineDir)//DIRSPACER)
-
-      TutorialWikiPage = TRIM("https://github.com/ccdc-opensource/dash/wiki/Tutorial"//TRIM(NumberStr))
-      CALL WHelpFile(TutorialWikiPage)
+      CALL IOsOpenDocument("https://github.com/ccdc-opensource/dash/wiki/Tutorial"//TRIM(NumberStr))
 
       CALL IOsDirChange(TRIM(DestineDir))
+      CALL IOsOpenDocument(TRIM(DestineDir))
 
 
       END SUBROUTINE LaunchTutorial

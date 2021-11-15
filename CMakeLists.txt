@@ -87,7 +87,6 @@ endif()
 target_link_libraries(
   DASH PRIVATE 
   winter.lib # Winteracter main library
-  htmlhelp.lib # Used by some parts of Winteracter
 )
 
 target_sources(

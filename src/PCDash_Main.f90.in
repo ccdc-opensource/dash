@@ -453,7 +453,7 @@
 
       USE WINTERACTER
       IMPLICIT NONE
-      CALL WHelpFile('https://github.com/ccdc-opensource/dash/wiki')
+      CALL IOsOpenDocument('https://github.com/ccdc-opensource/dash/wiki')
 
       END SUBROUTINE LaunchHelp
 !
