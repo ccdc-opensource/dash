@@ -124,7 +124,7 @@
       CALL StrUpperCase(tExtension)
       IF ( tExtension .NE. 'EXE' ) goto 998
 #endif
-      ScriptName = TRIM(BinDirectory)//ctScriptFile
+      ScriptName = TRIM(BinDirectory)//DIRSPACER//ctScriptFile
       INQUIRE(FILE=ScriptName, EXIST=exists)
       IF ( .NOT. exists ) GOTO 999
  10   CheckRIETANExe = 0

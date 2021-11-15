@@ -157,7 +157,7 @@
       ScriptName = TRIM(tDirName)//ctScriptDir//DIRSPACER//ctScriptFile
       INQUIRE(FILE=ScriptName, EXIST=exists)
       IF ( exists ) GOTO 10
-      ScriptName = TRIM(BinDirectory)//ctScriptDir//DIRSPACER//ctScriptFile
+      ScriptName = TRIM(BinDirectory)//DIRSPACER//ctScriptDir//DIRSPACER//ctScriptFile
       INQUIRE(FILE=ScriptName, EXIST=exists)
       IF ( .NOT. exists ) GOTO 999
  10   CheckEXPGUIExe = 0
