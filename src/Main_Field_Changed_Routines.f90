@@ -178,10 +178,10 @@
                 CALL WDialogFieldState(IDF_ColourBySolution, Enabled)
               ENDIF
             CASE (IDBBROWSE)
-              tFileName = ViewExe
+              tFileName = ViewerExecutable
               IF ( SelectOneFile(tFileName, 'Select Viewer') ) THEN
-                VIEWEXE = tFileName
-                CALL WDialogPutString(IDF_ViewExe, VIEWEXE)
+                ViewerExecutable = tFileName
+                CALL WDialogPutString(IDF_ViewExe, ViewerExecutable)
               ENDIF
             CASE (IDBBROWSE2)
               tFileName = MOGULEXE

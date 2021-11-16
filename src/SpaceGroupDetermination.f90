@@ -129,7 +129,7 @@
 ! Before calling the executable in the DASH installation directory.
      CALL IosDeleteFile(TRIM(CurrentDirectory)//DIRSPACER//'table.asc')
      errcode = InfoError(1) 
-     CALL IOsCommand(TRIM(BinDirectory)//ExtSymEXE,2)
+     CALL IOsCommand(TRIM(BinDirectory)//DIRSPACER//ExtSymEXE,2)
      errcode = InfoError(1) 
 #ifdef _WIN32
      IF (errcode .EQ. ErrOsCommand) GOTO 888 ! error ocurred 

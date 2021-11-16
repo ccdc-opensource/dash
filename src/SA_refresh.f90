@@ -112,8 +112,6 @@
       CHARACTER(MaxPathLength+40) tArgStr, tExeStr
       CHARACTER(1024) FullFileName
       
-      
-      CHARACTER(1) cUseClient
       INTEGER, DIMENSION(2) :: ID
 
 
@@ -126,21 +124,25 @@
         CALL SelectDASHDialog(IDD_Configuration)
         tBuiltInMercury = DASHWDialogGetCheckBoxLogical(IDF_BuiltIn_Mercury)
         tUseClient = DASHWDialogGetCheckBoxLogical(IDF_Use_Client)
-        CALL DASHWDialogGetString(IDF_ViewExe,ViewExe)
-        CALL DASHWDialogGetString(IDF_ViewArg,ViewArg)
+        CALL DASHWDialogGetString(IDF_ViewExe, ViewerExecutable)
+        CALL DASHWDialogGetString(IDF_ViewArg, ViewArg)
         CALL PopActiveWindowID
       ENDIF
       
       
       IF (tBuiltInMercury) THEN
+         if (LEN_TRIM(MercuryExecutable) .EQ. 0) THEN
+             CALL ErrorMessage("Could not find default mercury location.")
+             RETURN
+         ENDIF
 
-          
-         cUseClient = '0'
-         IF (tUseClient) cUseClient = '1'
-         
          CALL IOsFullPathname(TheFileName,FullFileName)
          M = WInfoError(3) ! Clear errors
-         CALL IOSCommand( TRIM(BinDirectory)//DIRSPACER//'zmconv'//DIRSPACER//'dash_csd_connector'//CCDC_EXE_EXT//' --launch-mercury "'//TRIM(FullFileName)//'" '//cUseClient , ProcSilent, IDPROC=ID)      
+         IF (tUseClient) THEN
+           CALL IOSCommand( TRIM(MercuryExecutable)//' -load-all-files -client "'//TRIM(FullFileName)//'"', ProcSilent, IDPROC=ID)      
+         ELSE
+           CALL IOSCommand( TRIM(MercuryExecutable)//' -load-all-files "'//TRIM(FullFileName)//'"', ProcSilent, IDPROC=ID)      
+         ENDIF
          DO
              CALL IOsCommandCheck(ID, ISTATUS, IEXCOD)
              IF (ISTATUS==0) EXIT
@@ -156,7 +158,7 @@
              RETURN
          ENDIF
       ELSE
-        tExeStr = ViewExe
+        tExeStr = ViewerExecutable
         tArgStr = ViewArg
 
         I = LEN_TRIM(tExeStr)

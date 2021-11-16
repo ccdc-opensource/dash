@@ -16,13 +16,18 @@ include(GNUInstallDirs)
 # Set up variables that will be replaced in source files
 set(DASH_VERSION ${CMAKE_PROJECT_VERSION})
 set(DASH_COPYRIGHT_YEAR "2021")
+set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
+set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
+set(CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH})
 
 # Configure CPack based package generation
-set(CPACK_PACKAGE_NAME "dash")
+set(CPACK_PACKAGE_NAME "DASH")
 set(CPACK_PACKAGE_VENDOR "The Cambridge Crystallographic Data Centre")
 set(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_SOURCE_DIR}/description.txt")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A versatile and interactive package for solving crystal structures from powder diffraction data")
 set(CPACK_PACKAGE_HOMEPAGE_URL "https://github.org/ccdc-opensource/dash")
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.txt")
+set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
 if($ENV{BUILD_NUMBER})
     set(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_NAME}-${DASH_VERSION}-$ENV{BUILD_NUMBER}-win32)
     set(CPACK_SOURCE_PACKAGE_FILE_NAME ${CPACK_PACKAGE_NAME}-${DASH_VERSION}-$ENV{BUILD_NUMBER})
@@ -31,16 +36,19 @@ else()
     set(CPACK_SOURCE_PACKAGE_FILE_NAME ${CPACK_PACKAGE_NAME}-${DASH_VERSION}-developer-build)
 endif()
 # set(CPACK_PACKAGE_INSTALL_DIRECTORY "")
-set(CPACK_PACKAGE_ICON icons/dash_128x128.png)
+set(CPACK_PACKAGE_ICON ${CMAKE_CURRENT_SOURCE_DIR}/distribution/share/icons/dash/dash.ico)
+set(CPACK_WIX_PRODUCT_ICON ${CMAKE_CURRENT_SOURCE_DIR}/distribution/share/icons/dash/dash.ico)
+set(CPACK_WIX_PROGRAM_MENU_FOLDER .)
 set(CPACK_PACKAGE_CHECKSUM SHA256)
-# set(CPACK_RESOURCE_FILE_LICENSE LICENSE)
-# set(CPACK_RESOURCE_FILE_README )
-# set(CPACK_RESOURCE_FILE_WELCOME)
 set(CPACK_MONOLITHIC_INSTALL TRUE)
 set(CPACK_PACKAGE_EXECUTABLES dash;DASH)
 set(CPACK_VERBATIM_VARIABLES TRUE)
-set(CPACK_GENERATOR "7Z")
-
+if(WIN32)
+set(CPACK_WIX_UPGRADE_GUID "f45138d2-73a1-4f1b-9099-85ecadd4f86e")
+set(CPACK_GENERATOR "7Z;WIX")
+else()
+  set(CPACK_GENERATOR "7Z")
+endif()
 
 include(CPack)
 
@@ -48,14 +56,17 @@ include(CPack)
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/PCDash_Main.f90.in" "${CMAKE_CURRENT_BINARY_DIR}/src/PCDash_Main.f90" @ONLY)
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/variables.f90.in" "${CMAKE_CURRENT_BINARY_DIR}/src/variables.f90" @ONLY)
 
-# A temporary path for winteracter 9.2
-FetchContent_Declare(
-  winteracter
-  URL      "https://artifactory.ccdc.cam.ac.uk/artifactory/ccdc-legacy-windows-distributions/winteracter-9.2.7z"
-  URL_HASH "SHA256=6c13d4e9b343e258630d879ff91f2d2d463ebe87d53d4224516e087197c2bf04"
-  HTTP_HEADER "X-JFrog-Art-Api:$ENV{ARTIFACTORY_API_KEY}"
-)
-FetchContent_MakeAvailable(winteracter)
+# Select the right library directory based on the compiler
+if(WIN32)
+  set(WINTERACTER_ROOT "c:/wint" CACHE STRING "Location where winteracter is installed")
+  if(${CMAKE_Fortran_COMPILER_ID} STREQUAL "Intel")
+    if (${CMAKE_Fortran_COMPILER_ARCHITECTURE_ID} STREQUAL "x64")
+      set(winteracter_LIBRARY_PATH ${WINTERACTER_ROOT}/lib.i64)
+    else()
+      set(winteracter_LIBRARY_PATH ${WINTERACTER_ROOT}/lib.if8)
+    endif()
+  endif()
+endif()
 
 # Create the DASH executable target
 add_executable(DASH WIN32)
@@ -63,20 +74,23 @@ add_executable(DASH WIN32)
 target_include_directories(
   DASH
   PRIVATE
-  ${winteracter_SOURCE_DIR}/include
-  ${winteracter_SOURCE_DIR}/lib.if8
+  ${WINTERACTER_ROOT}/include
+  ${winteracter_LIBRARY_PATH}
   ${CMAKE_CURRENT_SOURCE_DIR}/src
   ${CMAKE_CURRENT_SOURCE_DIR}
 )
-target_link_directories(DASH PRIVATE ${winteracter_SOURCE_DIR}/lib.if8)
+target_link_directories(DASH PRIVATE ${winteracter_LIBRARY_PATH})
 
+if(WIN32)
+  if(${CMAKE_Fortran_COMPILER_ID} STREQUAL "Intel")
 # DASH was built with /QxW, which has been superseded by /arch switches
 target_compile_options(DASH PRIVATE "/arch:SSE2")
+  endif()
+endif()
 
 target_link_libraries(
   DASH PRIVATE 
   winter.lib # Winteracter main library
-  htmlhelp.lib # Used by some parts of Winteracter
 )
 
 target_sources(
@@ -279,12 +293,21 @@ install(
 
 # Install required intel fortran DLLs.
 # InstallRequiredSystemLibraries currently has difficulties with our legacy fortran compiler
-set(INTEL_FORTRAN_COMMON_FILES "C:/Program Files (x86)/Common Files/Intel/Shared Libraries/redist/ia32_win/compiler")
-install(
-    FILES
-    "${INTEL_FORTRAN_COMMON_FILES}/libifcoremd.dll"
-    "${INTEL_FORTRAN_COMMON_FILES}/libmmd.dll"
-    "${INTEL_FORTRAN_COMMON_FILES}/svml_dispmd.dll"
-    DESTINATION ${CMAKE_INSTALL_BINDIR}
-    COMPONENT
-)
+if(WIN32)
+  if(${CMAKE_Fortran_COMPILER_ID} STREQUAL "Intel")
+    if (${CMAKE_Fortran_COMPILER_ARCHITECTURE_ID} STREQUAL "x64")
+      set(INTEL_FORTRAN_COMMON_FILES "C:/Program Files (x86)/Intel/oneAPI/compiler/2021.4.0/windows/redist/intel64_win/compiler")
+    else()
+      set(INTEL_FORTRAN_COMMON_FILES "C:/Program Files (x86)/Intel/oneAPI/compiler/2021.4.0/windows/redist/ia32_win/compiler")
+    endif()
+    install(
+      FILES
+      "${INTEL_FORTRAN_COMMON_FILES}/libifcoremd.dll"
+      "${INTEL_FORTRAN_COMMON_FILES}/libmmd.dll"
+      "${INTEL_FORTRAN_COMMON_FILES}/svml_dispmd.dll"
+      DESTINATION ${CMAKE_INSTALL_BINDIR}
+      COMPONENT
+    )
+    endif()
+endif()
+
