@@ -80,6 +80,7 @@
       CHARACTER(20)            :: VIEWARG
       CHARACTER(MaxPathLength) :: MOGULEXE
       CHARACTER(MaxPathLength) :: DICVOLEXE
+      CHARACTER(MaxPathLength) :: PYAPIEXE	  
       INTEGER                  :: DICVOL_ver
       INTEGER, PARAMETER       :: DICVOL_internal = 0, DICVOL04 = 4, DICVOL06 = 6
       CHARACTER(MaxPathLength) :: McMailleEXE

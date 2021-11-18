@@ -175,6 +175,7 @@ target_sources(
   src/SOLVAR.f90
   src/SpaceGroupDetermination.f90
   src/TAVAR.f90
+  src/Tests.f90
   src/TOPAS.f90
   src/Tutorials.f90
   src/Upload_Cell_Constants.f90

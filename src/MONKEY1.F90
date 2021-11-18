@@ -693,9 +693,11 @@
       IF (dwType .NE. REG_SZ) GOTO 20
       TempValueName = ValueName
       IF (TempValueName(1:3) .EQ. 'Exe') THEN
-          PYAPIEXE = ''
+          PYAPIEXE = ' '
           PYAPIEXE(1:cbData) = bData(1:cbData)
-          PYAPIEXE(cbData+1 : cbData+1) = CHAR(0)
+          DO I = 1,cbData
+             IF ( PYAPIEXE(I:I) .EQ. CHAR(0) ) PYAPIEXE(I:I) = ' '                
+          ENDDO
           RETURN
       ENDIF
       i = RegCloseKey(hKey) ! Close the key handle.

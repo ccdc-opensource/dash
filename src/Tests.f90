@@ -5,8 +5,9 @@
     INTEGER*4 LUIN
     LUIN = 42
 ! Deliberate crash on error note so we know something is wrong
-    OPEN(UNIT=LUIN,FILE='TestSuite.log')
+    OPEN(UNIT=LUIN,FILE='E:\\TestSuite.log')
     CALL TestZMConvWorkflow(LUIN)
+    CLOSE(LUIN)
 
     END SUBROUTINE TestSuite
     

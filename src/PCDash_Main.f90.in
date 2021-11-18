@@ -92,6 +92,10 @@
           in_batch = .TRUE.
           CALL RunMerge
           STOP
+		ELSE IF (  ArgString .EQ. "RUNTESTS" ) THEN
+          in_batch = .TRUE.
+          CALL TestSuite
+          STOP		
         ELSE
           ExtLen = 7
           CALL FileGetExtension(ArgString, StrFileExtension, ExtLen)
