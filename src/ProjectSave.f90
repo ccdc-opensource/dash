@@ -246,7 +246,7 @@
 
       INTEGER, EXTERNAL :: GetCrystalSystem
       INTEGER I, j, RW, MAJOR_IDX, MINOR_IDX, PATCH_IDX, END_IDX
-	  INTEGER MajorVersion,MinorVersion,PatchVersion
+      INTEGER MajorVersion,MinorVersion,PatchVersion
       CHARACTER*(255) tString, csol
       REAL PatchLevel
       REAL, PARAMETER :: TOLER = 1E-6
@@ -270,39 +270,39 @@
 ! Read / Write the header
       tString = TRIM(ProgramVersion)//' project file'
       CALL FileRWString(hPrjFile, iPrjRecNr, RW, tString)
-	  
-	  MAJOR_IDX = 6
+      
+      MAJOR_IDX = 6
       END_IDX = LEN(TRIM(tString))
-	  PATCH_IDX = LEN(TRIM(tString))
-	  DO I = MAJOR_IDX,LEN(TRIM(tString))
-		   IF ( tString(I:I) .EQ. '.' ) THEN
-		      MINOR_IDX = I
-			  EXIT
-		   ENDIF
-	  ENDDO
-		
-	  DO I = MINOR_IDX+1,LEN(TRIM(tString))
-		   IF ( tString(I:I) .EQ. '.' ) THEN
-		      PATCH_IDX = I
-			  EXIT
-		   ENDIF
-	  ENDDO
-		
-	  DO I = PATCH_IDX+1,LEN(TRIM(tString))
-		   IF ( tString(I:I) .EQ. ' ' ) THEN
-		      END_IDX = I
-			  EXIT
-		   ENDIF
-	  ENDDO		
+      PATCH_IDX = LEN(TRIM(tString))
+      DO I = MAJOR_IDX,LEN(TRIM(tString))
+           IF ( tString(I:I) .EQ. '.' ) THEN
+              MINOR_IDX = I
+              EXIT
+           ENDIF
+      ENDDO
+        
+      DO I = MINOR_IDX+1,LEN(TRIM(tString))
+           IF ( tString(I:I) .EQ. '.' ) THEN
+              PATCH_IDX = I
+              EXIT
+           ENDIF
+      ENDDO
+        
+      DO I = PATCH_IDX+1,LEN(TRIM(tString))
+           IF ( tString(I:I) .EQ. ' ' ) THEN
+              END_IDX = I
+              EXIT
+           ENDIF
+      ENDDO        
 
-	  READ (tString(MAJOR_IDX:MINOR_IDX-1),'(I)', ERR=999) MajorVersion
-	  READ (tString(MINOR_IDX+1:PATCH_IDX-1),'(I)', ERR=999) MinorVersion	
-	  IF ( PATCH_IDX .NE. LEN(TRIM(tString)) ) THEN
-			READ (tString(PATCH_IDX+1:END_IDX-1),'(I)', ERR=999) PatchVersion			
-	  ELSE
-		    PatchVersion = 0
+      READ (tString(MAJOR_IDX:MINOR_IDX-1),'(I)', ERR=999) MajorVersion
+      READ (tString(MINOR_IDX+1:PATCH_IDX-1),'(I)', ERR=999) MinorVersion    
+      IF ( PATCH_IDX .NE. LEN(TRIM(tString)) ) THEN
+            READ (tString(PATCH_IDX+1:END_IDX-1),'(I)', ERR=999) PatchVersion            
+      ELSE
+            PatchVersion = 0
       ENDIF
-	  
+      
       IF ( BFIOErrorCode .EQ. 1 ) GOTO 999
       ! If read, store program version for later reference
 
