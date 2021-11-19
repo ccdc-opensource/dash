@@ -115,78 +115,41 @@
       INTEGER, DIMENSION(2) :: ID
 
 
-      IF (BuiltInOnly) THEN
-        tBuiltInMercury = .TRUE.
-        tUseClient = .TRUE.
-      ELSE
+
 ! Get the argument for the viewer from the Configuration Window
-        CALL PushActiveWindowID
-        CALL SelectDASHDialog(IDD_Configuration)
-        tBuiltInMercury = DASHWDialogGetCheckBoxLogical(IDF_BuiltIn_Mercury)
-        tUseClient = DASHWDialogGetCheckBoxLogical(IDF_Use_Client)
-        CALL DASHWDialogGetString(IDF_ViewExe, ViewerExecutable)
-        CALL DASHWDialogGetString(IDF_ViewArg, ViewArg)
-        CALL PopActiveWindowID
-      ENDIF
-      
-      
-      IF (tBuiltInMercury) THEN
-         if (LEN_TRIM(MercuryExecutable) .EQ. 0) THEN
-             CALL ErrorMessage("Could not find default mercury location.")
-             RETURN
-         ENDIF
+      CALL PushActiveWindowID
+      CALL SelectDASHDialog(IDD_Configuration)
 
-         CALL IOsFullPathname(TheFileName,FullFileName)
-         M = WInfoError(3) ! Clear errors
-         IF (tUseClient) THEN
-           CALL IOSCommand( TRIM(MercuryExecutable)//' -load-all-files -client "'//TRIM(FullFileName)//'"', ProcSilent, IDPROC=ID)      
-         ELSE
-           CALL IOSCommand( TRIM(MercuryExecutable)//' -load-all-files "'//TRIM(FullFileName)//'"', ProcSilent, IDPROC=ID)      
-         ENDIF
-         DO
-             CALL IOsCommandCheck(ID, ISTATUS, IEXCOD)
-             IF (ISTATUS==0) EXIT
-             CALL IOsWait(5)
-         END DO
+      tUseClient = DASHWDialogGetCheckBoxLogical(IDF_Use_Client)
+      CALL DASHWDialogGetString(IDF_ViewExe, ViewerExecutable)
+      CALL DASHWDialogGetString(IDF_ViewArg, ViewArg)
+      CALL PopActiveWindowID
+      tExeStr = ViewerExecutable
+      tArgStr = ViewArg
 
-         IF ( ISTATUS.EQ.0 ) &
-            RETURN
-         
-         IF ( ISTATUS.EQ.2 ) THEN
-             tArgStr = 'The file named '//TRIM(FullFileName)//' Doesnt seem to exist or is unreadable ...'
-             CALL ErrorMessage(TRIM(tArgStr))
-             RETURN
-         ENDIF
-      ELSE
-        tExeStr = ViewerExecutable
-        tArgStr = ViewArg
-
-        I = LEN_TRIM(tExeStr)
+      I = LEN_TRIM(tExeStr)
       
-        IF (I .EQ. 0) THEN
+      IF (I .EQ. 0) THEN
            CALL ErrorMessage('DASH could not launch the viewer. '// &
                              'No viewer executable is currently specified.'//CHAR(13)//&
                              'This can be changed in the Configuration... window'//CHAR(13)//&
                              'under Options in the menu bar.')
           RETURN
-        ENDIF
+      ENDIF
    
-        INQUIRE(FILE = tExeStr(1:I),EXIST=exists)
-        IF (.NOT. exists) GOTO 999
-        M = InfoError(1) ! Clear errors
-        CALL IOSCommand('"'//tExeStr(1:I)//'" '//TRIM(tArgStr)//' "'//TRIM(TheFileName)//'"')
-        IF (InfoError(1) .NE. 0) GOTO 999
-        RETURN
-      ENDIF   
-999   IF (tBuiltInMercury) THEN
-        tArgStr = 'DASH could not find or launch the built in Mercury: '//CHAR(13)//tExeStr(1:I)
-      ELSE
+      INQUIRE(FILE = tExeStr(1:I),EXIST=exists)
+      IF (.NOT. exists) GOTO 999
+      M = InfoError(1) ! Clear errors
+      CALL IOSCommand('"'//tExeStr(1:I)//'" '//TRIM(tArgStr)//' "'//TRIM(TheFileName)//'"')
+      IF (InfoError(1) .NE. 0) GOTO 999
+        RETURN  
+999   CONTINUE
+
         tArgStr = 'DASH could not find or launch the viewer. '// &
                   'The viewer executable is currently configured'//CHAR(13)//&
                   'to launch the program '//tExeStr(1:I)//CHAR(13)//&
                   'This can be changed in the Configuration... window'//CHAR(13)//&
                   'under Options in the menu bar.'
-      ENDIF
       CALL ErrorMessage(TRIM(tArgStr))
       RETURN
 

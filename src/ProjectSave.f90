@@ -245,10 +245,10 @@
       COMMON /BATEXE/ in_batch
 
       INTEGER, EXTERNAL :: GetCrystalSystem
-      INTEGER I, j, RW
-      CHARACTER*(255) tString
-      CHARACTER*(10) Version  ! We have patch releases like "DASH 2.1.1"
-      REAL VerFig, PatchLevel
+      INTEGER I, j, RW, MAJOR_IDX, MINOR_IDX, PATCH_IDX, END_IDX
+      INTEGER MajorVersion,MinorVersion,PatchVersion
+      CHARACTER*(255) tString, csol
+      REAL PatchLevel
       REAL, PARAMETER :: TOLER = 1E-6
 
       INTEGER     BFIOErrorCode
@@ -268,21 +268,44 @@
       OPEN(UNIT=hPrjFile,FILE=ThePrjFile,ACCESS='DIRECT',RECL=cRECLMult,FORM='UNFORMATTED',ERR=999)
       iPrjRecNr = 1
 ! Read / Write the header
-      tString = ProgramVersion//' project file'
+      tString = TRIM(ProgramVersion)//' project file'
       CALL FileRWString(hPrjFile, iPrjRecNr, RW, tString)
+      
+      MAJOR_IDX = 6
+      END_IDX = LEN(TRIM(tString))
+      PATCH_IDX = LEN(TRIM(tString))
+      DO I = MAJOR_IDX,LEN(TRIM(tString))
+           IF ( tString(I:I) .EQ. '.' ) THEN
+              MINOR_IDX = I
+              EXIT
+           ENDIF
+      ENDDO
+        
+      DO I = MINOR_IDX+1,LEN(TRIM(tString))
+           IF ( tString(I:I) .EQ. '.' ) THEN
+              PATCH_IDX = I
+              EXIT
+           ENDIF
+      ENDDO
+        
+      DO I = PATCH_IDX+1,LEN(TRIM(tString))
+           IF ( tString(I:I) .EQ. ' ' ) THEN
+              END_IDX = I
+              EXIT
+           ENDIF
+      ENDDO        
+
+      READ (tString(MAJOR_IDX:MINOR_IDX-1),'(I)', ERR=999) MajorVersion
+      READ (tString(MINOR_IDX+1:PATCH_IDX-1),'(I)', ERR=999) MinorVersion    
+      IF ( PATCH_IDX .NE. LEN(TRIM(tString)) ) THEN
+            READ (tString(PATCH_IDX+1:END_IDX-1),'(I)', ERR=999) PatchVersion            
+      ELSE
+            PatchVersion = 0
+      ENDIF
+      
       IF ( BFIOErrorCode .EQ. 1 ) GOTO 999
       ! If read, store program version for later reference
-      IF (RW .EQ. cRead) THEN
-        ! Convert version string to real, include patch level
-        READ (tString(6:8),*, ERR=999) VerFig
-        IF ( tString(9:9) .EQ. " " ) THEN
-          Version = tString(1:8)
-        ELSE
-          Version = tString(1:10)
-          READ (tString(10:10),*) PatchLevel
-          VerFig = VerFig + PatchLevel / 100.0
-        ENDIF
-      ENDIF
+
 ! Read / Write radiation source
       CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, JRadOption)
 ! Read / Write Wavelength
@@ -392,7 +415,7 @@
 ! Must read/write hydrogen treatment first, because that is necessary to
 ! calculate the atomic weightings. This wasn't written out in version 3.0, so need
 ! to add a check.
-      IF ( (RW .EQ. cWrite) .OR. (Version(6:8) .NE. "3.0") ) THEN
+      IF ( (RW .EQ. cWrite) .OR. (MajorVersion .LE. 3 ) .OR. (MajorVersion .EQ. 3 .AND. MinorVersion .EQ. 0) ) THEN
         IF ( .NOT. ForceOldVersion ) THEN
           CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, HydrogenTreatment)
           IF ( BFIOErrorCode .EQ. 1 ) GOTO 999
@@ -417,7 +440,7 @@
         CALL SA_Parameter_Set
       ENDIF
 ! Read / Write MDB and SA Distance restraints. Version 3.2 onward
-      IF ( (RW .EQ. cWrite) .OR. (VerFig .GT. 3.2 - TOLER) ) THEN
+      IF ( (RW .EQ. cWrite) .OR. (MajorVersion .GT. 3) .OR. (MajorVersion .EQ. 3 .AND. MinorVersion .GE. 2)  ) THEN
         CALL PrjReadWriteParameterBoundsIncludeMDB
         IF ( BFIOErrorCode .EQ. 1 ) GOTO 999
         CALL PrjErrTrace
