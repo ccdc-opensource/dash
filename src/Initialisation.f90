@@ -422,7 +422,7 @@
       LOGICAL           ChildWinAutoClose
       COMMON /ChWinAC/  ChildWinAutoClose(1:20)
 
-      INTEGER*4         ChildWinHandler
+      INTEGER*8         ChildWinHandler
       LOGICAL                                  ChildWinHandlerSet
       COMMON /ChWinHan/ ChildWinHandler(1:20), ChildWinHandlerSet(1:20)
 

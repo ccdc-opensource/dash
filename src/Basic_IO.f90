@@ -263,7 +263,7 @@
 #ifdef __G95__
       TYPE(CallbackPointer) ChildWinHandler
 #else
-      INTEGER*4         ChildWinHandler
+      INTEGER*8         ChildWinHandler
 #endif
       LOGICAL                                  ChildWinHandlerSet
       COMMON /ChWinHan/ ChildWinHandler(1:20), ChildWinHandlerSet(1:20)
@@ -297,7 +297,7 @@
 #ifdef __G95__
       TYPE(CallbackPointer) ChildWinHandler
 #else
-      INTEGER*4         ChildWinHandler
+      INTEGER*8         ChildWinHandler
 #endif
       LOGICAL                                  ChildWinHandlerSet
       COMMON /ChWinHan/ ChildWinHandler(1:20), ChildWinHandlerSet(1:20)
@@ -340,7 +340,7 @@
 #ifdef __G95__
       TYPE(CallbackPointer) ChildWinHandler
 #else
-      INTEGER*4         ChildWinHandler
+      INTEGER*8         ChildWinHandler
 #endif
       LOGICAL                                  ChildWinHandlerSet
       COMMON /ChWinHan/ ChildWinHandler(1:20), ChildWinHandlerSet(1:20)
@@ -422,8 +422,8 @@
             Handler => ChildWinHandler(dummy)%p
 	    !CALL Handler         
 #else
-            p = ChildWinHandler(EventInfo%WIN)
-            CALL Handler
+        p = ChildWinHandler(EventInfo%WIN)
+        CALL Handler
 #endif
 
             GOTO 10
