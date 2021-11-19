@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.19...3.21)
 
 project(DASH
   VERSION
-      3.99.1
+      3.99.2
   DESCRIPTION
     "DASH powder diffraction solution"
   LANGUAGES
@@ -225,25 +225,16 @@ install(
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
-# Fetch current version of dash_requirements distribution from artifactory
-# This requires that developers set up their ARTIFACTORY_API_KEY environment variable correctly
-if(NOT DEFINED ENV{ARTIFACTORY_API_KEY})
-    message(FATAL_ERROR "ARTIFACTORY_API_KEY environment variable is not defined, cannot download dash_requirements distribution files. See https://confluence.ccdc.cam.ac.uk/x/oK7I for info.")
-endif()
-
-# Specify a build of dash_requirements. This part can become more complex later, downloading the latest version from a branch perhaps
-set(DASH_REQUIREMENTS_BUILD "316732")
-set(DASH_REQUIREMENTS_BRANCH "main")
-set(DASH_REQUIREMENTS_SHA256 "f30832ea6f7e483ecadf657f5196ea378b403dbb116f4eafa028027644dde9f7")
-
-# While DASH can be built in 32bit mode, nothing stops us from starting 64bit executables
+# Fetch current version of dash_requirements distribution from github
+set(DASH_REQUIREMENTS_BUILD "332413")
+set(DASH_REQUIREMENTS_BRANCH "2021.3")
+set(DASH_REQUIREMENTS_GITHUB_RELEASE "dash-requirements%2F2021.3")
+set(DASH_REQUIREMENTS_SHA256 "8752cdaca0cd549b2e9fbfa0931b5c98146adf4b6b2ff560f1a350fa5092bbcc")
 set(DASH_REQUIREMENTS_PLATFORM "windows-dynamic-64")
-
 FetchContent_Declare(
   dash_requirements
-  URL      "https://artifactory.ccdc.cam.ac.uk/artifactory/ccdc-cpp-main-builds/${DASH_REQUIREMENTS_PLATFORM}/distribution/dash_requirements/dash_requirements-${DASH_REQUIREMENTS_BUILD}-${DASH_REQUIREMENTS_BRANCH}-${DASH_REQUIREMENTS_PLATFORM}.7z"
+  URL      "https://github.com/ccdc-opensource/dash/releases/download/${DASH_REQUIREMENTS_GITHUB_RELEASE}/dash_requirements-${DASH_REQUIREMENTS_BUILD}-${DASH_REQUIREMENTS_BRANCH}-${DASH_REQUIREMENTS_PLATFORM}.7z"
   URL_HASH "SHA256=${DASH_REQUIREMENTS_SHA256}"
-  HTTP_HEADER "X-JFrog-Art-Api:$ENV{ARTIFACTORY_API_KEY}"
 )
 FetchContent_MakeAvailable(dash_requirements)
 
