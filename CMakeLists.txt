@@ -287,9 +287,9 @@ install(
 if(WIN32)
   if(${CMAKE_Fortran_COMPILER_ID} STREQUAL "Intel")
     if (${CMAKE_Fortran_COMPILER_ARCHITECTURE_ID} STREQUAL "x64")
-      set(INTEL_FORTRAN_COMMON_FILES "C:/Program Files (x86)/Intel/oneAPI/compiler/2021.4.0/windows/redist/intel64_win/compiler")
+      set(INTEL_FORTRAN_COMMON_FILES "C:/Program Files (x86)/Intel/oneAPI/compiler/latest/windows/redist/intel64_win/compiler")
     else()
-      set(INTEL_FORTRAN_COMMON_FILES "C:/Program Files (x86)/Intel/oneAPI/compiler/2021.4.0/windows/redist/ia32_win/compiler")
+      set(INTEL_FORTRAN_COMMON_FILES "C:/Program Files (x86)/Intel/oneAPI/compiler/latest/windows/redist/ia32_win/compiler")
     endif()
     install(
       FILES
