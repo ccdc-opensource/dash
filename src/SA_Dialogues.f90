@@ -31,7 +31,7 @@
 ! to open that window.
 !
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE ZMVAR
 
@@ -104,7 +104,7 @@
       SUBROUTINE DealWithWizardWindowZmatrices
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE ZMVAR
 
@@ -331,7 +331,7 @@
       SUBROUTINE ShowEditZMatrixWindow(iFrg)
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE ZMVAR
       USE SAMVAR
 
@@ -375,7 +375,7 @@
       SUBROUTINE DealWithEditZMatrixWindow
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE ZMVAR
       USE SAMVAR
@@ -571,7 +571,7 @@
       SUBROUTINE ShowEditZMatrixRotationsWindow
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE ZMVAR
 
       IMPLICIT NONE
@@ -611,7 +611,7 @@
       SUBROUTINE DealWithEditZMatrixRotationsWindow
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE ZMVAR
       USE SAMVAR
@@ -960,7 +960,7 @@
       SUBROUTINE zmCopyTemp2Dialog
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE ZMVAR
       USE ATMVAR
 
@@ -1001,7 +1001,7 @@
       SUBROUTINE zmRotCopyTemp2Dialog
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE ZMVAR
 
       IMPLICIT NONE 
@@ -1107,7 +1107,7 @@
       SUBROUTINE zmCopyDialog2Temp
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE ZMVAR
 
       IMPLICIT NONE
@@ -1142,7 +1142,7 @@
       SUBROUTINE zmRotCopyDialog2Temp
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE ZMVAR
 
       IMPLICIT NONE 
@@ -1385,7 +1385,7 @@
 ! RETURNS : 0 for success
 !
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE ZMVAR
 
@@ -1489,7 +1489,7 @@
       SUBROUTINE DealWithWizardWindowAdditionalSAParams
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE PO_VAR
       USE TAVAR
@@ -1569,7 +1569,7 @@
       SUBROUTINE ShowWizardWindowParameterBounds
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE ZMVAR
 
@@ -1642,7 +1642,7 @@
       SUBROUTINE DealWithWizardWindowParameterBounds
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE ZMVAR
 
@@ -1884,7 +1884,7 @@
       SUBROUTINE ClearSADistRestraintsGrid
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE ZMVAR
 
       IMPLICIT NONE      
@@ -1918,7 +1918,7 @@
       SUBROUTINE ShowSADistRestraints
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE ZMVAR
 
       IMPLICIT NONE
@@ -1952,7 +1952,7 @@
       SUBROUTINE DealWithWizardWindowSADistRestraints
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE ZMVAR
 
@@ -2038,7 +2038,7 @@
       SUBROUTINE SetupMDB(iMinHits)
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE ZMVAR
 
       IMPLICIT NONE
@@ -2129,7 +2129,7 @@
       SUBROUTINE RefreshTorsionRow(IFRow, keepStat)
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -2177,7 +2177,7 @@
       SUBROUTINE ShowWithWizardWindowSASettings
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -2208,7 +2208,7 @@
       INTEGER FUNCTION SAParams_PullDownState
       
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE ZMVAR
 
@@ -2233,7 +2233,7 @@
       SUBROUTINE DealWithWizardWindowSASettings
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE ZMVAR
 
@@ -2362,7 +2362,7 @@
       SUBROUTINE DealWithWizardWindowSAOptions
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
 
       IMPLICIT NONE      
@@ -2411,7 +2411,7 @@
       SUBROUTINE DealWithWizardWindowWriteGrid
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE ZMVAR
 
@@ -2549,7 +2549,7 @@
       SUBROUTINE ShowBimodalDialog(IFrow, Xinitial, UndoModalFlag)
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE ZMVAR
       USE VARIABLES
 
@@ -2672,7 +2672,7 @@
       SUBROUTINE DealWithBimodalDialog
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE ZMVAR
 
@@ -2983,7 +2983,7 @@
 !
       SUBROUTINE ShowWithWizardWindowLoadDBFFile
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
 
       IMPLICIT NONE
@@ -3003,7 +3003,7 @@
 !
       SUBROUTINE DealWithWizardWindowLoadDBFFile
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
 
       IMPLICIT NONE
@@ -3050,7 +3050,7 @@
 !
       SUBROUTINE DealWithWizardWindowSAMethod
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
 
       IMPLICIT NONE

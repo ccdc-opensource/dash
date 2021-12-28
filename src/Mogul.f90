@@ -25,7 +25,7 @@
       
       SUBROUTINE CheckMogulUse
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE WINTERACTER
 
@@ -199,7 +199,7 @@
 ! Calls command to execute Mogul.  Path to Mogul in Configuration Window
       
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE ZMVAR
 
@@ -247,7 +247,7 @@
 ! Works ok but is very simple (just pattern recognition) so is not 100% accurate.
       
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE ZMVAR
 

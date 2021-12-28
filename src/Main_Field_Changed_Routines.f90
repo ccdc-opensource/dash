@@ -27,7 +27,7 @@
       SUBROUTINE DealWithPlotOptionsWindow
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
 
       IMPLICIT NONE
@@ -104,7 +104,7 @@
       SUBROUTINE DealWithConfiguration
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE TAVAR
 
@@ -273,7 +273,7 @@
       LOGICAL FUNCTION SetRRMethodRadioState()
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE TAVAR
 
       IMPLICIT NONE
@@ -314,7 +314,7 @@
 ! This is the window containing the four tabs from the 'View' menu
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
 
       IMPLICIT NONE
@@ -373,7 +373,7 @@
       SUBROUTINE DealWithDiffractionSetupPane
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
 
       IMPLICIT NONE
@@ -416,7 +416,7 @@
       SUBROUTINE DealWithPeakPositionsPane
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
 
       IMPLICIT NONE
@@ -457,7 +457,7 @@
 ! model via Mercury and the profile data in a graph window
       
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE SOLVAR
 
@@ -552,7 +552,7 @@
       SUBROUTINE DealWithCrystalSymmetryPane
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
 
       IMPLICIT NONE
@@ -654,7 +654,7 @@
       SUBROUTINE DealWithIndexPreparation
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
 
       IMPLICIT NONE
@@ -697,7 +697,7 @@
       SUBROUTINE DealWithDVResults
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE DICVAR
 
@@ -745,7 +745,7 @@
       SUBROUTINE RunDICVOL
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE DICVAR
 

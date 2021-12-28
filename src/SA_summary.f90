@@ -32,7 +32,7 @@
 ! model via Mercury and the profile data in a graph window
       
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE SOLVAR
       USE PRJVAR
@@ -211,7 +211,7 @@
 ! - the chi-sqrd progress window
 ! - the Save solutions window
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -245,7 +245,7 @@
 !
       SUBROUTINE DealWithOutputSolutions
       
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE SOLVAR
 
@@ -351,7 +351,7 @@
 !
       SUBROUTINE UpdateOutputSolutionsWindow
       
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE SOLVAR
 
@@ -496,7 +496,7 @@
 !
       SUBROUTINE SaveSolutions
       
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE SOLVAR
 
@@ -676,7 +676,7 @@
 !
       SUBROUTINE SA_structure_output_2(TheSolutionNr, TheRunNr, TheFileName, TheFileType)
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE ATMVAR
       USE ZMVAR

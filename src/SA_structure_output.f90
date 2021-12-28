@@ -26,7 +26,7 @@
 !
       SUBROUTINE SA_structure_output(T, parvals, ntotmov)
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE ATMVAR
       USE ZMVAR
@@ -390,7 +390,7 @@
 ! This subroutine implements the option of write CIF format for viewer 
 ! by wrapping existing subs 
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -501,7 +501,7 @@
       SUBROUTINE SA_STRUCTURE_OUTPUT_OVERLAP(DialogueID)
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE ZMVAR
       USE ATMVAR
       USE SOLVAR
@@ -710,7 +710,7 @@
 !
      INTEGER FUNCTION WriteCIFCommon(hFileCIF, GoodnessOfFit, POMagnitude, FromRR)
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE ATMVAR
       USE ZMVAR

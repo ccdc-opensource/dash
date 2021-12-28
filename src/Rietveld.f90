@@ -34,7 +34,7 @@
 ! so here is a special routine to open that window.
 !
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE ZMVAR
       USE RRVAR
       USE SOLVAR
@@ -261,7 +261,7 @@
       SUBROUTINE Set_Show_bond
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE RRVAR
       USE ZMVAR
 
@@ -331,7 +331,7 @@
       SUBROUTINE Set_Show_angle
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE RRVAR
       USE ZMVAR
 
@@ -403,7 +403,7 @@
       SUBROUTINE Set_Show_torsion
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE RRVAR
       USE ZMVAR
 
@@ -474,7 +474,7 @@
       SUBROUTINE DealWithWindowRietveld
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE RRVAR
       USE ATMVAR
@@ -651,7 +651,7 @@
       SUBROUTINE DealWithRR_PO_Settings
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE PO_VAR
       USE RRVAR
@@ -722,7 +722,7 @@
       SUBROUTINE RietveldRefinement 
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE RRVAR
       USE PO_VAR
 
@@ -759,7 +759,7 @@
       SUBROUTINE Dialog2RRVAR
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE ZMVAR
       USE RRVAR
 
@@ -850,7 +850,7 @@
       SUBROUTINE RRVAR2Dialog
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE ZMVAR
       USE RRVAR
 
@@ -1261,7 +1261,7 @@
 !
       SUBROUTINE RR_Compare
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE ZMVAR
       USE ATMVAR
       USE RRVAR
@@ -1424,7 +1424,7 @@
       SUBROUTINE RR_SaveAs
 ! Pop up file window, user must select file name + file type (through extension).
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE ATMVAR
       USE ZMVAR
@@ -1715,7 +1715,7 @@
       SUBROUTINE DealWithWizardChooseRietveldRefinementMethod
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE TAVAR
 
@@ -1763,7 +1763,7 @@
       SUBROUTINE DealWithWizardRietveldRefinement
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE SOLVAR
       USE TAVAR

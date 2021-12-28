@@ -324,7 +324,7 @@
       SUBROUTINE HighLightPFR
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
 
       IMPLICIT NONE
@@ -497,7 +497,7 @@
 ! Draws peak fit ranges ("hatched areas")
 !
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
 
       IMPLICIT NONE
@@ -653,7 +653,7 @@
       SUBROUTINE Check_KeyDown_PeakFit_Inner
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
 
       IMPLICIT NONE
@@ -908,7 +908,7 @@
       SUBROUTINE UpdatePeaksButtonsStates
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -996,7 +996,7 @@
       SUBROUTINE CheckIfWeCanDoAPawleyRefinement
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -1024,7 +1024,7 @@
 !
       LOGICAL FUNCTION WeCanDoAPawleyRefinement()
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -1075,7 +1075,7 @@
       SUBROUTINE Create_DicvolIndexFile
      
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
 
       IMPLICIT NONE

@@ -26,7 +26,7 @@
       INTEGER FUNCTION Launch_GSAS(input_file_name, fg_EXPGUI)
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE TAVAR
 
@@ -187,7 +187,7 @@
 !
       INTEGER FUNCTION FillOptStr(OptStr)
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -219,7 +219,7 @@
 !
       SUBROUTINE UpdateGSASCheckBoxes
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE TAVAR
 
       IMPLICIT NONE
@@ -278,7 +278,7 @@
 ! in Wizard_routines.f90
       SUBROUTINE DealWithRR_GSAS
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE TAVAR
 
@@ -325,7 +325,7 @@
 !
       INTEGER FUNCTION WriteGSASFiles(TheFileName)
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE TAVAR
       USE VARIABLES
 

@@ -29,7 +29,7 @@
       PROGRAM PCDash_Main
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE ZMVAR
 #ifdef __G95__
@@ -242,7 +242,7 @@
 ! for item which may bring up wizard are ignored until current wizard closed.
 !
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
 
       IMPLICIT NONE
@@ -594,7 +594,7 @@
       SUBROUTINE RunMerge
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE ZMVAR
 #ifdef __G95__

@@ -26,7 +26,7 @@
       SUBROUTINE StartExternalRR
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE PO_VAR
       USE TAVAR
@@ -152,7 +152,7 @@
 !
       SUBROUTINE DealWithWizardExtRR
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE TAVAR
 
@@ -192,7 +192,7 @@
 !
       SUBROUTINE CopyPattern2Backup
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE TAVAR
       USE REFVAR
       USE PO_VAR
@@ -300,7 +300,7 @@
 !
       SUBROUTINE CopyBackup2Pattern
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE WINTERACTER
       USE TAVAR
       USE REFVAR

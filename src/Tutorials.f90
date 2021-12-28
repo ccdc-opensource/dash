@@ -27,7 +27,7 @@
       SUBROUTINE LaunchTutorial(Tutorial_ID)
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
 
       IMPLICIT NONE

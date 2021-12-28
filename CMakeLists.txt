@@ -151,7 +151,6 @@ target_sources(
   src/Mvec.f90
   src/pawley_error_check.f90
   src/Pawley.f90
-  src/PCDruid_Resource.F90
   src/PF_Simplex.f90
   src/Pf.f90
   src/plot_test.F90
@@ -215,7 +214,9 @@ target_sources(
   SGinc/ffcalctop.inc
 
   # Resources
-  src/PCDruid_resource.RC
+  src/dash_gui_resources.rc
+  # this file is generated from the file above but winteracter provide no way to generate it automatically
+  src/dash_gui_resources.f90
 )
 
 # Installation section

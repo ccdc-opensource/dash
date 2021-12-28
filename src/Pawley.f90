@@ -29,7 +29,7 @@
 ! This routine pops up the window for the Pawley refinement
 !
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
 
       IMPLICIT NONE
@@ -115,7 +115,7 @@
       SUBROUTINE DealWithPawleyFitWindow
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
 
       IMPLICIT NONE
@@ -440,7 +440,7 @@
       SUBROUTINE WritePawleyRefinementFile
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE REFVAR
 

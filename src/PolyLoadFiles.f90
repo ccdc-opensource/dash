@@ -148,7 +148,7 @@
 !           2 for user pressed cancel
 !
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE TAVAR
 

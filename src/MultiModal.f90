@@ -291,7 +291,7 @@
 !C      SUBROUTINE ShowBimodalDialog(IFrow, Xinitial)
 !C
 !C      USE WINTERACTER
-!C      USE DRUID_HEADER
+!C      USE dash_gui_resources
 !C      USE ZMVAR
 !C      USE VARIABLES
 !C
@@ -411,7 +411,7 @@
 !C      SUBROUTINE DealWithBimodalDialog
 !C
 !C      USE WINTERACTER
-!C      USE DRUID_HEADER
+!C      USE dash_gui_resources
 !C      USE VARIABLES
 !C      USE ZMVAR
 !C

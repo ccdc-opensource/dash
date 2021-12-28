@@ -127,7 +127,7 @@
       SUBROUTINE SelectDASHDialog(IDialogIdentifier)
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -144,7 +144,7 @@
       SUBROUTINE LoadDASHDialog(IDialogIdentifier)
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -194,7 +194,7 @@
       SUBROUTINE UnloadDASHDialog(IDialogIdentifier)
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -225,7 +225,7 @@
       SUBROUTINE InitialiseDASHDialogState
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -251,7 +251,7 @@
       SUBROUTINE PolyFitter_UploadDialogues
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -389,7 +389,7 @@
       SUBROUTINE InitialiseVariables(batch_setting)
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE ZMVAR
       USE REFVAR
@@ -802,7 +802,7 @@
 ! that DASH ignores the remainder of the configuration file. That's what it does at the moment.
 !
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE TAVAR
 
@@ -1071,7 +1071,7 @@
       SUBROUTINE ReadConfigurationFile
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE TAVAR
 

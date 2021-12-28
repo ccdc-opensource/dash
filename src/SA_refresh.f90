@@ -27,7 +27,7 @@
       SUBROUTINE DealWithSAStatusWindow
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
 
       IMPLICIT NONE
@@ -98,7 +98,7 @@
 ! TheFileName may include the full path, but cannot be a relative path ("..\molecule.pdb" is not allowed)
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
 
       IMPLICIT NONE

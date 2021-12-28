@@ -27,7 +27,7 @@
       INTEGER FUNCTION WriteSAParametersToFile(TheFileName)
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE ZMVAR
       USE PO_VAR
@@ -181,7 +181,7 @@
 ! leaving the Z-matrices window, 2. when loading a project file.
 !
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE PO_VAR
       USE ZMVAR
@@ -454,7 +454,7 @@
       SUBROUTINE UpdateZmatrixSelection
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE ZMVAR
       USE ATMVAR
@@ -568,7 +568,7 @@
 
       SUBROUTINE UpdateConstraintsAndRestraints
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE ZMVAR
       USE ATMVAR
@@ -632,7 +632,7 @@
 ! The result of merging samilar code spreaded in three places 
       LOGICAL FUNCTION RunZmConv(TheInputFile, CellOnly)
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
 
       IMPLICIT NONE

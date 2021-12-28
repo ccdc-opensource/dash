@@ -27,7 +27,7 @@
       SUBROUTINE sa_move_status(ntotmov,movenow)
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       INTEGER, INTENT (IN   ) :: ntotmov, movenow
 

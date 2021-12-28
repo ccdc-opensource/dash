@@ -65,7 +65,7 @@
       SUBROUTINE Background_Fit
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
 
       IMPLICIT NONE

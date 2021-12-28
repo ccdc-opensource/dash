@@ -32,7 +32,7 @@
       SUBROUTINE LocalMinimise(Auto, TestOnlyForAuto)
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE ATMVAR
       USE SOLVAR
