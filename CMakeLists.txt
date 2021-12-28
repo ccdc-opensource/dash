@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.19...3.21)
 
 project(DASH
   VERSION
-      3.99.2
+      4.0.0
   DESCRIPTION
     "DASH powder diffraction solution"
   LANGUAGES
