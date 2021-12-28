@@ -478,9 +478,12 @@
                '(STFC) at the ISIS Facility of the Rutherford Appleton '//CHAR(13)//&
                'Laboratory and CCDC Software Ltd. (CCDC).'//CHAR(13)//&
                CHAR(13)//&
-               'Access to this software product is permitted only under the'//CHAR(13)//&
-               'terms and conditions of a valid software licence, obtainable'//CHAR(13)//&
-               'from the CCDC Software Ltd.'//CHAR(13)//&
+               'DASH makes use of the CCSL library, written by '//CHAR(13)//&
+               'J.C. Matthewman and P.J. Brown with contributions '//CHAR(13)//&
+               'from W.I.F. David, J.B. Forsyth J.H. Matthewman, and J.P. Wright..'//CHAR(13)//&
+               CHAR(13)//&
+               'This software product is made available under the'//CHAR(13)//&
+               'terms and conditions of the MIT Licence'//CHAR(13)//&
                CHAR(13)//&
                'Reference:'//CHAR(13)//&
                'W.I.F. David, K. Shankland, J. van de Streek, E. Pidcock,'//CHAR(13)//&
