@@ -1,0 +1,7 @@
+#!/bin/bash
+# a script that can be used in the devcontainer to start intel's gdb
+# by setting "miDebuggerPath": "${workspaceFolder}/.devcontainer/gdb-oneapi",
+# in the launch.json file
+
+source /opt/intel/oneapi/setvars.sh
+gdb-oneapi $@
