@@ -7,7 +7,7 @@ project(DASH
   DESCRIPTION
     "DASH powder diffraction solution"
   LANGUAGES
-    Fortran RC
+    Fortran C
 )
 
 include(FetchContent)
@@ -28,11 +28,16 @@ set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "A versatile and interactive package for s
 set(CPACK_PACKAGE_HOMEPAGE_URL "https://github.org/ccdc-opensource/dash")
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.txt")
 set(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_SOURCE_DIR}/README.md")
+if(WIN32)
+  set(PACKAGE_PLATFORM "win32")
+elif(UNIX AND NOT APPLE)
+  set(PACKAGE_PLATFORM "linux")
+endif()
 if($ENV{BUILD_NUMBER})
-    set(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_NAME}-${DASH_VERSION}-$ENV{BUILD_NUMBER}-win32)
+    set(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_NAME}-${DASH_VERSION}-$ENV{BUILD_NUMBER}-${PACKAGE_PLATFORM})
     set(CPACK_SOURCE_PACKAGE_FILE_NAME ${CPACK_PACKAGE_NAME}-${DASH_VERSION}-$ENV{BUILD_NUMBER})
 else()
-    set(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_NAME}-${DASH_VERSION}-developer-build-win32)
+    set(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_NAME}-${DASH_VERSION}-developer-build-${PACKAGE_PLATFORM})
     set(CPACK_SOURCE_PACKAGE_FILE_NAME ${CPACK_PACKAGE_NAME}-${DASH_VERSION}-developer-build)
 endif()
 # set(CPACK_PACKAGE_INSTALL_DIRECTORY "")
@@ -60,9 +65,6 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/variables.f90.in" "${CMAKE_CURRE
 set(DASH_RESOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/dash_gui_resources.rc)
 if(WIN32)
   set(WINTERACTER_ROOT "c:/wint" CACHE STRING "Location where winteracter is installed")
-  set(WINTERACTER_RC "${CMAKE_RC_COMPILER}")
-  set(DASH_COMPILED_RESOURCE ${CMAKE_CURRENT_BINARY_DIR}/src/dash_gui_resources.obj)
-  set(WINTERACTER_RC_ARGS "/i${WINTERACTER_ROOT}/include" "/fo" "${DASH_COMPILED_RESOURCE}")
   if(${CMAKE_Fortran_COMPILER_ID} STREQUAL "Intel")
     if (${CMAKE_Fortran_COMPILER_ARCHITECTURE_ID} STREQUAL "x64")
       set(winteracter_LIBRARY_PATH ${WINTERACTER_ROOT}/lib.i64)
@@ -71,6 +73,20 @@ if(WIN32)
     endif()
   endif()
 endif()
+if(UNIX AND NOT APPLE)
+  find_package(X11 REQUIRED)
+  find_package(Motif REQUIRED)
+  find_package(Fontconfig REQUIRED)
+  set(WINTERACTER_ROOT "/opt/winteracter" CACHE STRING "Location where winteracter is installed")
+  set(CMAKE_RC_COMPILER "${WINTERACTER_ROOT}/bin/rc")
+  set(CMAKE_RC_COMPILE_OBJECT "<CMAKE_RC_COMPILER> <DEFINES> <INCLUDES> <FLAGS> -o <OBJECT> <SOURCE>")
+  set(CMAKE_RC_FLAGS "-cif8 -sm64")
+  if(${CMAKE_Fortran_COMPILER_ID} STREQUAL "Intel")
+    set(winteracter_LIBRARY_PATH ${WINTERACTER_ROOT}/lib.i64)
+  endif()
+endif()
+
+enable_language(RC)
 
 # Create the DASH executable target
 add_executable(DASH WIN32)
@@ -92,10 +108,22 @@ target_compile_options(DASH PRIVATE "/arch:SSE2")
   endif()
 endif()
 
+if(WIN32)
 target_link_libraries(
   DASH PRIVATE 
   winter.lib # Winteracter main library
 )
+else()
+  target_link_libraries(
+    DASH PRIVATE 
+    wint # Winteracter main library
+    ${MOTIF_LIBRARIES}
+    X11::Xmu
+    X11::Xft
+    X11::Xinerama
+    Fontconfig::Fontconfig
+  )
+endif()
 
 target_sources(
   DASH PRIVATE
@@ -210,7 +238,7 @@ target_sources(
   src/GLBVAR.INC
   src/Lattice.inc
   src/params.inc
-  src/POLY_COLOURS.INC
+  src/Poly_Colours.inc
   src/Reflns.inc
   src/SA_restrain.inc
   src/statlog.inc
@@ -248,14 +276,22 @@ install(
 )
 
 # Fetch current version of dash_requirements distribution from github
-set(DASH_REQUIREMENTS_BUILD "332413")
 set(DASH_REQUIREMENTS_BRANCH "2021.3")
 set(DASH_REQUIREMENTS_GITHUB_RELEASE "dash-requirements%2F2021.3")
-set(DASH_REQUIREMENTS_SHA256 "8752cdaca0cd549b2e9fbfa0931b5c98146adf4b6b2ff560f1a350fa5092bbcc")
+if(WIN32)
 set(DASH_REQUIREMENTS_PLATFORM "windows-dynamic-64")
+set(DASH_REQUIREMENTS_BUILD "332413")
+set(DASH_REQUIREMENTS_SHA256 "8752cdaca0cd549b2e9fbfa0931b5c98146adf4b6b2ff560f1a350fa5092bbcc")
+set(DASH_REQUIREMENTS_EXTENSION "7z")
+else()
+set(DASH_REQUIREMENTS_PLATFORM "linux-64")
+set(DASH_REQUIREMENTS_BUILD "332411")
+set(DASH_REQUIREMENTS_SHA256 "900eddb44c2a9b699447f1a2347f8b4ad1bd614a19b8036267a0dd134812e556")
+set(DASH_REQUIREMENTS_EXTENSION "tar.bz2")
+endif()
 FetchContent_Declare(
   dash_requirements
-  URL      "https://github.com/ccdc-opensource/dash/releases/download/${DASH_REQUIREMENTS_GITHUB_RELEASE}/dash_requirements-${DASH_REQUIREMENTS_BUILD}-${DASH_REQUIREMENTS_BRANCH}-${DASH_REQUIREMENTS_PLATFORM}.7z"
+  URL      "https://github.com/ccdc-opensource/dash/releases/download/${DASH_REQUIREMENTS_GITHUB_RELEASE}/dash_requirements-${DASH_REQUIREMENTS_BUILD}-${DASH_REQUIREMENTS_BRANCH}-${DASH_REQUIREMENTS_PLATFORM}.${DASH_REQUIREMENTS_EXTENSION}"
   URL_HASH "SHA256=${DASH_REQUIREMENTS_SHA256}"
 )
 FetchContent_MakeAvailable(dash_requirements)
