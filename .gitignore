@@ -3,3 +3,4 @@ build
 docs_dash_files
 .vs
 install
+*.mod

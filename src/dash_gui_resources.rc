@@ -8,7 +8,7 @@
 //
 // Winteracter resource script
 //
-// Modified : 28/Dec/2021 22:37:16
+// Modified : 28/Dec/2021 23:16:23
 //
 ///////////////////////////////////////////////////
 //
@@ -3999,5 +3999,5 @@ END
 //*WI* FORTSAVE    1
 //*WI* FILENAME    dash_gui_resources.f90
 //*WI* FMODNAME    dash_gui_resources
-//*WI* LASTTYPE    1
+//*WI* LASTTYPE    3
 //*WI* LASTRES     1

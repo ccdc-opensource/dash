@@ -57,8 +57,12 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/PCDash_Main.f90.in" "${CMAKE_CUR
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/src/variables.f90.in" "${CMAKE_CURRENT_BINARY_DIR}/src/variables.f90" @ONLY)
 
 # Select the right library directory based on the compiler
+set(DASH_RESOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/dash_gui_resources.rc)
 if(WIN32)
   set(WINTERACTER_ROOT "c:/wint" CACHE STRING "Location where winteracter is installed")
+  set(WINTERACTER_RC "${WINTERACTER_ROOT}/bin/rc.exe")
+  set(WINTERACTER_RC_ARGS "-i${WINTERACTER_ROOT}/include")
+  set(DASH_COMPILED_RESOURCE ${CMAKE_CURRENT_BINARY_DIR}/src/dash_gui_resources.obj)
   if(${CMAKE_Fortran_COMPILER_ID} STREQUAL "Intel")
     if (${CMAKE_Fortran_COMPILER_ARCHITECTURE_ID} STREQUAL "x64")
       set(winteracter_LIBRARY_PATH ${WINTERACTER_ROOT}/lib.i64)
@@ -214,9 +218,25 @@ target_sources(
   SGinc/ffcalctop.inc
 
   # Resources
-  src/dash_gui_resources.rc
-  # this file is generated from the file above but winteracter provide no way to generate it automatically
+  # this file is generated from src/dash_gui_resources.rc but winteracter provide no way to generate it automatically
   src/dash_gui_resources.f90
+  ${DASH_COMPILED_RESOURCE}
+)
+set_source_files_properties(
+  ${DASH_COMPILED_RESOURCE}
+  PROPERTIES
+  EXTERNAL_OBJECT true
+  GENERATED true
+)
+add_custom_command(
+  OUTPUT ${DASH_COMPILED_RESOURCE}
+  COMMAND ${WINTERACTER_RC} ${WINTERACTER_RC_ARGS} -o ${DASH_COMPILED_RESOURCE} ${DASH_RESOURCE}
+  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/src
+  DEPENDS ${WINTERACTER_RC}
+  MAIN_DEPENDENCY ${DASH_RESOURCE}
+  VERBATIM
+  COMMAND_EXPAND_LISTS
+  COMMENT "Compiling resource ${DASH_RESOURCE}"
 )
 
 # Installation section
