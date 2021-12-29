@@ -48,6 +48,7 @@
       CHARACTER(MaxPathLength) ::  FNAME
       DATA FNAME / ' ' /     ! Current filename
 
+      CHARACTER(MaxPathLength) ::  CurrentExecutableFullPath
       CHARACTER(MaxPathLength) ::  BinDirectory
       CHARACTER(MaxPathLength) ::  ShareDashDirectory
       CHARACTER(MaxPathLength) ::  DocumentationRoot
