@@ -301,18 +301,34 @@ install(
     DESTINATION ${CMAKE_INSTALL_BINDIR}/zmconv
 )
 
-FetchContent_Declare(
-  extinction_symbol_exe
-  URL      "https://github.com/ccdc-opensource/dash/releases/download/extinction_symbol_2009/ExtinctionSymbol.exe"
-  URL_HASH "SHA256=399353ca13a35f40c898973a1e19ebe7ce12642f2e672a485c731d0f42c6bb16"
-  DOWNLOAD_NO_EXTRACT YES
-)
-FetchContent_MakeAvailable(extinction_symbol_exe)
+if(WIN32)
+  FetchContent_Declare(
+    extinction_symbol_exe
+    URL      "https://github.com/ccdc-opensource/dash/releases/download/extinction_symbol_2009/ExtinctionSymbol.exe"
+    URL_HASH "SHA256=399353ca13a35f40c898973a1e19ebe7ce12642f2e672a485c731d0f42c6bb16"
+    DOWNLOAD_NO_EXTRACT YES
+  )
+  FetchContent_MakeAvailable(extinction_symbol_exe)
 
-install(
-    DIRECTORY   "${extinction_symbol_exe_SOURCE_DIR}/"
-    DESTINATION ${CMAKE_INSTALL_BINDIR}
-)
+  install(
+      DIRECTORY   "${extinction_symbol_exe_SOURCE_DIR}/"
+      DESTINATION ${CMAKE_INSTALL_BINDIR}
+  )
+endif()
+
+if(UNIX AND NOT APPLE)
+  FetchContent_Declare(
+    extinction_symbol
+    URL      "https://www.markvardsen.net/projects/download/ExtSym2008Linux32bit.tar.gz"
+    URL_HASH "SHA256=4eec93c1dd9f1aa94bee5eec8cdecfc19ece3acca60dda75d5bc197ed94b6239"
+  )
+  FetchContent_MakeAvailable(extinction_symbol)
+
+  install(
+      PROGRAMS "${extinction_symbol_SOURCE_DIR}/ExtSym"
+      DESTINATION ${CMAKE_INSTALL_BINDIR}
+  )
+endif()
 
 install(
     FILES       distribution/bin/RIETAN.cmd

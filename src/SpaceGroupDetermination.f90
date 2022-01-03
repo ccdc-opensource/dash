@@ -30,7 +30,11 @@
 
       INTEGER LatBrav, errcode
       CHARACTER(MaxPathLength) :: CurrentDirectory
-      CHARACTER(MaxPathLength), PARAMETER :: ExtSymEXE = 'ExtinctionSymbol'//CCDC_EXE_EXT
+#ifdef _WIN32
+      CHARACTER(MaxPathLength), PARAMETER :: ExtSymEXE = 'ExtinctionSymbol.exe'
+#else
+      CHARACTER(MaxPathLength), PARAMETER :: ExtSymEXE = 'ExtSym'
+#endif
       INTEGER IHANDLE
       REAL PawleyChiSqd
       REAL Correction
