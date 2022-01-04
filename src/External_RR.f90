@@ -545,14 +545,16 @@
       INTEGER hSP_in_file
       PARAMETER ( hSP_in_file = 115 )
       INTEGER ii
-#ifdef _WIN32
-      CHARACTER(MaxPathLength) tSpecialPositionsExe = '"'//TRIM(BinDirectory)//DIRSPACER//'zmconv'//DIRSPACER//'special_positions.exe"'
-#else
-      CHARACTER(MaxPathLength) tSpecialPositionsExe = '"'//TRIM(BinDirectory)//DIRSPACER//'zmconv'//DIRSPACER//'bin'//DIRSPACER//'special_positions"'
-#endif
+      CHARACTER(MaxPathLength) tSpecialPositionsExe
 
       ! Initialise to failure
       PutAtomsForSpecialPosition = .TRUE.
+
+#ifdef _WIN32
+      tSpecialPositionsExe = '"'//TRIM(BinDirectory)//DIRSPACER//'zmconv'//DIRSPACER//'special_positions.exe"'
+#else
+      tSpecialPositionsExe = '"'//TRIM(BinDirectory)//DIRSPACER//'zmconv'//DIRSPACER//'bin'//DIRSPACER//'special_positions"'
+#endif
 
       OPEN(UNIT=hSP_in_file, FILE="special_positions.in", STATUS='unknown', ERR=999)
       WRITE(hSP_in_file, '(A)', ERR=999) 'TOLE 0.15'

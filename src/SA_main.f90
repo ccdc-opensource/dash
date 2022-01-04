@@ -646,16 +646,17 @@
       CHARACTER*20 tExtraArg
       CHARACTER*80 errMessage;
       CHARACTER(MaxPathLength) tInputFile ! to resolve call by reference/value ambiguity
-#ifdef _WIN32
-      CHARACTER(MaxPathLength) tMakezmatrixExe = '"'//TRIM(BinDirectory)//DIRSPACER//'zmconv'//DIRSPACER//'makezmatrix.exe"'
-#else
-      CHARACTER(MaxPathLength) tMakezmatrixExe = '"'//TRIM(BinDirectory)//DIRSPACER//'zmconv'//DIRSPACER//'bin'//DIRSPACER//'makezmatrix"'
-#endif
-
+      CHARACTER(MaxPathLength) tMakezmatrixExe
 
       INTEGER iStat, iStart, I
 
       RunZmConv = .FALSE. ! Initialise to error
+
+#ifdef _WIN32
+      tMakezmatrixExe = '"'//TRIM(BinDirectory)//DIRSPACER//'zmconv'//DIRSPACER//'makezmatrix.exe"'
+#else
+      tMakezmatrixExe = '"'//TRIM(BinDirectory)//DIRSPACER//'zmconv'//DIRSPACER//'bin'//DIRSPACER//'makezmatrix"'
+#endif
 
       IF (CellOnly) THEN
         tExtraArg = ' -cell_only'
