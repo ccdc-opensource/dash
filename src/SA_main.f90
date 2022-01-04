@@ -646,7 +646,11 @@
       CHARACTER*20 tExtraArg
       CHARACTER*80 errMessage;
       CHARACTER(MaxPathLength) tInputFile ! to resolve call by reference/value ambiguity
-
+#ifdef _WIN32
+      CHARACTER(MaxPathLength) tMakezmatrixExe = '"'//TRIM(BinDirectory)//DIRSPACER//'zmconv'//DIRSPACER//'makezmatrix.exe"'
+#else
+      CHARACTER(MaxPathLength) tMakezmatrixExe = '"'//TRIM(BinDirectory)//DIRSPACER//'zmconv'//DIRSPACER//'bin'//DIRSPACER//'makezmatrix"'
+#endif
 
 
       INTEGER iStat, iStart, I
@@ -708,16 +712,14 @@
         IF (tInputFile(I:I) .EQ. DIRSPACER) iStart = I + 1
       ENDDO
       CALL WCursorShape(CurHourGlass)
-      CALL IOSCommand('"'//TRIM(BinDirectory)//DIRSPACER//'zmconv'//DIRSPACER// &
-        'makezmatrix'//CCDC_EXE_EXT//'" '// &
-        TRIM(fmt)//' "'//tInputFile(iStart:iLen)//'"'//TRIM(tExtraArg), ProcSilent+ProcBlocked)
+      CALL IOSCommand(tMakezmatrixExe//' '//TRIM(fmt)//' "'//tInputFile(iStart:iLen)//'"'//TRIM(tExtraArg), ProcSilent+ProcBlocked)
       iStat = WInfoError(1)
       CALL WCursorShape(CurCrossHair)
       IF (iStat .EQ. ErrOSCommand) THEN
 ! An error occurred
         iStat =  WInfoError(3)
         CALL WInfoErrorMessage(iStat,errMessage,2)
-        CALL ErrorMessage("Error occurred when running makezmatrix"//CCDC_EXE_EXT//" - "//errMessage(1:LEN(errMessage)))
+        CALL ErrorMessage("Error occurred when running "//tMakezmatrixExe//" - "//errMessage(1:LEN(errMessage)))
         GOTO 200
       ENDIF
       RunZmConv = .TRUE.

@@ -545,6 +545,11 @@
       INTEGER hSP_in_file
       PARAMETER ( hSP_in_file = 115 )
       INTEGER ii
+#ifdef _WIN32
+      CHARACTER(MaxPathLength) tSpecialPositionsExe = '"'//TRIM(BinDirectory)//DIRSPACER//'zmconv'//DIRSPACER//'special_positions.exe"'
+#else
+      CHARACTER(MaxPathLength) tSpecialPositionsExe = '"'//TRIM(BinDirectory)//DIRSPACER//'zmconv'//DIRSPACER//'bin'//DIRSPACER//'special_positions"'
+#endif
 
       ! Initialise to failure
       PutAtomsForSpecialPosition = .TRUE.
@@ -559,11 +564,9 @@
       CLOSE(hSP_in_file)
       ! Run the special positions program
       IF ( ISTOPAS ) THEN
-         CALL IOSCommand( TRIM(BinDirectory)//DIRSPACER//'zmconv'//DIRSPACER//'special_positions'//CCDC_EXE_EXT// &
-         ' "special_positions.in" "topas"', ProcSilent+ProcBlocked)      
+         CALL IOSCommand( tSpecialPositionsExe//' "special_positions.in" "topas"', ProcSilent+ProcBlocked)      
       ELSE
-         CALL IOSCommand( TRIM(BinDirectory)//DIRSPACER//'zmconv'//DIRSPACER//'special_positions'//CCDC_EXE_EXT// &
-         ' "special_positions.in"', ProcSilent+ProcBlocked)      
+         CALL IOSCommand( tSpecialPositionsExe//' "special_positions.in"', ProcSilent+ProcBlocked)      
       ENDIF
       PutAtomsForSpecialPosition = .FALSE.
 
