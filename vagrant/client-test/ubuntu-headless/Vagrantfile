@@ -1,0 +1,24 @@
+# you might have to
+# unset VAGRANT_SERVER_URL 
+# unset ATLAS_TOKEN  
+Vagrant.configure("2") do |config|
+  config.vm.hostname = "dash-client-ubuntu-headless"
+  config.vm.define "dash-client-ubuntu-headless"
+
+  config.vm.box = "bento/ubuntu-20.04"
+  config.vm.synced_folder "../../../", "/dash-code"
+
+  config.ssh.forward_agent = true
+  config.ssh.forward_x11 = true
+
+  config.vm.provider :virtualbox do |vb|
+    vb.gui = true
+    vb.name = "dash-client-ubuntu-headless"
+  
+    # Use VBoxManage to customize the VM. For example to change memory:
+    vb.customize ["modifyvm", :id, "--memory", "4096"]
+  end
+  config.vm.provision "shell", path: "../../scripts/ubuntu-initial.sh"
+  config.vm.provision "shell", path: "../../scripts/ubuntu-install-xauth.sh"
+  config.vm.provision "shell", path: "../../scripts/ubuntu-install-client-libraries.sh"
+end

@@ -2,6 +2,7 @@ bld
 build
 docs_dash_files
 .vs
+.vagrant
 install
 *.mod
 winteracter-linux*.tar.bz2
