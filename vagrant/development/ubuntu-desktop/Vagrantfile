@@ -18,9 +18,10 @@ Vagrant.configure("2") do |config|
   end
   config.vm.provision "shell", path: "../../scripts/ubuntu-initial.sh"
   config.vm.provision "shell", path: "../../scripts/ubuntu-install-development-environment.sh"
-  config.vm.provision "shell", path: "../../scripts/ubuntu-install-minimal-desktop.sh"
   if ENV['ARTIFACTORY_API_KEY']
     config.vm.provision "shell", path: "../../scripts/ubuntu-fetch-winteracter-ccdc-private.sh", args: ENV['ARTIFACTORY_API_KEY']
   end
+  # last one as it reboots
+  config.vm.provision "shell", path: "../../scripts/ubuntu-install-minimal-desktop.sh"
   
 end
