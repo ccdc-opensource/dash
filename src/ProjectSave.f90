@@ -415,7 +415,7 @@
 ! Must read/write hydrogen treatment first, because that is necessary to
 ! calculate the atomic weightings. This wasn't written out in version 3.0, so need
 ! to add a check.
-      IF ( (RW .EQ. cWrite) .OR. (MajorVersion .LE. 3 ) .OR. (MajorVersion .EQ. 3 .AND. MinorVersion .EQ. 0) ) THEN
+      IF ( (RW .EQ. cWrite) .OR. (MajorVersion .GT. 3 ) .OR. (MajorVersion .EQ. 3 .AND. MinorVersion .GT. 0) ) THEN
         IF ( .NOT. ForceOldVersion ) THEN
           CALL FileRWInteger(hPrjFile, iPrjRecNr, RW, HydrogenTreatment)
           IF ( BFIOErrorCode .EQ. 1 ) GOTO 999
