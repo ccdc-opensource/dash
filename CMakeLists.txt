@@ -33,12 +33,20 @@ if(WIN32)
 elseif(UNIX AND NOT APPLE)
   set(PACKAGE_PLATFORM "linux")
 endif()
+
+# Do not name the package DASH if you value your debian or ubuntu installation
+set(CPACK_DEBIAN_PACKAGE_NAME "dash-powder-diffraction")
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "zlib1g, libpng16-16, libx11-6, libxext6, libxm4, libxt6, libice6, libsm6, libxmu6, libxft2, libxrender1, libfreetype6, libfontconfig1, libxinerama1")
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER "admin@ccdc.cam.ac.uk")
+
 if($ENV{BUILD_NUMBER})
     set(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_NAME}-${DASH_VERSION}-$ENV{BUILD_NUMBER}-${PACKAGE_PLATFORM})
     set(CPACK_SOURCE_PACKAGE_FILE_NAME ${CPACK_PACKAGE_NAME}-${DASH_VERSION}-$ENV{BUILD_NUMBER})
+    set(CPACK_DEBIAN_FILE_NAME ${CPACK_DEBIAN_PACKAGE_NAME}-${DASH_VERSION}-$ENV{BUILD_NUMBER}-${PACKAGE_PLATFORM}.deb)
 else()
     set(CPACK_PACKAGE_FILE_NAME ${CPACK_PACKAGE_NAME}-${DASH_VERSION}-developer-build-${PACKAGE_PLATFORM})
     set(CPACK_SOURCE_PACKAGE_FILE_NAME ${CPACK_PACKAGE_NAME}-${DASH_VERSION}-developer-build)
+    set(CPACK_DEBIAN_FILE_NAME ${CPACK_DEBIAN_PACKAGE_NAME}-${DASH_VERSION}-developer-build-${PACKAGE_PLATFORM}.deb)
 endif()
 # set(CPACK_PACKAGE_INSTALL_DIRECTORY "")
 set(CPACK_PACKAGE_ICON ${CMAKE_CURRENT_SOURCE_DIR}/distribution/share/icons/dash/dash.ico)
@@ -49,10 +57,10 @@ set(CPACK_MONOLITHIC_INSTALL TRUE)
 set(CPACK_PACKAGE_EXECUTABLES dash;DASH)
 set(CPACK_VERBATIM_VARIABLES TRUE)
 if(WIN32)
-set(CPACK_WIX_UPGRADE_GUID "f45138d2-73a1-4f1b-9099-85ecadd4f86e")
-set(CPACK_GENERATOR "7Z;WIX")
+  set(CPACK_WIX_UPGRADE_GUID "f45138d2-73a1-4f1b-9099-85ecadd4f86e")
+  set(CPACK_GENERATOR "7Z;WIX")
 else()
-  set(CPACK_GENERATOR "7Z")
+  set(CPACK_GENERATOR "7Z;DEB")
 endif()
 
 include(CPack)
@@ -89,6 +97,7 @@ endif()
 enable_language(RC)
 
 # Create the DASH executable target
+# Do note that dash is the standard shell on debian/ubuntu so case is important
 add_executable(DASH WIN32)
 
 target_include_directories(
