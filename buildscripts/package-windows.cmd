@@ -1,9 +1,6 @@
 rmdir /Q /S dash
 rmdir /Q /S bld
 git clone ssh://git@github.com/ccdc-opensource/dash.git
-cd dash
-git checkout xmas_updates
-cd ..
 
 call "C:\Program Files (x86)\Intel\oneAPI\setvars.bat"
 
