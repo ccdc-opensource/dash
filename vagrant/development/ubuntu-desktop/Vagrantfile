@@ -16,11 +16,60 @@ Vagrant.configure("2") do |config|
     vb.customize ["modifyvm", :id, "--memory", "8182"]
     vb.customize ["modifyvm", :id, "--vram", "128"]
   end
+  config.vm.provider :vmware_fusion do |v, override|
+    v.gui = true
+    v.vmx["memsize"] = "8192"
+    v.vmx["numvcpus"] = "4"
+    v.vmx["mks.enable3d"] = "TRUE"
+  end
+
+  config.vm.provision "shell" do |s|
+    ssh_prv_key = ""
+    ssh_pub_key = ""
+    if File.file?("#{Dir.home}/.ssh/id_rsa")
+        ssh_prv_key = File.read("#{Dir.home}/.ssh/id_rsa")
+        ssh_pub_key = File.readlines("#{Dir.home}/.ssh/id_rsa.pub").first.strip
+        s.inline = <<-SHELL
+echo "SSH key provisioning: authorized keys."
+mkdir -p /home/vagrant/.ssh
+cat >> /home/vagrant/.ssh/authorized_keys <<EOF
+#{ssh_pub_key}
+EOF
+echo "SSH key provisioning: pub key."
+cat > /home/vagrant/.ssh/id_rsa.pub <<EOF
+#{ssh_pub_key}
+EOF
+
+echo "SSH key provisioning: private key."
+cat > /home/vagrant/.ssh/id_rsa <<EOF
+#{ssh_prv_key}
+EOF
+
+echo "SSH key provisioning: permissions."
+chown vagrant.vagrant /home/vagrant/.ssh/*
+chmod go-wx /home/vagrant/.ssh/authorized_keys 
+chmod go-rwx /home/vagrant/.ssh/id_rsa 
+            SHELL
+    else
+        puts "No SSH key found. You will need to remedy this before pushing to the repository."
+    end
+  end
+
   config.vm.provision "shell", path: "../../scripts/ubuntu-initial.sh"
   config.vm.provision "shell", path: "../../scripts/ubuntu-install-development-environment.sh"
   if ENV['ARTIFACTORY_API_KEY']
     config.vm.provision "shell", path: "../../scripts/ubuntu-fetch-winteracter-ccdc-private.sh", args: ENV['ARTIFACTORY_API_KEY']
   end
+
+  config.vm.provision "shell" do |s|
+    git_username = `git config --get user.name`.strip
+    git_email = `git config --get user.email`.strip
+    s.inline = <<-SHELL
+    git config --global user.name "#{git_username}"
+    git config --global user.email "#{git_email}"
+    SHELL
+  end
+
   # last one as it reboots
   config.vm.provision "shell", path: "../../scripts/ubuntu-install-minimal-desktop.sh"
   
