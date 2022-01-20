@@ -11,7 +11,7 @@ DASH has been successfully used to solve a diverse array of structure types incl
 
 ## System Requirements and Installation
 
-DASH runs under Windows 10 and 11.
+DASH runs under Windows 10 and 11. To install it go to https://github.com/ccdc-opensource/dash/releases and download and run the latest release installer. 
 
 Subscribers to the Cambridge Structural Database Portfolio benefit from direct links with Mogul for the automatic assessment and use of torsional restraints during structure solution. Biasing conformational searching towards torsion angle ranges commonly observed in crystal structures has been shown to give, on average, a 40% reduction in the number of moves required to solve the structure compared to unconstrained runs. This not only speeds up structure solution but can also make challenging problems tractable. For more information please visit the [CCDC website](https://www.ccdc.cam.ac.uk) or [email CCDC](mailto:admin@ccdc.cam.ac.uk).
 
