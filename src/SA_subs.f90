@@ -27,7 +27,7 @@
       SUBROUTINE SimulatedAnnealing
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE ATMVAR
       USE PO_VAR
@@ -899,7 +899,7 @@
       SUBROUTINE MAKXIN
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
    
       IMPLICIT NONE
 

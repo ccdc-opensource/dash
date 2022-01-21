@@ -148,7 +148,7 @@
 ! JvdS 17 July 2001
 !
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
 
       IMPLICIT NONE
@@ -179,7 +179,7 @@
 ! on the status bar and in the wizard.
 !
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -304,7 +304,7 @@
 ! When .TRUE., the cumulative chi-sqd is plotted
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -324,7 +324,7 @@
 ! When .TRUE., the points of the difference curve are divided by their ESDs
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -344,7 +344,7 @@
 ! When .TRUE., the profile chi**2 versus moves graph is written out to a file
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -372,7 +372,7 @@
 ! When .TRUE., the profile chi**2 versus moves graph is written out to a file
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -402,7 +402,7 @@
 ! When .TRUE., each run in a multi run ends with a local minimisation
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -444,7 +444,7 @@
 ! When .TRUE., each run in a multi run ends with a local minimisation
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -477,7 +477,7 @@
 ! When .TRUE., hydrogens are treated explicitly during auto local minimise
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -510,7 +510,7 @@
 ! each atom is weighted by the square of its number of electrons
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -541,7 +541,7 @@
 ! When .TRUE., the molecules of each solution in a multi run are set to a default position/orientation
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -589,7 +589,7 @@
 ! 2 = absorb
 ! 3 = explicit
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -642,7 +642,7 @@
 ! When .TRUE., a file in .pdb format is written out for each SA solution
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -671,7 +671,7 @@
 ! When .TRUE., a file in .pdb format is written out for each SA solution
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -701,7 +701,7 @@
 ! When .TRUE., a file containing the calculated profile is saved for each SA run
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -727,7 +727,7 @@
 ! When .TRUE., a file containing the calculated profile is saved for each SA run
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
       LOGICAL Setting
@@ -758,7 +758,7 @@
 ! When .TRUE., a file containing the calculated profile is saved for each SA run
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -786,7 +786,7 @@
 ! When .TRUE., a file containing the calculated profile is saved for each SA run
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -817,7 +817,7 @@
 ! When .TRUE., a file containing the calculated profile is saved for each SA run
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -843,7 +843,7 @@
 ! When .TRUE., a file containing the calculated profile is saved for each SA run
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -874,7 +874,7 @@
 ! When .TRUE., flexible torsions are coloured when viewing a Z-matrix
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -896,7 +896,7 @@
 ! files written and read by other programs.
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -919,7 +919,7 @@
 !           .FALSE. if user requested the error bars not to be plotted
 !
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -940,7 +940,7 @@
 !           .FALSE. if user requested the error bars not to be plotted
 !
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -961,7 +961,7 @@
 !           .FALSE. if user requested the error bars not to be plotted
 !
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -981,7 +981,7 @@
 !           .FALSE. if user requested the background not to be plotted
 !
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -1001,7 +1001,7 @@
 ! .TRUE. = when drawing the observed profile, the data points are joined by lines
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -1021,7 +1021,7 @@
 ! .TRUE. = when fitting peaks, the difference profile is plotted.
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -1041,7 +1041,7 @@
 ! When .TRUE., a file in .cssr format is written out for each SA solution
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -1069,7 +1069,7 @@
 ! When .TRUE., a file in .cssr format is written out for each SA solution
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -1102,7 +1102,7 @@
 ! When .TRUE., a file in .ccl format is written out for each SA solution
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -1130,7 +1130,7 @@
 ! When .TRUE., a file in .ccl format is written out for each SA solution
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -1160,7 +1160,7 @@
 ! When .TRUE., a file in .cif format is written out for each SA solution
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -1187,7 +1187,7 @@
 ! When .TRUE., a file in .cif format is written out for each SA solution
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -1218,7 +1218,7 @@
 ! When .TRUE., a file in .res format is written out for each SA solution
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -1245,7 +1245,7 @@
 ! When .TRUE., a file in .res format is written out for each SA solution
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -1273,7 +1273,7 @@
       SUBROUTINE Upload_ZeroPoint
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
 
       IMPLICIT NONE
@@ -1308,7 +1308,7 @@
 ! Puts the global variables CellPar(1:6) into the Winteracter menus
 !
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
 
       IMPLICIT NONE
@@ -1393,7 +1393,7 @@
       SUBROUTINE Download_Cell_Constants(IDownFrom)
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       INTEGER, INTENT (IN) :: IDownFrom
 
@@ -1420,7 +1420,7 @@
       SUBROUTINE DownLoadWavelength(From)
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       INTEGER, INTENT (IN   ) :: From
 
@@ -1494,7 +1494,7 @@
       SUBROUTINE Set_AnodeMaterial(IRadSelection)
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -1514,7 +1514,7 @@
       SUBROUTINE Upload_Wavelength
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -1561,7 +1561,7 @@
       SUBROUTINE Upload_Positions
 
       USE WINTERACTER
-      USE DRUID_HEADER 
+      USE dash_gui_resources 
       USE REFVAR
 
       IMPLICIT NONE
@@ -1753,7 +1753,7 @@
       SUBROUTINE Upload_Source
 
       USE WINTERACTER
-      USE DRUID_HEADER 
+      USE dash_gui_resources 
       USE VARIABLES
       USE TAVAR
 
@@ -1836,7 +1836,7 @@
 ! CellPar and updates other menus accordingly.
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -1941,7 +1941,7 @@
 ! only those space groups
 !
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
 
       IMPLICIT NONE
@@ -1985,7 +1985,7 @@
       SUBROUTINE Download_SpaceGroup(IUploadFrom)
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -2015,7 +2015,7 @@
       SUBROUTINE Upload_CrystalSystem
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
 
       IMPLICIT NONE
@@ -2203,7 +2203,7 @@
 ! If PawleyOn is zero then the Pawley fitting state is left as is
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -2245,7 +2245,7 @@
 ! updating the current mode in the menu and in the toolbar.
 !
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       
       IMPLICIT NONE
 
@@ -3260,7 +3260,7 @@
       SUBROUTINE Upload_SAParameters
       
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
 
       IMPLICIT NONE
@@ -3316,7 +3316,7 @@
  
       SUBROUTINE Upload_N1(TheValue)
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       
       INTEGER, INTENT(IN) :: TheValue
@@ -3327,7 +3327,7 @@
 
       SUBROUTINE Upload_N2(TheValue)
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       
       INTEGER, INTENT(IN) :: TheValue
@@ -3338,7 +3338,7 @@
 
       SUBROUTINE Upload_N1_N2_and_CoolingRate(N1,N2,CoolingRate)
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       INTEGER, INTENT(IN) :: N1
       INTEGER, INTENT(IN) :: N2
@@ -3387,7 +3387,7 @@
 
       SUBROUTINE Upload_MaxRuns(TheValue)
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       
       INTEGER, INTENT(IN) :: TheValue
@@ -3398,7 +3398,7 @@
 
       SUBROUTINE Upload_Seed1(TheValue)
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       
       INTEGER, INTENT(IN) :: TheValue
@@ -3409,7 +3409,7 @@
 
       SUBROUTINE Upload_Seed2(TheValue)
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       
       INTEGER, INTENT(IN) :: TheValue
@@ -3420,7 +3420,7 @@
 
       SUBROUTINE Upload_MaxMoves(TheValue)
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
 
       REAL, INTENT(IN) :: TheValue
@@ -3437,7 +3437,7 @@
       
       SUBROUTINE Upload_T0(TheValue)
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       
       REAL, INTENT(IN) :: TheValue
@@ -3449,7 +3449,7 @@
       
       SUBROUTINE Upload_CoolingRate(TheValue)
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       
       REAL, INTENT(IN) :: TheValue
@@ -3461,7 +3461,7 @@
       
       SUBROUTINE Upload_Multiplier(TheValue)
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       
       REAL, INTENT(IN) :: TheValue
@@ -3473,7 +3473,7 @@
         
       SUBROUTINE Upload_Integer_SA_input3(TheField,TheValue)
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
 
       IMPLICIT NONE
@@ -3496,7 +3496,7 @@
 
       SUBROUTINE Upload_Real_SA_input3(TheField,TheValue)
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
 
       IMPLICIT NONE
@@ -3520,7 +3520,7 @@
 
       SUBROUTINE Upload_AutoAlign(TheValue)
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       
       LOGICAL, INTENT(IN) :: TheValue
@@ -3531,7 +3531,7 @@
 
       SUBROUTINE Upload_AutoLocalMinimise(TheValue)
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       
       LOGICAL, INTENT(IN) :: TheValue
@@ -3542,7 +3542,7 @@
       
       SUBROUTINE Upload_UseCCOM(TheValue)
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       
       LOGICAL, INTENT(IN) :: TheValue
@@ -3553,7 +3553,7 @@
       
       SUBROUTINE Upload_UseHAutoMin(TheValue)
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       
       LOGICAL, INTENT(IN) :: TheValue
@@ -3564,7 +3564,7 @@
       
       SUBROUTINE Upload_SA_input4_checkbox(TheField,TheValue)
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
 
       IMPLICIT NONE
@@ -3775,7 +3775,7 @@
       SUBROUTINE SetTmpSaveFileName(tTmpSaveName)
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
            
       IMPLICIT NONE

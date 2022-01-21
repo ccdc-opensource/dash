@@ -27,7 +27,7 @@
       SUBROUTINE StartWizard
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -45,7 +45,7 @@
       SUBROUTINE WizardWindowHide
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
 
       IMPLICIT NONE
@@ -103,7 +103,7 @@
       SUBROUTINE WizardWindowShow(TheDialogID)
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE TAVAR
 
@@ -176,7 +176,7 @@
       SUBROUTINE EndWizard
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -206,7 +206,7 @@
 ! Effectively, this subroutine is supposed to be the inverse of ShowWizardWindowZmatrices
 !
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
 
       IMPLICIT NONE
@@ -309,7 +309,7 @@
 !
       SUBROUTINE DealWithMainWizardWindow
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
 
       IMPLICIT NONE
@@ -413,7 +413,7 @@
 !
       SUBROUTINE DealWithWizardWindowDiffractionFileInput
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE TAVAR
 
@@ -489,7 +489,7 @@
 !
       SUBROUTINE WizardApplyRebin
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -517,7 +517,7 @@
 !
       SUBROUTINE DealWithWizardWindowRebin
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE TAVAR
 
@@ -579,7 +579,7 @@
 !
 ! Effectively, the user is asked to provide / confirm the wavelength
 !
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE TAVAR
 
@@ -682,7 +682,7 @@
 !
       SUBROUTINE WizardApplyProfileRange
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
 
       IMPLICIT NONE
@@ -728,7 +728,7 @@
 !
       SUBROUTINE DealWithWizardWindowProfileRange
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE TAVAR
 
@@ -837,7 +837,7 @@
 !
       SUBROUTINE WizardApplyBackground
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
 
       IMPLICIT NONE
@@ -868,7 +868,7 @@
 !
       SUBROUTINE DealWithWizardWindowBackground
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE TAVAR
 
@@ -1017,7 +1017,7 @@
 !
       SUBROUTINE DealWithWizardWindowIndexing1
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
 
       IMPLICIT NONE
@@ -1092,7 +1092,7 @@
 !
       SUBROUTINE DealWithDICVOLRunning
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE DICVAR
 
@@ -1120,7 +1120,7 @@
 ! Called when DICVOL has finished searching a crystal system. Updates the
 ! "DICVOL Running..." dialogue.
 !
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE DICVAR
 
@@ -1166,7 +1166,7 @@
 !
       SUBROUTINE DealWithWizardWindowIndexing2
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE DICVAR
 
@@ -1419,7 +1419,7 @@
 !
       SUBROUTINE DealWithWizardWindowExtDICVOL
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE DICVAR
 
@@ -1906,7 +1906,7 @@
       SUBROUTINE DealWithWizardWindowDICVOLResults
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE DICVAR
 
@@ -1989,7 +1989,7 @@
       SUBROUTINE DealWithWizardWindowUnitCellParameters
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
 
       IMPLICIT NONE
@@ -2105,7 +2105,7 @@
       SUBROUTINE DealWithWizardWindowPawley1
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
 
       IMPLICIT NONE
@@ -2145,7 +2145,7 @@
 !
       SUBROUTINE DealWithWizardWindowMcMaille
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
 
       IMPLICIT NONE
@@ -2186,7 +2186,7 @@
 !
       LOGICAL FUNCTION LaunchMcMaille(Ngrid)
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE DICVAR
 

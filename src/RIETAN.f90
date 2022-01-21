@@ -26,7 +26,7 @@
       INTEGER FUNCTION Launch_RIETAN(input_file_name)
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE TAVAR
 
@@ -153,7 +153,7 @@
 !
       INTEGER FUNCTION SetOptions()
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -182,7 +182,7 @@
 !
       SUBROUTINE UpdateRIETANCheckBoxes
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE TAVAR
 
       IMPLICIT NONE
@@ -233,7 +233,7 @@
 ! in Wizard_routines.f90
       SUBROUTINE DealWithRR_RIETAN
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE TAVAR
 
@@ -276,7 +276,7 @@
 !
       INTEGER FUNCTION SetRefineParameters(TheFileName, OptWord)
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE WINTERACTER
       USE TAVAR
 
@@ -448,7 +448,7 @@
 !
       INTEGER FUNCTION WriteRIETANFiles(TheFileName)
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE ATMVAR
       USE ZMVAR

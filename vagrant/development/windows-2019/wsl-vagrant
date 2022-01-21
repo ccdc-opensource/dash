@@ -1,0 +1,12 @@
+#!/bin/bash
+if [ ! -d /mnt/d ]
+then
+    echo "Please mount the d: drive under /mnt/d"
+    echo "Instructions can be found in the README.md file"
+    exit 1
+fi
+
+export VAGRANT_WSL_ENABLE_WINDOWS_ACCESS="1"
+export PATH="$PATH:/mnt/c/Program Files/Oracle/VirtualBox"
+
+vagrant $@

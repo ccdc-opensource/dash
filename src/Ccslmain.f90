@@ -544,7 +544,7 @@
       SUBROUTINE ADJUST(PAR)
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 !
 ! *** ADJUST updated by JCM 11 Jan 88 ***
 !

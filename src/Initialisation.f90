@@ -24,34 +24,79 @@
 !
 !*****************************************************************************
 !
+#ifndef _WIN32
+      MODULE CCDC_LINUX_LIBC_BINDINGS
+      use ISO_C_BINDING
+      use IFPORT
+      INTERFACE
+            function readlink(path, buf, bufsize) bind(C, NAME = 'readlink')
+                  import
+                  integer(C_SIZE_T) :: readlink
+                  character(KIND = C_CHAR), intent(IN) :: path(*)
+                  character(KIND = C_CHAR) :: buf(*)
+                  integer(C_SIZE_T), value :: bufsize
+            end function
+      END INTERFACE
+      END MODULE CCDC_LINUX_LIBC_BINDINGS
+#endif
+
+      SUBROUTINE ReadCurrentExecutableFullPath()
+! Based on previous code and on idea from
+! https://community.intel.com/t5/Intel-Fortran-Compiler/How-to-get-an-executable-s-location/td-p/749967
+#ifdef _WIN32
+      USE KERNEL32
+#else
+      use ISO_C_BINDING
+      use IFPORT
+      use CCDC_LINUX_LIBC_BINDINGS
+#endif
+      USE VARIABLES
+
+      IMPLICIT NONE
+
+#ifdef _WIN32
+      INTEGER IDummy
+      INTEGER(4) tProcess, tSize
+      CHARACTER(MaxPathLength) tCurrentExecutable
+      tSize = MaxPathLength
+      IDummy = GetModuleFileName(tProcess, tCurrentExecutable, LOC(tSize))
+      CurrentExecutableFullPath = TRIM(tCurrentExecutable)
+#else
+
+      integer :: pid, i, idx
+      integer(C_SIZE_T) :: szret
+      character(MaxPathLength) :: path
+      character(KIND = C_CHAR) :: cbuf(MaxPathLength)
+      pid = GETPID()
+      write (path, '(i0)') pid
+      path = '/proc/'//TRIM(path)//'/exe'
+      szret = readlink(TRIM(path)//C_NULL_CHAR, cbuf, SIZE(cbuf, KIND = C_SIZE_T))
+      if (szret == -1) stop 'Error reading link'
+
+      path = ''
+      do i = 1, SIZE(cbuf)
+            if (cbuf(i) == C_NULL_CHAR) exit
+            path(i:i) = cbuf(i)
+      enddo
+      CurrentExecutableFullPath = TRIM(path)
+#endif
+      END SUBROUTINE ReadCurrentExecutableFullPath
+
       SUBROUTINE InitialisePathLookupVariables
  
       USE WINTERACTER
       USE VARIABLES
-#ifdef _WIN32
-      USE KERNEL32
-#endif
 
       IMPLICIT NONE
 
       CHARACTER(MaxPathLength) tInstallationDirectory
-      CHARACTER(MaxPathLength) tCurrentExecutable
       CHARACTER(MaxPathLength) tCurrentExecutableDirectory
       CHARACTER(MaxPathLength) tCurrentExecutableFileName
-      INTEGER*4 tProcess, tSize
-      INTEGER IDummy
-! Determine the directory where DASH.exe resides and store it in "BinDirectory"
-      tSize = MaxPathLength
-      tProcess = 0 ! this program
-#ifdef _WIN32
-      IDummy = GetModuleFileName(tProcess, tCurrentExecutable, LOC(tSize))
-#else
-      CALL GetArg(0, tCurrentExecutable)
-#endif
-      
+
+      CALL ReadCurrentExecutableFullPath()
 ! tCurrentExecutable should now contain the full path to DASH.exe irrespective of the way
 ! DASH has been invoked.
-      CALL SplitPath(tCurrentExecutable, tCurrentExecutableDirectory, tCurrentExecutableFileName)
+      CALL SplitPath(CurrentExecutableFullPath, tCurrentExecutableDirectory, tCurrentExecutableFileName)
       IF (LEN_TRIM(tCurrentExecutableDirectory) .EQ. 0) tCurrentExecutableDirectory = '.'
       
 ! Store the directory where DASH was invoked from      
@@ -127,7 +172,7 @@
       SUBROUTINE SelectDASHDialog(IDialogIdentifier)
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -144,7 +189,7 @@
       SUBROUTINE LoadDASHDialog(IDialogIdentifier)
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -194,7 +239,7 @@
       SUBROUTINE UnloadDASHDialog(IDialogIdentifier)
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -225,7 +270,7 @@
       SUBROUTINE InitialiseDASHDialogState
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -251,7 +296,7 @@
       SUBROUTINE PolyFitter_UploadDialogues
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -389,7 +434,7 @@
       SUBROUTINE InitialiseVariables(batch_setting)
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE ZMVAR
       USE REFVAR
@@ -802,7 +847,7 @@
 ! that DASH ignores the remainder of the configuration file. That's what it does at the moment.
 !
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE TAVAR
 
@@ -1071,7 +1116,7 @@
       SUBROUTINE ReadConfigurationFile
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE TAVAR
 

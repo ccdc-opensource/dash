@@ -28,7 +28,7 @@
       SUBROUTINE RefineLattice
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 #ifdef __G95__
       USE FOR_G95
 #endif

@@ -120,7 +120,7 @@
 !           FALSE for error
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE REFVAR
 
@@ -308,7 +308,7 @@
 ! radiation type/wavelength etc.
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 

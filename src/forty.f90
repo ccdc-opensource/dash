@@ -44,7 +44,7 @@
 !A        settings for this are CALPRM for magnetic, CALPR for non-magnetic.
 !
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 !

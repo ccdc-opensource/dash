@@ -1,0 +1,31 @@
+{
+    "configurations": [
+        {
+            "name": "Run dash",
+            "type": "cppdbg",
+            "request": "launch",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/install/bin",
+            "environment": [],
+            "linux": {
+                "program": "${workspaceFolder}/install/bin/DASH",
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "miDebuggerPath": "${workspaceFolder}/.devcontainer/gdb-oneapi",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    },
+                    {
+                        "description": "Disable target async",
+                        "text": "set target-async off",
+                        "ignoreFailures": true
+                    }
+                ]
+            }
+        }
+    ]
+}

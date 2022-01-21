@@ -27,7 +27,7 @@
       SUBROUTINE LaunchTutorial(Tutorial_ID)
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
 
       IMPLICIT NONE
@@ -38,12 +38,15 @@
       CHARACTER(MaxPathLength) DestineDir
       CHARACTER(2)             NumberStr
 
-      INTEGER d
+      CHARACTER(LEN=MaxPathLength), ALLOCATABLE, DIMENSION(:) :: tFileNames
+      CHARACTER(LEN=MaxPathLength) tCurrentFileName
+      INTEGER tNFiles, tFileIndex
 
       DestineDir = TRIM(AppDataDirectory)//DIRSPACER//'DASH_files'
       IF (.NOT. IOsDirExists(DestineDir)) CALL IOsDirMake(DestineDir)
       CALL WSelectDir(DirCreate, DestineDir, 'Directory to save tutorial files')
       IF (WInfoDialog(ExitButtonCommon) .NE. CommonOK .OR. LEN_TRIM(DestineDir) .LE. 0) RETURN
+      DestineDir = TRIM(DestineDir)//DIRSPACER
 
       SELECT CASE (Tutorial_ID)
         CASE (ID_Tutorial_1)
@@ -61,10 +64,28 @@
       END SELECT
 
       CALL IOsDirChange(TRIM(DocumentationRoot)//DIRSPACER//"tutorials"//DIRSPACER//"tutorial-"//NumberStr//DIRSPACER//"data")
-      CALL IOsCopyFile('*.xye',TRIM(DestineDir)//DIRSPACER)
-      CALL IOsCopyFile('*.raw',TRIM(DestineDir)//DIRSPACER)
-      CALL IOsCopyFile('*.mol2',TRIM(DestineDir)//DIRSPACER)
-      CALL IOsCopyFile('*.zmatrix',TRIM(DestineDir)//DIRSPACER)
+
+      CALL IOsDirCount('.','',tNFiles)
+      IF (tNFiles>0) THEN
+          ALLOCATE(tFileNames(tNFiles))
+          CALL IOsDirList('.','',tFileNames,tNFiles)
+          DO tFileIndex = 1,tNFiles
+            tCurrentFileName = TRIM(tFileNames(tFileIndex))
+            ! Match suffix
+            IF (tCurrentFileName(LEN_TRIM(tCurrentFileName)-len('.xye')+1:) == '.xye') THEN
+              CALL IOsCopyFile(tCurrentFileName, DestineDir)
+            END IF
+            IF (tCurrentFileName(LEN_TRIM(tCurrentFileName)-len('.raw')+1:) == '.raw') THEN
+              CALL IOsCopyFile(tCurrentFileName, DestineDir)
+            END IF
+            IF (tCurrentFileName(LEN_TRIM(tCurrentFileName)-len('.mol2')+1:) == '.mol2') THEN
+              CALL IOsCopyFile(tCurrentFileName, DestineDir)
+            END IF
+            IF (tCurrentFileName(LEN_TRIM(tCurrentFileName)-len('.zmatrix')+1:) == '.zmatrix') THEN
+              CALL IOsCopyFile(tCurrentFileName, DestineDir)
+            END IF
+          END DO
+      END IF
 
       CALL IOsOpenDocument("https://github.com/ccdc-opensource/dash/wiki/Tutorial"//TRIM(NumberStr))
 

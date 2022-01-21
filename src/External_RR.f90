@@ -26,7 +26,7 @@
       SUBROUTINE StartExternalRR
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE PO_VAR
       USE TAVAR
@@ -152,7 +152,7 @@
 !
       SUBROUTINE DealWithWizardExtRR
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE TAVAR
 
@@ -192,7 +192,7 @@
 !
       SUBROUTINE CopyPattern2Backup
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE TAVAR
       USE REFVAR
       USE PO_VAR
@@ -300,7 +300,7 @@
 !
       SUBROUTINE CopyBackup2Pattern
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE WINTERACTER
       USE TAVAR
       USE REFVAR
@@ -545,9 +545,16 @@
       INTEGER hSP_in_file
       PARAMETER ( hSP_in_file = 115 )
       INTEGER ii
+      CHARACTER(MaxPathLength) tSpecialPositionsExe
 
       ! Initialise to failure
       PutAtomsForSpecialPosition = .TRUE.
+
+#ifdef _WIN32
+      tSpecialPositionsExe = '"'//TRIM(BinDirectory)//DIRSPACER//'zmconv'//DIRSPACER//'special_positions.exe"'
+#else
+      tSpecialPositionsExe = '"'//TRIM(BinDirectory)//DIRSPACER//'zmconv'//DIRSPACER//'bin'//DIRSPACER//'special_positions"'
+#endif
 
       OPEN(UNIT=hSP_in_file, FILE="special_positions.in", STATUS='unknown', ERR=999)
       WRITE(hSP_in_file, '(A)', ERR=999) 'TOLE 0.15'
@@ -559,11 +566,9 @@
       CLOSE(hSP_in_file)
       ! Run the special positions program
       IF ( ISTOPAS ) THEN
-         CALL IOSCommand( TRIM(BinDirectory)//DIRSPACER//'zmconv'//DIRSPACER//'special_positions'//CCDC_EXE_EXT// &
-         ' "special_positions.in" "topas"', ProcSilent+ProcBlocked)      
+         CALL IOSCommand( tSpecialPositionsExe//' "special_positions.in" "topas"', ProcSilent+ProcBlocked)      
       ELSE
-         CALL IOSCommand( TRIM(BinDirectory)//DIRSPACER//'zmconv'//DIRSPACER//'special_positions'//CCDC_EXE_EXT// &
-         ' "special_positions.in"', ProcSilent+ProcBlocked)      
+         CALL IOSCommand( tSpecialPositionsExe//' "special_positions.in"', ProcSilent+ProcBlocked)      
       ENDIF
       PutAtomsForSpecialPosition = .FALSE.
 

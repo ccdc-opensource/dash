@@ -55,7 +55,7 @@
       SUBROUTINE PawleyWarning
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       INTEGER IRetVal, IHan
       CHARACTER*4 NextLine

@@ -27,7 +27,7 @@
       INTEGER FUNCTION WriteSAParametersToFile(TheFileName)
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE ZMVAR
       USE PO_VAR
@@ -181,7 +181,7 @@
 ! leaving the Z-matrices window, 2. when loading a project file.
 !
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE PO_VAR
       USE ZMVAR
@@ -454,7 +454,7 @@
       SUBROUTINE UpdateZmatrixSelection
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE ZMVAR
       USE ATMVAR
@@ -568,7 +568,7 @@
 
       SUBROUTINE UpdateConstraintsAndRestraints
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE ZMVAR
       USE ATMVAR
@@ -632,7 +632,7 @@
 ! The result of merging samilar code spreaded in three places 
       LOGICAL FUNCTION RunZmConv(TheInputFile, CellOnly)
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
 
       IMPLICIT NONE
@@ -646,12 +646,17 @@
       CHARACTER*20 tExtraArg
       CHARACTER*80 errMessage;
       CHARACTER(MaxPathLength) tInputFile ! to resolve call by reference/value ambiguity
-
-
+      CHARACTER(MaxPathLength) tMakezmatrixExe
 
       INTEGER iStat, iStart, I
 
       RunZmConv = .FALSE. ! Initialise to error
+
+#ifdef _WIN32
+      tMakezmatrixExe = '"'//TRIM(BinDirectory)//DIRSPACER//'zmconv'//DIRSPACER//'makezmatrix.exe"'
+#else
+      tMakezmatrixExe = '"'//TRIM(BinDirectory)//DIRSPACER//'zmconv'//DIRSPACER//'bin'//DIRSPACER//'makezmatrix"'
+#endif
 
       IF (CellOnly) THEN
         tExtraArg = ' -cell_only'
@@ -708,16 +713,14 @@
         IF (tInputFile(I:I) .EQ. DIRSPACER) iStart = I + 1
       ENDDO
       CALL WCursorShape(CurHourGlass)
-      CALL IOSCommand('"'//TRIM(BinDirectory)//DIRSPACER//'zmconv'//DIRSPACER// &
-        'makezmatrix'//CCDC_EXE_EXT//'" '// &
-        TRIM(fmt)//' "'//tInputFile(iStart:iLen)//'"'//TRIM(tExtraArg), ProcSilent+ProcBlocked)
+      CALL IOSCommand(tMakezmatrixExe//' '//TRIM(fmt)//' "'//tInputFile(iStart:iLen)//'"'//TRIM(tExtraArg), ProcSilent+ProcBlocked)
       iStat = WInfoError(1)
       CALL WCursorShape(CurCrossHair)
       IF (iStat .EQ. ErrOSCommand) THEN
 ! An error occurred
         iStat =  WInfoError(3)
         CALL WInfoErrorMessage(iStat,errMessage,2)
-        CALL ErrorMessage("Error occurred when running makezmatrix"//CCDC_EXE_EXT//" - "//errMessage(1:LEN(errMessage)))
+        CALL ErrorMessage("Error occurred when running "//tMakezmatrixExe//" - "//errMessage(1:LEN(errMessage)))
         GOTO 200
       ENDIF
       RunZmConv = .TRUE.

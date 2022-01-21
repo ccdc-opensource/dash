@@ -26,7 +26,7 @@
 !
       SUBROUTINE OpenChiSqPlotWindow
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE WINTERACTER
 
       IMPLICIT NONE
@@ -354,7 +354,7 @@
       SUBROUTINE DealWithChiSqdPlot
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
 
       IMPLICIT NONE
@@ -410,7 +410,7 @@
       SUBROUTINE Close_Chisq_Plot
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 

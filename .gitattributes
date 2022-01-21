@@ -1,0 +1,35 @@
+*.dat text eol=lf
+*.dsl text eol=lf
+*.duff text eol=lf
+*.f90 text eol=lf
+*.F90 text eol=lf
+*.hcv text eol=lf
+*.inc text eol=lf
+*.INC text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.mol2 text eol=lf
+*.pik text eol=lf
+*.ps1 text eol=lf
+*.rc text eol=lf
+*.sdi text eol=lf
+*.sh text eol=lf
+*.tcl text eol=lf
+*.tem text eol=lf
+*.tic text eol=lf
+*.txt text eol=lf
+*.xye text eol=lf
+*.zmatrix text eol=lf
+
+wsl-vagrant text eol=lf
+Vagrantfile text eol=lf
+
+*.bmp -text
+*.BMP -text
+*.dash -text
+*.gif -text
+*.icns -text
+*.ico -text
+*.png -text
+*.raw -text
+*.tif -text

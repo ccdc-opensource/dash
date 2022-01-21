@@ -25,7 +25,7 @@
 !
       SUBROUTINE Launch_TOPAS(input_file_name)
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE WINTERACTER
       USE TAVAR
 
@@ -103,7 +103,7 @@
 !
       INTEGER FUNCTION WriteTOPASFilePawley(TheFileName)
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE WINTERACTER
       USE VARIABLES
       USE TAVAR
@@ -319,7 +319,7 @@
 ! 
       SUBROUTINE UpdateTOPASCheckBoxes
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE TAVAR
 
@@ -416,7 +416,7 @@
 ! in Wizard_routines.f90
       SUBROUTINE DealWithRR_TOPAS
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE TAVAR
 
@@ -515,7 +515,7 @@
       ! next step could be Pawley refinement with anisotropic broadening.
       ! To be written out after "Strain_L". All other parameters remain variable.
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE ATMVAR
       USE ZMVAR
@@ -583,7 +583,7 @@
 ! This function reads and writes the file for Rietveld refinement (as opposed to Pawley).
       INTEGER FUNCTION WriteTOPASFileRietveld2(FileNameBase)
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE PO_VAR
       USE RRVAR
@@ -1085,7 +1085,7 @@
 ! This function backup/restore both .inp and .out files.
       INTEGER FUNCTION BackupRestorTopasFiles(FileName, Backup)
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
 
       IMPLICIT NONE

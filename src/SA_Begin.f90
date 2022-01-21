@@ -27,7 +27,7 @@
       SUBROUTINE BeginSA
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE PRJVAR
 
@@ -360,7 +360,7 @@
       SUBROUTINE InitRenormalisationLogicals
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE ZMVAR
 
       IMPLICIT NONE

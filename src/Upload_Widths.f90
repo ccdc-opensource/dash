@@ -27,7 +27,7 @@
       SUBROUTINE Upload_Widths
 
       USE WINTERACTER
-      USE DRUID_HEADER 
+      USE dash_gui_resources 
 
       IMPLICIT NONE
 

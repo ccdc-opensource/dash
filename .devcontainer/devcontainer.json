@@ -1,0 +1,24 @@
+{
+    "name": "linux environment for developing dash, works on linux hosts only due to use of X11 files",
+    "dockerFile": "Dockerfile",
+    "postCreateCommand": "bash .devcontainer/fetch-winteracter.sh",
+    "extensions": [
+        "ms-vscode.cpptools",
+        "ms-vscode.cmake-tools",
+        "intel-corporation.oneapi-gdb-debug",
+        "krvajalm.linter-gfortran",
+        "mhutchie.git-graph"
+    ],
+    "containerEnv": {
+        "ARTIFACTORY_API_KEY": "${localEnv:ARTIFACTORY_API_KEY}",
+        "DISPLAY": "unix:0"
+    },
+    "mounts": [
+        "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind,consistency=cached"
+    ],
+    "runArgs": [
+        "--cap-add=SYS_PTRACE",
+        "--security-opt",
+        "seccomp=unconfined"
+    ],
+}

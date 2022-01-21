@@ -27,7 +27,7 @@
       SUBROUTINE SA_OUTPUT(T,CHIMIN,CHIAV,CHIESD,dxvav,xvsig,flav,N,NUP,NDOWN,ntotmov)
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 

@@ -26,7 +26,7 @@
       SUBROUTINE DealWithWizardWindowSingleCrystalData1
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
 
       IMPLICIT NONE
@@ -107,7 +107,7 @@
       SUBROUTINE DealWithWizardWindowSingleCrystalData1a ! Resolution
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
 
       IMPLICIT NONE
@@ -146,7 +146,7 @@
       SUBROUTINE DealWithWizardWindowSingleCrystalData2
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
 
       IMPLICIT NONE
@@ -244,7 +244,7 @@
 ! 0 = OK
 ! 1 = error
 !
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE WINTERACTER
       USE VARIABLES
 
@@ -296,7 +296,7 @@
 ! 0 = OK
 ! 1 = error
 !
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE ATMVAR
       USE REFVAR
@@ -594,7 +594,7 @@
       SUBROUTINE FORORD(pname,filnmr,Keep)
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE REFVAR
       USE VARIABLES
 #ifdef __G95__

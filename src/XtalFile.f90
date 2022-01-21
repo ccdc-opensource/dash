@@ -109,7 +109,7 @@
 !           1 for error (could be file not found/file in use/no valid data/...)
 !
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE ZMVAR
       USE RRVAR
@@ -350,7 +350,7 @@
       SUBROUTINE UnitCellParametersFileLoad(TheFileName)
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
 
       IMPLICIT NONE

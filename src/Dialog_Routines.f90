@@ -26,7 +26,7 @@
 !
       SUBROUTINE UPLOAD_RANGE
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 

@@ -77,7 +77,7 @@
 !
       SUBROUTINE Update_Solutions
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE SOLVAR
 
       IMPLICIT NONE
@@ -159,7 +159,7 @@
 !
       SUBROUTINE Update_PO
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE PO_VAR
 
       IMPLICIT NONE
@@ -185,7 +185,7 @@
       SUBROUTINE Clear_PeakFitRanges
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -309,7 +309,7 @@
       SUBROUTINE Clear_SA
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE
 
@@ -339,7 +339,7 @@
 ! This routine should be called whenever a new pattern is loaded, so that can
 ! be a new powder pattern, a .sdi file or a .dash file
 
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
 
       IMPLICIT NONE

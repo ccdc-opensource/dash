@@ -317,7 +317,7 @@
       ! Fills COMMON block /SAOPT/ with values from GUI.
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
 
       IMPLICIT NONE   
 

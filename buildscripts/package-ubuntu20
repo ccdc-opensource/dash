@@ -1,0 +1,18 @@
+#!/bin/bash
+
+rm -rf dash
+rm -rf bld
+git clone ssh://git@github.com/ccdc-opensource/dash.git
+
+source /opt/intel/oneapi/setvars.sh
+
+cmake \
+    -G Ninja \
+    -S /dash-code \
+    -B bld \
+    -DWINTERACTER_ROOT=/opt/winteracter/winteracter-linux-14.10d \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_Fortran_COMPILER="/opt/intel/oneapi/compiler/latest/linux/bin/intel64/ifort" \
+    -DCMAKE_INSTALL_PREFIX=install
+
+cmake --build bld --target package

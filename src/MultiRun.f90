@@ -31,7 +31,7 @@
       SUBROUTINE Log_SARun_Entry
 
       USE WINTERACTER
-      USE DRUID_HEADER
+      USE dash_gui_resources
       USE VARIABLES
       USE SOLVAR
       USE ZMVAR
